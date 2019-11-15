@@ -219,6 +219,15 @@ namespace Moritz.Symbols
 			}
 		}
 
+		protected virtual void DrawRegionFrameConnector(SvgWriter w, FramedRegionInfoMetrics framedRegionInfoMetrics)
+		{			
+			float x = this.Metrics.OriginX;
+			float top = framedRegionInfoMetrics.Bottom;
+			float bottom = this.Metrics.Top;
+
+			w.SvgLine(CSSObjectClass.regionFrameConnector, x, top, x, bottom);
+		}
+
 		protected void SetDrawObjects(List<DrawObject> drawObjects)
 		{
 			DrawObjects.Clear();
@@ -387,6 +396,7 @@ namespace Moritz.Symbols
 
 			if(FramedRegionStartTextMetrics != null)
 			{
+				DrawRegionFrameConnector(w, FramedRegionStartTextMetrics);
 				FramedRegionStartTextMetrics.WriteSVG(w);
 			}
 		}
@@ -437,7 +447,8 @@ namespace Moritz.Symbols
 			{
 				if(drawObject is FramedRegionStartText frst)
 				{
-					FramedRegionStartTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo);
+					FramedRegionStartTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo, Gap);
+					RegionFrameConnectorMetrics = new RegionFrameConnectorMetrics(Barline_LineMetrics.OriginX, frst.FrameInfo.Bottom, Barline_LineMetrics.Top);
 					break;
 				}
 			}			
@@ -454,6 +465,7 @@ namespace Moritz.Symbols
 		}
 
 		public FramedRegionInfoMetrics FramedRegionStartTextMetrics = null;
+		public RegionFrameConnectorMetrics RegionFrameConnectorMetrics = null;
 	}
 
 	/// <summary>
@@ -498,6 +510,7 @@ namespace Moritz.Symbols
 
 			if(FramedRegionEndTextMetrics != null)
 			{
+				DrawRegionFrameConnector(w, FramedRegionEndTextMetrics);
 				FramedRegionEndTextMetrics.WriteSVG(w);
 			}
 		}
@@ -552,7 +565,8 @@ namespace Moritz.Symbols
 			{
 				if(drawObject is FramedRegionEndText frst)
 				{
-					FramedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo);
+					FramedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo, Gap);
+					RegionFrameConnectorMetrics = new RegionFrameConnectorMetrics(Barline_LineMetrics.OriginX, frst.FrameInfo.Bottom, Barline_LineMetrics.Top);
 					break;
 				}
 			}
@@ -564,6 +578,7 @@ namespace Moritz.Symbols
 		}
 
 		public FramedRegionInfoMetrics FramedRegionEndTextMetrics = null;
+		public RegionFrameConnectorMetrics RegionFrameConnectorMetrics = null;
 	}
 
 	/// <summary>_
@@ -610,6 +625,20 @@ namespace Moritz.Symbols
 		public override void WriteDrawObjectsSVG(SvgWriter w)
 		{
 			base.WriteDrawObjectsSVG(w);
+
+			FramedRegionInfoMetrics upperBox = null;
+			if(FramedRegionEndTextMetrics != null)
+			{
+				upperBox = FramedRegionEndTextMetrics;
+			}
+			if(FramedRegionStartTextMetrics != null)
+			{
+				upperBox = (upperBox != null && upperBox.Bottom < FramedRegionStartTextMetrics.Bottom) ? upperBox : FramedRegionStartTextMetrics;
+			}
+			if(upperBox != null)
+			{
+				DrawRegionFrameConnector(w, upperBox);
+			}
 
 			if(FramedRegionEndTextMetrics != null)
 			{
@@ -681,11 +710,15 @@ namespace Moritz.Symbols
 			{
 				if(drawObject is FramedRegionStartText frst)
 				{
-					FramedRegionStartTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo);
+					FramedRegionStartTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo, Gap);
+					if(RegionFrameConnectorMetrics == null)
+					{
+						RegionFrameConnectorMetrics = new RegionFrameConnectorMetrics(Barline_LineMetrics.OriginX, frst.FrameInfo.Bottom, Barline_LineMetrics.Top);
+					}
 				}
 				if(drawObject is FramedRegionEndText fret)
 				{
-					FramedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, fret.Texts, fret.FrameInfo);
+					FramedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, fret.Texts, fret.FrameInfo, Gap);
 				}
 			}
 		}
@@ -706,6 +739,7 @@ namespace Moritz.Symbols
 
 		public FramedRegionInfoMetrics FramedRegionStartTextMetrics = null;
 		public FramedRegionInfoMetrics FramedRegionEndTextMetrics = null;
+		public RegionFrameConnectorMetrics RegionFrameConnectorMetrics = null;
 	}
 
 	/// <summary>
@@ -757,7 +791,7 @@ namespace Moritz.Symbols
 			{
 				if(drawObject is FramedRegionEndText frst)
 				{
-					FramedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo);
+					FramedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo, Gap);
 					break;
 				}
 			}

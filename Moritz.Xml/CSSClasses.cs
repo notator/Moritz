@@ -111,6 +111,7 @@ namespace Moritz.Xml
 		endRegionBarline,
 		endAndStartRegionBarline,
 		endOfScoreBarline,
+		regionFrameConnector,
 		#endregion barlines
 	};
 

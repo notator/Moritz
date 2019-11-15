@@ -177,9 +177,11 @@ namespace Moritz.Symbols
 	// FramedRegionInfoMetrics(graphics, framedRegionEndText.Texts, framedRegionEndText.FrameInfo)
 	public class FramedRegionInfoMetrics : GroupMetrics
 	{
-		public FramedRegionInfoMetrics(Graphics graphics, List<Text> texts, FramePadding framePadding)
+		public FramedRegionInfoMetrics(Graphics graphics, List<Text> texts, FramePadding framePadding, float gap)
 			: base(CSSObjectClass.framedRegionInfo)
 		{
+			Gap = gap;
+
 			float maxWidth = 0F;
 			float nextTop = 0F;
 			
@@ -248,6 +250,20 @@ namespace Moritz.Symbols
 			}
 		}
 
+		/// <summary>
+		/// Moves this FramedRegionInfoMetrics object above the argument,
+		/// but only if they overlap horizontally.
+		/// </summary>
+		/// <param name="framedRegionInfoMetrics"></param>
+		internal void MoveAbove(FramedRegionInfoMetrics framedRegionInfoMetrics)
+		{
+			float verticalOverlap = this.OverlapHeight(framedRegionInfoMetrics, -1F);
+			if(verticalOverlap > 0F)
+			{
+				this.Move(0F, Bottom - (verticalOverlap - (2 * Gap)));
+			}
+		}
+
 		public override void WriteSVG(SvgWriter w)
 		{
 			w.SvgStartGroup(CSSObjectClass.ToString());
@@ -266,5 +282,7 @@ namespace Moritz.Symbols
 
 		List<TextMetrics> _textMetrics = new List<TextMetrics>();
 		List<string> _textStrings = new List<string>();
+
+		public float Gap { get; }
 	}
 }

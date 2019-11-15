@@ -949,9 +949,37 @@ namespace Moritz.Symbols
 					}
 				}
 			}
+
+			MoveFramedRegionTextsY(voice0NoteObjects);
 		}
 
-        private void AlignStaffnamesInLeftMargin(float leftMarginPos, float gap)
+		private void MoveFramedRegionTextsY(List<NoteObject> voice0NoteObjects)
+		{
+			List<FramedRegionInfoMetrics> fmt = new List<FramedRegionInfoMetrics>();
+
+			foreach(NoteObject noteObject in voice0NoteObjects)
+			{
+				if(noteObject is StartRegionBarline startRegionBarline)
+				{
+					fmt.Add(startRegionBarline.FramedRegionStartTextMetrics);
+				}
+				else if(noteObject is EndAndStartRegionBarline endAndStartRegionBarline)
+				{
+					fmt.Add(endAndStartRegionBarline.FramedRegionEndTextMetrics);
+					fmt.Add(endAndStartRegionBarline.FramedRegionStartTextMetrics);
+				}
+				else if(noteObject is EndRegionBarline endRegionBarline)
+				{
+					fmt.Add(endRegionBarline.FramedRegionEndTextMetrics);
+				}
+			}
+			for(int i = 1; i < fmt.Count; i++)
+			{
+				fmt[i].MoveAbove(fmt[i - 1]);
+			}
+		}
+
+		private void AlignStaffnamesInLeftMargin(float leftMarginPos, float gap)
         {
             foreach(Staff staff in Staves)
             {

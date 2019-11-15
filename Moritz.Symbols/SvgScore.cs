@@ -758,8 +758,8 @@ namespace Moritz.Symbols
             
             string strokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
             StringBuilder standardLineClasses = GetStandardLineClasses(usedCSSClasses, defineFlagStyle);
-            //".staffline, .ledgerline, .stem, .beam, .flag
-            lineStyles.Append($@"{standardLineClasses.ToString()}
+			//".staffline, .ledgerline, .stem, .beam, .flag, regionFrameConnector
+			lineStyles.Append($@"{standardLineClasses.ToString()}
             {{
                 stroke:black;
                 stroke-width:{strokeWidth}px;
@@ -767,14 +767,14 @@ namespace Moritz.Symbols
             }}
             ");
 
-            if(usedCSSClasses.Contains(CSSObjectClass.stem))
-            {
-                lineStyles.Append($@".stem
+			if(usedCSSClasses.Contains(CSSObjectClass.stem))
+			{
+				lineStyles.Append($@".stem
             {{
                 stroke-linecap:round                
             }}
             ");
-            }
+			}
 
 			if(usedCSSClasses.Contains(CSSObjectClass.normalBarline))
 			{
@@ -924,8 +924,8 @@ namespace Moritz.Symbols
         }
         private StringBuilder GetStandardLineClasses(List<CSSObjectClass> usedCSSClasses, bool defineFlagStyle)
         {
-            //.staffline, .ledgerline, .stem, .beam
-            StringBuilder rval = new StringBuilder();
+			//.staffline, .ledgerline, .stem, regionFrameConnector, .beam
+			StringBuilder rval = new StringBuilder();
             if(usedCSSClasses.Contains(CSSObjectClass.staff))
             {
 				ExtendRval(rval, ".staffline");
@@ -938,11 +938,15 @@ namespace Moritz.Symbols
             {
 				ExtendRval(rval, ".stem");
             }
-            if(usedCSSClasses.Contains(CSSObjectClass.beamBlock))
-            {
+			if(usedCSSClasses.Contains(CSSObjectClass.regionFrameConnector))
+			{
+				ExtendRval(rval, ".regionFrameConnector");
+			}
+			if(usedCSSClasses.Contains(CSSObjectClass.beamBlock))
+			{
 				ExtendRval(rval, ".beam");
-            }
-            if(defineFlagStyle)
+			}
+			if(defineFlagStyle)
             {
                 ExtendRval(rval, ".flag");
             }

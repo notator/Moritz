@@ -169,14 +169,35 @@ namespace Moritz.Symbols
 			_originY = originY;
 		}
 
-        /// <summary>
-        /// This function should never be called.
-        /// See Staff.WriteSVG(...).
-        /// </summary>
-        public override void WriteSVG(SvgWriter w)
-        {
-            throw new NotImplementedException();
-        }
+		/// <summary>
+		/// This function should never be called.
+		/// See Staff.WriteSVG(...).
+		/// </summary>
+		public override void WriteSVG(SvgWriter w)
+		{
+			throw new NotImplementedException();
+		}
+	}
+	public class RegionFrameConnectorMetrics : LineMetrics
+	{
+		public RegionFrameConnectorMetrics(float x, float top, float bottom)
+			: base(CSSObjectClass.regionFrameConnector, 0F, "black")
+		{
+			_left = x;
+			_right = x;
+			_top = top;
+			_bottom = bottom;
+			_originY = bottom;
+		}
+
+		/// <summary>
+		/// This function should never be called.
+		/// See Staff.WriteSVG(...).
+		/// </summary>
+		public override void WriteSVG(SvgWriter w)
+		{
+			throw new NotImplementedException();
+		}
 	}
 	/// <summary>
 	/// Notehead extender lines are used when chord symbols cross barlines.
