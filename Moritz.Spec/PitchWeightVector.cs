@@ -21,10 +21,10 @@ namespace Moritz.Spec
 		/// <param name="targetGamut">Must contain the pitch pitchVectorEndPoints.Item2</param>
 		/// <param name="pitchVectorEndPoints">All ints (both start and end pitches) are in range [0..127]</param>
 		/// <param name="steps">The number of PitchWeights in the constructed PitchWeights list. Must be greater than 0</param>
-		public PitchWeightVector(LongGamut startGamut, LongGamut targetGamut, Tuple<int, int> pitchVectorEndPoints, int steps)
+		public PitchWeightVector(Gamut startGamut, Gamut targetGamut, Tuple<int, int> pitchVectorEndPoints, int steps)
 		{
-			M.AssertRange0_127(pitchVectorEndPoints.Item1);
-			M.AssertRange0_127(pitchVectorEndPoints.Item2);
+			M.Assert(pitchVectorEndPoints.Item1 >= startGamut.MinPitch && pitchVectorEndPoints.Item1 <= startGamut.MaxPitch);
+			M.Assert(pitchVectorEndPoints.Item2 >= targetGamut.MinPitch && pitchVectorEndPoints.Item2 <= targetGamut.MaxPitch);
 			M.Assert(steps > 0);
 
 			int startPitch = pitchVectorEndPoints.Item1;

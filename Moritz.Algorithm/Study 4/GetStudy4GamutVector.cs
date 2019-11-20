@@ -51,36 +51,36 @@ namespace Moritz.Algorithm.Study4
 				{ 5, 43}, // pp
 				{ 9, 29}  // ppp
 			};
-			LongGamut gamut1 = new LongGamut(gamut1AbsPitchWeightDict);
-			LongGamut gamut2 = gamut1.Clone() as LongGamut;
+			Gamut gamut1 = new Gamut(gamut1AbsPitchWeightDict);
+			Gamut gamut2 = gamut1.Clone() as Gamut;
 			gamut2.Transpose(7);
-			LongGamut gamut3 = gamut2.Clone() as LongGamut;
+			Gamut gamut3 = gamut2.Clone() as Gamut;
 			gamut3.Transpose(7);
-			LongGamut gamut4 = gamut3.Clone() as LongGamut;
+			Gamut gamut4 = gamut3.Clone() as Gamut;
 			gamut4.Transpose(7);
-			LongGamut gamut5 = gamut4.Clone() as LongGamut;
+			Gamut gamut5 = gamut4.Clone() as Gamut;
 			gamut5.Transpose(7);
-			LongGamut gamut6 = gamut5.Clone() as LongGamut;
+			Gamut gamut6 = gamut5.Clone() as Gamut;
 			gamut6.Transpose(7);
-			LongGamut gamut7 = gamut6.Clone() as LongGamut;
+			Gamut gamut7 = gamut6.Clone() as Gamut;
 			gamut7.Transpose(7);
 
-			List<Tuple<LongGamut, LongGamut>> gamutsPerGamutVector = new List<Tuple<LongGamut, LongGamut>>
+			List<Tuple<Gamut, Gamut>> gamutsPerGamutVector = new List<Tuple<Gamut, Gamut>>
 			{
-				new Tuple<LongGamut, LongGamut>(gamut1, gamut1),
-				new Tuple<LongGamut, LongGamut>(gamut1, gamut2),
-				new Tuple<LongGamut, LongGamut>(gamut2, gamut1),
-				new Tuple<LongGamut, LongGamut>(gamut1, gamut3),
-				new Tuple<LongGamut, LongGamut>(gamut3, gamut1),
-				new Tuple<LongGamut, LongGamut>(gamut1, gamut4),
-				new Tuple<LongGamut, LongGamut>(gamut4, gamut1),
-				new Tuple<LongGamut, LongGamut>(gamut1, gamut5),
-				new Tuple<LongGamut, LongGamut>(gamut5, gamut1),
-				new Tuple<LongGamut, LongGamut>(gamut1, gamut6),
-				new Tuple<LongGamut, LongGamut>(gamut6, gamut1),
-				new Tuple<LongGamut, LongGamut>(gamut1, gamut7),
-				new Tuple<LongGamut, LongGamut>(gamut7, gamut1),
-				new Tuple<LongGamut, LongGamut>(gamut1, null)
+				new Tuple<Gamut, Gamut>(gamut1, gamut1),
+				new Tuple<Gamut, Gamut>(gamut1, gamut2),
+				new Tuple<Gamut, Gamut>(gamut2, gamut1),
+				new Tuple<Gamut, Gamut>(gamut1, gamut3),
+				new Tuple<Gamut, Gamut>(gamut3, gamut1),
+				new Tuple<Gamut, Gamut>(gamut1, gamut4),
+				new Tuple<Gamut, Gamut>(gamut4, gamut1),
+				new Tuple<Gamut, Gamut>(gamut1, gamut5),
+				new Tuple<Gamut, Gamut>(gamut5, gamut1),
+				new Tuple<Gamut, Gamut>(gamut1, gamut6),
+				new Tuple<Gamut, Gamut>(gamut6, gamut1),
+				new Tuple<Gamut, Gamut>(gamut1, gamut7),
+				new Tuple<Gamut, Gamut>(gamut7, gamut1),
+				new Tuple<Gamut, Gamut>(gamut1, null)
 
 			};
 
@@ -147,7 +147,7 @@ namespace Moritz.Algorithm.Study4
 		/// </summary>
 		/// <param name="gamutsPerGamutVector"></param>
 		/// <param name="pitchVectorEndPointsPerGamutVector"></param>
-		private void AssertConsistency(List<Tuple<LongGamut, LongGamut>> gamutsPerGamutVector, List<List<int>> pitchVectorEndPointsPerGamutVector)
+		private void AssertConsistency(List<Tuple<Gamut, Gamut>> gamutsPerGamutVector, List<List<int>> pitchVectorEndPointsPerGamutVector)
 		{
 			int nEntries = pitchVectorEndPointsPerGamutVector.Count;
 			M.Assert(nEntries == gamutsPerGamutVector.Count); // condition 1

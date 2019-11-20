@@ -18,11 +18,11 @@ namespace Moritz.Algorithm.Study4
 		public void Tests()
 		{
 			#region Gamut test1
-			HashSet<int> absPitchSet1_Start = new HashSet<int>() { 0, 4, 2, 11 };
+			var absPitchSet1_Start = new List<int>() { 0, 2, 4, 11 };
 			StandardGamut test1_StartGamut = new StandardGamut(0, 0, absPitchSet1_Start);
 
-			HashSet<int> absPitchSet1_Target = new HashSet<int>() { 7, 0, 11, 9, 6 };
-			StandardGamut test1_TargetGamut = new StandardGamut(0, 0,absPitchSet1_Target);
+			var absPitchSet1_Target = new List<int>() { 0, 6, 7, 9, 11 };
+			StandardGamut test1_TargetGamut = new StandardGamut(0, 0, absPitchSet1_Target);
 
 			//All ints (both pitches and weights) must be in range [0..127]
 			List<Tuple<int, int>> test1_PitchVectorEndPoints = new List<Tuple<int, int>>()
@@ -43,7 +43,7 @@ namespace Moritz.Algorithm.Study4
 				{1, 100 },
 				{5, 100 }
 			};
-			LongGamut test2_StartGamut = new LongGamut(test2_StartAbsPitchWeightDict);
+			Gamut test2_StartGamut = new Gamut(test2_StartAbsPitchWeightDict);
 
 			Dictionary<int, int> test2_TargetAbsPitchWeightDict = new Dictionary<int, int>()
 			{
@@ -51,7 +51,7 @@ namespace Moritz.Algorithm.Study4
 				{8, 50 },
 				{9, 50 }
 			};
-			LongGamut test2_TargetGamut = new LongGamut(test2_TargetAbsPitchWeightDict);
+			Gamut test2_TargetGamut = new Gamut(test2_TargetAbsPitchWeightDict);
 
 			List<Tuple<int, int>> test2_PitchVectorEndPoints = new List<Tuple<int, int>>()
 			{
@@ -76,7 +76,7 @@ namespace Moritz.Algorithm.Study4
 				{2, 100 },
 				{3, 100 }
 			};
-			LongGamut test3_StartGamut = new LongGamut(test3_StartAbsPitchWeightDict);
+			Gamut test3_StartGamut = new Gamut(test3_StartAbsPitchWeightDict);
 
 			Dictionary<int, int> test3_TargetAbsPitchWeightDict = new Dictionary<int, int>()
 			{
@@ -84,7 +84,7 @@ namespace Moritz.Algorithm.Study4
 				{8, 50 },
 				{9, 50 }
 			};
-			LongGamut test3_TargetGamut = new LongGamut(test3_TargetAbsPitchWeightDict);
+			Gamut test3_TargetGamut = new Gamut(test3_TargetAbsPitchWeightDict);
 
 			List<Tuple<int, int>> test3_PitchVectorEndPoints = new List<Tuple<int, int>>()
 			{
