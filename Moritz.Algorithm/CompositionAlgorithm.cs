@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
+using Moritz.Globals;
 using Moritz.Palettes;
 using Moritz.Spec;
 using Moritz.Symbols;
@@ -103,7 +104,7 @@ namespace Moritz.Algorithm
 
 		protected Palette GetPaletteByName(string paletteName)
         {
-            Debug.Assert(_palettes != null && _palettes.Count > 0);
+            M.Assert(_palettes != null && _palettes.Count > 0);
             Palette rval = null;
             foreach(Palette palette in _palettes)
             {
@@ -113,7 +114,7 @@ namespace Moritz.Algorithm
                     break;
                 }
             }
-            Debug.Assert(rval != null);
+            M.Assert(rval != null);
             return rval;
         }
 
@@ -350,7 +351,7 @@ namespace Moritz.Algorithm
 		/// <summary>
 		/// Returns nBars barlineMsPositions.
 		/// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef.
-		/// The returned list contains no duplicates (A Debug.Assertion fails otherwise).
+		/// The returned list contains no duplicates (A M.Assertion fails otherwise).
 		/// </summary>
 		/// <returns></returns>
 		/// <param name="trks"></param>
@@ -372,7 +373,7 @@ namespace Moritz.Algorithm
 			int msDuration = voiceDefs[0].MsDuration;
 
 			double approxBarMsDuration = (((double)msDuration) / nBars);
-			Debug.Assert(approxBarMsDuration * nBars == msDuration);
+			M.Assert(approxBarMsDuration * nBars == msDuration);
 
 			List<int> barlineMsPositions = new List<int>();
 
@@ -381,11 +382,11 @@ namespace Moritz.Algorithm
 				double approxBarMsPosition = approxBarMsDuration * barNumber;
 				int barMsPosition = NearestAbsUIDEndMsPosition(voiceDefs, approxBarMsPosition);
 
-				Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
+				M.Assert(barlineMsPositions.Contains(barMsPosition) == false);
 
 				barlineMsPositions.Add(barMsPosition);
 			}
-			Debug.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == msDuration);
+			M.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == msDuration);
 
 			return barlineMsPositions;
 		}
@@ -419,13 +420,13 @@ namespace Moritz.Algorithm
 
 		private void InsertClefChangesInBars(List<Bar> bars, List<List<SortedDictionary<int, string>>> clefChangesPerBar)
 		{
-			Debug.Assert(bars.Count == clefChangesPerBar.Count);
+			M.Assert(bars.Count == clefChangesPerBar.Count);
 
 			for(int i = 0; i < bars.Count; i++)
 			{
 				List<VoiceDef> barVoiceDefs = bars[i].VoiceDefs;
 				List<SortedDictionary<int, string>> clefChangesPerVoiceDef = clefChangesPerBar[i];
-				Debug.Assert(barVoiceDefs.Count == clefChangesPerVoiceDef.Count);
+				M.Assert(barVoiceDefs.Count == clefChangesPerVoiceDef.Count);
 				for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
 				{
 					SortedDictionary<int, string> clefChanges = clefChangesPerVoiceDef[voiceDefIndex];
@@ -456,13 +457,13 @@ namespace Moritz.Algorithm
 
 		private void AddLyricsToBars(List<Bar> bars, List<List<SortedDictionary<int, string>>> lyricsPerBar)
 		{
-			Debug.Assert(bars.Count == lyricsPerBar.Count);
+			M.Assert(bars.Count == lyricsPerBar.Count);
 
 			for(int i = 0; i < bars.Count; i++)
 			{
 				List<VoiceDef> barVoiceDefs = bars[i].VoiceDefs;
 				List<SortedDictionary<int, string>> lyricsPerVoiceDef = lyricsPerBar[i];
-				Debug.Assert(barVoiceDefs.Count == lyricsPerVoiceDef.Count);
+				M.Assert(barVoiceDefs.Count == lyricsPerVoiceDef.Count);
 				for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
 				{
 					VoiceDef voiceDef = barVoiceDefs[voiceDefIndex];
@@ -486,7 +487,7 @@ namespace Moritz.Algorithm
 							mcds.Add(mcd);
 						}
 					}
-					Debug.Assert(lyrics.Count <= mcds.Count);
+					M.Assert(lyrics.Count <= mcds.Count);
 					foreach(int key in lyrics.Keys)
 					{
 						mcds[key].Lyric = lyrics[key];
@@ -494,7 +495,7 @@ namespace Moritz.Algorithm
 				}
 				else
 				{
-					Debug.Assert(voiceDef is InputVoiceDef);
+					M.Assert(voiceDef is InputVoiceDef);
 					var icds = new List<InputChordDef>();
 					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
 					{
@@ -503,7 +504,7 @@ namespace Moritz.Algorithm
 							icds.Add(icd);
 						}
 					}
-					Debug.Assert(lyrics.Count <= icds.Count);
+					M.Assert(lyrics.Count <= icds.Count);
 					foreach(int key in lyrics.Keys)
 					{
 						icds[key].Lyric = lyrics[key];
@@ -551,7 +552,7 @@ namespace Moritz.Algorithm
 			public override void AssertConsistency()
 			{
 				base.AssertConsistency();
-				Debug.Assert(AbsMsPosition == 0);
+				M.Assert(AbsMsPosition == 0);
 
 				#region At least one Trk must end with a MidiChordDef.
 				IReadOnlyList<Trk> trks = Trks;
@@ -566,7 +567,7 @@ namespace Moritz.Algorithm
 						break;
 					}
 				}
-				Debug.Assert(endFound, "MidiChordDef not found at end.");
+				M.Assert(endFound, "MidiChordDef not found at end.");
 				#endregion
 			}
 
@@ -600,15 +601,15 @@ namespace Moritz.Algorithm
 					Bar poppedBar = rTuple.Item1;
 					remainingBar = rTuple.Item2; // null after the last pop.
 
-					Debug.Assert(poppedBar.MsDuration == barMsDuration);
+					M.Assert(poppedBar.MsDuration == barMsDuration);
 					if(remainingBar != null)
 					{
-						Debug.Assert(poppedBar.MsDuration + remainingBar.MsDuration == totalDurationBeforePop);
+						M.Assert(poppedBar.MsDuration + remainingBar.MsDuration == totalDurationBeforePop);
 						totalDurationBeforePop = remainingBar.MsDuration;
 					}
 					else
 					{
-						Debug.Assert(poppedBar.MsDuration == totalDurationBeforePop);
+						M.Assert(poppedBar.MsDuration == totalDurationBeforePop);
 					}
 
 					bars.Add(poppedBar);
@@ -630,7 +631,7 @@ namespace Moritz.Algorithm
 			/// <returns>The popped bar</returns>
 			private Tuple<Bar, Bar> PopBar(Bar bar, int barMsDuration)
 			{
-				Debug.Assert(barMsDuration > 0);
+				M.Assert(barMsDuration > 0);
 
 				if(barMsDuration == bar.MsDuration)
 				{
@@ -701,7 +702,7 @@ namespace Moritz.Algorithm
 							}
 							else if(iud is CautionaryChordDef)
 							{
-								Debug.Assert(false, "There shouldnt be any cautionary chords here.");
+								M.Assert(false, "There shouldnt be any cautionary chords here.");
 								// This error can happen if an attempt is made to set barlines too close together,
 								// i.e. (I think) if an attempt is made to create a bar that contains nothing... 
 							}
@@ -711,14 +712,14 @@ namespace Moritz.Algorithm
 								uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
 								poppedBarVoice.UniqueDefs.Add(uniqueChordDef);
 
-								Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
+								M.Assert(remainingBarVoice.UniqueDefs.Count == 0);
 								CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
 								remainingBarVoice.UniqueDefs.Add(ccd);
 							}
 						}
 						else
 						{
-							Debug.Assert(iudEndPos <= barMsDuration && iudStartPos >= 0);
+							M.Assert(iudEndPos <= barMsDuration && iudStartPos >= 0);
 							poppedBarVoice.UniqueDefs.Add(iud);
 						}
 					}
@@ -747,23 +748,23 @@ namespace Moritz.Algorithm
 			/// </summary>
 			private void CheckBarlineMsPositions(IReadOnlyList<int> barlineMsPositionsReThisBar)
 			{
-				Debug.Assert(barlineMsPositionsReThisBar[0] > 0, "The first msPosition must be greater than 0.");
+				M.Assert(barlineMsPositionsReThisBar[0] > 0, "The first msPosition must be greater than 0.");
 
 				int msDuration = this.MsDuration;
 				for(int i = 0; i < barlineMsPositionsReThisBar.Count; ++i)
 				{
 					int msPosition = barlineMsPositionsReThisBar[i];
-					Debug.Assert(msPosition <= this.MsDuration);
+					M.Assert(msPosition <= this.MsDuration);
 					for(int j = i + 1; j < barlineMsPositionsReThisBar.Count; ++j)
 					{
-						Debug.Assert(msPosition != barlineMsPositionsReThisBar[j], "Error: Duplicate barline msPositions.");
+						M.Assert(msPosition != barlineMsPositionsReThisBar[j], "Error: Duplicate barline msPositions.");
 					}
 				}
 
 				int currentMsPos = -1;
 				foreach(int msPosition in barlineMsPositionsReThisBar)
 				{
-					Debug.Assert(msPosition > currentMsPos, "Value out of order.");
+					M.Assert(msPosition > currentMsPos, "Value out of order.");
 					currentMsPos = msPosition;
 					bool found = false;
 					bool inputVoiceDefFound = false;
@@ -771,7 +772,7 @@ namespace Moritz.Algorithm
 					{
 						VoiceDef voiceDef = _voiceDefs[i];
 
-						Debug.Assert(voiceDef.MsPositionReContainer == 0);
+						M.Assert(voiceDef.MsPositionReContainer == 0);
 						if(voiceDef is InputVoiceDef)
 						{
 							inputVoiceDefFound = true;
@@ -795,25 +796,25 @@ namespace Moritz.Algorithm
 					}
 					if(inputVoiceDefFound)
 					{
-						Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef in an InputVoiceDef.");
+						M.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef in an InputVoiceDef.");
 					}
 					else
 					{
-						Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef in a Trk.");
+						M.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef in a Trk.");
 					}
 				}
 			}
 
 			public void AddInputVoice(InputVoiceDef ivd)
 			{
-				Debug.Assert((ivd.MsPositionReContainer + ivd.MsDuration) <= MsDuration);
-				Debug.Assert(ivd.MidiChannel >= 0 && ivd.MidiChannel <= 3);
+				M.Assert((ivd.MsPositionReContainer + ivd.MsDuration) <= MsDuration);
+				M.Assert(ivd.MidiChannel >= 0 && ivd.MidiChannel <= 3);
 				#region check for an existing InputVoiceDef having the same MidiChannel
 				foreach(VoiceDef voiceDef in _voiceDefs)
 				{
 					if(voiceDef is InputVoiceDef existingInputVoiceDef)
 					{
-						Debug.Assert(existingInputVoiceDef.MidiChannel != ivd.MidiChannel, "Error: An InputVoiceDef with the same MidiChannel already exists.");
+						M.Assert(existingInputVoiceDef.MidiChannel != ivd.MidiChannel, "Error: An InputVoiceDef with the same MidiChannel already exists.");
 					}
 				}
 				#endregion
