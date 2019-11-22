@@ -1,4 +1,5 @@
-﻿using Moritz.Spec;
+﻿using Moritz.Globals;
+using Moritz.Spec;
 using System.Collections.Generic;
 
 namespace Moritz.Algorithm.Study4
@@ -7,84 +8,93 @@ namespace Moritz.Algorithm.Study4
 	{
 		private void GetTrksAndBarlines(GamutVector gamutVector, out List<Trk> trks, out List<int> barlineMsPositions)
 		{
-			const int barChordDuration = 1000; //ms
-			const int relativePitch = 60; // added to the pitch values in the PitchWeightVectors to find the pitches in the Trks
-			trks = GetTrks(gamutVector.PitchWeightVectors, relativePitch, barChordDuration);
-
+			trks = new List<Trk>();
 			barlineMsPositions = new List<int>();
-			foreach(var uid in trks[0].UniqueDefs)
+			for(int i = 0; i < this.MidiChannelPerOutputVoice.Count; i++)
 			{
-				barlineMsPositions.Add(uid.MsPositionReFirstUD + barChordDuration);
+				trks.Add(new Trk(i));
+			}
+
+			List<List<Trk>> trkListList = GetTrkListList(gamutVector.PitchWeightVectors, out barlineMsPositions);
+
+			for(int i = 0; i < trkListList.Count; i++)
+			{
+				var trkList = trkListList[i];
+				var currentMsPos = 0;
+				foreach(Trk barTrk in trkList)
+				{
+					trks[i].ConcatCloneAt(barTrk, currentMsPos);
+
+					currentMsPos += barTrk.MsDuration;
+					M.Assert(barlineMsPositions.Contains(currentMsPos));
+				}
 			}
 		}
 
 		/// <summary>
-		/// Creates a list of 8 Trks, each of which contains 55 (=each pitchList.Count) MidiChordDefs.
-		/// Each MidiChorddef has a duration of 1000ms. There is going to be 1 MidiChordDef per Bar.
-		/// The last Trk is a tutti trk: each MidiChordDef contains all the pitches in the above Trks once.
-		/// If a pitch would occur more than once in a tutti chord, then it occurs once with the largest
-		/// velocity of any duplicated pitch.
+		/// Creates a list of 8 parallel Trk lists, each of which contains 55 Trks (=Bars).
 		/// </summary>
 		/// <param name="pitchVectors"></param>
 		/// <returns></returns>
-		private List<Trk> GetTrks(IReadOnlyList<PitchWeightVector> pitchVectors, int relativePitch, int barChordDuration)
+		private List<List<Trk>> GetTrkListList(IReadOnlyList<PitchWeightVector> pitchVectors, out List<int> barlineMsPositions)
 		{
-			List<Trk> trks = new List<Trk>();
-			int channel = 0;
-			foreach(var pitchVector in pitchVectors)
+			const int minBarMsDuration = 5000;
+			var nBars = pitchVectors[0].PitchWeights.Count;
+			var nChannels = this.MidiChannelPerOutputVoice.Count;
+			var palette = _palettes[0];
+			//var nMidiChordDefs = palette.Count;
+			//var midiChordDef = palette.MidiChordDef(0);
+			//var basicMidiChordDef = midiChordDef.BasicMidiChordDefs[0];
+
+			List<List<Trk>> trkListList = new List<List<Trk>>();
+			for(var channel = 0; channel < nChannels; ++channel)
 			{
-				Trk trk = new Trk(channel++);
-				IReadOnlyList<PitchWeight> pitchWeights = pitchVector.PitchWeights;
-				foreach(var def in pitchVector.PitchWeights)
-				{
-					List<byte> pitches = new List<byte>() { (byte)(def.Pitch + relativePitch) };
-					List<byte> velocities = new List<byte>() { (byte)def.Weight };
-					IUniqueDef midiChordDef = new MidiChordDef(pitches, velocities, barChordDuration, true);
-					trk.Add(midiChordDef);
-				}
-
-				trks.Add(trk);
+				trkListList.Add(new List<Trk>());
 			}
-			// now create the bottom, tutti Trk
-			int nChords = pitchVectors[0].PitchWeights.Count;
-			List<IUniqueDef> tuttiChords = new List<IUniqueDef>();
-			for(int i = 0; i < nChords; ++i)
+
+			// barlineMsPositions does not include 0, but does include the final barline position.
+			barlineMsPositions = new List<int>();
+			#region create trk0
+			List<Trk> trks0 = trkListList[0];
+			int iudIndex = 0;
+			int currentMsPos = 0;
+			for(int i = 0; i < nBars; i++)
 			{
-				List<byte> pitches = new List<byte>();
-				List<byte> velocities = new List<byte>();
-
-				for(int j= 0; j < pitchVectors.Count; j++)
+				Trk barTrk = new Trk(0);
+				trks0.Add(barTrk);
+				var barMsDuration = 0;
+				while(barMsDuration <= minBarMsDuration)
 				{
-					PitchWeightVector pitchVector = pitchVectors[j];
-					var def = pitchVector.PitchWeights[i];
-					byte pitch = (byte)(def.Pitch + relativePitch);
-					byte velocity = (byte)def.Weight;
-					if(!pitches.Contains(pitch))
+					var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
+					if(iud is MidiRestDef)
 					{
-						int insertIndex = pitches.Count;
-						for(int k = 0; k < pitches.Count; ++k)
-						{
-							if(pitches[k] > pitch)
-							{
-								insertIndex = k;
-								break;
-							}
-						}
-						pitches.Insert(insertIndex, pitch);
-						velocities.Insert(insertIndex, velocity);
+						iud = palette.GetIUniqueDef(0);
 					}
-					else
-					{
-						int pitchIndex = pitches.IndexOf(pitch);
-						byte existingVelocity = velocities[pitchIndex];
-						velocities[pitchIndex] = (existingVelocity > velocity) ? existingVelocity : velocity;
-					}
+					barMsDuration += iud.MsDuration;
+					barTrk.Add(iud);
 				}
-				tuttiChords.Add(new MidiChordDef(pitches, velocities, barChordDuration, true));
+				currentMsPos += barTrk.MsDuration;
+				barlineMsPositions.Add(currentMsPos);					
 			}
-			trks.Add(new Trk(channel, 0, tuttiChords));
+			#endregion
 
-			return trks;
+			#region fill the other trks with rests
+			for(int i = 1; i < nChannels; i++)
+			{
+				currentMsPos = 0;
+				var trkList = trkListList[i];
+				for(int j = 0; j < nBars; j++)
+				{
+					Trk trk = new Trk(i);
+					trkList.Add(trk);
+					trk.Add(new MidiRestDef(currentMsPos, barlineMsPositions[j] - currentMsPos));
+					currentMsPos = barlineMsPositions[j];
+				}
+			}
+			#endregion
+
+			return trkListList;
 		}
+
 	}
 }
