@@ -1,4 +1,5 @@
 ﻿using Moritz.Globals;
+using Moritz.Palettes;
 using Moritz.Spec;
 using System.Collections.Generic;
 
@@ -38,10 +39,9 @@ namespace Moritz.Algorithm.Study4
 		/// <returns></returns>
 		private List<List<Trk>> GetTrkListList(GamutVector gamutVector, out List<int> barlineMsPositions)
 		{
-			const int minBarMsDuration = 5000;
 			var nBars = gamutVector.Gamuts.Count;
 			var nChannels = this.MidiChannelPerOutputVoice.Count;
-			var palette = _palettes[0];
+
 			//var nMidiChordDefs = palette.Count;
 			//var midiChordDef = palette.MidiChordDef(0);
 			//var basicMidiChordDef = midiChordDef.BasicMidiChordDefs[0];
@@ -52,33 +52,11 @@ namespace Moritz.Algorithm.Study4
 				trkListList.Add(new List<Trk>());
 			}
 
-			// barlineMsPositions does not include 0, but does include the final barline position.
-			barlineMsPositions = new List<int>();
-			#region create trk0
-			List<Trk> trks0 = trkListList[0];
-			int iudIndex = 0;
-			int currentMsPos = 0;
-			for(int i = 0; i < nBars; i++)
-			{
-				Trk barTrk = new Trk(0);
-				trks0.Add(barTrk);
-				var barMsDuration = 0;
-				while(barMsDuration <= minBarMsDuration)
-				{
-					var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
-					if(iud is MidiRestDef)
-					{
-						iud = palette.GetIUniqueDef(0);
-					}
-					barMsDuration += iud.MsDuration;
-					barTrk.Add(iud);
-				}
-				currentMsPos += barTrk.MsDuration;
-				barlineMsPositions.Add(currentMsPos);					
-			}
-			#endregion
+			// the returned barlineMsPositions do not include 0, but do include the final barline position.
+			trkListList[0] = CreateTopChannelBarTrks(gamutVector.Gamuts, out barlineMsPositions);
 
 			#region fill the other trks with rests
+			int currentMsPos = 0;
 			for(int i = 1; i < nChannels; i++)
 			{
 				currentMsPos = 0;
@@ -96,5 +74,44 @@ namespace Moritz.Algorithm.Study4
 			return trkListList;
 		}
 
+		// the returned barlineMsPositions do not include 0, but do include the final barline position.
+		private List<Trk> CreateTopChannelBarTrks(IReadOnlyList<Gamut> gamuts, out List<int> barlineMsPositions)
+		{
+			const int minBarMsDuration = 5000;
+			const int topChannelIndex = 0;
+			int nBars = gamuts.Count;
+
+			Palette palette = _palettes[0];
+
+			barlineMsPositions = new List<int>(); // out
+			List<Trk> topTrks = new List<Trk>(); // return
+
+
+			int iudIndex = 0;
+			int currentMsPos = 0;
+			for(int i = 0; i < nBars; i++)
+			{
+				Gamut gamut = gamuts[i];
+
+				Trk barTrk = new Trk(topChannelIndex);
+				topTrks.Add(barTrk);
+				var barMsDuration = 0;
+				while(barMsDuration <= minBarMsDuration)
+				{
+					var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
+					if(iud is MidiRestDef)
+					{
+						iud = palette.GetIUniqueDef(0);
+					}
+					barMsDuration += iud.MsDuration;
+
+					barTrk.Add(iud);
+				}
+				currentMsPos += barTrk.MsDuration;
+				barlineMsPositions.Add(currentMsPos);
+			}
+
+			return topTrks;
+		}
 	}
 }
