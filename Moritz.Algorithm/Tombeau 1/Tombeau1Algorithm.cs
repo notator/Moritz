@@ -419,23 +419,16 @@ namespace Moritz.Algorithm.Tombeau1
 
 		public override ScoreData SetScoreRegionsData(List<Bar> bars)
 		{
-			Dictionary<int, (int index, int msPosition)> msPosPerBarlineIndexDict = GetMsPosPerBarlineIndexDict(bars);
+			List<(int index, int msPosition)> regionBorderlines = GetRegionBarlineIndexMsPosList(bars);
 
-			// Each barline is the left barline of the bar with the same index.
-			// The finalBarline has also been added to the Dictionary, so
-			// msPosPerBarlineIndexDict.Count is 1 + bars.Count.
-			var barline0 = msPosPerBarlineIndexDict[0];
-			var barline24 = msPosPerBarlineIndexDict[24];
-			var barline48 = msPosPerBarlineIndexDict[48];
-			var barline72 = msPosPerBarlineIndexDict[72];
-			var barline96 = msPosPerBarlineIndexDict[96];
-			var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
+			// Each regionBorderline consists of a bar's index and its msPositionInScore.
+			// The finalBarline is also included, so regionBorderlines.Count is 1 + RegionStartBarIndices.Count.
 
-			RegionDef rd1 = new RegionDef("A", barline0, barline24);
-			RegionDef rd2 = new RegionDef("B", barline24, barline72);
-			RegionDef rd3 = new RegionDef("C", barline24, barline48);
-			RegionDef rd4 = new RegionDef("D", barline72, finalBarline);
-			RegionDef rd5 = new RegionDef("E", barline96, finalBarline);
+			RegionDef rd1 = new RegionDef("A", regionBorderlines[0], regionBorderlines[1]);
+			RegionDef rd2 = new RegionDef("B", regionBorderlines[1], regionBorderlines[3]);
+			RegionDef rd3 = new RegionDef("C", regionBorderlines[1], regionBorderlines[2]);
+			RegionDef rd4 = new RegionDef("D", regionBorderlines[3], regionBorderlines[5]);
+			RegionDef rd5 = new RegionDef("E", regionBorderlines[4], regionBorderlines[5]);
 
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5 };
 
@@ -444,29 +437,6 @@ namespace Moritz.Algorithm.Tombeau1
 			ScoreData scoreData = new ScoreData(regionSequence);
 
 			return scoreData;
-		}
-
-		/// <summary>
-		/// Returns a dictionary containing (barlineIndex, (barlineIndex, barlineMsPosition)) KeyValuePairs.
-		/// Each barlineIndex is the index of the left barline of the bar with the same index, so the first KeyValuePair
-		/// is (0,(0,0)). The finalBarline is also added to the returned dictionary, so its Count is 1 + bars.Count.
-		/// The data for the final barline in the score is in the final entry.
-		/// </summary>
-		private Dictionary<int, (int index, int msPosition)> GetMsPosPerBarlineIndexDict(List<Bar> bars)
-		{
-			var rval = new Dictionary<int, (int index, int msPosition)>();
-
-			int barlineMsPos = 0;
-			int barsCount = bars.Count;
-			for(int i = 0; i < barsCount; ++i)
-			{
-				var tuple = (index: i, msPosition: barlineMsPos);
-				rval.Add(i, tuple);
-				barlineMsPos += bars[i].MsDuration;
-			}
-			rval.Add(barsCount, (index: barsCount, msPosition: barlineMsPos));
-
-			return rval;
 		}
 
 		#region available Trk transformations

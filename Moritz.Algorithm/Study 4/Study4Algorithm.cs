@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
+using System.Linq;
 using Krystals4ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Palettes;
@@ -68,30 +68,21 @@ namespace Moritz.Algorithm.Study4
 		/// <returns></returns>
 		public override ScoreData SetScoreRegionsData(List<Bar> bars)
 		{
-			Debug.Assert(bars.Count == 55); // 08.10.2019
+			Debug.Assert(bars.Count == NumberOfBars); // 08.10.2019
 
-			Dictionary<int, (int index, int msPosition)> msPosPerBarlineIndexDict = GetMsPosPerBarlineIndexDict(bars);
+			List<(int index, int msPosition)> regionBorderlines = GetRegionBarlineIndexMsPosList(bars);
 
-			// Each barline is the left barline of the bar with the same index.
-			// The finalBarline has also been added to the Dictionary, so
-			// msPosPerBarlineIndexDict.Count is 1 + bars.Count.
-			var barline0 = msPosPerBarlineIndexDict[0];
-			var barline1 = msPosPerBarlineIndexDict[1];
-			var barline5 = msPosPerBarlineIndexDict[5];
-			var barline11 = msPosPerBarlineIndexDict[11];
-			var barline19 = msPosPerBarlineIndexDict[19];
-			var barline29 = msPosPerBarlineIndexDict[29];
-			var barline41 = msPosPerBarlineIndexDict[41];
-			var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
+			// Each regionBorderline consists of a bar's index and its msPositionInScore.
+			// The finalBarline is also included, so regionBorderlines.Count is 1 + RegionStartBarIndices.Count.
 
 			// The following regions can be redefined later to express the existing logic better.
-			RegionDef rd1 = new RegionDef("A", barline0, barline1);
-			RegionDef rd2 = new RegionDef("B", barline1, barline5);
-			RegionDef rd3 = new RegionDef("C", barline5, barline11);
-			RegionDef rd4 = new RegionDef("D", barline11, barline19);
-			RegionDef rd5 = new RegionDef("E", barline19, barline29);
-			RegionDef rd6 = new RegionDef("F", barline29, barline41);
-			RegionDef rd7 = new RegionDef("G", barline41, finalBarline);
+			RegionDef rd1 = new RegionDef("A", regionBorderlines[0], regionBorderlines[1]);
+			RegionDef rd2 = new RegionDef("B", regionBorderlines[1], regionBorderlines[2]);
+			RegionDef rd3 = new RegionDef("C", regionBorderlines[2], regionBorderlines[3]);
+			RegionDef rd4 = new RegionDef("D", regionBorderlines[3], regionBorderlines[4]);
+			RegionDef rd5 = new RegionDef("E", regionBorderlines[4], regionBorderlines[5]);
+			RegionDef rd6 = new RegionDef("F", regionBorderlines[5], regionBorderlines[6]);
+			RegionDef rd7 = new RegionDef("G", regionBorderlines[6], regionBorderlines[7]);
 
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5, rd6, rd7 };
 
@@ -102,29 +93,6 @@ namespace Moritz.Algorithm.Study4
 			ScoreData scoreData = new ScoreData(regionSequence);
 
 			return scoreData;
-		}
-
-		/// <summary>
-		/// Returns a dictionary containing (barlineIndex, (barlineIndex, barlineMsPosition)) KeyValuePairs.
-		/// Each barlineIndex is the index of the left barline of the bar with the same index, so the first KeyValuePair
-		/// is (0,(0,0)). The finalBarline is also added to the returned dictionary, so its Count is 1 + bars.Count.
-		/// The data for the final barline in the score is in the final entry.
-		/// </summary>
-		private Dictionary<int, (int index, int msPosition)> GetMsPosPerBarlineIndexDict(List<Bar> bars)
-		{
-			var rval = new Dictionary<int, (int index, int msPosition)>();
-
-			int barlineMsPos = 0;
-			int barsCount = bars.Count;
-			for(int i = 0; i < barsCount; ++i)
-			{
-				var tuple = (index: i, msPosition: barlineMsPos);
-				rval.Add(i, tuple);
-				barlineMsPos += bars[i].MsDuration;
-			}
-			rval.Add(barsCount, (index: barsCount, msPosition: barlineMsPos));
-
-			return rval;
 		}
 
 		#region available Trk transformations
