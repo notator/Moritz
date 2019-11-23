@@ -22,6 +22,7 @@ namespace Moritz.Algorithm.Study1
 		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get{ return new List<int>() { 0 }; }}
 		public override int NumberOfBars { get{	return 68; }}
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
+		public override IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>() { 0 }; } }
 
 		// Neither the krystals, nor the palettes argument is used.
 		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)

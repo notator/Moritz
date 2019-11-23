@@ -20,6 +20,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         public override IReadOnlyList<int> MidiChannelPerOutputVoice { get{	return new List<int>() { 0, 1, 2 }; }}
 		public override int NumberOfBars { get{	return 27; }}
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
+		public override IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>() { 0 }; } }
 
 		private static readonly int nKeyboardPitches = 85;
 		private readonly int transposition = (byte)((127 - nKeyboardPitches) / 2); // 21 -- puts the range in middle of the MIDI range

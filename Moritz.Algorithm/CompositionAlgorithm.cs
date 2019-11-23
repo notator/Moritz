@@ -161,6 +161,11 @@ namespace Moritz.Algorithm
         /// <returns></returns>
         public abstract int NumberOfBars { get; }
 
+		/// <summary>
+		/// The bar indices at which regions begin.
+		/// </summary>
+		public abstract IReadOnlyList<int> RegionStartBarIndices { get; }
+
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
         /// This function returns a sequence of abstract bar definitions, devoid of layout information.

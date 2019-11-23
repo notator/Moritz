@@ -21,6 +21,7 @@ namespace Moritz.Algorithm.Study4
 		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 		public override int NumberOfBars { get { return 55; } }
+		public override IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>() { 0, 1, 5, 11, 19, 29, 41 }; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()

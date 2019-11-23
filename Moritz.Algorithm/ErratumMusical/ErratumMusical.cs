@@ -20,6 +20,7 @@ namespace Moritz.Algorithm.ErratumMusical
         public override IReadOnlyList<int> MidiChannelPerOutputVoice { get{	return new List<int>() { 0 }; }}
 		public override int NumberOfBars { get{	return 8; }}
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
+		public override IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>() { 0 }; } }
 
 		private static IReadOnlyList<IReadOnlyList<byte>> erratumMusicalGraphPitches = new List<List<byte>>()
 		{			

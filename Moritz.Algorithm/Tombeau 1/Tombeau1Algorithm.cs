@@ -21,6 +21,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 		public override int NumberOfBars { get { return 120; } }
+		public override IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>() { 0, 24, 48, 72, 96 }; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()
