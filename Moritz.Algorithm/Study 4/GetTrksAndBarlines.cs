@@ -15,7 +15,7 @@ namespace Moritz.Algorithm.Study4
 				trks.Add(new Trk(i));
 			}
 
-			List<List<Trk>> trkListList = GetTrkListList(gamutVector.PitchWeightVectors, out barlineMsPositions);
+			List<List<Trk>> trkListList = GetTrkListList(gamutVector, out barlineMsPositions);
 
 			for(int i = 0; i < trkListList.Count; i++)
 			{
@@ -34,12 +34,12 @@ namespace Moritz.Algorithm.Study4
 		/// <summary>
 		/// Creates a list of 8 parallel Trk lists, each of which contains 55 Trks (=Bars).
 		/// </summary>
-		/// <param name="pitchVectors"></param>
+		/// <param name="gamutVector"></param>
 		/// <returns></returns>
-		private List<List<Trk>> GetTrkListList(IReadOnlyList<PitchWeightVector> pitchVectors, out List<int> barlineMsPositions)
+		private List<List<Trk>> GetTrkListList(GamutVector gamutVector, out List<int> barlineMsPositions)
 		{
 			const int minBarMsDuration = 5000;
-			var nBars = pitchVectors[0].PitchWeights.Count;
+			var nBars = gamutVector.Gamuts.Count;
 			var nChannels = this.MidiChannelPerOutputVoice.Count;
 			var palette = _palettes[0];
 			//var nMidiChordDefs = palette.Count;
