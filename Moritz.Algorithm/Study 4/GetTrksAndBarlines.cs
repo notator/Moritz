@@ -2,6 +2,7 @@
 using Moritz.Palettes;
 using Moritz.Spec;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Moritz.Algorithm.Study4
 {
@@ -81,34 +82,43 @@ namespace Moritz.Algorithm.Study4
 			const int topChannelIndex = 0;
 			int nBars = gamuts.Count;
 
-			Palette palette = _palettes[0];
-
 			barlineMsPositions = new List<int>(); // out
 			List<Trk> topTrks = new List<Trk>(); // return
 
-
 			int iudIndex = 0;
 			int currentMsPos = 0;
+			int regionIndex = -1;
 			for(int i = 0; i < nBars; i++)
 			{
 				Gamut gamut = gamuts[i];
 
-				Trk barTrk = new Trk(topChannelIndex);
-				topTrks.Add(barTrk);
-				var barMsDuration = 0;
-				while(barMsDuration <= minBarMsDuration)
+				if(RegionStartBarIndices.Contains(i))
 				{
-					var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
-					if(iud is MidiRestDef)
-					{
-						iud = palette.GetIUniqueDef(0);
-					}
-					barMsDuration += iud.MsDuration;
-
-					barTrk.Add(iud);
+					regionIndex++; // Can be used in the code below (but isn't yet).
 				}
-				currentMsPos += barTrk.MsDuration;
-				barlineMsPositions.Add(currentMsPos);
+
+				switch(regionIndex)
+				{
+					case 0:
+						Palette palette = _palettes[0];
+						Trk barTrk = new Trk(topChannelIndex);
+						topTrks.Add(barTrk);
+						var barMsDuration = 0;
+						while(barMsDuration <= minBarMsDuration)
+						{
+							var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
+							if(iud is MidiRestDef)
+							{
+								iud = palette.GetIUniqueDef(0);
+							}
+							barMsDuration += iud.MsDuration;
+
+							barTrk.Add(iud);
+						}
+						currentMsPos += barTrk.MsDuration;
+						barlineMsPositions.Add(currentMsPos);
+						break;
+				}
 			}
 
 			return topTrks;
