@@ -42,7 +42,7 @@ namespace Moritz.Symbols
             get
             {
                 RestMetrics restMetrics = Metrics as RestMetrics;
-                Debug.Assert(restMetrics != null);
+                M.Assert(restMetrics != null);
                 return restMetrics;
             }
         }

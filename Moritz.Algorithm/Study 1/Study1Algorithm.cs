@@ -30,7 +30,7 @@ namespace Moritz.Algorithm.Study1
 			List<byte> trackChordNumbers = GetTrackChordNumbers();
 			List<byte> trackRootPitches = GetTrackRootPitches();
 
-			Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
+			M.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
 			Trk track = GetTrack(trackChordNumbers, trackRootPitches);
 			Seq mainSeq = new Seq(0, new List<Trk>() { track }, MidiChannelPerOutputVoice);

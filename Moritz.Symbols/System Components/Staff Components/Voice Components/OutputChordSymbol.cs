@@ -58,17 +58,17 @@ namespace Moritz.Symbols
         public void SetNoteheadPitchesAndVelocities(List<byte> midiPitches, List<byte> midiVelocities)
         {
             #region check inputs
-             Debug.Assert(midiPitches.Count == midiVelocities.Count);
+             M.Assert(midiPitches.Count == midiVelocities.Count);
             int previousPitch = -1;
             foreach(int midiPitch in midiPitches)
             {
-                Debug.Assert(midiPitch >= 0 && midiPitch <= 127, "midiPitch out of range.");
-                Debug.Assert(midiPitch > previousPitch, "midiPitches must be unique and in ascending order.");
+                M.Assert(midiPitch >= 0 && midiPitch <= 127, "midiPitch out of range.");
+                M.Assert(midiPitch > previousPitch, "midiPitches must be unique and in ascending order.");
                 previousPitch = midiPitch;
             }
             foreach(int midiVelocity in midiVelocities)
             {
-                Debug.Assert(midiVelocity >= 0 && midiVelocity <= 127, "midiVelocity out of range.");
+                M.Assert(midiVelocity >= 0 && midiVelocity <= 127, "midiVelocity out of range.");
             }
             #endregion
             this.HeadsTopDown.Clear();
@@ -99,7 +99,7 @@ namespace Moritz.Symbols
         {
             foreach(Head head in HeadsTopDown)
             {
-                Debug.Assert(head.MidiVelocity >= 0 && head.MidiVelocity <= 127);
+                M.Assert(head.MidiVelocity >= 0 && head.MidiVelocity <= 127);
 
                 int velocity = head.MidiVelocity;
                 if(velocity > M.MaxMidiVelocity[M.Dynamic.ff])

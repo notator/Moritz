@@ -29,7 +29,7 @@ namespace Moritz.Spec
                 w.WriteStartElement("noteOffs");
                 foreach(MidiMsg msg in _msgs)
                 {
-                    Debug.Assert(IsNoteOffMsg(msg));
+                    M.Assert(IsNoteOffMsg(msg));
                     msg.WriteSVG(w);
                 }
                 w.WriteEndElement(); // end of noteOffs
@@ -70,11 +70,11 @@ namespace Moritz.Spec
         /// </summary>
         private void CheckMsg(MidiMsg msg)
         {
-            Debug.Assert(IsNoteOffMsg(msg));
+            M.Assert(IsNoteOffMsg(msg));
 
             if(_msgs.Count > 0 && (_msgs[0].Channel != msg.Channel))
             {
-                Debug.Assert(false);
+                M.Assert(false);
             }
         }
 

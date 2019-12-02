@@ -46,8 +46,8 @@ namespace Moritz.Palettes
 
         public void ReadAudioFiles(XmlReader r)
         {
-            Debug.Assert(_audioSampleButtons != null && _audioSampleButtons.Count > 0);
-            Debug.Assert(r.Name == "audioFiles");
+            M.Assert(_audioSampleButtons != null && _audioSampleButtons.Count > 0);
+            M.Assert(r.Name == "audioFiles");
 
             int buttonIndex = 0;
             M.ReadToXmlElementTag(r, "file");
@@ -56,9 +56,9 @@ namespace Moritz.Palettes
                 if(r.Name == "file" && r.NodeType != XmlNodeType.EndElement)
                 {
                     Button button = _audioSampleButtons[buttonIndex];
-                    Debug.Assert(button != null);
+                    M.Assert(button != null);
                     MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
-                    Debug.Assert(player != null);
+                    M.Assert(player != null);
                     string fileName = r.ReadElementContentAsString();
                     if(!String.IsNullOrEmpty(fileName))
                     {
@@ -81,9 +81,9 @@ namespace Moritz.Palettes
             for(int i = 0; i < _audioSampleButtons.Count; ++i)
             {
                 Button button = _audioSampleButtons[i];
-                Debug.Assert(button != null);
+                M.Assert(button != null);
                 MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
-                Debug.Assert(player != null);
+                M.Assert(player != null);
                 if(i < _savedPlayerFilenames.Count)
                 {
                     string fileName = _savedPlayerFilenames[i];
@@ -112,7 +112,7 @@ namespace Moritz.Palettes
             foreach(Button button in _audioSampleButtons)
             {
                 MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
-                Debug.Assert(player != null);
+                M.Assert(player != null);
                 if(!(String.IsNullOrEmpty(player.URL)))
                 {
                     audioFilesExist = true;
@@ -126,7 +126,7 @@ namespace Moritz.Palettes
                 foreach(Button button in _audioSampleButtons)
                 {
                     MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
-                    Debug.Assert(player != null);
+                    M.Assert(player != null);
                     w.WriteStartElement("file");
                     if(String.IsNullOrEmpty(player.URL))
                         w.WriteString("");
@@ -256,7 +256,7 @@ namespace Moritz.Palettes
 						_midiEventDemoButtons[index].Select();
 						Refresh();
 						MidiChordDef midiChordDef = iud as MidiChordDef;
-						Debug.Assert(midiChordDef != null);
+						M.Assert(midiChordDef != null);
 						MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
 						midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
 					}
@@ -268,7 +268,7 @@ namespace Moritz.Palettes
         private void PaletteChordFormButton_MouseDown(object sender, MouseEventArgs e)
         {
             Button button = sender as Button;
-            Debug.Assert(button != null);
+            M.Assert(button != null);
 
             if(button != null)
             {
@@ -285,9 +285,9 @@ namespace Moritz.Palettes
 			}
 
 			Button button = sender as Button;
-            Debug.Assert(button != null);
+            M.Assert(button != null);
             MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
-            Debug.Assert(player != null);
+            M.Assert(player != null);
 
             if(button != null)
             {

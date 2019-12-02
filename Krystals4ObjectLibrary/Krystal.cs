@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using Moritz.Globals;
 
 namespace Krystals4ObjectLibrary
 {
@@ -265,7 +266,7 @@ namespace Krystals4ObjectLibrary
 		/// <returns></returns>
 		protected string GetNameOfEquivalentSavedKrystal(string nameIntro)
         {
-            Debug.Assert(_name == "" || _name == K.UntitledKrystalName);
+            M.Assert(_name == "" || _name == K.UntitledKrystalName);
             string newName = "";
             DirectoryInfo dir = new DirectoryInfo(K.KrystalsFolder);
             Krystal otherKrystal = null;
@@ -445,8 +446,8 @@ namespace Krystals4ObjectLibrary
         /// <returns></returns>
         public List<List<int>> GetValuePerValue(Krystal largerKrystal)
         {
-            Debug.Assert(largerKrystal.Shape.Contains(this.Shape));
-            Debug.Assert(largerKrystal.Level > this.Level);
+            M.Assert(largerKrystal.Shape.Contains(this.Shape));
+            M.Assert(largerKrystal.Level > this.Level);
 
             List<List<int>> returnValue = new List<List<int>>();
             List<List<int>> largerValues = largerKrystal.GetValues(this.Level + 1);

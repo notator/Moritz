@@ -84,7 +84,7 @@ namespace Krystals4ObjectLibrary
         /// <returns></returns>
         public static int[] Contour(int density, int contourNumberMod12, int axisNumberMod12)
         {
-            Debug.Assert( density > 0 && density <= 7
+            M.Assert( density > 0 && density <= 7
                 && contourNumberMod12 > 0 && contourNumberMod12 <= 12
                 && axisNumberMod12 > 0 && axisNumberMod12 <= 12);
 

@@ -15,7 +15,7 @@ namespace Moritz.Spec
 	{
 		public InputNoteDef(byte notatedMidiPitch, NoteOn noteOn, NoteOff noteOff, TrkOptions trkOptions)
 		{
-			Debug.Assert(notatedMidiPitch >= 0 && notatedMidiPitch <= 127);
+			M.Assert(notatedMidiPitch >= 0 && notatedMidiPitch <= 127);
 			// If trkOptions is null, the higher level trkOptions are used.
 
 			NotatedMidiPitch = notatedMidiPitch;

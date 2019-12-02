@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-
+using Moritz.Globals;
 using Moritz.Spec;
+using System.Collections.Generic;
 
 namespace Moritz.Midi
 {
-    public class BasicMidiChord
+	public class BasicMidiChord
     {
         public BasicMidiChord(int channel, MidiChord midiChord, BasicMidiChordDef bmcd, int realMsDuration)
         {
@@ -59,7 +58,7 @@ namespace Moritz.Midi
             get { return (byte)ChordOn.Notes[0].Velocity; }
             set
             {
-                Debug.Assert(value <= 127);
+                M.Assert(value <= 127);
                 foreach(NoteMessage note in ChordOn.Notes)
                     note.Velocity = value;
             }

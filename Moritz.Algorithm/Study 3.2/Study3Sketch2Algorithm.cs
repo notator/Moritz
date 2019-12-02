@@ -175,7 +175,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 InputRestDef iRestDef = new InputRestDef(ivd.MsDuration, finalRestMsDuration);
                 ivd.Add(iRestDef);
             }
-            Debug.Assert(ivd.MsDuration == bar2Seq.MsDuration);
+            M.Assert(ivd.MsDuration == bar2Seq.MsDuration);
 
             return ivd;
         }

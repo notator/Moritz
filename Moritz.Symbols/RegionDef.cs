@@ -20,8 +20,8 @@ namespace Moritz.Symbols
 			startBarlineMsPosInScore = startBarline.msPosition;
 			endBarlineIndex = endBarline.index;
 			endBarlineMsPosInScore = endBarline.msPosition;
-			Debug.Assert(startBarlineIndex >= 0 && endBarlineIndex > startBarlineIndex);
-			Debug.Assert(startBarlineMsPosInScore >= 0 && endBarlineMsPosInScore > startBarlineMsPosInScore);
+			M.Assert(startBarlineIndex >= 0 && endBarlineIndex > startBarlineIndex);
+			M.Assert(startBarlineMsPosInScore >= 0 && endBarlineMsPosInScore > startBarlineMsPosInScore);
 		}
 
 		public void WriteSVG(SvgWriter w)

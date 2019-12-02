@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using Moritz.Globals;
 
 namespace Krystals4ObjectLibrary
 {
@@ -45,7 +46,7 @@ namespace Krystals4ObjectLibrary
 
             public void SetInnerSuperStrands()
             {
-                Debug.Assert(StrandObjs.Count > 0);
+                M.Assert(StrandObjs.Count > 0);
                 _topLevel = StrandObjs[0].Strand.Level;
  
                 InnerSuperStrand innerSuperStrand = new InnerSuperStrand();
@@ -66,7 +67,7 @@ namespace Krystals4ObjectLibrary
                 topLevel = innerSuperStrand.StrandObjs[0].Strand.Level;
                 innerSuperStrand.SetNumberOfValues(topLevel);
                 _innerSuperStrands.Add(innerSuperStrand);
-                Debug.Assert(_innerSuperStrands.Count <= 7);
+                M.Assert(_innerSuperStrands.Count <= 7);
             }
 
             /// <summary>
@@ -130,7 +131,7 @@ namespace Krystals4ObjectLibrary
 
             private void SortByContour(int[] contour)
             {
-                Debug.Assert(_innerSuperStrands.Count < 8);
+                M.Assert(_innerSuperStrands.Count < 8);
                 List<InnerSuperStrand> sorted = new List<InnerSuperStrand>();
                 List<uint> igsLevels = new List<uint>();
                 foreach(InnerSuperStrand igs in _innerSuperStrands)
@@ -169,7 +170,7 @@ namespace Krystals4ObjectLibrary
                 _numberOfValues = StrandObjs[0].Strand.Values.Count;
                 for(int i = 1; i < StrandObjs.Count; i++)
                 {
-                    Debug.Assert(topLevel < StrandObjs[i].Strand.Level); 
+                    M.Assert(topLevel < StrandObjs[i].Strand.Level); 
                     _numberOfValues += StrandObjs[i].Strand.Values.Count;
                 }
             }

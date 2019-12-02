@@ -19,7 +19,7 @@ namespace Moritz.Palettes
 
         public void ReadBasicChordControl(XmlReader r)
         {
-            Debug.Assert(r.Name == "basicChord" && r.IsStartElement());
+            M.Assert(r.Name == "basicChord" && r.IsStartElement());
 
             #region default values
             DurationsTextBox.Text = "";
@@ -76,7 +76,7 @@ namespace Moritz.Palettes
                         "basicChord", "durations", "velocities", "midiPitches",
                         "chordOffs", "chordDensities", "rootInversion", "inversionIndices", "verticalVelocityFactors");
                 }
-                Debug.Assert(r.Name == "basicChord"); // end element
+                M.Assert(r.Name == "basicChord"); // end element
             }
         }
 

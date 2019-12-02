@@ -630,14 +630,14 @@ namespace Moritz.Globals
             int intSum = 0;
 			foreach(int i in intDivisionSizes)
 			{
-				//Debug.Assert(i >= 0);
+				//M.Assert(i >= 0);
 				if(i < 0)
 				{
 					throw new ApplicationException();
 				}
 				intSum += i;
 			}
-            Debug.Assert(intSum <= total);
+            M.Assert(intSum <= total);
             if(intSum < total)
             {
                 int lastDuration = intDivisionSizes[intDivisionSizes.Count - 1];
@@ -816,11 +816,11 @@ namespace Moritz.Globals
 		}
 
 		/// <summary>
-		/// A Debug.Assert that fails if the argument is outside the range 1..127.
+		/// A M.Assert that fails if the argument is outside the range 1..127.
 		/// </summary>
 		public static void AssertIsVelocityValue(int velocity)
 		{
-			Debug.Assert(velocity >= 1 && velocity <= 127);
+			M.Assert(velocity >= 1 && velocity <= 127);
 		}
 
 		public static Color TextBoxErrorColor = Color.FromArgb(255, 220, 220);

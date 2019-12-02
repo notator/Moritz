@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.ComponentModel;
-
+using Moritz.Globals;
 using Sanford.Multimedia.Midi;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Moritz.Midi
 {
@@ -72,7 +71,7 @@ namespace Moritz.Midi
 		{
 			get
 			{
-				Debug.Assert(_notes.Count > 0);
+				M.Assert(_notes.Count > 0);
 				return _notes[0].Velocity;
 			}
 		}
@@ -145,7 +144,7 @@ namespace Moritz.Midi
 		public override void AddNote(NoteMessage note)
 		{
 			// All notes in a ChordOn must have the same channel.
-			Debug.Assert(note is NoteOn && ((_notes.Count == 0) || (note.Channel == _notes[0].Channel)));
+			M.Assert(note is NoteOn && ((_notes.Count == 0) || (note.Channel == _notes[0].Channel)));
 			NoteOn newNote = new NoteOn
 			{
 				Channel = note.Channel,
@@ -196,7 +195,7 @@ namespace Moritz.Midi
 		public override void AddNote(NoteMessage note)
 		{
 			// All notes in a ChordOff must have the same channel.
-			Debug.Assert(note is NoteOff && ((_notes.Count == 0) || (note.Channel == _notes[0].Channel)));
+			M.Assert(note is NoteOff && ((_notes.Count == 0) || (note.Channel == _notes[0].Channel)));
 			NoteOff noteOff = new NoteOff
 			{
 				Channel = note.Channel,

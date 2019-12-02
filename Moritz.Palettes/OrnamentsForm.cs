@@ -88,7 +88,7 @@ namespace Moritz.Palettes
             PatchIndicesTextBox.Text = "";
             NumberOfOrnamentsTextBox.Text = "";
             #endregion
-            Debug.Assert(r.Name == "ornamentSettings");
+            M.Assert(r.Name == "ornamentSettings");
             M.ReadToXmlElementTag(r, "numBasicChordDefs", "basicChord", "bankIndices", "patchIndices", "ornaments");
 
             while(r.Name == "numBasicChordDefs" || r.Name == "basicChord" || r.Name == "bankIndices" || r.Name == "patchIndices"
@@ -126,7 +126,7 @@ namespace Moritz.Palettes
                     "numBasicChordDefs", "basicChord", "bankIndices", "patchIndices",
                     "numOrnaments", "ornaments");
             }
-            Debug.Assert(r.Name == "ornamentSettings");
+            M.Assert(r.Name == "ornamentSettings");
 
             _fsf.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
 
@@ -138,7 +138,7 @@ namespace Moritz.Palettes
         private int GetOrnaments(XmlReader r)
         {
             int numberOfOrnaments = 0;
-            Debug.Assert(r.Name == "ornaments");
+            M.Assert(r.Name == "ornaments");
             M.ReadToXmlElementTag(r, "ornament");
             while(r.Name == "ornament")
             {
@@ -198,7 +198,7 @@ namespace Moritz.Palettes
                 #endregion read each ornament
                 M.ReadToXmlElementTag(r, "ornaments", "ornament");
             }
-            Debug.Assert(r.Name == "ornaments");
+            M.Assert(r.Name == "ornaments");
             return numberOfOrnaments;
         }
 
@@ -581,7 +581,7 @@ namespace Moritz.Palettes
         {
             if(textBox.BackColor != M.TextBoxErrorColor)
             {
-                Debug.Assert(_ornaments.Count >= ornamentNumber);
+                M.Assert(_ornaments.Count >= ornamentNumber);
                 _ornaments[ornamentNumber - 1] = M.StringToIntList(textBox.Text, ',');
             }
         }
@@ -621,7 +621,7 @@ namespace Moritz.Palettes
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
+            M.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
             DialogResult result = 
                 MessageBox.Show("Are you sure you want to revert these ornament settings to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -675,7 +675,7 @@ namespace Moritz.Palettes
         {
             w.WriteStartElement("ornamentSettings");
 
-            Debug.Assert(!string.IsNullOrEmpty(NumBasicChordDefsTextBox.Text));
+            M.Assert(!string.IsNullOrEmpty(NumBasicChordDefsTextBox.Text));
             w.WriteStartElement("numBasicChordDefs");
             w.WriteString(NumBasicChordDefsTextBox.Text);
             w.WriteEndElement();
@@ -694,7 +694,7 @@ namespace Moritz.Palettes
                 w.WriteString(PatchIndicesTextBox.Text.Replace(" ", ""));
                 w.WriteEndElement();
             }
-            Debug.Assert(!string.IsNullOrEmpty(NumberOfOrnamentsTextBox.Text));
+            M.Assert(!string.IsNullOrEmpty(NumberOfOrnamentsTextBox.Text));
             w.WriteStartElement("numOrnaments");
             w.WriteString(NumberOfOrnamentsTextBox.Text);
             w.WriteEndElement();

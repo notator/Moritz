@@ -26,14 +26,14 @@ namespace Moritz.Spec
 			int pitchBelow = -1;
 			foreach(InputNoteDef ind in inputNoteDefs)
 			{
-				Debug.Assert(ind.NotatedMidiPitch > pitchBelow);
+				M.Assert(ind.NotatedMidiPitch > pitchBelow);
 				pitchBelow = ind.NotatedMidiPitch;
 
 				if(ind.NoteOn != null && ind.NoteOn.SeqRef != null)
 				{
 					foreach(TrkRef trk in ind.NoteOn.SeqRef)
 					{ 
-						Debug.Assert(msPositionReFirstIUD <= trk.MsPosition);
+						M.Assert(msPositionReFirstIUD <= trk.MsPosition);
 					}
 				}
 				if(ind.NoteOff != null && ind.NoteOff.SeqRef != null)
@@ -41,7 +41,7 @@ namespace Moritz.Spec
 					int minSeqPos = msPositionReFirstIUD + msDuration;
 					foreach(TrkRef trk in ind.NoteOff.SeqRef)
 					{
-						Debug.Assert(minSeqPos <= trk.MsPosition);
+						M.Assert(minSeqPos <= trk.MsPosition);
 					}
 				}
 				// Note that there is no corresponding check for ind.NoteOnTrkOffs and ind.NoteOffTrkOffs
@@ -83,7 +83,7 @@ namespace Moritz.Spec
         public void AdjustMsDuration(double factor)
         {
             MsDuration = (int)(_msDuration * factor);
-            Debug.Assert(MsDuration > 0, "A UniqueDef's MsDuration may not be set to zero!");
+            M.Assert(MsDuration > 0, "A UniqueDef's MsDuration may not be set to zero!");
         }
 
         /// <summary>
@@ -150,12 +150,12 @@ namespace Moritz.Spec
             set
             {
                 List<byte> newPitches = value;
-                Debug.Assert(newPitches.Count == _inputNoteDefs.Count);
+                M.Assert(newPitches.Count == _inputNoteDefs.Count);
                 int pitchBelow = -1;
                 for(int i = 0; i < newPitches.Count; ++i)
                 {
                     byte newPitch = newPitches[i];
-                    Debug.Assert(newPitch > pitchBelow);
+                    M.Assert(newPitch > pitchBelow);
                     pitchBelow = newPitch;
                     _inputNoteDefs[i].NotatedMidiPitch = newPitch;
                 }
@@ -166,12 +166,12 @@ namespace Moritz.Spec
         {
             get
             {
-                Debug.Assert(false, "Input Chords do not have notated Midi velocities.");
+                M.Assert(false, "Input Chords do not have notated Midi velocities.");
                 return null;
             }
             set
             {
-                Debug.Assert(false, "Input Chords do not have notated Midi velocities.");
+                M.Assert(false, "Input Chords do not have notated Midi velocities.");
             }
         }
 

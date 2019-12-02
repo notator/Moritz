@@ -40,7 +40,7 @@ namespace Moritz.Spec
             {
                 foreach(byte pitch in value)
                 {
-                    Debug.Assert(pitch == M.SetRange0_127(pitch));
+                    M.Assert(pitch == M.SetRange0_127(pitch));
                 }
                 _notatedMidiPitches = new List<byte>(value);
             }
@@ -60,7 +60,7 @@ namespace Moritz.Spec
             {
                 foreach(byte velocity in value)
                 {
-                    Debug.Assert(velocity == M.SetRange0_127(velocity));
+                    M.Assert(velocity == M.SetRange0_127(velocity));
                 }
                 _notatedMidiVelocities = new List<byte>(value);
             }

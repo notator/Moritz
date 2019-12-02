@@ -86,13 +86,13 @@ namespace Moritz.Palettes
         /// </summary>
         internal void BringPaletteChordFormToFront()
         {
-            Debug.Assert(this.Enabled == false && _paletteChordForm != null);
+            M.Assert(this.Enabled == false && _paletteChordForm != null);
             _paletteChordForm.BringToFront();
         }
 
         internal void ClosePaletteChordForm(int chordIndex)
         {
-            Debug.Assert(this.Enabled);
+            M.Assert(this.Enabled);
             _paletteChordForm.Close();
             _paletteChordForm = null;
 
@@ -123,7 +123,7 @@ namespace Moritz.Palettes
         {
             Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y + 27);
             _paletteButtonsControl = new PaletteButtonsControl(domain, location, this, audioFolder);
-            Debug.Assert(_paletteButtonsControl != null);
+            M.Assert(_paletteButtonsControl != null);
             Controls.Add(_paletteButtonsControl);
             _paletteButtonsControl.TabIndex = 18;
         }
@@ -341,7 +341,7 @@ namespace Moritz.Palettes
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
+            M.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
             DialogResult result = 
                 MessageBox.Show("Are you sure you want to revert this palette and its ornaments to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -1140,8 +1140,8 @@ namespace Moritz.Palettes
         }
         public void ReadPalette(XmlReader r)
         {
-            Debug.Assert(r.Name == "name" || r.Name == "domain" || r.Name == "percussion"); // attributes
-            Debug.Assert(_bcc != null);
+            M.Assert(r.Name == "name" || r.Name == "domain" || r.Name == "percussion"); // attributes
+            M.Assert(_bcc != null);
 
             #region
             BankIndicesTextBox.Text = "";
@@ -1215,7 +1215,7 @@ namespace Moritz.Palettes
                     "pitchwheelDeviations", "pitchwheelEnvelopes", "panEnvelopes", "modulationWheelEnvelopes",
                     "expressionEnvelopes", "audioFiles", "ornamentNumbers", "ornamentMinMsDurations", "ornamentSettings");
             }
-            Debug.Assert(r.Name == "palette"); // end element
+            M.Assert(r.Name == "palette"); // end element
             SetOrnamentControls();
             TouchAllTextBoxes();
             _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);

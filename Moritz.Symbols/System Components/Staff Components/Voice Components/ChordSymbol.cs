@@ -21,13 +21,13 @@ namespace Moritz.Symbols
 
         public VerticalDir DefaultStemDirection(Clef clef)
         {
-            Debug.Assert(this.HeadsTopDown.Count > 0);
+            M.Assert(this.HeadsTopDown.Count > 0);
             float gap = 32F; // dummy value
             List<float> topDownHeadOriginYs = new List<float>();
             int lastMidiPitch = int.MaxValue;
             foreach(Head head in this.HeadsTopDown)
             {
-                Debug.Assert(head.MidiPitch < lastMidiPitch);
+                M.Assert(head.MidiPitch < lastMidiPitch);
                 topDownHeadOriginYs.Add(head.GetOriginY(clef, gap));
             }
 
@@ -62,7 +62,7 @@ namespace Moritz.Symbols
         {
             for(int i = 0; i < midiPitches.Count; i++)
             {
-                Debug.Assert(midiPitches[i] >= 0 && midiPitches[i] < 128);
+                M.Assert(midiPitches[i] >= 0 && midiPitches[i] < 128);
             }
 
             bool useSharps = true;
@@ -124,8 +124,8 @@ namespace Moritz.Symbols
         /// <returns></returns>
         private bool? GetUseSharps(Head head, int interval)
         {
-            Debug.Assert(interval > 0 && interval < 12);
-            Debug.Assert(head.Alteration == 0 || head.Alteration == 1);
+            M.Assert(interval > 0 && interval < 12);
+            M.Assert(head.Alteration == 0 || head.Alteration == 1);
             bool? useSharpsOrNull = null;
             #region Head is A
             if(head.Pitch[0] == 'A')

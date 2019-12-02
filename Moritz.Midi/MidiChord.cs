@@ -19,7 +19,7 @@ namespace Moritz.Midi
             _midiOutputDevice = midiOutputDevice;
 
             List<BasicDurationDef> basicDurationDefs = midiChordDef.BasicDurationDefs;
-			//Debug.Assert(basicDurationDefs.Count > 0);
+			//M.Assert(basicDurationDefs.Count > 0);
 			if(basicDurationDefs.Count < 1)
 			{
 				throw new ApplicationException();

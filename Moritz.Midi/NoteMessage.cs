@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using Moritz.Globals;
 
 namespace Moritz.Midi
 {
@@ -21,7 +21,7 @@ namespace Moritz.Midi
 			get { return _channel; }
 			set
 			{
-				Debug.Assert(value >= 0 || value <= 15);
+				M.Assert(value >= 0 || value <= 15);
 				_channel = value;
 			}
 		}
@@ -31,7 +31,7 @@ namespace Moritz.Midi
 			get { return _pitch; }
 			set
 			{
-				Debug.Assert(value >= 0 || value <= 127);
+				M.Assert(value >= 0 || value <= 127);
 				_pitch = value;
 			}
 		}
@@ -41,7 +41,7 @@ namespace Moritz.Midi
 			get { return _velocity; }
 			set
 			{
-				Debug.Assert(value >= 0 || value <= 127);
+				M.Assert(value >= 0 || value <= 127);
 				_velocity = value;
 			}
 		}

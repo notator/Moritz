@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Krystals4ObjectLibrary;
+using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -23,13 +24,13 @@ namespace Moritz.Spec
 		public Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
             #region conditions
-            Debug.Assert(absSeqMsPosition >= 0);
+            M.Assert(absSeqMsPosition >= 0);
             for(int i = 0; i < trks.Count - 1; ++i)
             {
 				Trk trk = trks[i];
 				for(int j = i + 1; j < trks.Count; ++j)
 				{
-					Debug.Assert(trk.MidiChannel != trks[j].MidiChannel);
+					M.Assert(trk.MidiChannel != trks[j].MidiChannel);
 				}
 				bool trkChannelFound = false;
 				foreach(int ovChannel in midiChannelIndexPerOutputVoice)
@@ -40,8 +41,8 @@ namespace Moritz.Spec
 						break;
 					}
 				}
-				Debug.Assert(trkChannelFound);
-				Debug.Assert(trk.MsPositionReContainer == 0);
+				M.Assert(trkChannelFound);
+				M.Assert(trk.MsPositionReContainer == 0);
 				trk.AssertConsistency();
             }
             #endregion conditions
@@ -99,9 +100,9 @@ namespace Moritz.Spec
         public Seq Concat(Seq seq2)
         {
             #region assertions
-            Debug.Assert(_trks.Count == seq2.Trks.Count);
-            Debug.Assert(this.IsNormalized);
-            Debug.Assert(seq2.IsNormalized);
+            M.Assert(_trks.Count == seq2.Trks.Count);
+            M.Assert(this.IsNormalized);
+            M.Assert(seq2.IsNormalized);
             AssertChannelConsistency(seq2.MidiChannelPerOutputVoice);
             #endregion
 
@@ -169,7 +170,7 @@ namespace Moritz.Spec
                 }
             }
 
-            Debug.Assert(found == true, "Illegal channel");
+            M.Assert(found == true, "Illegal channel");
 
         }
 
@@ -199,28 +200,28 @@ namespace Moritz.Spec
 		/// </summary>
 		private void CheckBarlineMsPositions(IReadOnlyList<int> barlineMsPositionsReSeq)
 		{
-			Debug.Assert(barlineMsPositionsReSeq[0] > 0, "The first msPosition must be greater than 0.");
+			M.Assert(barlineMsPositionsReSeq[0] > 0, "The first msPosition must be greater than 0.");
 
 			int msDuration = this.MsDuration;
 			for(int i = 0; i < barlineMsPositionsReSeq.Count; ++i)
 			{
 				int msPosition = barlineMsPositionsReSeq[i];
-				Debug.Assert(msPosition <= this.MsDuration);
+				M.Assert(msPosition <= this.MsDuration);
 				for(int j = i + 1; j < barlineMsPositionsReSeq.Count; ++j)
 				{
-					Debug.Assert(msPosition != barlineMsPositionsReSeq[j], "Error: Duplicate barline msPositions.");
+					M.Assert(msPosition != barlineMsPositionsReSeq[j], "Error: Duplicate barline msPositions.");
 				}
 			}
 
 			int currentMsPos = -1;
 			foreach(int msPosition in barlineMsPositionsReSeq)
 			{
-				Debug.Assert(msPosition > currentMsPos, "Value out of order.");
+				M.Assert(msPosition > currentMsPos, "Value out of order.");
 				currentMsPos = msPosition;
 				bool found = false;
 				foreach(Trk trk in Trks)
 				{
-					Debug.Assert(trk.MsPositionReContainer == 0);
+					M.Assert(trk.MsPositionReContainer == 0);
 					foreach(IUniqueDef iud in trk.UniqueDefs)
 					{
 						if(msPosition == (iud.MsPositionReFirstUD + iud.MsDuration))
@@ -235,7 +236,7 @@ namespace Moritz.Spec
 					}
 					
 				}
-				Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef.");
+				M.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef.");
 			}
 		}
 
@@ -244,18 +245,18 @@ namespace Moritz.Spec
 		/// </summary>
 		private void AssertChannelConsistency(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
-            Debug.Assert(_trks != null && _trks.Count > 0);
+            M.Assert(_trks != null && _trks.Count > 0);
             int nTrks = 0;
             for(int i = 0; i < _trks.Count; ++i)
             {
 				if (_trks[i] is Trk trk)
 				{
 					nTrks++;
-					Debug.Assert(trk.MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
+					M.Assert(trk.MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
 				}
 			}
 
-            Debug.Assert(nTrks == midiChannelIndexPerOutputVoice.Count);
+            M.Assert(nTrks == midiChannelIndexPerOutputVoice.Count);
         }
 
 		/// <summary>
@@ -269,8 +270,8 @@ namespace Moritz.Spec
 		/// </summary>
 		public void AssertConsistency()
         {
-			Debug.Assert(AbsMsPosition >= 0);
-			Debug.Assert(_trks != null && _trks.Count > 0);
+			M.Assert(AbsMsPosition >= 0);
+			M.Assert(_trks != null && _trks.Count > 0);
 
 			List<int> midiChannels = new List<int>();
 			int thisMsDuration = MsDuration;
@@ -278,8 +279,8 @@ namespace Moritz.Spec
             {
                 trk.AssertConsistency();
 				int trkMsDuration = trk.MsDuration;
-				Debug.Assert(trkMsDuration == thisMsDuration || trkMsDuration == 0);
-				Debug.Assert(midiChannels.Contains(trk.MidiChannel) == false);
+				M.Assert(trkMsDuration == thisMsDuration || trkMsDuration == 0);
+				M.Assert(midiChannels.Contains(trk.MidiChannel) == false);
 				midiChannels.Add(trk.MidiChannel);
             }
         }
@@ -324,7 +325,7 @@ namespace Moritz.Spec
         /// </summary>
         public void AlignTrkUniqueDefs(List<int> indicesToAlign)
         {
-            Debug.Assert(indicesToAlign.Count == this._trks.Count);
+            M.Assert(indicesToAlign.Count == this._trks.Count);
             List<int> newMsPositionsReContainer = new List<int>();
             int minMsPositionReContainer = int.MaxValue;
             for(int i = 0; i < _trks.Count; ++i)
@@ -332,7 +333,7 @@ namespace Moritz.Spec
                 newMsPositionsReContainer.Add(0); // default value
                 Trk trk = _trks[i];
                 int index = indicesToAlign[i];
-                Debug.Assert(index >= 0);
+                M.Assert(index >= 0);
 
                 if(index < trk.UniqueDefs.Count)
                 {
@@ -374,7 +375,7 @@ namespace Moritz.Spec
         /// <param name="msShifts">The number of milliseconds to shift each trk. (May be negative.)</param>
         public void ShiftTrks(List<int> msShifts)
         {
-            Debug.Assert(msShifts.Count == this._trks.Count);
+            M.Assert(msShifts.Count == this._trks.Count);
             for(int i = 0; i < msShifts.Count; ++i)
             {
                 Trk trk = _trks[i];
@@ -440,7 +441,7 @@ namespace Moritz.Spec
                 iud.MsDuration = originalMsDuration - msPos;
             }
 
-            Debug.Assert(originalMsDuration == MsDuration);
+            M.Assert(originalMsDuration == MsDuration);
 
             AssertConsistency();
         }
@@ -500,7 +501,7 @@ namespace Moritz.Spec
 			get	{ return _absMsPosition; }
 			set
 			{
-				Debug.Assert(value >= 0);
+				M.Assert(value >= 0);
 				_absMsPosition = value;
 			}
 		}
@@ -514,7 +515,7 @@ namespace Moritz.Spec
 		{ 
 			get
 			{
-				Debug.Assert(_trks != null && _trks.Count > 0);
+				M.Assert(_trks != null && _trks.Count > 0);
 				int msDuration = 0;
 				foreach(Trk trk in _trks)
 				{
@@ -525,14 +526,14 @@ namespace Moritz.Spec
 					}
 					if(msDuration > 0)
 					{
-						Debug.Assert(trkMsDur == 0 || trkMsDur == msDuration);
+						M.Assert(trkMsDur == 0 || trkMsDur == msDuration);
 					}
 				}
 				return msDuration;
 			}
 			set
 			{
-				Debug.Assert(_trks.Count > 0);
+				M.Assert(_trks.Count > 0);
 				// there is a trk that begins at msPosition==0.
 				int currentDuration = MsDuration;
 				double factor = ((double)value) / currentDuration;
@@ -552,7 +553,7 @@ namespace Moritz.Spec
 						}
 					}
 				}
-				Debug.Assert(MsDuration == value); 
+				M.Assert(MsDuration == value); 
 			}
 		}
 

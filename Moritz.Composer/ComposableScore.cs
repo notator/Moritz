@@ -66,7 +66,7 @@ namespace Moritz.Composer
 			List<string> currentClefs = new List<string>(initialClefPerMIDIChannel);
 			int nBars = bars.Count;
 			int nVoiceDefs = bars[0].VoiceDefs.Count;
-			Debug.Assert(nVoiceDefs == initialClefPerMIDIChannel.Count); // VoiceDefs are both Trks and InputVoiceDefs
+			M.Assert(nVoiceDefs == initialClefPerMIDIChannel.Count); // VoiceDefs are both Trks and InputVoiceDefs
 			foreach (Bar bar in bars)
 			{
 				for (int i = 0; i < nVoiceDefs; ++i)
@@ -98,7 +98,7 @@ namespace Moritz.Composer
 			{
 				errorString = CheckCCSettings(bars);
 			}
-			Debug.Assert(string.IsNullOrEmpty(errorString), errorString);
+			M.Assert(string.IsNullOrEmpty(errorString), errorString);
 		}
 		#region private to CheckBars(...)
 		private string BasicChecks(List<Bar> bars)
@@ -299,7 +299,7 @@ namespace Moritz.Composer
 				}
 				for (int trackIndex = 0; trackIndex < outputTrackMidiChannels.Count; trackIndex++)
 				{
-					Debug.Assert(trackIndex == outputTrackMidiChannels[trackIndex], "Track index and MidiChannel must be identical.");
+					M.Assert(trackIndex == outputTrackMidiChannels[trackIndex], "Track index and MidiChannel must be identical.");
 				}
 			}
 		}
@@ -346,7 +346,7 @@ namespace Moritz.Composer
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
                         Trk trkDef = voiceDefs[outputVoiceIndices[ovIndex]] as Trk;
-                        Debug.Assert(trkDef != null);
+                        M.Assert(trkDef != null);
                         OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel)
 						{
 							VoiceDef = trkDef
@@ -384,7 +384,7 @@ namespace Moritz.Composer
                     for(int ivIndex = 0; ivIndex < inputVoiceIndices.Count; ++ivIndex)
                     {
                         InputVoiceDef inputVoiceDef = voiceDefs[inputVoiceIndices[ivIndex] + _algorithm.MidiChannelPerOutputVoice.Count] as InputVoiceDef;
-                        Debug.Assert(inputVoiceDef != null);
+                        M.Assert(inputVoiceDef != null);
 						InputVoice inputVoice = new InputVoice(inputStaff)
 						{
 							VoiceDef = inputVoiceDef
@@ -399,7 +399,7 @@ namespace Moritz.Composer
 
 		private void AdjustOutputVoiceRefs(List<SvgSystem> systems, List<int> outputMidiChannelSubstitutions)
 		{
-			Debug.Assert(_algorithm.MidiChannelPerInputVoice != null);
+			M.Assert(_algorithm.MidiChannelPerInputVoice != null);
 
 			foreach(var system in systems)
 			{
@@ -464,7 +464,7 @@ namespace Moritz.Composer
             }
             else
             {
-                Debug.Assert(staff.Voices.Count == 2);
+                M.Assert(staff.Voices.Count == 2);
                 staff.Voices[0].StemDirection = VerticalDir.up;
                 staff.Voices[1].StemDirection = VerticalDir.down;
             }

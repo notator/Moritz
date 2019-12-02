@@ -31,7 +31,7 @@ namespace Moritz.Spec
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 // In blocks, inputChordDefs can also contain CautionaryChordDefs
-                Debug.Assert(iud is InputChordDef || iud is InputRestDef);
+                M.Assert(iud is InputChordDef || iud is InputRestDef);
             }
         }
 
@@ -66,22 +66,22 @@ namespace Moritz.Spec
         {
 			base.AssertConsistency();
 
-			Debug.Assert(MidiChannel >= 0 && MidiChannel <= 3);	 // max 4 input channels
+			M.Assert(MidiChannel >= 0 && MidiChannel <= 3);	 // max 4 input channels
 
-			Debug.Assert(Container == null || Container is Bar);
+			M.Assert(Container == null || Container is Bar);
 
 			if(Container is Bar)
 			{
 				foreach(IUniqueDef iud in UniqueDefs)
 				{
-					Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
+					M.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
 				}
 			}
 			else // during construction
 			{
 				foreach(IUniqueDef iud in UniqueDefs)
 				{
-					Debug.Assert(iud is InputChordDef || iud is InputRestDef);
+					M.Assert(iud is InputChordDef || iud is InputRestDef);
 				}
 			}
 		}
@@ -94,7 +94,7 @@ namespace Moritz.Spec
         /// <param name="iUniqueDef"></param>
         public override void Add(IUniqueDef iud)
         {
-            Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
+            M.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
             _Add(iud);
         }
 		/// <summary>
@@ -104,7 +104,7 @@ namespace Moritz.Spec
 		/// </summary>
 		public override void AddRange(VoiceDef inputVoiceDef)
         {
-            Debug.Assert(inputVoiceDef is InputVoiceDef);
+            M.Assert(inputVoiceDef is InputVoiceDef);
             _AddRange(inputVoiceDef);
         }
 
@@ -130,7 +130,7 @@ namespace Moritz.Spec
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is InputChordDef || iUniqueDef is InputRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefDef);
+            M.Assert(iUniqueDef is InputChordDef || iUniqueDef is InputRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>
@@ -148,7 +148,7 @@ namespace Moritz.Spec
         /// </summary>
         private void _InsertInRest(InputVoiceDef iVoiceDef)
         {
-            Debug.Assert(!(Container is Bar), "Cannot Insert a Trk in a InputRestDef inside a Bar.");
+            M.Assert(!(Container is Bar), "Cannot Insert a Trk in a InputRestDef inside a Bar.");
 
             int iLmddsStartMsPosReFirstIUD = iVoiceDef[0].MsPositionReFirstUD;
             int iLmddsEndMsPosReFirstIUD = iVoiceDef[iVoiceDef.Count - 1].MsPositionReFirstUD + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
@@ -163,7 +163,7 @@ namespace Moritz.Spec
             }
             else
             {
-                Debug.Assert(false, "Can't find a rest spanning the chord!");
+                M.Assert(false, "Can't find a rest spanning the chord!");
             }
 
             AssertConsistency();
@@ -212,7 +212,7 @@ namespace Moritz.Spec
             int replacementEndMsPosReFirstIUD = replacement[replacement.Count - 1].MsPositionReFirstUD + replacement[replacement.Count - 1].MsDuration;
             int restStartMsPosReFirstIUD = rest.MsPositionReFirstUD;
             int restEndMsPosReFirstIUD = rest.MsPositionReFirstUD + rest.MsDuration;
-            Debug.Assert(restStartMsPosReFirstIUD == replacementStartMsPosReFirstIUD && restEndMsPosReFirstIUD == replacementEndMsPosReFirstIUD);
+            M.Assert(restStartMsPosReFirstIUD == replacementStartMsPosReFirstIUD && restEndMsPosReFirstIUD == replacementEndMsPosReFirstIUD);
             lmdds.RemoveAt(restIndex);
             lmdds.InsertRange(restIndex, replacement);
         }
@@ -222,9 +222,9 @@ namespace Moritz.Spec
         /// </summary>
         private List<IUniqueDef> GetReplacementList(IUniqueDef originalRest, VoiceDef iVoiceDef)
         {
-            Debug.Assert(originalRest is InputRestDef || originalRest is MidiRestDef);
-            Debug.Assert(iVoiceDef[0] is MidiChordDef || iVoiceDef[0] is InputChordDef);
-            Debug.Assert(iVoiceDef[iVoiceDef.Count - 1] is MidiChordDef || iVoiceDef[iVoiceDef.Count - 1] is InputChordDef);
+            M.Assert(originalRest is InputRestDef || originalRest is MidiRestDef);
+            M.Assert(iVoiceDef[0] is MidiChordDef || iVoiceDef[0] is InputChordDef);
+            M.Assert(iVoiceDef[iVoiceDef.Count - 1] is MidiChordDef || iVoiceDef[iVoiceDef.Count - 1] is InputChordDef);
 
             List<IUniqueDef> rList = new List<IUniqueDef>();
             if(iVoiceDef[0].MsPositionReFirstUD > originalRest.MsPositionReFirstUD)
@@ -285,7 +285,7 @@ namespace Moritz.Spec
         /// </summary>
         public void InsertInRest(InputVoiceDef inputVoiceDef)
         {
-            Debug.Assert(inputVoiceDef[0] is InputChordDef && inputVoiceDef[inputVoiceDef.Count - 1] is InputChordDef);
+            M.Assert(inputVoiceDef[0] is InputChordDef && inputVoiceDef[inputVoiceDef.Count - 1] is InputChordDef);
             _InsertInRest(inputVoiceDef);
         }
         /// <summary>
@@ -293,7 +293,7 @@ namespace Moritz.Spec
         /// </summary>
         public void Replace(int index, IUniqueDef replacementIUnique)
         {
-            Debug.Assert(!(replacementIUnique is MidiChordDef));
+            M.Assert(!(replacementIUnique is MidiChordDef));
             _Replace(index, replacementIUnique);
         }
         #endregion Count changers

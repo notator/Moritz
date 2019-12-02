@@ -11,7 +11,7 @@ namespace Moritz.Spec
 	{
 		public BasicDurationDef(int msDuration)
 		{
-			//Debug.Assert(msDuration > 0, "msDuration out of range");
+			//M.Assert(msDuration > 0, "msDuration out of range");
 			if(msDuration <= 0)
 			{
 				throw new ApplicationException("msDuration out of range");
@@ -42,11 +42,11 @@ namespace Moritz.Spec
             Velocities = new List<byte>(velocities);
 
             #region check values
-            Debug.Assert(BankIndex == null || BankIndex == M.SetRange0_127((int)BankIndex), "Bank out of range.");
-            Debug.Assert(PatchIndex == null || PatchIndex == M.SetRange0_127((int)PatchIndex), "Patch out of range.");
-            Debug.Assert(Pitches.Count == Velocities.Count, "There must be the same number of pitches and velocities.");
+            M.Assert(BankIndex == null || BankIndex == M.SetRange0_127((int)BankIndex), "Bank out of range.");
+            M.Assert(PatchIndex == null || PatchIndex == M.SetRange0_127((int)PatchIndex), "Patch out of range.");
+            M.Assert(Pitches.Count == Velocities.Count, "There must be the same number of pitches and velocities.");
             foreach(byte pitch in Pitches)
-                Debug.Assert(pitch >= 0 && pitch <= 127);
+                M.Assert(pitch >= 0 && pitch <= 127);
             foreach(byte velocity in Velocities)
                 M.AssertIsVelocityValue(velocity);     
             #endregion
@@ -67,8 +67,8 @@ namespace Moritz.Spec
 			: base(msDuration)
 		{
 			#region conditions
-			//Debug.Assert(density > 0 && density <= 12);
-			//Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+			//M.Assert(density > 0 && density <= 12);
+			//M.Assert(rootPitch >= 0 && rootPitch <= 127);
 			if(density < 1 || density > 12 || rootPitch < 0 || rootPitch > 127)
 			{
 				throw new ApplicationException();
@@ -86,8 +86,8 @@ namespace Moritz.Spec
 
 		internal void AssertConsistency()
 		{
-			//Debug.Assert(Pitches != null && Pitches.Count > 0);
-			//Debug.Assert(Velocities != null && Velocities.Count == Pitches.Count);
+			//M.Assert(Pitches != null && Pitches.Count > 0);
+			//M.Assert(Velocities != null && Velocities.Count == Pitches.Count);
 			if(Pitches == null || Pitches.Count == 0 || Velocities == null || Velocities.Count != Pitches.Count)
 			{
 				throw new ApplicationException();
@@ -182,7 +182,7 @@ namespace Moritz.Spec
 
             if(Pitches != null)
             {
-                Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
+                M.Assert(Velocities != null && Pitches.Count == Velocities.Count);
                 w.WriteStartElement("noteOns");
                 int status = M.CMD_NOTE_ON_0x90 + channel; // NoteOn
                 for(int i = 0; i < Pitches.Count; ++i)
@@ -241,7 +241,7 @@ namespace Moritz.Spec
         /// <param name="factor"></param>
         internal void AdjustVelocities(double factor)
         {
-            Debug.Assert(factor > 0.0);
+            M.Assert(factor > 0.0);
             for(int i = 0; i < Velocities.Count; ++i)
             {
                 byte velocity = (byte)Math.Round((Velocities[i] * factor));

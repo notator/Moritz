@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Collections;
+using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -11,7 +12,7 @@ namespace Moritz.Spec
 		/// <param name="trkOptions">Can be null</param>
 		public SeqRef(List<TrkRef> trkRefs, TrkOptions trkOptions)
 		{
-			Debug.Assert(trkRefs != null && trkRefs.Count > 0);
+			M.Assert(trkRefs != null && trkRefs.Count > 0);
 			TrkOptions = trkOptions;
 			TrkRefs = trkRefs;
 		}
@@ -29,7 +30,7 @@ namespace Moritz.Spec
 			{
 				TrkOptions.WriteSVG(w, false);
 			}
-			Debug.Assert(TrkRefs != null && TrkRefs.Count > 0);
+			M.Assert(TrkRefs != null && TrkRefs.Count > 0);
 			foreach(TrkRef trkRef in TrkRefs)
 			{
 				trkRef.WriteSVG(w);
@@ -79,7 +80,7 @@ namespace Moritz.Spec
 					}
 					catch(IndexOutOfRangeException)
 					{
-						Debug.Assert(false);
+						M.Assert(false);
 						return null;
 					}
 				}

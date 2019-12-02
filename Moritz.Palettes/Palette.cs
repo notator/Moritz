@@ -188,7 +188,7 @@ namespace Moritz.Palettes
                     if(basicMidiChordDefs[0].PatchIndex == null)
                         basicMidiChordDefs[0].PatchIndex = patchIndex;
 
-                    Debug.Assert(basicMidiChordDefs[0].PatchIndex != null);
+                    M.Assert(basicMidiChordDefs[0].PatchIndex != null);
 
                     basicMidiChordDefs = Moritz.Spec.MidiChordDef.FitToDuration(basicMidiChordDefs, duration, ornamentMinMsDuration);
 
@@ -340,7 +340,7 @@ namespace Moritz.Palettes
             int msPositionReFirstIUD = 0;
             foreach(int value in sequence)
             {
-                Debug.Assert((value > 0 && value <= this.Count), "Illegal argument: value out of range in sequence");
+                M.Assert((value > 0 && value <= this.Count), "Illegal argument: value out of range in sequence");
 
                 IUniqueDef iumdd = GetClonedValueAt(value - 1);
                 iumdd.MsPositionReFirstUD = msPositionReFirstIUD;
@@ -376,7 +376,7 @@ namespace Moritz.Palettes
         public OrnamentSettings(PaletteForm paletteform)
         {
             OrnamentsForm osf = paletteform.OrnamentsForm;
-            Debug.Assert(osf != null && osf.Ornaments != null);
+            M.Assert(osf != null && osf.Ornaments != null);
 
 			BasicChordFormSettings bcs = new BasicChordFormSettings
 			{
@@ -492,11 +492,11 @@ namespace Moritz.Palettes
         private List<byte> GetMidiPitches(int chordIndex, List<byte> rootPitches, List<byte> densities, List<List<byte>> inversions, List<int> inversionIndices)
         {
             List<byte> primeIntervals = null;
-            Debug.Assert(inversions != null);
+            M.Assert(inversions != null);
             if(inversions.Count > 1)
             {
                 int inversionIndex = inversionIndices[chordIndex];
-                Debug.Assert(inversions.Count > inversionIndex);
+                M.Assert(inversions.Count > inversionIndex);
                 primeIntervals = inversions[inversionIndex];
             }
             else if(inversions.Count == 1)

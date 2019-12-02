@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-using Krystals4ObjectLibrary;
-using Moritz.Algorithm;
+﻿using Krystals4ObjectLibrary;
+using Moritz.Globals;
 using Moritz.Palettes;
 using Moritz.Spec;
+using System.Collections.Generic;
 
 namespace Moritz.Algorithm.Study2
 {
-    public class Study2Algorithm : CompositionAlgorithm
+	public class Study2Algorithm : CompositionAlgorithm
     {
         public Study2Algorithm()
             : base()
@@ -33,7 +30,7 @@ namespace Moritz.Algorithm.Study2
             List<Trk> sequentialMainStaffBars = WriteMainStaff();
             List<Trk> sequentialStaff2Bars = WriteOtherStaff(2, sequentialMainStaffBars);
             List<Trk> sequentialStaff1Bars = WriteOtherStaff(1, sequentialMainStaffBars);
-            Debug.Assert((sequentialMainStaffBars.Count == sequentialStaff2Bars.Count) 
+            M.Assert((sequentialMainStaffBars.Count == sequentialStaff2Bars.Count) 
                       && (sequentialMainStaffBars.Count == sequentialStaff1Bars.Count));
 
 			List<int> barlineMsPositions = GetBarlinePositions(sequentialMainStaffBars);
@@ -126,7 +123,7 @@ namespace Moritz.Algorithm.Study2
 			Krystal krystal = _krystals[(staffNumber == 2) ? 1 : 2];
             Palette palette = _palettes[(staffNumber == 2) ? 1 : 2];
             List<List<int>> strandValuesList = krystal.GetValues(krystal.Level);
-            Debug.Assert(topStaffBars.Count == strandValuesList.Count);
+            M.Assert(topStaffBars.Count == strandValuesList.Count);
 
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
@@ -161,7 +158,7 @@ namespace Moritz.Algorithm.Study2
                 voiceMsDuration += iumdd.MsDuration;
                 numberOfTopDurations++;
             }
-            Debug.Assert(numberOfTopDurations > 0);
+            M.Assert(numberOfTopDurations > 0);
 
             int equal1MsDuration = voiceMsDuration / numberOfTopDurations;
             List<int> equal1MsPositions = new List<int>();
@@ -184,7 +181,7 @@ namespace Moritz.Algorithm.Study2
             #endregion
 
             #region get the (hypothetical) equal durations and positions in newVoice
-            Debug.Assert(numberOfDurationSymbolsToConstruct > 0);
+            M.Assert(numberOfDurationSymbolsToConstruct > 0);
 
             int equal2MsDuration = voiceMsDuration / numberOfDurationSymbolsToConstruct;
             List<int> equal2MsPositions = new List<int>();
@@ -227,7 +224,7 @@ namespace Moritz.Algorithm.Study2
                     actualStaff2MsPositions.Add(actualStaff2MsPosition);
                 }
             }
-            Debug.Assert(actualStaff2MsPositions.Count == numberOfDurationSymbolsToConstruct);
+            M.Assert(actualStaff2MsPositions.Count == numberOfDurationSymbolsToConstruct);
             #endregion
 
             #region set newVoice MsDurations

@@ -73,7 +73,7 @@ namespace Moritz.Composer
         public void Read(XmlReader r)
         {
             _isLoading = true;
-            Debug.Assert(r.Name == "moritzKrystalScore");
+            M.Assert(r.Name == "moritzKrystalScore");
             M.ReadToXmlElementTag(r, "metadata", "dimensions");
             while(r.Name == "metadata" || r.Name == "dimensions")
             {
@@ -96,7 +96,7 @@ namespace Moritz.Composer
         }
         private void GetMetadata(XmlReader r)
         {
-            Debug.Assert(r.Name == "metadata");
+            M.Assert(r.Name == "metadata");
 			#region default values
 			this.Page1TitleTextBox.Text = "";
 			this.Page1AuthorTextBox.Text = "";
@@ -128,7 +128,7 @@ namespace Moritz.Composer
         }
         private void GetWebsiteLinks(XmlReader r)
         {
-            //Debug.Assert(r.Name == "metadata");
+            //M.Assert(r.Name == "metadata");
             M.ReadToXmlElementTag(r, "websiteLink");
             int count = r.AttributeCount;
             for(int i = 0; i < count; i++)
@@ -170,7 +170,7 @@ namespace Moritz.Composer
         }
         private void GetPaperSize(XmlReader r)
         {
-            Debug.Assert(r.Name == "paper");
+            M.Assert(r.Name == "paper");
             int count = r.AttributeCount;
             for(int i = 0; i < count; i++)
             {
@@ -195,7 +195,7 @@ namespace Moritz.Composer
         }
         private void GetTitleSizesAndPositions(XmlReader r)
         {
-            Debug.Assert(r.Name == "title");
+            M.Assert(r.Name == "title");
             int count = r.AttributeCount;
             for(int i = 0; i < count; i++)
             {
@@ -216,7 +216,7 @@ namespace Moritz.Composer
         }
         private void GetFrame(XmlReader r)
         {
-            Debug.Assert(r.Name == "margins");
+            M.Assert(r.Name == "margins");
             int count = r.AttributeCount;
             for(int i = 0; i < count; i++)
             {
@@ -427,7 +427,7 @@ namespace Moritz.Composer
         #region RevertToSaved
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
+            M.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert this form to the saved version?", "Revert?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);

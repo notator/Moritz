@@ -1,15 +1,15 @@
+using Moritz.Globals;
 using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace Moritz.Symbols
 {
-    /// <summary>
-    /// A list of synchronous NoteObjects.
-    /// </summary>
-    public class NoteObjectMoment
+	/// <summary>
+	/// A list of synchronous NoteObjects.
+	/// </summary>
+	public class NoteObjectMoment
     {
         public NoteObjectMoment(int absMsPosition)
         {
@@ -107,7 +107,7 @@ namespace Moritz.Symbols
 				ChordSymbol chordSymbol = _noteObjects[index] as ChordSymbol;
 				if(_noteObjects[index] is Barline barline && barline.Metrics != null)
 				{
-					Debug.Assert(AlignmentX == 0F);
+					M.Assert(AlignmentX == 0F);
 					if(index > 0)
 					{
 						if(_noteObjects[index - 1] is Clef clef)
@@ -131,8 +131,8 @@ namespace Moritz.Symbols
         {
 			if(noteObject is DurationSymbol durationSymbol && _noteObjects.Count > 0)
 			{
-				Debug.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
-				Debug.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
+				M.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
+				M.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
 			}
 			if(noteObject is Clef)
             {

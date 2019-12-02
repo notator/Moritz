@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Krystals4ObjectLibrary;
+using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -43,7 +44,7 @@ namespace Moritz.Spec
 			foreach(Trk trk in seq.Trks)
             {
                 trk.Container = this;
-				Debug.Assert(trk.MsDuration == msDuration); // cannot be 0 here.
+				M.Assert(trk.MsDuration == msDuration); // cannot be 0 here.
                 _voiceDefs.Add(trk);
 				clefIndex++;
             }
@@ -53,7 +54,7 @@ namespace Moritz.Spec
                 foreach(InputVoiceDef ivd in inputVoiceDefs)
                 {
                     ivd.Container = this;
-					Debug.Assert(ivd.MsDuration == msDuration);
+					M.Assert(ivd.MsDuration == msDuration);
 					_voiceDefs.Add(ivd);
                 }
             }
@@ -63,7 +64,7 @@ namespace Moritz.Spec
 
 		public void Concat(Bar bar2)
         {
-            Debug.Assert(_voiceDefs.Count == bar2._voiceDefs.Count);
+            M.Assert(_voiceDefs.Count == bar2._voiceDefs.Count);
 
             for(int i = 0; i < _voiceDefs.Count; ++i)
             {
@@ -76,7 +77,7 @@ namespace Moritz.Spec
                 InputVoiceDef ivd1 = vd1 as InputVoiceDef;
                 InputVoiceDef ivd2 = vd2 as InputVoiceDef;
 
-                Debug.Assert((trk1 != null && trk2 != null) || (ivd1 != null && ivd2 != null));
+                M.Assert((trk1 != null && trk2 != null) || (ivd1 != null && ivd2 != null));
 
                 vd1.Container = null;
                 vd2.Container = null;
@@ -115,7 +116,7 @@ namespace Moritz.Spec
 				}
 				else
 				{
-					Debug.Assert(false, "Type error.");
+					M.Assert(false, "Type error.");
 				}
 			}
 			#endregion
@@ -123,21 +124,21 @@ namespace Moritz.Spec
 			int barMsDuration = MsDuration;
 
 			#region 1. The first VoiceDef in a Bar must be a Trk.
-			Debug.Assert(_voiceDefs[0] is Trk, "The first VoiceDef in a Bar must be a Trk.");
+			M.Assert(_voiceDefs[0] is Trk, "The first VoiceDef in a Bar must be a Trk.");
 			#endregion
 
 			#region 2. All Trks precede the InputVoiceDefs (if any) in the _voiceDefs list.
 			int nTrks = Trks.Count;
 			for(int i = nTrks; i < _voiceDefs.Count; i++)
 			{
-				Debug.Assert(_voiceDefs[i] is InputVoiceDef, "All Trks must precede InputVoiceDefs (if any) in the _voiceDefs list."); 
+				M.Assert(_voiceDefs[i] is InputVoiceDef, "All Trks must precede InputVoiceDefs (if any) in the _voiceDefs list."); 
 			}
 			#endregion
 
 			#region 3. All voiceDefs have the same MsDuration.
 			foreach(VoiceDef voiceDef in _voiceDefs)
 			{
-				Debug.Assert(voiceDef.MsDuration == barMsDuration, "All Trks in a block must have the same duration.");
+				M.Assert(voiceDef.MsDuration == barMsDuration, "All Trks in a block must have the same duration.");
 			}
 			#endregion
 
@@ -150,7 +151,7 @@ namespace Moritz.Spec
                     nInputVoiceDefs++;
                 }
             }
-            Debug.Assert((nInputVoiceDefs <= 4), "There may not be more than 4 InputVoiceDefs.");
+            M.Assert((nInputVoiceDefs <= 4), "There may not be more than 4 InputVoiceDefs.");
 			#endregion
 
 			#region 5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef.
@@ -166,7 +167,7 @@ namespace Moritz.Spec
 					break;
 				} 				
 			}
-			Debug.Assert(startFound, "MidiChordDef not found at start.");
+			M.Assert(startFound, "MidiChordDef not found at start.");
 			#endregion
 		}
 
@@ -210,7 +211,7 @@ namespace Moritz.Spec
                 iud.MsDuration = originalMsDuration - msPos;
             }
 
-            Debug.Assert(originalMsDuration == MsDuration);
+            M.Assert(originalMsDuration == MsDuration);
 
             AssertConsistency();
         }
@@ -306,7 +307,7 @@ namespace Moritz.Spec
                 }
 				foreach(VoiceDef voiceDef in _voiceDefs)
 				{
-					Debug.Assert(voiceDef.MsDuration == value);
+					M.Assert(voiceDef.MsDuration == value);
 				}				
             }
         }
@@ -316,7 +317,7 @@ namespace Moritz.Spec
             get { return _absMsPosition; }
             set
             {
-                Debug.Assert(value >= 0);
+                M.Assert(value >= 0);
                 _absMsPosition = value;
             }
         }

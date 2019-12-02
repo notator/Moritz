@@ -98,7 +98,7 @@ namespace Moritz.Palettes
         public void Set(string attributeString)
         { 
             string[] values = attributeString.Split(',');
-            Debug.Assert(values.Length == _boxes.Count);
+            M.Assert(values.Length == _boxes.Count);
             for(int i = 0; i < _boxes.Count; ++i)
             {
                 _boxes[i].Text = values[i];

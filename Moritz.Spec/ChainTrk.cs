@@ -65,11 +65,11 @@ namespace Moritz.Spec
 			#endregion
 
 			#region argument checks
-			Debug.Assert(startPitches.Count == targetPitches.Count);
+			M.Assert(startPitches.Count == targetPitches.Count);
 			for(int i = 0; i < startPitches.Count; i++)
 			{
-				Debug.Assert(startPitches[i] >= 0 && startPitches[i] <= 127);
-				Debug.Assert((targetPitches[i] >= 0 && targetPitches[i] <= 127) || targetPitches[i] == int.MaxValue || targetPitches[i] == byte.MaxValue);
+				M.Assert(startPitches[i] >= 0 && startPitches[i] <= 127);
+				M.Assert((targetPitches[i] >= 0 && targetPitches[i] <= 127) || targetPitches[i] == int.MaxValue || targetPitches[i] == byte.MaxValue);
 			}
 			CheckEnvelope(pitchEnv);
 			#endregion
@@ -125,7 +125,7 @@ namespace Moritz.Spec
 			}
 
 			var envelope = pitchEnv.Original;
-			Debug.Assert(envelope.Count == nMidiChordDefs + 1);
+			M.Assert(envelope.Count == nMidiChordDefs + 1);
 
 			var firstEnvelopeVal = envelope[0];
 			for(int i = 0; i < envelope.Count; i++)

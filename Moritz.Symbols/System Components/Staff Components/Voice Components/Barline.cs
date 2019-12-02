@@ -1,8 +1,9 @@
+using Moritz.Globals;
+using Moritz.Xml;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using Moritz.Xml;
+
 
 namespace Moritz.Symbols
 {
@@ -677,7 +678,7 @@ namespace Moritz.Symbols
 
 			// An EndAndStartRegionBarline cannot be at the start of a system,
 			// so it can't have a barnumber, and there's no reason to call base.AlignBarnumberX();
-			Debug.Assert(BarnumberMetrics == null);
+			M.Assert(BarnumberMetrics == null);
 
 			float originX = Barline_LineMetrics.OriginX;
 			if(FramedRegionEndTextMetrics != null)

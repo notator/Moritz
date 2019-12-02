@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
+using Moritz.Globals;
 
 namespace Krystals4ObjectLibrary
 {
@@ -127,7 +128,7 @@ namespace Krystals4ObjectLibrary
 
         private void ContourStrands(List<StrandNode> contouredStrandNodeList, List<Strand> strands)
         {
-            Debug.Assert(contouredStrandNodeList.Count ==  strands.Count);
+            M.Assert(contouredStrandNodeList.Count ==  strands.Count);
 
             List<uint> tempList = new List<uint>();
             int[] contour;

@@ -27,7 +27,7 @@ namespace Moritz.Symbols
 		/// <param name="nScorePages"></param>
 		public void WriteSVG(SvgWriter w, int pageNumber, int nScorePages, string aboutThePieceLinkURL, int nOutputVoices, int nInputVoices)
         {
-			Debug.Assert(!String.IsNullOrEmpty(Page1Title));
+			M.Assert(!String.IsNullOrEmpty(Page1Title));
 
 			string pageTitle;
 			if(pageNumber == 0)

@@ -279,7 +279,7 @@ namespace Moritz.Palettes
 
         private void SetEnabledOrnamentControls(int numberOfOrnaments)
         {
-            Debug.Assert(numberOfOrnaments > 0);
+            M.Assert(numberOfOrnaments > 0);
             if(OrnamentNumberHelpLabel.Enabled)
             {
                 OrnamentNumberHelpLabel.Text = "1 integer value in range [ 0.." + numberOfOrnaments.ToString() + " ] (0 means no ornament)";
@@ -318,7 +318,7 @@ namespace Moritz.Palettes
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
+            M.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -718,7 +718,7 @@ namespace Moritz.Palettes
 				{
 					midiEventDemoButton.Hide();
 					Refresh(); // shows "rest" behind button
-					Debug.Assert(restDef != null);
+					M.Assert(restDef != null);
 					Thread.Sleep(restDef.MsDuration);
 					midiEventDemoButton.Show();
 					Refresh();
@@ -743,9 +743,9 @@ namespace Moritz.Palettes
                 }
                 catch
                 {
-                    Debug.Assert(false);
+                    M.Assert(false);
                 }
-                Debug.Assert(msDuration > 0);
+                M.Assert(msDuration > 0);
                 rval = new MidiRestDef(0, msDuration);
             }
             else

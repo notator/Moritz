@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-using Krystals4ObjectLibrary;
+﻿using Krystals4ObjectLibrary;
+using Moritz.Globals;
 using Moritz.Palettes;
 using Moritz.Spec;
+using System.Collections.Generic;
 
 namespace Moritz.Algorithm.PianolaMusic
 {
-    public class PianolaMusicAlgorithm : CompositionAlgorithm
+	public class PianolaMusicAlgorithm : CompositionAlgorithm
 	{
 		public PianolaMusicAlgorithm()
             : base()
@@ -30,7 +28,7 @@ namespace Moritz.Algorithm.PianolaMusic
 
 			// Add each Trk to trks here, in top to bottom (=channelIndex) order in the score.
 			List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
-			Debug.Assert(trks.Count == MidiChannelPerOutputVoice.Count);
+			M.Assert(trks.Count == MidiChannelPerOutputVoice.Count);
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 			List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
@@ -89,8 +87,8 @@ namespace Moritz.Algorithm.PianolaMusic
 
 		private List<IUniqueDef> GetMidiChordDefs(List<int> pitches, List<int> durations)
 		{
-			Debug.Assert(pitches.Count == 96);
-			Debug.Assert(durations.Count == 96);
+			M.Assert(pitches.Count == 96);
+			M.Assert(durations.Count == 96);
 
 			const int durationFactor = 48;	// the shortest note is 48ms
 

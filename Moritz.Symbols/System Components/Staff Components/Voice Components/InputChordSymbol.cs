@@ -60,8 +60,8 @@ namespace Moritz.Symbols
             int previousPitch = -1;
             foreach(int midiPitch in midiPitches)
             {
-                Debug.Assert(midiPitch >= 0 && midiPitch <= 127, "midiPitch out of range.");
-                Debug.Assert(midiPitch > previousPitch, "midiPitches must be unique and in ascending order.");
+                M.Assert(midiPitch >= 0 && midiPitch <= 127, "midiPitch out of range.");
+                M.Assert(midiPitch > previousPitch, "midiPitches must be unique and in ascending order.");
                 previousPitch = midiPitch;
             }
             #endregion
@@ -105,7 +105,7 @@ namespace Moritz.Symbols
 
             w.SvgStartGroup(ChordMetrics.CSSObjectClass.ToString()); // "inputChord";
 
-            Debug.Assert(_msDuration > 0);
+            M.Assert(_msDuration > 0);
 
 			if(!graphicsOnly)
 			{

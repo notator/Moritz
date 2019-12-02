@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Moritz.Globals;
 
 namespace Krystals4ObjectLibrary
 {
@@ -107,7 +108,7 @@ namespace Krystals4ObjectLibrary
         public List<T> ValueList<T>(List<T> availableValues)
         {
             #region conditions
-            Debug.Assert(Domain < availableValues.Count);
+            M.Assert(Domain < availableValues.Count);
             #endregion conditions
 
             List<T> values = new List<T>();
@@ -132,13 +133,13 @@ namespace Krystals4ObjectLibrary
         public List<int> TimeWarp(List<int> originalMsPositions, double distortion)
         {
             #region conditions
-            Debug.Assert(_domain > 0);
-            Debug.Assert(originalMsPositions.Count > 1); // At least the start and end positions of the duration to warp.
-            Debug.Assert(originalMsPositions[0] == 0);
-            Debug.Assert(distortion > 1);
+            M.Assert(_domain > 0);
+            M.Assert(originalMsPositions.Count > 1); // At least the start and end positions of the duration to warp.
+            M.Assert(originalMsPositions[0] == 0);
+            M.Assert(distortion > 1);
             for(int i = 1; i < originalMsPositions.Count; ++i)
             {
-                Debug.Assert(originalMsPositions[i] > originalMsPositions[i - 1]);
+                M.Assert(originalMsPositions[i] > originalMsPositions[i - 1]);
             }
             #endregion conditions
 
@@ -187,7 +188,7 @@ namespace Krystals4ObjectLibrary
                 else if(roundingError < 0)
                 {
                     newIntMsDurations[indexOfLongestDuration]--;
-                    Debug.Assert(newIntMsDurations[indexOfLongestDuration] > 0, "Impossible Warp: An msDuration may not be set to zero!");
+                    M.Assert(newIntMsDurations[indexOfLongestDuration] > 0, "Impossible Warp: An msDuration may not be set to zero!");
                     roundingError++;
                 }
             }
@@ -201,8 +202,8 @@ namespace Krystals4ObjectLibrary
             }
             newMsPositions.Add(msPos);
 
-            Debug.Assert(newMsPositions[0] == 0);
-            Debug.Assert(newMsPositions[newMsPositions.Count - 1] == originalTotalDuration);
+            M.Assert(newMsPositions[0] == 0);
+            M.Assert(newMsPositions[newMsPositions.Count - 1] == originalTotalDuration);
 
             return newMsPositions;
         }
@@ -430,7 +431,7 @@ namespace Krystals4ObjectLibrary
         private List<int> GeneralSpread(List<int> argList, int count)
         {
             #region conditions
-            Debug.Assert(count > 1 && argList.Count > 1 && count != argList.Count);
+            M.Assert(count > 1 && argList.Count > 1 && count != argList.Count);
             #endregion conditions
 
             int nValuesMinusOne = count - 1;
@@ -447,7 +448,7 @@ namespace Krystals4ObjectLibrary
                 }
             }
 
-            Debug.Assert(longSpread.Count == (nOriginalValuesMinusOne * nValuesMinusOne));
+            M.Assert(longSpread.Count == (nOriginalValuesMinusOne * nValuesMinusOne));
 
             List<int> spread = new List<int>();
             int index = 0;
