@@ -68,7 +68,7 @@ namespace Moritz.Algorithm.Study4
 		/// <returns></returns>
 		public override ScoreData SetScoreRegionsData(List<Bar> bars)
 		{
-			Debug.Assert(bars.Count == NumberOfBars); // 08.10.2019
+			M.Assert(bars.Count == NumberOfBars); // 08.10.2019
 
 			List<(int index, int msPosition)> regionBorderlines = GetRegionBarlineIndexMsPosList(bars);
 
@@ -188,37 +188,37 @@ namespace Moritz.Algorithm.Study4
 		{
 			if(domain != null)
 			{
-				Debug.Assert(domain > 1 && domain < 8);
+				M.Assert(domain > 1 && domain < 8);
 			}
 			IReadOnlyList<byte> rval = null;
 			switch(domain)
 			{
 				case 2:
-					Debug.Assert(index < _sliderShapes2.Count);
+					M.Assert(index < _sliderShapes2.Count);
 					rval = _sliderShapes2[index];
 					break;
 				case 3:
-					Debug.Assert(index < _sliderShapes3.Count);
+					M.Assert(index < _sliderShapes3.Count);
 					rval = _sliderShapes3[index];
 					break;
 				case 4:
-					Debug.Assert(index < _sliderShapes4.Count);
+					M.Assert(index < _sliderShapes4.Count);
 					rval = _sliderShapes4[index];
 					break;
 				case 5:
-					Debug.Assert(index < _sliderShapes5.Count);
+					M.Assert(index < _sliderShapes5.Count);
 					rval = _sliderShapes5[index];
 					break;
 				case 6:
-					Debug.Assert(index < _sliderShapes6.Count);
+					M.Assert(index < _sliderShapes6.Count);
 					rval = _sliderShapes6[index];
 					break;
 				case 7:
-					Debug.Assert(index < _sliderShapes7.Count);
+					M.Assert(index < _sliderShapes7.Count);
 					rval = _sliderShapes7[index];
 					break;
 				case null:
-					Debug.Assert(index < _sliderShapesLong.Count);
+					M.Assert(index < _sliderShapesLong.Count);
 					rval = _sliderShapesLong[index];
 					break;
 			}

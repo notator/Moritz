@@ -141,24 +141,27 @@ namespace Moritz.Symbols
             }
         }
 
-        /// <summary>
-        /// Dont use this function.
-        /// </summary>
-        /// <param name="w"></param>
-        public override void WriteSVG(SvgWriter w)
-        {
-            throw new NotImplementedException();
-        }
+		/// <summary>
+		/// This function should never be used. Use the other WriteSVG() instead.
+		/// </summary>
+		/// <param name="w"></param>
+		public override void WriteSVG(SvgWriter w)
+		{
+			M.Assert(false, "This function should never be called.");
+		}
 
-        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
+		public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs, bool graphicsOnly)
         {
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
 			w.SvgStartGroup(CSSObjectClass.chord.ToString()); // "chord"
-			w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
-            
-            _midiChordDef.WriteSVG(w, channel, carryMsgs);
+			if(!graphicsOnly)
+			{
+				w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
+
+				_midiChordDef.WriteSVG(w, channel, carryMsgs);
+			}
 
             w.SvgStartGroup(CSSObjectClass.graphics.ToString());
             ChordMetrics.WriteSVG(w);

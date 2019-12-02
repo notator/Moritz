@@ -89,7 +89,16 @@ namespace Moritz.Symbols
             }
         }
 
-        public override void WriteSVG(SvgWriter w)
+		/// <summary>
+		/// This function should never be used. Use the other WriteSVG() instead.
+		/// </summary>
+		/// <param name="w"></param>
+		public override void WriteSVG(SvgWriter w)
+		{
+			M.Assert(false, "This function should never be called.");
+		}
+
+		public void WriteSVG(SvgWriter w, bool graphicsOnly)
         {
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
@@ -98,10 +107,13 @@ namespace Moritz.Symbols
 
             Debug.Assert(_msDuration > 0);
 
-			w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
-            w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
+			if(!graphicsOnly)
+			{
+				w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
+				w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
-            _inputChordDef.WriteSVG(w);
+				_inputChordDef.WriteSVG(w);
+			}
 
 			w.SvgStartGroup(CSSObjectClass.graphics.ToString());
             ChordMetrics.WriteSVG(w);

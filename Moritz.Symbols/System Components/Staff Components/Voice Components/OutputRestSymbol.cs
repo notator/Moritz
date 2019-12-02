@@ -27,16 +27,16 @@ namespace Moritz.Symbols
             }
         }
 
-        /// <summary>
-        /// Dont use this function, use the other WriteSVG().
-        /// </summary>
-        /// <param name="w"></param>
-        public override void WriteSVG(SvgWriter w)
-        {
-            throw new NotImplementedException();
-        }
+		/// <summary>
+		/// This function should never be used. Use the other WriteSVG() instead.
+		/// </summary>
+		/// <param name="w"></param>
+		public override void WriteSVG(SvgWriter w)
+		{
+			M.Assert(false, "This function should never be called.");
+		}
 
-        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
+		public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs, bool graphicsOnly)
         {
             if(LocalCautionaryChordDef == null)
             {
@@ -44,9 +44,12 @@ namespace Moritz.Symbols
 
 				w.SvgStartGroup(CSSObjectClass.rest.ToString()); // "rest"
 
-                w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
+				if(!graphicsOnly)
+				{
+					w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 
-                _midiRestDef.WriteSVG(w, channel, carryMsgs);
+					_midiRestDef.WriteSVG(w, channel, carryMsgs);
+				}
 
                 if(this.Metrics != null)
                 {

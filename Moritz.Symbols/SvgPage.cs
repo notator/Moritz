@@ -88,7 +88,7 @@ namespace Moritz.Symbols
                     float totalSystemHeight = 0;
                     foreach(SvgSystem system in pageSystems)
                     {
-                        Debug.Assert(system.Metrics != null);
+                        M.Assert(system.Metrics != null);
                         totalSystemHeight += (system.Metrics.NotesBottom - system.Metrics.NotesTop);
                     }
                     systemSeparation = (frameHeight - totalSystemHeight) / (pageSystems.Count - 1);
@@ -115,7 +115,7 @@ namespace Moritz.Symbols
         /// Writes this page.
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, Metadata metadata, bool isSinglePageScore)
+        public void WriteSVG(SvgWriter w, Metadata metadata, bool isSinglePageScore, bool graphicsOnly)
         {
 			int nOutputVoices = 0;
 			int nInputVoices = 0;
@@ -126,13 +126,16 @@ namespace Moritz.Symbols
             w.WriteProcessingInstruction("xml-stylesheet", "href=\"../../fontsStyleSheet.css\" type=\"text/css\"");
             w.WriteStartElement("svg", "http://www.w3.org/2000/svg");
 
-            WriteSvgHeader(w);
+            WriteSvgHeader(w, graphicsOnly);
 
-			metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
+			if(!graphicsOnly)
+			{
+				metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
+			}
 
             _score.WriteDefs(w, _pageNumber);
 
-			if(isSinglePageScore)
+			if(isSinglePageScore && (!graphicsOnly))
 			{
 				_score.WriteScoreData(w);
 			}
@@ -144,7 +147,7 @@ namespace Moritz.Symbols
 				WriteFrameLayer(w, _pageFormat.Right, _pageFormat.Bottom);
 			}
 
-			WriteSystemsLayer(w, _pageNumber, metadata);
+			WriteSystemsLayer(w, _pageNumber, metadata, graphicsOnly);
 
             w.WriteComment(@" Annotations that are added here will be ignored by the AssistantPerformer. ");
 
@@ -179,11 +182,9 @@ namespace Moritz.Symbols
             w.SvgRect(CSSObjectClass.frame, 0, 0, width, height);
         }
 
-		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)
+		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata, bool graphicsOnly)
 		{
             w.SvgStartGroup(CSSObjectClass.systems.ToString());
-
-            //w.WriteAttributeString("style", "display:inline");
 
 			w.SvgText(CSSObjectClass.timeStamp, _infoTextInfo.Text, 32, _infoTextInfo.FontHeight);
 
@@ -204,47 +205,51 @@ namespace Moritz.Symbols
 			int systemNumber = 1;
 			foreach(SvgSystem system in Systems)
 			{
-				system.WriteSVG(w, systemNumber++, _pageFormat, carryMsgsPerChannel);
+				system.WriteSVG(w, systemNumber++, _pageFormat, carryMsgsPerChannel, graphicsOnly);
 			}
 
 			w.WriteEndElement(); // end layer
 		}
 
-        private void WriteSvgHeader(SvgWriter w)
+        private void WriteSvgHeader(SvgWriter w, bool graphicsOnly)
         {
 			w.WriteAttributeString("xmlns", "http://www.w3.org/2000/svg");
-            // I think the following is redundant...
-            //w.WriteAttributeString("xmlns", "svg", null, "http://www.w3.org/2000/svg");
-            // Deleted the following, since it is only advisory, and I think the latest version is 2. See deprecated xlink below.
-            //w.WriteAttributeString("version", "1.1");
+			// I think the following is redundant...
+			//w.WriteAttributeString("xmlns", "svg", null, "http://www.w3.org/2000/svg");
+			// Deleted the following, since it is only advisory, and I think the latest version is 2. See deprecated xlink below.
+			//w.WriteAttributeString("version", "1.1");
 
-            // Namespaces used for standard metadata
-            w.WriteAttributeString("xmlns", "dc", null, "http://purl.org/dc/elements/1.1/");
-			w.WriteAttributeString("xmlns", "cc", null, "http://creativecommons.org/ns#");
-			w.WriteAttributeString("xmlns", "rdf", null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+			if(!graphicsOnly)
+			{
+				// Namespaces used for standard metadata
+				w.WriteAttributeString("xmlns", "dc", null, "http://purl.org/dc/elements/1.1/");
+				w.WriteAttributeString("xmlns", "cc", null, "http://creativecommons.org/ns#");
+				w.WriteAttributeString("xmlns", "rdf", null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 
-            // Namespace used for linking to svg defs (defined objects)
-            // N.B.: xlink is deprecated in SVG 2 
-			// w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
 
-            // Standard definition of the "score" namespace.
-            // The file documents the additional attributes and elements available in the "score" namespace.
-            w.WriteAttributeString("xmlns", "score", null, "https://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+				// Namespace used for linking to svg defs (defined objects)
+				// N.B.: xlink is deprecated in SVG 2 
+				// w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
 
-            // The file defines and documents all the element classes used in this particular scoreType.
-            // The definitions include information as to how the classes nest, and the directions in which they are read.
-            // For example:
-            // 1) in cmn_core files, systems are read from top to bottom on a page, and contain
-            //    staves that are read in parallel, left to right.
-            // 2) cmn_1950.html files might include elements having class="tupletBracket", but
-            //    cmn_core files don't. As with the score namespace, the file does not actually
-            //    need to be read by the client code in order to discover the scoreType. 
-            w.WriteAttributeString("data-scoreType", null, "https://www.james-ingram-act-two.de/open-source/cmn_core.html");
+				// Standard definition of the "score" namespace.
+				// The file documents the additional attributes and elements available in the "score" namespace.
+				w.WriteAttributeString("xmlns", "score", null, "https://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+
+				// The file defines and documents all the element classes used in this particular scoreType.
+				// The definitions include information as to how the classes nest, and the directions in which they are read.
+				// For example:
+				// 1) in cmn_core files, systems are read from top to bottom on a page, and contain
+				//    staves that are read in parallel, left to right.
+				// 2) cmn_1950.html files might include elements having class="tupletBracket", but
+				//    cmn_core files don't. As with the score namespace, the file does not actually
+				//    need to be read by the client code in order to discover the scoreType. 
+				w.WriteAttributeString("data-scoreType", null, "https://www.james-ingram-act-two.de/open-source/cmn_core.html");
+			}
 
             w.WriteAttributeString("width", M.FloatToShortString(_pageFormat.ScreenRight)); // the intended screen display size (100%)
             w.WriteAttributeString("height", M.FloatToShortString(_pageFormat.ScreenBottom)); // the intended screen display size (100%)
             string viewBox = "0 0 " + _pageFormat.RightVBPX.ToString() + " " + _pageFormat.BottomVBPX.ToString();
-            w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (800%)            
+            w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (10 x the width and height -- see)            
         }
 
 		/// <summary>

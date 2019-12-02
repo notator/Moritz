@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Globals;
 
 namespace Moritz.Symbols
 {
@@ -25,14 +26,14 @@ namespace Moritz.Symbols
             Staff = staff;
         }
 
-		public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
+		public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel, bool graphicsOnly);
 
         /// <summary>
         /// Writes out an SVG Voice
         /// carryperChannel is null for InputVoices
         /// </summary>
         /// <param name="w"></param>
-        public virtual void WriteSVG(SvgWriter w, List<CarryMsgs> carryMsgsPerChannel)
+        public virtual void WriteSVG(SvgWriter w, List<CarryMsgs> carryMsgsPerChannel, bool graphicsOnly)
         {
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
@@ -58,7 +59,7 @@ namespace Moritz.Symbols
 				}
 				else if(inputChordSymbol != null)
 				{
-					inputChordSymbol.WriteSVG(w);
+					inputChordSymbol.WriteSVG(w, graphicsOnly);
 				}
 				else if(cautionaryChordSymbol != null)
 				{
@@ -66,17 +67,17 @@ namespace Moritz.Symbols
 				}
 				else if(outputChordSymbol != null)
 				{
-					Debug.Assert(carryMsgsPerChannel != null);
-					outputChordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+					M.Assert(carryMsgsPerChannel != null);
+					outputChordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel], graphicsOnly);
 				}
 				else if(inputRestSymbol != null)
 				{
-					inputRestSymbol.WriteSVG(w);
+					inputRestSymbol.WriteSVG(w, graphicsOnly);
 				}
 				else if(outputRestSymbol != null)
 				{
-					Debug.Assert(carryMsgsPerChannel != null);
-					outputRestSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+					M.Assert(carryMsgsPerChannel != null);
+					outputRestSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel], graphicsOnly);
 				}
 				else if(clef != null) // clef
 				{
@@ -162,7 +163,7 @@ namespace Moritz.Symbols
         public void Replace(DurationSymbol symbolToBeReplaced, List<NoteObject> noteObjects)
         {
             #region conditions
-            Debug.Assert(symbolToBeReplaced != null && symbolToBeReplaced.Voice == this);
+            M.Assert(symbolToBeReplaced != null && symbolToBeReplaced.Voice == this);
             #endregion conditions
 
             List<NoteObject> tempList = new List<NoteObject>(this.NoteObjects);
@@ -444,7 +445,7 @@ namespace Moritz.Symbols
 			get { return _midiChannel; } 
 			set
 			{
-				Debug.Assert(value >= 0 && value <= 15);
+				M.Assert(value >= 0 && value <= 15);
 				_midiChannel = value;
 			}
 		}

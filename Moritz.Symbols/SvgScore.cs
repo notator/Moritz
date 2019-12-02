@@ -42,12 +42,15 @@ namespace Moritz.Symbols
 
         #region save multi-page score
         /// <summary>
-        /// Silently overwrites the .html and all .svg pages.
-        /// An SVGScore consists of an .html file which references one .svg file per page of the score. 
+        /// Silently overwrites the .html and all current .svg pages.
+        /// An SVGScore consists of an .html file which references one .svg file per page of the score.
+		/// When graphicsOnly is true, the following are omitted (for ease of use in CorelDraw):
+		///     a) the metadata element, and all its required namespaces,
+		///     b) the score namespace, and all its enclosed (temporal and alignment) information.
         /// </summary>
-        public void SaveMultiPageScore()
+        public void SaveMultiPageScore(bool graphicsOnly)
         {
-            List<string> svgPagenames = SaveSVGPages();
+            List<string> svgPagenames = SaveSVGPages(graphicsOnly);
 
             if(File.Exists(FilePath))
             {
@@ -119,20 +122,27 @@ namespace Moritz.Symbols
             w.WriteEndElement(); // head
         }
 
-        private List<string> SaveSVGPages()
+        private List<string> SaveSVGPages(bool graphicsOnly)
         {
             List<string> pageFilenames = new List<string>();
 
             int pageNumber = 1;
             foreach(SvgPage page in _pages)
             {
-                string pageFilename = Path.GetFileNameWithoutExtension(FilePath) +
-                    " page " + (pageNumber).ToString() + ".svg";
+				string pageFilename = Path.GetFileNameWithoutExtension(FilePath);
+				if(graphicsOnly)
+				{
+					pageFilename += " page " + (pageNumber).ToString() + " graphics.svg";
+				}
+				else
+				{
+					pageFilename += " page " + (pageNumber).ToString() + ".svg";
+				}
                 string pagePath = Path.GetDirectoryName(FilePath) + @"\" + pageFilename;
 
                 pageFilenames.Add(pageFilename);
 
-                SaveSVGPage(pagePath, page, this.Metadata, false);
+                SaveSVGPage(pagePath, page, this.Metadata, false, graphicsOnly);
                 pageNumber++;
             }
 
@@ -150,7 +160,7 @@ namespace Moritz.Symbols
 		/// <summary>
 		/// Writes an SVG file containing one page of the score.
 		/// </summary>
-		public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata, bool isSinglePageScore)
+		public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata, bool isSinglePageScore, bool graphicsOnly)
         {
             if(File.Exists(pagePath))
             {
@@ -169,13 +179,13 @@ namespace Moritz.Symbols
 
             using(SvgWriter w = new SvgWriter(pagePath, settings))
             {
-                page.WriteSVG(w, metadata, isSinglePageScore);
+                page.WriteSVG(w, metadata, isSinglePageScore, graphicsOnly);
             }
         }
 
         public void WriteDefs(SvgWriter w, int pageNumber)
         {
-            Debug.Assert(Notator != null);
+            M.Assert(Notator != null);
 			w.SvgStartDefs(null);
 			WriteStyle(w, pageNumber);
 			Notator.SymbolSet.WriteSymbolDefinitions(w, _pageFormat);
@@ -188,8 +198,8 @@ namespace Moritz.Symbols
 
             w.WriteStartElement("style");
 			w.WriteAttributeString("type", "text/css");
-            w.WriteString(css.ToString());
-            w.WriteEndElement();
+			w.WriteCData(css.ToString());// CDATA block needed by CorelDraw when importing. (?)
+			w.WriteEndElement();
 		}
 
         private StringBuilder GetStyles(PageFormat pageFormat, int pageNumber)
@@ -981,21 +991,37 @@ namespace Moritz.Symbols
             return rval;
         }
 
-        #endregion line styles
+		#endregion line styles
 
-        #endregion save multi-page score
+		#endregion save multi-page score
 
-        #region save single svg score
-        public void SaveSingleSVGScore()
+		#region save single svg score
+		/// <summary>
+		/// <summary>
+		/// Writes the "scroll" version of the score. This is a standalone SVG file.
+		/// When graphicsOnly is true, the following are omitted (for ease of use in CorelDraw):
+		///     a) the metadata element, and all its required namespaces,
+		///     b) the score namespace, and all its enclosed (temporal and alignment) information.
+		/// </summary>
+		public void SaveSingleSVGScore(bool graphicsOnly)
 		{
-			string pageFilename = Path.GetFileNameWithoutExtension(FilePath) + " (scroll).svg";
+			string pageFilename = Path.GetFileNameWithoutExtension(FilePath);
+			if(graphicsOnly)
+			{
+				pageFilename += " graphics (scroll).svg";
+			}
+			else
+			{
+				pageFilename += " (scroll).svg";
+
+			}
 			string pagePath = Path.GetDirectoryName(FilePath) + @"\" + pageFilename;
 
 			TextInfo infoTextInfo = GetInfoTextAtTopOfPage(0);
 
 			SvgPage singlePage = new SvgPage(this, _pageFormat, 0, infoTextInfo, this.Systems, true);
 
-			SaveSVGPage(pagePath, singlePage, this.Metadata, true);
+			SaveSVGPage(pagePath, singlePage, this.Metadata, true, graphicsOnly);
 		}
 
 
@@ -1051,14 +1077,14 @@ namespace Moritz.Symbols
                 {
                     foreach(Voice voice in staff.Voices)
                     {
-                        Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
+                        M.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
                         // contains lists of consecutive rest indices
                         List<List<int>> restIndexLists = new List<List<int>>();
                         #region find the consecutive rests
                         List<int> consecutiveRestIndexList = new List<int>();
                         for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
                         {
-                            Debug.Assert(!(voice.NoteObjects[i] is Barline));
+                            M.Assert(!(voice.NoteObjects[i] is Barline));
 
 							RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
 							if(voice.NoteObjects[i] is RestSymbol rest1 && rest2 != null)
@@ -1091,7 +1117,7 @@ namespace Moritz.Symbols
                                 for(int j = consecutiveRestIndices.Count - 1; j > 0; j--)
                                 {
                                     rest = voice.NoteObjects[consecutiveRestIndices[j]] as RestSymbol;
-                                    Debug.Assert(rest != null);
+                                    M.Assert(rest != null);
                                     msDuration += rest.MsDuration;
                                     voice.NoteObjects.RemoveAt(consecutiveRestIndices[j]);
                                 }
@@ -1115,7 +1141,7 @@ namespace Moritz.Symbols
         /// </summary>
         public void SetSystemsToBeginAtBars(List<int> barNumbers)
         {
-			Debug.Assert(barNumbers != null);
+			M.Assert(barNumbers != null);
             if(barNumbers.Count == 0)
             {
                 int barNumber = 1;
@@ -1126,7 +1152,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            Debug.Assert(barNumbers[0] == 1);
+            M.Assert(barNumbers[0] == 1);
 
             // barNumbers beyond the end of the score are silently ignored.
             List<int> systemStartBarIndices = new List<int>();
@@ -1174,15 +1200,15 @@ namespace Moritz.Symbols
 		/// <param name="barlineIndex"></param>
 		private void JoinNextSystemToSystem(int systemIndex)
         {
-            Debug.Assert(Systems.Count > 1 && Systems.Count > systemIndex + 1);
+            M.Assert(Systems.Count > 1 && Systems.Count > systemIndex + 1);
             SvgSystem system1 = Systems[systemIndex];
             SvgSystem system2 = Systems[systemIndex+1];
-            Debug.Assert(system1.Staves.Count == system2.Staves.Count);
+            M.Assert(system1.Staves.Count == system2.Staves.Count);
 			foreach (Staff staff in system2.Staves)
 			{
 				foreach (Voice voice in staff.Voices)
 				{
-					Debug.Assert(voice.NoteObjects[0] is Clef);
+					M.Assert(voice.NoteObjects[0] is Clef);
 				}
 			}
 
@@ -1195,7 +1221,7 @@ namespace Moritz.Symbols
                 {
                     Voice voice1 = system1.Staves[staffIndex].Voices[voiceIndex];
                     Voice voice2 = system2.Staves[staffIndex].Voices[voiceIndex];
-					Debug.Assert(voice2.NoteObjects[0] is Clef);
+					M.Assert(voice2.NoteObjects[0] is Clef);
 					voice2.NoteObjects.RemoveAt(0);
                     try
                     {
@@ -1214,7 +1240,7 @@ namespace Moritz.Symbols
         //private string FindClefTypeAtEndOfStaff1(Voice staff1voice0)
         //{
         //    Clef mainStaff1Clef = staff1voice0.NoteObjects[0] as Clef;
-        //    Debug.Assert(mainStaff1Clef != null);
+        //    M.Assert(mainStaff1Clef != null);
 
         //    string clefTypeAtEndOfStaff1 = mainStaff1Clef.ClefType;
         //    foreach(NoteObject noteObject in staff1voice0.NoteObjects)
@@ -1300,7 +1326,7 @@ namespace Moritz.Symbols
                 {
                     foreach(Voice voice in staff.Voices)
                     {
-                        Debug.Assert(voice.NoteObjects.Count > 0
+                        M.Assert(voice.NoteObjects.Count > 0
                             && !(voice.NoteObjects[voice.NoteObjects.Count - 1] is NormalBarline));
 
                         NormalBarline normalBarline = new NormalBarline(voice);
@@ -1352,7 +1378,7 @@ namespace Moritz.Symbols
             int nStaves = Systems[0].Staves.Count;
             foreach(SvgSystem system in Systems)
             {
-                Debug.Assert(system.Staves.Count == nStaves);
+                M.Assert(system.Staves.Count == nStaves);
             }
             List<int> nVoices = new List<int>();
             foreach(Staff staff in Systems[0].Staves)
@@ -1362,10 +1388,10 @@ namespace Moritz.Symbols
             {
                 for(int i = 0; i < system.Staves.Count; ++i)
                 {
-                    Debug.Assert(system.Staves[i].Voices.Count == nVoices[i]);
+                    M.Assert(system.Staves[i].Voices.Count == nVoices[i]);
 					foreach(Voice voice in system.Staves[i].Voices)
 					{
-						Debug.Assert(voice.NoteObjects[0] is Clef);
+						M.Assert(voice.NoteObjects[0] is Clef);
 					}
                 }
             }
@@ -1458,12 +1484,12 @@ namespace Moritz.Symbols
 
 		private int BarlineMsPos(List<NoteObject> noteObjects, int i)
 		{
-			Debug.Assert(noteObjects[i] is Barline);
+			M.Assert(noteObjects[i] is Barline);
 			int barlineMsPos = 0;
 			if(i > 0 && i == noteObjects.Count - 1)
 			{
 				DurationSymbol prevDurationSymbol = noteObjects[i - 1] as DurationSymbol;
-				Debug.Assert(prevDurationSymbol != null);
+				M.Assert(prevDurationSymbol != null);
 				if((prevDurationSymbol is RestSymbol restSymbol)
 				|| (prevDurationSymbol is ChordSymbol cSymbol && cSymbol.MsDurationToNextBarline == null))
 				{
@@ -1577,8 +1603,8 @@ namespace Moritz.Symbols
 		private void MoveSmallClefsToFollowRests(Voice voice, int systemIndex, int staffIndex, int voiceIndex)
 		{
 			List<NoteObject> noteObjects = voice.NoteObjects;
-			Debug.Assert(noteObjects[0] is Clef);
-			Debug.Assert(noteObjects[noteObjects.Count - 1] is Barline);
+			M.Assert(noteObjects[0] is Clef);
+			M.Assert(noteObjects[noteObjects.Count - 1] is Barline);
 
 			for(int i = noteObjects.Count - 1; i > 0; --i)
             {
@@ -1670,8 +1696,8 @@ namespace Moritz.Symbols
             float systemHeightsTotal = 0;
             while(systemIndex < Systems.Count)
             {
-                Debug.Assert(Systems[systemIndex].Metrics != null);
-                Debug.Assert(Systems[systemIndex].Metrics.StafflinesTop == 0);
+                M.Assert(Systems[systemIndex].Metrics != null);
+                M.Assert(Systems[systemIndex].Metrics.StafflinesTop == 0);
 
                 systemHeight = Systems[systemIndex].Metrics.NotesBottom - Systems[systemIndex].Metrics.NotesTop;
 
@@ -1700,9 +1726,24 @@ namespace Moritz.Symbols
                 infoAtTopOfPageSB.Append(Path.GetFileNameWithoutExtension(_filename));
 
 			if(pageNumber == 0)
-				infoAtTopOfPageSB.Append(" (scroll)");
+			{
+				//if(graphicsOnly)
+				//{
+				//	infoAtTopOfPageSB.Append(" graphics (scroll)");
+				//}
+				//else
+				//{
+					infoAtTopOfPageSB.Append(" (scroll)");
+				//}
+			}
 			else
+			{
 				infoAtTopOfPageSB.Append(" page " + pageNumber.ToString());
+				//if(graphicsOnly)
+				//{
+				//	infoAtTopOfPageSB.Append(" graphics");
+				//}
+			}				
 
             if(Metadata != null)
                 infoAtTopOfPageSB.AppendFormat(", " + Metadata.Date);
@@ -1909,12 +1950,12 @@ namespace Moritz.Symbols
         {
             get
             {
-                Debug.Assert(_pages.Count > 0);
-                Debug.Assert(_pages[0].Systems.Count > 0);
-                Debug.Assert(_pages[0].Systems[0].Staves.Count > 0);
+                M.Assert(_pages.Count > 0);
+                M.Assert(_pages[0].Systems.Count > 0);
+                M.Assert(_pages[0].Systems[0].Staves.Count > 0);
                 foreach(Staff staff in _pages[0].Systems[0].Staves)
                 {
-                    Debug.Assert(!String.IsNullOrEmpty(staff.Staffname));
+                    M.Assert(!String.IsNullOrEmpty(staff.Staffname));
                     yield return staff.Staffname;
                 }
             }

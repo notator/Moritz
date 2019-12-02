@@ -12,7 +12,7 @@ namespace Moritz.Symbols
         {
         }
 
-        public readonly int ViewBoxMagnification = 8;
+        public readonly int ViewBoxMagnification = 10;
 
         #region paper size
         public float Right { get { return RightVBPX; } }

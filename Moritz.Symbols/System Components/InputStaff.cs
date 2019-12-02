@@ -16,11 +16,11 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the stafflines, and noteObjects for an InputStaff.
         /// </summary>
-        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel, bool graphicsOnly)
         {
             w.SvgStartGroup(Metrics.CSSObjectClass.ToString()); // "inputStaff"
 
-            base.WriteSVG(w, systemNumber, staffNumber, null); // carryMsgsPerChannel only for OutputStaff
+            base.WriteSVG(w, systemNumber, staffNumber, null, graphicsOnly); // carryMsgsPerChannel only for OutputStaff
 
             w.SvgEndGroup(); // InputStaff
         }

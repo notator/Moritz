@@ -31,7 +31,7 @@ namespace Moritz.Composer
             SetDefaultValues();
             DeselectAll();
 
-            Debug.Assert(File.Exists(settingsPath));
+            M.Assert(File.Exists(settingsPath));
 
             _settingsPath = settingsPath;
             _settingsFolderPath = Path.GetDirectoryName(settingsPath);
@@ -44,7 +44,7 @@ namespace Moritz.Composer
 
             _algorithm = ComposableScore.Algorithm(_scoreTitle);
 
-            Debug.Assert(_algorithm != null);
+            M.Assert(_algorithm != null);
 
 			_outputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerOutputVoice);
 			if(_algorithm.MidiChannelPerInputVoice != null)
@@ -133,7 +133,7 @@ namespace Moritz.Composer
         #endregion DeselectAll
         private List<byte> GetVoiceIndices(IReadOnlyList<int> MidiChannelIndexPerVoice)
         {
-			Debug.Assert(MidiChannelIndexPerVoice != null);
+			M.Assert(MidiChannelIndexPerVoice != null);
 
             List<byte> rval = new List<byte>();
             for(byte i = 0; i < MidiChannelIndexPerVoice.Count; ++i)
@@ -157,7 +157,7 @@ namespace Moritz.Composer
         #region helpers
         private void SetVoiceIndicesHelpLabel(IReadOnlyList<int> midiChannelIndexPerOutputVoice, IReadOnlyList<int> midiChannelIndexPerInputVoice)
         {
-            Debug.Assert(midiChannelIndexPerOutputVoice.Count > 0);
+            M.Assert(midiChannelIndexPerOutputVoice.Count > 0);
 			StringBuilder sb = new StringBuilder();
 			foreach(var channel in midiChannelIndexPerOutputVoice)
 			{
@@ -408,7 +408,7 @@ namespace Moritz.Composer
         }
         private void RevertNotationToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((SavedState)NotationGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)NotationGroupBox.Tag) == SavedState.confirmed);
+            M.Assert(((SavedState)NotationGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)NotationGroupBox.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert the notation panel to the saved version?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -437,7 +437,7 @@ namespace Moritz.Composer
                         }
                         M.ReadToXmlElementTag(r, "notation", "moritzKrystalScore");
                     }
-                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                    M.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
             }
             catch(Exception ex)
@@ -453,7 +453,7 @@ namespace Moritz.Composer
         }
         private void RevertKrystalsToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((SavedState)KrystalsGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)KrystalsGroupBox.Tag) == SavedState.confirmed);
+            M.Assert(((SavedState)KrystalsGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)KrystalsGroupBox.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert the krystals panel to the saved version?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -482,7 +482,7 @@ namespace Moritz.Composer
                         }
                         M.ReadToXmlElementTag(r, "krystals", "moritzKrystalScore");
                     }
-                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                    M.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
             }
             catch(Exception ex)
@@ -494,7 +494,7 @@ namespace Moritz.Composer
 
         private void RevertPalettesButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((SavedState)PalettesGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)PalettesGroupBox.Tag) == SavedState.confirmed);
+            M.Assert(((SavedState)PalettesGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)PalettesGroupBox.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to close all palettes and revert them to their saved versions?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -528,7 +528,7 @@ namespace Moritz.Composer
                         }
                         M.ReadToXmlElementTag(r, "palettes", "moritzKrystalScore");
                     }
-                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                    M.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
             }
             catch(Exception ex)
@@ -540,12 +540,12 @@ namespace Moritz.Composer
         #endregion GroupBox confirm and revert buttons
         private void ShowUnconfirmedFormsButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(_fsf.UnconfirmedFormsExist());
+            M.Assert(_fsf.UnconfirmedFormsExist());
             _fsf.ShowUnconfirmedForms();
         }
         private void ShowConfirmedFormsButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(_fsf.ConfirmedFormsExist());
+            M.Assert(_fsf.ConfirmedFormsExist());
             _fsf.ShowConfirmedForms();
         }   
         #region SaveSettingsCreateScore button
@@ -559,7 +559,7 @@ namespace Moritz.Composer
             }
             else
             {
-                Debug.Assert(SaveSettingsCreateScoreButton.Text.StartsWith("create"));
+                M.Assert(SaveSettingsCreateScoreButton.Text.StartsWith("create"));
                 CreateSVGScore();
             }
         }
@@ -662,7 +662,7 @@ namespace Moritz.Composer
                 }
                 if(visibleOrnamentFormLocations.ContainsKey(i))
                 {
-                    Debug.Assert(paletteForm.OrnamentsForm != null);
+                    M.Assert(paletteForm.OrnamentsForm != null);
                     paletteForm.OrnamentsForm.Show();
                     paletteForm.OrnamentsForm.Location = visibleOrnamentFormLocations[i];
                 }
@@ -1014,7 +1014,7 @@ namespace Moritz.Composer
 
         private bool CheckMIDIChannelIndices(List<List<byte>> midiChannelsPerStaff, List<byte> availableMIDIChannels)
         {
-			Debug.Assert(availableMIDIChannels != null);
+			M.Assert(availableMIDIChannels != null);
 
             bool error = false;
 			var flatMIDIChannels = new List<byte>();
@@ -1688,7 +1688,7 @@ namespace Moritz.Composer
 
                     _dimensionsAndMetadataForm.Read(r);
 
-                    Debug.Assert(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes");
+                    M.Assert(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes");
 
                     while(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes")
                     {
@@ -1709,10 +1709,10 @@ namespace Moritz.Composer
                         }
                         M.ReadToXmlElementTag(r, "notation", "krystals", "palettes", "moritzKrystalScore");
                     }
-                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                    M.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
-                Debug.Assert(!_fsf.UnconfirmedFormsExist());
-                Debug.Assert(!_fsf.ConfirmedFormsExist());
+                M.Assert(!_fsf.UnconfirmedFormsExist());
+                M.Assert(!_fsf.ConfirmedFormsExist());
             }
             catch(Exception ex)
             {
@@ -1721,7 +1721,7 @@ namespace Moritz.Composer
         }
         private void GetNotation(XmlReader r)
         {
-            Debug.Assert(r.Name == "notation");
+            M.Assert(r.Name == "notation");
             int count = r.AttributeCount;
             OutputChordSymbolTypeComboBox.SelectedIndex = 0; // default is standard outputChord symbols (all noteheads black)
             for(int i = 0; i < count; i++)
@@ -1806,7 +1806,7 @@ namespace Moritz.Composer
         #endregion helpers
         private void GetKrystals(XmlReader r)
         {
-            Debug.Assert(r.Name == "krystals");
+            M.Assert(r.Name == "krystals");
 
             M.ReadToXmlElementTag(r, "krystal");
             this.KrystalsListBox.SuspendLayout();
@@ -1843,7 +1843,7 @@ namespace Moritz.Composer
         }
         private void GetPalettes(XmlReader r)
         {
-            Debug.Assert(r.Name == "palettes");
+            M.Assert(r.Name == "palettes");
             M.ReadToXmlElementTag(r, "palette");
             this.PalettesListBox.SuspendLayout();
             this.PalettesListBox.Items.Clear();
@@ -1882,7 +1882,7 @@ namespace Moritz.Composer
                 }
             }
             this.PalettesListBox.ResumeLayout();
-            Debug.Assert(r.Name == "palettes");
+            M.Assert(r.Name == "palettes");
             SetGroupBoxIsSaved(PalettesGroupBox, null, RevertPalettesListButton,
                 (SavedState)NotationGroupBox.Tag, (SavedState)KrystalsGroupBox.Tag);
             PalettesListBox.Refresh();
@@ -1892,7 +1892,7 @@ namespace Moritz.Composer
         #region save settings
         public void SaveSettings()
         {
-            Debug.Assert(!string.IsNullOrEmpty(_settingsPath));
+            M.Assert(!string.IsNullOrEmpty(_settingsPath));
 
             M.CreateDirectoryIfItDoesNotExist(this._settingsFolderPath);
 
@@ -2018,10 +2018,14 @@ namespace Moritz.Composer
 
             if(score != null && score.Systems.Count > 0)
             {
-                score.SaveMultiPageScore();
-				score.SaveSingleSVGScore();
-                // Opens the multi-page score in the program which is set by the system to open .svg files.
-                global::System.Diagnostics.Process.Start(score.FilePath);
+				// score.SaveMultiPageScore(false); // writes all information (as before 01.12.2019)
+				score.SaveMultiPageScore(true); // only writes the graphics (for possible export to CorelDraw)
+
+				score.SaveSingleSVGScore(false); // writes all information (as before 01.12.2019)
+				score.SaveSingleSVGScore(true); // only writes the graphics (for export to CorelDraw)
+
+				// Opens the multi-page (graphics-only) score in the program which is set by the system to open .svg files.
+				global::System.Diagnostics.Process.Start(score.FilePath);
             }
         }
 
@@ -2056,7 +2060,7 @@ namespace Moritz.Composer
             pageFormat.IsLandscape = _dimensionsAndMetadataForm.Landscape;
             int bottomPX;
             int rightPX;
-            Debug.Assert(Regex.Matches(pageFormat.PaperSize, @"^(A4|B4|A5|B5|A3|Letter|Legal|Tabloid)$") != null);
+            M.Assert(Regex.Matches(pageFormat.PaperSize, @"^(A4|B4|A5|B5|A3|Letter|Legal|Tabloid)$") != null);
             if(pageFormat.IsLandscape == true)
             {
                 bottomPX = (int)(pageFormat.VerticalPixelsPerMillimeter * M.PaperSizes[pageFormat.PaperSize].ShortDimension_MM);
@@ -2142,11 +2146,11 @@ namespace Moritz.Composer
 				clefPerMidiChannel.Add(clef);
 				if (pageFormat.OutputMIDIChannelsPerStaff[staffIndex].Count > 1)
 				{
-					Debug.Assert(pageFormat.OutputMIDIChannelsPerStaff[index: staffIndex].Count == 2);
+					M.Assert(pageFormat.OutputMIDIChannelsPerStaff[index: staffIndex].Count == 2);
 					clefPerMidiChannel.Add(clef);
 				}
 			}
-			Debug.Assert(pageFormat.InputMIDIChannelsPerStaff.Count < 3);
+			M.Assert(pageFormat.InputMIDIChannelsPerStaff.Count < 3);
 			int endIndex = staffIndex + pageFormat.InputMIDIChannelsPerStaff.Count;
 			for (; staffIndex < endIndex; staffIndex++)
 			{
@@ -2224,7 +2228,7 @@ namespace Moritz.Composer
         {
             get
             {
-				Debug.Assert(_outputMIDIChannelsPerStaff != null && _outputMIDIChannelsPerStaff.Count > 0 && _inputMIDIChannelsPerStaff != null);
+				M.Assert(_outputMIDIChannelsPerStaff != null && _outputMIDIChannelsPerStaff.Count > 0 && _inputMIDIChannelsPerStaff != null);
 				var nStaves = _outputMIDIChannelsPerStaff.Count + _inputMIDIChannelsPerStaff.Count; // _inputVoiceIndicesPerStaff.Count can be 0.
 				return nStaves;
             }

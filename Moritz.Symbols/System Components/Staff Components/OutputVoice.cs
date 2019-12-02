@@ -17,11 +17,11 @@ namespace Moritz.Symbols
             MidiChannel = midiChannel;
         }
 
-		public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel)
+		public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel, bool graphicsOnly)
         {
 			w.SvgStartGroup(CSSObjectClass.voice.ToString());
 
-            base.WriteSVG(w, carryMsgsPerChannel);
+            base.WriteSVG(w, carryMsgsPerChannel, graphicsOnly);
             w.SvgEndGroup(); // outputVoice
         }
     }

@@ -25,15 +25,18 @@ namespace Moritz.Symbols
         /// Writes out all the SVGSystem's staves. 
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel)
+        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel, bool graphicsOnly)
         {
             w.SvgStartGroup(this.Metrics.CSSObjectClass.ToString()); // "system"
 
-            WriteLeftToRightElement(w);
+			if(!graphicsOnly)
+			{
+				WriteLeftToRightElement(w);
+			}
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
-                Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1, carryMsgsPerChannel);
+                Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1, carryMsgsPerChannel, graphicsOnly);
             }
 
             w.SvgStartGroup(CSSObjectClass.staffConnectors.ToString());
@@ -56,7 +59,7 @@ namespace Moritz.Symbols
         private void WriteConnectors(SvgWriter w, int systemNumber, PageFormat pageFormat)
         {
             List<bool> barlineContinuesDownList = pageFormat.BarlineContinuesDownList;
-            Debug.Assert(barlineContinuesDownList[barlineContinuesDownList.Count - 1] == false);
+            M.Assert(barlineContinuesDownList[barlineContinuesDownList.Count - 1] == false);
             Barline barline = null;
             bool isFirstBarline = true;
 
@@ -215,7 +218,7 @@ namespace Moritz.Symbols
                         NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
                         noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, pageFormat);
 
-						Debug.Assert(noteObject.Metrics != null);
+						M.Assert(noteObject.Metrics != null);
 						staff.Metrics.Add(noteObject.Metrics);
 						if(noteObject is Barline barline)
 						{
@@ -226,7 +229,7 @@ namespace Moritz.Symbols
 
                 if(staff.Voices.Count > 1)
                 {
-                    Debug.Assert(Score.Notator.SymbolSet is StandardSymbolSet);
+                    M.Assert(Score.Notator.SymbolSet is StandardSymbolSet);
                     // Other symbol sets do not support multi voice staves.
                     staff.AdjustTwoPartChords();
                 }
@@ -434,7 +437,7 @@ namespace Moritz.Symbols
             {
                 absMsPos = moments[i].AbsMsPosition;
                 float barlineWidth = 0F;
-                Debug.Assert(moments.Count > 1);
+                M.Assert(moments.Count > 1);
 
                 barline = moments[i].Barline;
                 if(barline != null && barline.Metrics != null)
@@ -525,7 +528,7 @@ namespace Moritz.Symbols
             }
 
             List<NoteObjectMoment> momentSymbols = new List<NoteObjectMoment>();
-            Debug.Assert(dict.Count > 0);
+            M.Assert(dict.Count > 0);
             foreach(int key in dict.Keys)
                 momentSymbols.Add(dict[key]);
 
@@ -539,7 +542,7 @@ namespace Moritz.Symbols
             float prevMsPos = -1;
             foreach(NoteObjectMoment moment in momentSymbols)
             {
-                Debug.Assert(moment.AbsMsPosition > prevMsPos);
+                M.Assert(moment.AbsMsPosition > prevMsPos);
                 prevMsPos = moment.AbsMsPosition;
             }
             #endregion
@@ -708,7 +711,7 @@ namespace Moritz.Symbols
             List<NoteObjectMoment> staffMoments, // the NoteObjectMoments used by the current staff (contains their msPositions)
             Dictionary<int, float> staffOverlaps) // msPosition, overlap.
         {
-            Debug.Assert(systemMoments.Count > 1 && staffMoments.Count > 1);
+            M.Assert(systemMoments.Count > 1 && staffMoments.Count > 1);
 
             SetNonCompressible(nonCompressibleSystemMomentPositions, systemMoments, staffMoments, staffOverlaps);
 
@@ -775,7 +778,7 @@ namespace Moritz.Symbols
             List<NoteObjectMoment> staffMoments, 
             Dictionary<int, float> staffOverlaps)
         {
-            Debug.Assert(staffMoments.Count > 1);
+            M.Assert(staffMoments.Count > 1);
             for(int stmIndex = 1; stmIndex < staffMoments.Count; ++stmIndex)
             {
                 int prevMPos = staffMoments[stmIndex - 1].AbsMsPosition;
@@ -1029,7 +1032,7 @@ namespace Moritz.Symbols
                     && !isSingleStaffGroup)
                     {                           
                         Barline barline = noteObjects[i - 1] as Barline;
-                        Debug.Assert(barline != null);
+                        M.Assert(barline != null);
                         barline.IsVisible = false;
                     }
                 }
@@ -1074,7 +1077,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            Debug.Assert(Staves[0].Metrics.StafflinesTop == 0);
+            M.Assert(Staves[0].Metrics.StafflinesTop == 0);
             for(int i = 1; i < Staves.Count; ++i)
             {
                 if(Staves[i].Metrics != null)
@@ -1109,7 +1112,7 @@ namespace Moritz.Symbols
             {
                 this.Metrics.Add(staff.Metrics);
             }
-            Debug.Assert(this.Metrics.StafflinesTop == 0);
+            M.Assert(this.Metrics.StafflinesTop == 0);
         }
 
         private BottomEdge GetBottomEdge(int upperStaffIndex, int topVisibleStaffIndex, float pageWidth, float gap)

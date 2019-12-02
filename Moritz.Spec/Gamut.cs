@@ -231,7 +231,7 @@ namespace Moritz.Spec
 			{
 				if(i > 0)
 				{
-					Debug.Assert(PitchWeights[i].Pitch > PitchWeights[i - 1].Pitch, $"{nameof(PitchWeights)} values must be in ascending pitch order.");
+					M.Assert(PitchWeights[i].Pitch > PitchWeights[i - 1].Pitch, $"{nameof(PitchWeights)} values must be in ascending pitch order.");
 				}
 			}
 
