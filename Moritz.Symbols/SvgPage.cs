@@ -186,6 +186,13 @@ namespace Moritz.Symbols
 		{
             w.SvgStartGroup(CSSObjectClass.systems.ToString());
 
+			if(graphicsOnly)
+			{
+				var commaIndex = _infoTextInfo.Text.IndexOf(',');
+				var text = _infoTextInfo.Text.Insert(commaIndex, " graphics");
+				_infoTextInfo = new TextInfo(text, _infoTextInfo.FontFamily, _infoTextInfo.FontHeight, _infoTextInfo.TextHorizAlign);
+			}
+
 			w.SvgText(CSSObjectClass.timeStamp, _infoTextInfo.Text, 32, _infoTextInfo.FontHeight);
 
 			if(pageNumber == 1 || pageNumber == 0)

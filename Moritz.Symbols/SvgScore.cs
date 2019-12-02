@@ -1005,6 +1005,9 @@ namespace Moritz.Symbols
 		/// </summary>
 		public void SaveSingleSVGScore(bool graphicsOnly)
 		{
+			TextInfo infoTextInfo = GetBasicInfoTextAtTopOfPage(0);
+			SvgPage singlePage = new SvgPage(this, _pageFormat, 0, infoTextInfo, this.Systems, true);
+
 			string pageFilename = Path.GetFileNameWithoutExtension(FilePath);
 			if(graphicsOnly)
 			{
@@ -1016,10 +1019,6 @@ namespace Moritz.Symbols
 
 			}
 			string pagePath = Path.GetDirectoryName(FilePath) + @"\" + pageFilename;
-
-			TextInfo infoTextInfo = GetInfoTextAtTopOfPage(0);
-
-			SvgPage singlePage = new SvgPage(this, _pageFormat, 0, infoTextInfo, this.Systems, true);
 
 			SaveSVGPage(pagePath, singlePage, this.Metadata, true, graphicsOnly);
 		}
@@ -1682,7 +1681,7 @@ namespace Moritz.Symbols
 
         protected SvgPage NewSvgPage(int pageNumber, ref int systemIndex)
         {
-            TextInfo infoTextInfo = GetInfoTextAtTopOfPage(pageNumber);
+            TextInfo infoTextInfo = GetBasicInfoTextAtTopOfPage(pageNumber);
 
             List<SvgSystem> systemsOnPage = new List<SvgSystem>();
             bool lastPage = true;
@@ -1718,7 +1717,7 @@ namespace Moritz.Symbols
             return new SvgPage(this, _pageFormat, pageNumber, infoTextInfo, systemsOnPage, lastPage);
         }
 
-        private TextInfo GetInfoTextAtTopOfPage(int pageNumber)
+        private TextInfo GetBasicInfoTextAtTopOfPage(int pageNumber)
         {
             StringBuilder infoAtTopOfPageSB = new StringBuilder();
 
@@ -1727,22 +1726,11 @@ namespace Moritz.Symbols
 
 			if(pageNumber == 0)
 			{
-				//if(graphicsOnly)
-				//{
-				//	infoAtTopOfPageSB.Append(" graphics (scroll)");
-				//}
-				//else
-				//{
-					infoAtTopOfPageSB.Append(" (scroll)");
-				//}
+				infoAtTopOfPageSB.Append(" (scroll)");
 			}
 			else
 			{
 				infoAtTopOfPageSB.Append(" page " + pageNumber.ToString());
-				//if(graphicsOnly)
-				//{
-				//	infoAtTopOfPageSB.Append(" graphics");
-				//}
 			}				
 
             if(Metadata != null)
