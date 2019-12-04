@@ -2,7 +2,6 @@
 using Moritz.Palettes;
 using Moritz.Spec;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Moritz.Algorithm.Study4
 {
@@ -54,7 +53,7 @@ namespace Moritz.Algorithm.Study4
 			}
 
 			// the returned barlineMsPositions do not include 0, but do include the final barline position.
-			trkListList[0] = CreateTopChannelBarTrks(gamutVector.Gamuts, out barlineMsPositions);
+			trkListList[0] = CreateChannel0BarTrks(gamutVector.Gamuts, out barlineMsPositions);
 
 			#region fill the other trks with rests
 			int currentMsPos = 0;
@@ -76,33 +75,47 @@ namespace Moritz.Algorithm.Study4
 		}
 
 		// the returned barlineMsPositions do not include 0, but do include the final barline position.
-		private List<Trk> CreateTopChannelBarTrks(IReadOnlyList<Gamut> gamuts, out List<int> barlineMsPositions)
-		{
-			const int minBarMsDuration = 5000;
-			const int topChannelIndex = 0;
-			int nBars = gamuts.Count;
-
+		private List<Trk> CreateChannel0BarTrks(IReadOnlyList<Gamut> gamuts, out List<int> barlineMsPositions)
+		{			
 			barlineMsPositions = new List<int>(); // out
 			List<Trk> topTrks = new List<Trk>(); // return
 
-			int iudIndex = 0;
-			int currentMsPos = 0;
-			int regionIndex = -1;
-			for(int i = 0; i < nBars; i++)
+			List<Trk> ch0RegionTrks = null;
+			var rSBI = RegionStartBarIndices;
+			List<int> nBarsPerRegion = new List<int>();
+			for(int i = 0; i < rSBI.Count - 1; i++)
 			{
-				Gamut gamut = gamuts[i];
+				ch0RegionTrks = GetCh0RegionTrks(i, gamuts, rSBI[i], rSBI[i+1]);
+				topTrks.AddRange(ch0RegionTrks);
+			}
+			ch0RegionTrks = GetCh0RegionTrks(rSBI.Count - 1, gamuts, rSBI[rSBI.Count - 1], gamuts.Count);
+			topTrks.AddRange(ch0RegionTrks);
 
-				if(RegionStartBarIndices.Contains(i))
-				{
-					regionIndex++; // Can be used in the code below (but isn't yet).
-				}
+			int msPos = 0;
+			foreach(Trk trk in topTrks)
+			{
+				msPos += trk.MsDuration;
+				barlineMsPositions.Add(msPos);
+			}			
 
-				switch(regionIndex)
-				{
-					case 0:
-						Palette palette = _palettes[0];
-						Trk barTrk = new Trk(topChannelIndex);
-						topTrks.Add(barTrk);
+			return topTrks;
+		}
+
+		// endIndex is non-inclusive
+		private List<Trk> GetCh0RegionTrks(int regionIndex, IReadOnlyList<Gamut> gamuts, int startGamutIndex, int endGamutIndex)
+		{
+			List<Trk> regionTrks = new List<Trk>(); // return
+			switch(regionIndex)
+			{
+				case 0:
+					Palette palette = _palettes[0];
+					int iudIndex = 0;
+					int minBarMsDuration = 5000;
+
+					for(int i = startGamutIndex; i < endGamutIndex; i++)
+					{
+						Trk barTrk = new Trk(0);
+						regionTrks.Add(barTrk); // region 0 only has one bar
 						var barMsDuration = 0;
 						while(barMsDuration <= minBarMsDuration)
 						{
@@ -111,17 +124,47 @@ namespace Moritz.Algorithm.Study4
 							{
 								iud = palette.GetIUniqueDef(0);
 							}
+							iud = FitToGamut(gamuts[i], iud);
+
 							barMsDuration += iud.MsDuration;
 
 							barTrk.Add(iud);
 						}
-						currentMsPos += barTrk.MsDuration;
-						barlineMsPositions.Add(currentMsPos);
-						break;
-				}
-			}
+					}
+					break;
+				default:
+					Palette defaultPalette = _palettes[0];
+					iudIndex = 0;
+					minBarMsDuration = 1000;
 
-			return topTrks;
+					for(int i = startGamutIndex; i < endGamutIndex; i++)
+					{
+						Trk barTrk = new Trk(0);
+						regionTrks.Add(barTrk);
+						var barMsDuration = 0;
+						while(barMsDuration <= minBarMsDuration)
+						{
+							var iud = defaultPalette.GetIUniqueDef((iudIndex++) % defaultPalette.Count);
+							if(iud is MidiRestDef)
+							{
+								iud = defaultPalette.GetIUniqueDef(0);
+							}
+							iud = FitToGamut(gamuts[i], iud);
+
+							barMsDuration += iud.MsDuration;
+
+							barTrk.Add(iud);
+						}
+					}
+					break;
+
+			}
+			return regionTrks;
+		}
+
+		private IUniqueDef FitToGamut(Gamut gamut, IUniqueDef iud)
+		{
+			return iud.Clone() as IUniqueDef;
 		}
 	}
 }
