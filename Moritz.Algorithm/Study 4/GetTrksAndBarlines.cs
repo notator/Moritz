@@ -128,7 +128,7 @@ namespace Moritz.Algorithm.Study4
 					var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
 					if(iud is MidiChordDef mcd)
 					{
-						mcd = FitToGamut(gamuts[i], mcd, 0, 0);
+						mcd.SetToGamut(gamuts[i], 0, 0);
 
 						barMsDuration += mcd.MsDuration;
 
@@ -158,7 +158,7 @@ namespace Moritz.Algorithm.Study4
 					var iud = defaultPalette.GetIUniqueDef((iudIndex++) % defaultPalette.Count);
 					if(iud is MidiChordDef mcd)
 					{
-						mcd = FitToGamut(gamuts[i], mcd, 0, 0);
+						mcd.SetToGamut(gamuts[i], 0, 0);
 
 						barMsDuration += mcd.MsDuration;
 
@@ -168,51 +168,6 @@ namespace Moritz.Algorithm.Study4
 			}
 
 			return regionTrks;
-		}
-
-		/// <summary>
-		/// The argument MidiChordDef determines the following parameters in the returned MidiChordDef:
-		/// (These should be set using a palette.)
-		///    1. the number of BasicMidiChordDefs and their pitch density
-		///    2. the root pitch will be as high as possible, but less than or equal to BasicMidiChordDef[0].Pitches[0]. 
-		///    2. pitchWheelDeviation
-		///    3. pitchWheel and pan slider definitions
-		/// ------------------------------------------------------------------
-		/// The root (lowest) pitch in the returned MidiChordDef is found as follows:
-		///    1. The root's absolute pitch is found using absRootIndex in the gamut.AbsolutePitches list.
-		///    2. The root's relative pitch is the highest root pitch less than or equal to the lowest pitch in the argument MidiChordDef.
-		/// The shape of the output chord is determined by the chordShapeIndex using a static set of Study4ChordShapes as follows:
-		///    1. Find the chordShape in Study4ChordShapes using the chordShapeIndex.
-		///       A Study4ChordShape is a list of 7 indices for use in the gamut.AbsolutePitches list.
-		///       These indices may repeat in the list (resulting in octaves).
-		///    2. Find the corresponding list of absolute pitches using only the number of pitches defined by the MidiChordDef argument.
-		///    3. Build the chord upwards from the root, copying the velocities that correspond to the pitches from the gamut.    
-		/// </summary>
-		private MidiChordDef FitToGamut(Gamut gamut, MidiChordDef mcd, int absRootIndex, int chordShapeIndex)
-		{
-			List<IUniqueDef> basicChords = new List<IUniqueDef>();
-
-			foreach(var bmc in mcd.BasicMidiChordDefs)
-			{
-				List<byte> pitches = new List<byte>();
-				List<byte> velocities = new List<byte>();
-				for(int i = 0; i < bmc.Pitches.Count; i++)
-				{ 
-					// Do the pitch and velocity changes here.
-
-					pitches.Add((byte)(bmc.Pitches[i] - 12));
-					velocities.Add(bmc.Velocities[i]);
-				}
-				basicChords.Add(new MidiChordDef(pitches, velocities, mcd.MsDuration, mcd.HasChordOff));
-			}
-
-			var rval = new MidiChordDef(mcd.MsDuration, basicChords, mcd.OrnamentText)
-			{
-				PitchWheelDeviation = mcd.PitchWheelDeviation,
-				MidiChordSliderDefs = mcd.MidiChordSliderDefs
-			};
-
-			return rval;
 		}
 	}
 }
