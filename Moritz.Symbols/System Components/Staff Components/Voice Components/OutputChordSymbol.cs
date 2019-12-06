@@ -21,11 +21,19 @@ namespace Moritz.Symbols
 
             if(! String.IsNullOrEmpty(umcd.OrnamentText))
             {
-				// if umcd.OrnamentText is null or empty, there will be no ornamentString DrawObject
-				string ornamentString = String.Concat('~', umcd.OrnamentText);   
+				string ornamentString = null;
+				if(Char.IsDigit(umcd.OrnamentText[0]))
+				{
+					// if umcd.OrnamentText is null or empty, there will be no ornamentString DrawObject
+					ornamentString = String.Concat('~', umcd.OrnamentText);
+				}
+				else
+				{
+					ornamentString = umcd.OrnamentText;
+				}
 				OrnamentText ornamentText = new OrnamentText(this, ornamentString, pageFormat.OrnamentFontHeight);
 				DrawObjects.Add(ornamentText);
-            }
+			}
 
             if(umcd.Lyric != null)
             {
