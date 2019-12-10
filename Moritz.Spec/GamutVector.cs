@@ -65,43 +65,18 @@ namespace Moritz.Spec
 				pitchWeightVectors.Add(pitchWeightVector);
 			}
 
-			List<List<PitchWeight>> absPitchWeightsListPerGamut = GetAbsPitchWeightsListPerGamut(pitchWeightVectors);
+			List<Dictionary<int,int>> absPitchWeightsDictPerGamut = GetAbsPitchWeightDictPerGamut(pitchWeightVectors);
 
 			List<Gamut> gamuts = new List<Gamut>();
-			foreach(var absPitchWeights in absPitchWeightsListPerGamut)
+			foreach(var pitchWeightDict in absPitchWeightsDictPerGamut)
 			{
-				List<PitchWeight> gamutPitchWeights = GetAllPitchWeights(absPitchWeights);
-				Gamut gamut = new Gamut(gamutPitchWeights);
+				Gamut gamut = new Gamut(pitchWeightDict);
 				gamuts.Add(gamut);
 			}
 
 			Gamuts = gamuts;
-			TargetGamut = new Gamut(targetGamut.PitchWeights);
+			TargetGamut = (Gamut) targetGamut.Clone();
 			PitchWeightVectors = pitchWeightVectors;
-		}
-
-		private List<PitchWeight> GetAllPitchWeights(List<PitchWeight> absPitchWeights)
-		{
-			absPitchWeights.OrderBy(x => x.Pitch);
-
-			List<PitchWeight> gamutPitchWeights = new List<PitchWeight>();
-			int relPitch = 0;
-			int octave = 0;
-			while(relPitch < 127)
-			{
-				foreach(var pitchWeight in absPitchWeights)
-				{
-					relPitch = pitchWeight.Pitch + octave;
-					if( relPitch > 127)
-					{
-						break;
-					}
-					gamutPitchWeights.Add(new PitchWeight(relPitch, pitchWeight.Weight));
-				}
-				octave += 12;
-			}
-
-			return gamutPitchWeights;
 		}
 
 		public GamutVector(IReadOnlyList<Gamut> gamuts, Gamut targetGamut, IReadOnlyList<PitchWeightVector> pitchVectors)
@@ -119,52 +94,43 @@ namespace Moritz.Spec
 		#region constructor helpers
 
 		/// <summary>
-		/// The returned lists are ordered by Pitch.
 		/// The weight associated with an absolute pitch is the maximum weight
 		/// associated with that absolute pitch in any of the pitchVectors.
 		/// </summary>
 		/// <param name="pitchVectors"></param>
 		/// <returns></returns>
-		private List<List<PitchWeight>> GetAbsPitchWeightsListPerGamut(IReadOnlyList<PitchWeightVector> pitchVectors)
+		private List<Dictionary<int, int>> GetAbsPitchWeightDictPerGamut(IReadOnlyList<PitchWeightVector> pitchVectors)
 		{
 			// all pitches in pitchVectors are in range 0..127 (has been checked before)
 
-			List<List<PitchWeight>> absPitchWeightsPerGamut = new List<List<PitchWeight>>();
+			List<Dictionary<int, int>> absPitchWeightDictPerGamut = new List<Dictionary<int, int>>();
 			int nGamuts = pitchVectors[0].PitchWeights.Count;
 			for(int i = 0; i < nGamuts; i++)
 			{
-				List<PitchWeight> absPWPerGamut = new List<PitchWeight>();
-				absPitchWeightsPerGamut.Add(absPWPerGamut);
+				Dictionary<int, int> absPWDict = new Dictionary<int, int>();
+				absPitchWeightDictPerGamut.Add(absPWDict);
 			}
 
 			for(int i = 0; i < nGamuts; i++)
 			{
-				var absPitchWeights = absPitchWeightsPerGamut[i];
+				var absPWDict = absPitchWeightDictPerGamut[i];
 				for(int j = 0; j < pitchVectors.Count; j++)
 				{
 					PitchWeight pw = pitchVectors[j].PitchWeights[i];
 					int absPitch = pw.Pitch % 12;
-					int index = absPitchWeights.FindIndex(x => x.Pitch == absPitch);
-					if(index >= 0)
+					if(absPWDict.ContainsKey(absPitch))
 					{
-						int weight = (pw.Weight > absPitchWeights[index].Weight) ? pw.Weight : absPitchWeights[index].Weight;
-						absPitchWeights[index] = new PitchWeight(absPitch, weight);
+						int weight = (pw.Weight > absPWDict[absPitch]) ? pw.Weight : absPWDict[absPitch];
+						absPWDict[absPitch] = weight;
 					}
 					else
 					{
-						absPitchWeights.Add(new PitchWeight(absPitch, pw.Weight));
+						absPWDict.Add(absPitch, pw.Weight);
 					}
 				}
-				var rval = absPitchWeights.OrderBy(x => x.Pitch);
-				List<PitchWeight> ordered = new List<PitchWeight>();
-				foreach(var pitchweight in rval)
-				{
-					ordered.Add(pitchweight);
-				}
-				absPitchWeightsPerGamut[i] = ordered;
 			}
 
-			return absPitchWeightsPerGamut;
+			return absPitchWeightDictPerGamut;
 		}
 
 		#endregion constructor helpers

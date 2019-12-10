@@ -13,10 +13,7 @@ namespace Moritz.Spec
 	/// </summary>
 	public class Gamut : ICloneable
 	{
-		protected Gamut()
-		{
-			PitchWeights = null; // to be set by the derived class
-		}
+		protected Gamut() { }
 
 		/// <summary>
 		/// This constructor creates each PitchWeight that has the same absolute pitch with the same weight.
@@ -24,66 +21,33 @@ namespace Moritz.Spec
 		/// <param name="absPitchWeightDict">keys (pitches) must be in range 0..11 and contain both rootPitch and maxPitch, the values (weights) must be in range 0..127</param>
 		public Gamut(Dictionary<int, int> absPitchWeightDict)
 		{
+			SetAbsolutePitchWeights(absPitchWeightDict);
+			SetAbsolutePitches();
+			SetPitchWeights();
+
+			AssertGamutValidity();
+		}
+
+		/// <summary>
+		/// Sets AbsolutePitchweights containing all the absolute Pitch values (in range 0..11) ordered by decreasing Weight.
+		/// </summary>
+		protected void SetAbsolutePitchWeights(Dictionary<int, int> absPitchWeightDict)
+		{
 			#region checks
 			M.AssertRange0_11(absPitchWeightDict.Keys);
 			M.AssertRange0_127(absPitchWeightDict.Values);
 			#endregion checks
 
-			var pitchWeights = new List<PitchWeight>();
-			for(int relPitch = 0; relPitch <= 127; ++relPitch)
-			{
-				int absPitch = relPitch % 12;
-				if(absPitchWeightDict.TryGetValue(absPitch, out int weight))
-				{
-					PitchWeight pitchWeight = new PitchWeight(relPitch, weight);
-					pitchWeights.Add(pitchWeight);
-				}
-			}
-			PitchWeights = pitchWeights;
-
-			SetAbsolutePitchWeights();
-			SetAbsolutePitches();
-
-			AssertGamutValidity();
-		}
-
-		public Gamut(IReadOnlyList<PitchWeight> pitchWeights)
-		{
-			PitchWeights = new List<PitchWeight>(pitchWeights);
-
-			SetAbsolutePitchWeights();
-			SetAbsolutePitches();
-
-			AssertGamutValidity();
-		}
-
-		public virtual object Clone()
-		{
-			return new Gamut(PitchWeights);
-		}
-
-		/// <summary>
-		/// A list of PitchWeights containing all the absolute Pitch values (in range 0..11) ordered by descending Weight.
-		/// </summary>
-		protected void SetAbsolutePitchWeights()
-		{
-			M.Assert(PitchWeights != null && PitchWeights.Count > 1);
-
 			var absolutePitchWeights = new List<PitchWeight>();
-			foreach(var pitchWeight in PitchWeights)
+			foreach(var absPitch in absPitchWeightDict.Keys)
 			{
-				int absPitch = pitchWeight.Pitch % 12;
-				if(absolutePitchWeights.FindIndex(x => (x.Pitch == absPitch)) > -1)
-				{
-					break;
-				}
-				absolutePitchWeights.Add(pitchWeight);
+				absolutePitchWeights.Add(new PitchWeight(absPitch, absPitchWeightDict[absPitch]));
 			}
 
 			_absolutePitchWeights = new List<PitchWeight>(absolutePitchWeights.OrderByDescending(x => x.Weight));
 		}
 		/// <summary>
-		/// A sorted list (values in range 0..11).
+		/// Sets AbsolutePitches containing the absolute pitches (possible range 0..11) sorted by inceasing Pitch.
 		/// </summary>
 		protected void SetAbsolutePitches()
 		{
@@ -94,15 +58,45 @@ namespace Moritz.Spec
 			{
 				_absolutePitches.Add(pitchWeight.Pitch);
 			}
+			_absolutePitches.Sort();
 
 			_absolutePitches.Sort();
+		}
+		/// <summary>
+		/// Sets PitchWeights containing all the relative pitches (possible range 0..127) sorted by inceasing Pitch.
+		/// </summary>
+		private void SetPitchWeights()
+		{
+			var pitchWeights = new List<PitchWeight>();
+			for(int relPitch = 0; relPitch <= 127; ++relPitch)
+			{
+				int absPitch = relPitch % 12;
+				PitchWeight absPitchWeight = _absolutePitchWeights.Find(x => x.Pitch == absPitch);
+				if(absPitchWeight != null)
+				{
+					PitchWeight pitchWeight = new PitchWeight(relPitch, absPitchWeight.Weight);
+					pitchWeights.Add(pitchWeight);
+				}
+			}
+			_pitchWeights = pitchWeights;
+		}
+
+		public Gamut(IReadOnlyList<PitchWeight> absolutePitchWeights, IReadOnlyList<int> absolutePitches, IReadOnlyList<PitchWeight> pitchWeights)
+		{
+			_absolutePitchWeights = new List<PitchWeight>(absolutePitchWeights);
+			_absolutePitches = new List<int>(absolutePitches);
+			_pitchWeights = new List<PitchWeight>(pitchWeights);
+
+			AssertGamutValidity();
+		}
+
+		public virtual object Clone()
+		{
+			return new Gamut(AbsolutePitchWeights, AbsolutePitches, PitchWeights);
 		}
 
 		/// <summary>
 		/// Adds transposition (which can be positive, negative or zero) to all pitches in the PitchWeights.
-		/// If the resulting pitch would be less than RootPitch or greater than MaxPitch, it is silently omitted.
-		/// The PitchWeights list is then extended to ensure that each octave contains all possible absolute pitches.
-		/// Transposition means that the lowest and highest octaves may not contain all the permitted absolute pitches.
 		/// </summary>
 		/// <param name="transposition"></param>
 		/// <returns></returns>
@@ -110,146 +104,22 @@ namespace Moritz.Spec
 		{
 			if(transposition != 0)
 			{
-				var newPitchWeights = new List<PitchWeight>();
-				foreach(var pitchWeight in PitchWeights)
+				while(transposition < 0)
 				{
-					int newPitch = pitchWeight.Pitch + transposition;
-					if(newPitch >= 0 && newPitch <= 127)
-					{
-						newPitchWeights.Add(new PitchWeight(newPitch, (int)pitchWeight.Weight));
-					}
+					transposition += 12;
 				}
-				PitchWeights = newPitchWeights;
-
-				if(transposition > 0)
+				List<PitchWeight> trAbsPitchWeights = new List<PitchWeight>();
+				foreach(var pitchWeight in _absolutePitchWeights)
 				{
-					ExtendGamutAtLowEnd();
+					int pitch = (pitchWeight.Pitch + transposition) % 12;
+					trAbsPitchWeights.Add(new PitchWeight(pitch, pitchWeight.Weight));
 				}
-				else
-				{
-					ExtendGamutAtHighEnd();
-				}
-
-				SetAbsolutePitchWeights();
+				_absolutePitchWeights = trAbsPitchWeights; // is already ordered by descending weight
 				SetAbsolutePitches();
+				SetPitchWeights();
 
 				AssertGamutValidity();
 			}
-		}
-
-		/// <summary>
-		/// Helper function for Transpose()
-		/// </summary>
-		private void ExtendGamutAtLowEnd()
-		{
-			List<PitchWeight> lowAbsPitchWeights = GetLowAbsPitchWeights();
-
-			List<PitchWeight> lowPitchWeights = new List<PitchWeight>();
-			int pitch = -1;
-			int octave = 0;
-			while(pitch < PitchWeights[0].Pitch)
-			{
-				foreach(var pitchWeight in lowAbsPitchWeights)
-				{
-					pitch = pitchWeight.Pitch + octave;
-					if(pitch >= PitchWeights[0].Pitch)
-					{
-						break;
-					}
-					lowPitchWeights.Add(new PitchWeight(pitch, pitchWeight.Weight));
-				}
-				octave += 12;
-			}
-
-			lowPitchWeights.AddRange(PitchWeights);
-			PitchWeights = lowPitchWeights;
-		}
-
-		/// <summary>
-		/// Helper function for ExtendGamutAtLowEnd().
-		/// Returns the absolute PitchWeights in the lowest octave of the current PitchWeights
-		/// in order of pitch.
-		/// </summary>
-		private List<PitchWeight> GetLowAbsPitchWeights()
-		{
-			List<PitchWeight> lowAbsPitchWeights = new List<PitchWeight>();
-			List<int> absPitches = new List<int>();
-			foreach(var pitchWeight in PitchWeights)
-			{
-				int absPitch = pitchWeight.Pitch % 12;
-				if(absPitches.Contains(absPitch))
-				{
-					break;
-				}
-				absPitches.Add(absPitch);
-				lowAbsPitchWeights.Add(new PitchWeight(absPitch, pitchWeight.Weight));
-			}
-			lowAbsPitchWeights = lowAbsPitchWeights.OrderBy(x => x.Pitch).ToList<PitchWeight>();
-
-			return lowAbsPitchWeights;
-		}
-
-		/// <summary>
-		/// Helper function for Transpose()
-		/// </summary>
-		private void ExtendGamutAtHighEnd()
-		{
-			List<PitchWeight> highAbsPitchWeights = GetHighAbsPitchWeights();
-
-			int topPitch = PitchWeights[PitchWeights.Count - 1].Pitch;
-			List<int> highPitches = new List<int>();
-			int octave = 12;
-			foreach(var absPitchWeight in highAbsPitchWeights)
-			{
-				int highPitch = absPitchWeight.Pitch;
-				while(highPitch <= topPitch)
-				{
-					highPitch += octave;
-				}
-				while(highPitch <= 127)
-				{
-					highPitches.Add(highPitch);
-					highPitch += octave;
-				}
-			}
-			highPitches.Sort();
-
-			List<PitchWeight> highPitchWeights = new List<PitchWeight>();			
-			foreach(int pitch in highPitches)
-			{
-				int weightIndex = highAbsPitchWeights.FindIndex(x => x.Pitch == (pitch % 12));
-				PitchWeight pitchWeight = new PitchWeight(pitch, highAbsPitchWeights[weightIndex].Weight);
-				highPitchWeights.Add(pitchWeight);
-			}
-
-			List<PitchWeight> pitchWeights = new List<PitchWeight>(PitchWeights);
-			pitchWeights.AddRange(highPitchWeights);
-			PitchWeights = pitchWeights;
-		}
-
-		/// <summary>
-		/// Helper function for ExtendGamutAtHighEnd().
-		/// Returns an unordered list of PitchWeights. The Pitches are in range 0..11.
-		/// The pitchWeights are derived from those in the top octave of the current PitchWeights.
-		/// </summary>
-		/// <returns></returns>
-		private List<PitchWeight> GetHighAbsPitchWeights()
-		{
-			List<PitchWeight> highAbsPitchWeights = new List<PitchWeight>();
-			List<int> absPitches = new List<int>();
-			for(int i = PitchWeights.Count - 1; i >= 0; i--)
-			{
-				PitchWeight pitchWeight = PitchWeights[i];
-				int absPitch = pitchWeight.Pitch % 12;
-				if(absPitches.Contains(absPitch))
-				{
-					break;
-				}
-				absPitches.Add(absPitch);
-				highAbsPitchWeights.Add(new PitchWeight(absPitch, pitchWeight.Weight));
-			}
-
-			return highAbsPitchWeights;
 		}
 
 		/// <summary>
@@ -355,17 +225,6 @@ namespace Moritz.Spec
 			}
 		}
 
-		/// <summary>
-		/// A sorted list (values in range 0..11).
-		/// </summary>
-		public IReadOnlyList<int> AbsolutePitches { get { return _absolutePitches; }	}
-		private List<int> _absolutePitches;
-		/// <summary>
-		/// A list of PitchWeights containing all the absolute Pitch values (in range 0..11) ordered by descending Weight.
-		/// </summary>
-		public IReadOnlyList<PitchWeight> AbsolutePitchWeights { get { return _absolutePitchWeights; } }
-		private List<PitchWeight> _absolutePitchWeights;
-
 		public IReadOnlyList<int> Pitches
 		{
 			get
@@ -395,7 +254,21 @@ namespace Moritz.Spec
 			}
 		}
 
-		public IReadOnlyList<PitchWeight> PitchWeights { get; protected set; }
+		/// <summary>
+		/// A list of PitchWeights containing the absolute Pitch values (in range 0..11) in decreasing order of weight.
+		/// </summary>
+		public IReadOnlyList<PitchWeight> AbsolutePitchWeights { get { return _absolutePitchWeights; } }
+		protected List<PitchWeight> _absolutePitchWeights;
+		/// <summary>
+		/// A list of the absolute pitches (possible range 0..11) ordered by increasing pitch.
+		/// </summary>
+		public IReadOnlyList<int> AbsolutePitches { get { return _absolutePitches; }	}
+		protected List<int> _absolutePitches;
+		/// <summary>
+		/// A list of PitchWeights containing all the relative Pitch values (possible range 0..127) ordered by increasing pitch.
+		/// </summary>
+		public IReadOnlyList<PitchWeight> PitchWeights { get { return _pitchWeights; } }
+		protected List<PitchWeight> _pitchWeights;
 	}
 
 	/// <summary>
@@ -517,9 +390,9 @@ namespace Moritz.Spec
 
 			Gamut gamut = new Gamut(absPitchWeightDict);
 
-			PitchWeights = gamut.PitchWeights;
-			SetAbsolutePitchWeights();
-			SetAbsolutePitches();
+			_absolutePitchWeights = (List<PitchWeight>) gamut.AbsolutePitchWeights;
+			_absolutePitches = (List<int>) gamut.AbsolutePitches;
+			_pitchWeights = (List<PitchWeight>) gamut.PitchWeights;
 		}
 
 		public override object Clone()
