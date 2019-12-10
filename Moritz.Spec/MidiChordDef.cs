@@ -93,12 +93,12 @@ namespace Moritz.Spec
 			AssertConsistency(this);
 		}
 
-		/// <summary>
-		/// Constructor used when creating a list of DurationDef templates from a Palette.
-		/// The palette has created new values for all the arguments, so this constructor simply transfers
-		/// those values to the new MidiChordDef. MsPositionReFirstIUD is set to 0, lyric is set to null.
-		/// </summary>
-		public MidiChordDef(
+        /// <summary>
+        /// Constructor used when creating a list of DurationDef templates from a Palette.
+        /// The palette has created new values for all the arguments, so this constructor simply transfers
+        /// those values to the new MidiChordDef. MsPositionReFirstIUD is set to 0, lyric is set to null.
+        /// </summary>
+        public MidiChordDef(
             int msDuration, // the total duration (this should be the sum of the durations of the basicMidiChordDefs)
             byte pitchWheelDeviation, // should be set to the default value: M.DEFAULT_PITCHWHEELDEVIATION_2 if unsure.
 			bool hasChordOff, // default is M.DefaultHasChordOff (=true)
@@ -758,56 +758,19 @@ namespace Moritz.Spec
             velocity = (velocity <= 127) ? velocity : 127;
             return (byte)velocity;
         }
-		#endregion utilities
+        #endregion utilities
 
-		#endregion Functions that use Envelopes
+        #endregion Functions that use Envelopes 
 
-		/// <summary>
-		/// The pitches and velocities in this MidiChordDef change so that it respects the gamut.
-		/// Nothing changes except for the pitches and velocities. In particular, the following are preserved:
-		///    1. the msDuration
-		///    2. the number of BasicMidiChordDefs and their pitch density 
-		///    3. PitchWheelDeviation
-		///    4. MidiChordSliderDefs
-		///    5. etc.
-		/// ------------------------------------------------------------------
-		/// The root (lowest) pitch will be as high as possible, but less than or equal to the original BasicMidiChordDef[0].Pitches[0].
-		/// The root (lowest) pitch is found as follows:
-		///    1. The root's absolute pitch is found using absRootIndex in the gamut.AbsolutePitches list.
-		///    2. The root's relative pitch is the highest root pitch less than or equal to the lowest pitch in the argument MidiChordDef.
-		/// The shape of the output chord is determined by the chordShapeIndex using a static set of GamutChordShapes as follows:
-		///    1. Find the chordShape in GamutChordShapes using the chordShapeIndex.
-		///       A GamutChordShape is a list of indices for use in the gamut.AbsolutePitches list.
-		///       These indices may repeat in the list (resulting in octaves).
-		///    2. Find the corresponding list of absolute pitches using only the number of pitches defined by the MidiChordDef argument.
-		///    3. The BasicMidiChords are then built upwards from the root, copying the velocities that correspond to the pitches from the gamut.    
-		/// </summary>
-		public void SetToGamut(Gamut gamut, int absRootIndex, int chordShapeIndex)
-		{
-			foreach(var bmc in BasicMidiChordDefs)
-			{
-				for(int i = 0; i < bmc.Pitches.Count; i++)
-				{
-					// Do the pitch and velocity changes here.
-
-					bmc.Pitches[i] = (byte)(bmc.Pitches[i] - 12);
-					bmc.Velocities[i] = bmc.Velocities[i];
-				}
-			}
-
-			_notatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
-
-		}
-
-		#region IUniqueChordDef
-		/// <summary>
-		/// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by the number of semitones
-		/// given in the argument interval. Negative interval values transpose down.
-		/// It is not an error if Midi values would exceed the range 0..127.
-		/// In this case, they are silently coerced to 0 or 127 respectively.
-		/// If pitches become duplicated at the extremes, the duplicates are removed.
-		/// </summary>
-		public void Transpose(int interval)
+        #region IUniqueChordDef
+        /// <summary>
+        /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by the number of semitones
+        /// given in the argument interval. Negative interval values transpose down.
+        /// It is not an error if Midi values would exceed the range 0..127.
+        /// In this case, they are silently coerced to 0 or 127 respectively.
+        /// If pitches become duplicated at the extremes, the duplicates are removed.
+        /// </summary>
+        public void Transpose(int interval)
         {
             foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
             {
