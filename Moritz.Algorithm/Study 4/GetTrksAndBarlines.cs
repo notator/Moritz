@@ -128,7 +128,7 @@ namespace Moritz.Algorithm.Study4
 					var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
 					if(iud is MidiChordDef mcd)
 					{
-						mcd = FitToGamut(gamuts[i], mcd, 0, 0);
+						mcd = FitToGamut(gamuts[i], mcd, 0);
 
 						barMsDuration += mcd.MsDuration;
 
@@ -158,7 +158,7 @@ namespace Moritz.Algorithm.Study4
 					var iud = defaultPalette.GetIUniqueDef((iudIndex++) % defaultPalette.Count);
 					if(iud is MidiChordDef mcd)
 					{
-						mcd = FitToGamut(gamuts[i], mcd, 0, 0);
+						mcd = FitToGamut(gamuts[i], mcd, 0);
 
 						barMsDuration += mcd.MsDuration;
 
@@ -173,23 +173,26 @@ namespace Moritz.Algorithm.Study4
 		/// <summary>
 		/// The argument MidiChordDef determines the following parameters in the returned MidiChordDef:
 		/// (These should be set using a palette.)
-		///    1. the number of BasicMidiChordDefs and their pitch density
-		///    2. the root pitch will be as high as possible, but less than or equal to BasicMidiChordDef[0].Pitches[0]. 
+		///    1. the number of BasicMidiChordDefs and their (initial) pitch density
 		///    2. pitchWheelDeviation
 		///    3. pitchWheel and pan slider definitions
-		/// ------------------------------------------------------------------
-		/// The root (lowest) pitch in the returned MidiChordDef is found as follows:
-		///    1. The root's absolute pitch is found using absRootIndex in the gamut.AbsolutePitches list.
-		///    2. The root's relative pitch is the highest root pitch less than or equal to the lowest pitch in the argument MidiChordDef.
-		/// The shape of the output chord is determined by the chordShapeIndex using a static set of Study4ChordShapes as follows:
-		///    1. Find the chordShape in Study4ChordShapes using the chordShapeIndex.
-		///       A Study4ChordShape is a list of 7 indices for use in the gamut.AbsolutePitches list.
-		///       These indices may repeat in the list (resulting in octaves).
-		///    2. Find the corresponding list of absolute pitches using only the number of pitches defined by the MidiChordDef argument.
-		///    3. Build the chord upwards from the root, copying the velocities that correspond to the pitches from the gamut.    
+		/// The lowest pitch in each BasicMidichordDef is found as follows:
+		///    1. The lowest pitch in BasicMidiChordDef[0] determines the *register* of the output MidiChordDef.
+		///       (The lowest pitch in the returned BasicMidiChordDef[0] is found as follows:
+		///          a) find its absolute pitch using chordShapeindex in gamut.LinearChordShapeMatrix (see below)
+		///          b) find the lowest possible corresponding relative pitch that is higher than or equal to the
+		///             lowest pitch in the input .
+		///    2. The lowest pitches of the input BasicMidiChordDefs determine the contour of the lowest pitches
+		///       in the output BasicMidiChordDefs. A chromatic step in the input corresponds to a gamut step in the output.
+		///       Gamut steps can simply be achieved by using the chromatic indices as indices in the gamut.PitchWeights list.
+		/// The shape of BasicMidiChordDef[0] is determined by adding the absolute pitches in the ChordShape upwards from the base.
+		/// The other BasicMidichords have the same shape, but are transposed by gamut step, not chromatically...
+		/// 
+		/// Probably, additional pitches can be added to chords, doubling octaves where weights are heavy...
 		/// </summary>
-		private MidiChordDef FitToGamut(Gamut gamut, MidiChordDef mcd, int absRootIndex, int chordShapeIndex)
+		private MidiChordDef FitToGamut(Gamut gamut, MidiChordDef mcd, int chordShapeIndex)
 		{
+			/// todo... (see above)
 			List<IUniqueDef> basicChords = new List<IUniqueDef>();
 
 			foreach(var bmc in mcd.BasicMidiChordDefs)
