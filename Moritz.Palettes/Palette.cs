@@ -25,7 +25,7 @@ namespace Moritz.Palettes
             bcfs.MidiPitches = M.StringToByteList(paletteForm.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcfs.ChordOffs = M.StringToBoolList(paletteForm.BasicChordControl.ChordOffsTextBox.Text, ',');
             bcfs.ChordDensities = M.StringToByteList(paletteForm.BasicChordControl.ChordDensitiesTextBox.Text, ',');
-            bcfs.Inversions = paletteForm.GetLinearInversions(paletteForm.BasicChordControl.RootInversionTextBox.Text);
+            bcfs.Inversions = M.GetLinearMatrix(paletteForm.BasicChordControl.RootInversionTextBox.Text);
             bcfs.InversionIndices = M.StringToIntList(paletteForm.BasicChordControl.InversionIndicesTextBox.Text, ',');
             bcfs.VerticalVelocityFactors = M.StringToFloatList(paletteForm.BasicChordControl.VerticalVelocityFactorsTextBox.Text, ',');
 
@@ -76,7 +76,7 @@ namespace Moritz.Palettes
             bcfs.MidiPitches = M.StringToByteList(paletteChordForm.BaseMidiPitchTextBox.Text,  ',');
             bcfs.ChordOffs = M.StringToBoolList(paletteChordForm.ChordOffTextBox.Text, ',');
             bcfs.ChordDensities = M.StringToByteList(paletteChordForm.ChordDensityTextBox.Text, ',');
-            bcfs.Inversions = paletteChordForm.PaletteForm.GetLinearInversions(paletteChordForm.PaletteForm.BasicChordControl.RootInversionTextBox.Text);
+            bcfs.Inversions = M.GetLinearMatrix(paletteChordForm.PaletteForm.BasicChordControl.RootInversionTextBox.Text);
             bcfs.InversionIndices = M.StringToIntList(paletteChordForm.InversionIndexTextBox.Text, ',');
             bcfs.VerticalVelocityFactors = M.StringToFloatList(paletteChordForm.VerticalVelocityFactorTextBox.Text, ',');
 
@@ -390,7 +390,7 @@ namespace Moritz.Palettes
             bcs.MidiPitches = M.StringToByteList(osf.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcs.ChordOffs = M.StringToBoolList(osf.BasicChordControl.ChordOffsTextBox.Text, ',');
             bcs.ChordDensities = M.StringToByteList(osf.BasicChordControl.ChordDensitiesTextBox.Text, ',');
-            bcs.Inversions = paletteform.GetLinearInversions(osf.BasicChordControl.RootInversionTextBox.Text);
+            bcs.Inversions = M.GetLinearMatrix(osf.BasicChordControl.RootInversionTextBox.Text);
             bcs.InversionIndices = M.StringToIntList(osf.BasicChordControl.InversionIndicesTextBox.Text, ',');
             bcs.VerticalVelocityFactors = M.StringToFloatList(osf.BasicChordControl.VerticalVelocityFactorsTextBox.Text, ',');
 
