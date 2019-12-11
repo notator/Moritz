@@ -232,16 +232,15 @@ namespace Moritz.Globals
 		}
 
 		/// <summary>
-		/// Returns a list of intLists whose first intList is inversion0.
+		/// Returns a list of byteLists whose first byteList is inversion0.
 		/// If inversion0 is null or inversion0.Count == 0, the returned list of intlists is empty, otherwise
-		/// If inversion0.Count == 1, the contained intList is simply inversion0, otherwise
-		/// The returned list of intLists has a Count of (n-1)*2, where n is the Count of inversion0.
+		/// If inversion0.Count == 1, the contained byteList is simply inversion0, otherwise
+		/// The returned list of byteLists has a Count of (n-1)*2, where n is the Count of inversion0.
 		/// </summary>
 		/// <param name="inversion0"></param>
 		/// <returns></returns>
-		public static List<List<byte>> GetLinearMatrix(string inversion0String)
+		public static List<List<byte>> GetLinearMatrix(List<byte> inversion0)
 		{
-			List<byte> inversion0 = M.StringToByteList(inversion0String, ',');
 			List<List<byte>> inversions = new List<List<byte>>();
 			if(inversion0 != null && inversion0.Count != 0)
 			{
@@ -251,7 +250,7 @@ namespace Moritz.Globals
 				{
 
 					List<IntervalPositionDistance> ipdList = new List<IntervalPositionDistance>();
-					for(int i = 0; i < inversion0.Count; i++)
+					for(byte i = 0; i < inversion0.Count; i++)
 					{
 						IntervalPositionDistance ipd = new IntervalPositionDistance(inversion0[i], i);
 						ipdList.Add(ipd);
@@ -275,6 +274,19 @@ namespace Moritz.Globals
 				}
 			}
 			return inversions;
+		}
+
+		/// <summary>
+		/// Returns a list of byteLists whose first byteList is inversion0.
+		/// If inversion0 is null or inversion0.Count == 0, the returned list of byteLists is empty, otherwise
+		/// If inversion0.Count == 1, the contained byteLists is simply inversion0, otherwise
+		/// The returned list of byteLists has a Count of (n-1)*2, where n is the Count of inversion0.
+		/// </summary>
+		/// <param name="inversion0">A string of comma-separated integers</param>
+		public static List<List<byte>> GetLinearMatrix(string inversion0String)
+		{
+			List<byte> inversion0 = M.StringToByteList(inversion0String, ',');
+			return GetLinearMatrix(inversion0);
 		}
 
 		#region lists of lists of bytes
