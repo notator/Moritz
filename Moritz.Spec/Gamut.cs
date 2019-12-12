@@ -84,8 +84,6 @@ namespace Moritz.Spec
 				_absolutePitches.Add(pitchWeight.Pitch);
 			}
 			_absolutePitches.Sort();
-
-			_absolutePitches.Sort();
 		}
 		/// <summary>
 		/// Sets PitchWeights containing all the relative pitches (possible range 0..127) sorted by inceasing Pitch.
@@ -93,11 +91,12 @@ namespace Moritz.Spec
 		private void SetPitchWeights()
 		{
 			var pitchWeights = new List<PitchWeight>();
+			var defaultPitchWeight = new PitchWeight();
 			for(int relPitch = 0; relPitch <= 127; ++relPitch)
 			{
 				int absPitch = relPitch % 12;
 				PitchWeight absPitchWeight = _absolutePitchWeights.Find(x => x.Pitch == absPitch);
-				if(absPitchWeight != null)
+				if(absPitchWeight != defaultPitchWeight)
 				{
 					PitchWeight pitchWeight = new PitchWeight(relPitch, absPitchWeight.Weight);
 					pitchWeights.Add(pitchWeight);
@@ -113,17 +112,12 @@ namespace Moritz.Spec
 			}
 			var absPitches = AbsolutePitches;
 			List<int> relPitches = new List<int>(Pitches);
-			int minPitch = MinPitch;
-			int maxPitch = MaxPitch;
 			foreach(var absPitch in absPitches)
 			{
 				int relPitch = absPitch;
-				while(relPitch <= maxPitch)
+				while(relPitch <= 127)
 				{
-					if(relPitch > minPitch && relPitches.FindIndex(x => x == relPitch) < 0)
-					{
-						throw new ApplicationException("Each absolute pitch must occur in each possible octave.");
-					}
+					M.Assert(relPitches.FindIndex(x => x == relPitch) >= 0, "Each absolute pitch must occur in each possible octave.");
 					relPitch += 12;
 				}
 			}
@@ -186,8 +180,9 @@ namespace Moritz.Spec
 		/// <returns></returns>
 		public int Weight(int pitch)
 		{
+			PitchWeight defaultPitchWeight = new PitchWeight();
 			PitchWeight pitchWeight = ((List<PitchWeight>)PitchWeights).Find(x => x.Pitch == pitch);
-			M.Assert(pitchWeight != null, $"Gamut.PitchWeights does not contain pitch {pitch}");
+			M.Assert(pitchWeight != defaultPitchWeight, $"Gamut.PitchWeights does not contain pitch {pitch}");
 			return pitchWeight.Weight;
 		}
 
