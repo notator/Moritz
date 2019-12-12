@@ -176,12 +176,12 @@ namespace Moritz.Algorithm.Study4
 		///    1. the number of BasicMidiChordDefs and their (initial) pitch density
 		///    2. pitchWheelDeviation
 		///    3. pitchWheel and pan slider definitions
-		/// The lowest pitch in each BasicMidichordDef is found as follows:
+		/// The lowest pitch in each BasicMidiChordDef is found as follows:
 		///    1. The lowest pitch in BasicMidiChordDef[0] determines the *register* of the output MidiChordDef.
 		///       (The lowest pitch in the returned BasicMidiChordDef[0] is found as follows:
-		///          a) find its absolute pitch using chordShapeindex in gamut.LinearChordShapeMatrix (see below)
+		///          a) find its absolute pitch using chordShapeIndex in gamut.LinearChordShapeMatrix (see below)
 		///          b) find the lowest possible corresponding relative pitch that is higher than or equal to the
-		///             lowest pitch in the input .
+		///             lowest pitch in the input.
 		///    2. The lowest pitches of the input BasicMidiChordDefs determine the contour of the lowest pitches
 		///       in the output BasicMidiChordDefs. A chromatic step in the input corresponds to a gamut step in the output.
 		///       Gamut steps can simply be achieved by using the chromatic indices as indices in the gamut.PitchWeights list.
@@ -192,19 +192,46 @@ namespace Moritz.Algorithm.Study4
 		/// </summary>
 		private MidiChordDef FitToGamut(Gamut gamut, MidiChordDef mcd, int chordShapeIndex)
 		{
-			/// todo... (see above)
-			List<IUniqueDef> basicChords = new List<IUniqueDef>();
-
-			foreach(var bmc in mcd.BasicMidiChordDefs)
+			List<byte> chordShape = gamut.LinearChordShapesMatrix[chordShapeIndex];
+			byte absRootPitch = chordShape[0];
+			byte relRootPitch = absRootPitch;
+			while(relRootPitch < mcd.BasicMidiChordDefs[0].Pitches[0])
 			{
+				relRootPitch += 12;
+			}
+			int relRootPitchIndex = ((List<PitchWeight>)gamut.PitchWeights).FindIndex(x => x.Pitch == relRootPitch);
+			List<int> ornamentBaseIndices = new List<int>();
+			List<BasicMidiChordDef> inputBMCDs = mcd.BasicMidiChordDefs;
+			byte inputRootPitch = inputBMCDs[0].Pitches[0];
+			for(int i = 0; i < inputBMCDs.Count; i++)
+			{
+				ornamentBaseIndices.Add(relRootPitchIndex + mcd.BasicMidiChordDefs[i].Pitches[0] - inputRootPitch);
+			}
+
+			List<IUniqueDef> basicChords = new List<IUniqueDef>();
+			for(int i = 0; i < inputBMCDs.Count; i++)
+			{
+				var inputBMCD = inputBMCDs[i];
 				List<byte> pitches = new List<byte>();
 				List<byte> velocities = new List<byte>();
-				for(int i = 0; i < bmc.Pitches.Count; i++)
-				{ 
-					// Do the pitch and velocity changes here.
+				int baseIndex = ornamentBaseIndices[i];
+				int prevPitch = -1;
+				for(int j = 0; j < inputBMCD.Pitches.Count; j++)
+				{
+					int csIndex = j % chordShape.Count;
+					byte absPitch = chordShape[csIndex];
+					var pitchIndex = baseIndex + ((List<int>)gamut.AbsolutePitches).FindIndex(x => x == absPitch);
 
-					pitches.Add((byte)(bmc.Pitches[i] - 12));
-					velocities.Add(bmc.Velocities[i]);
+					PitchWeight pitchWeight = gamut.PitchWeights[pitchIndex];
+					while(pitchWeight.Pitch <= prevPitch)
+					{
+						pitchIndex += gamut.AbsolutePitches.Count;
+						pitchWeight = gamut.PitchWeights[pitchIndex];
+					}
+					pitches.Add((byte)pitchWeight.Pitch);
+					velocities.Add((byte)pitchWeight.Weight);
+
+					prevPitch = pitchWeight.Pitch;
 				}
 				basicChords.Add(new MidiChordDef(pitches, velocities, mcd.MsDuration, mcd.HasChordOff));
 			}
