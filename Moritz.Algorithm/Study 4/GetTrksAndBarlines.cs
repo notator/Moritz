@@ -76,14 +76,14 @@ namespace Moritz.Algorithm.Study4
 
 		// the returned barlineMsPositions do not include 0, but do include the final barline position.
 		private List<Trk> CreateChannel0BarTrks(IReadOnlyList<Gamut> gamuts, out List<int> barlineMsPositions)
-		{			
+		{
 			barlineMsPositions = new List<int>(); // out
 			List<Trk> topTrks = new List<Trk>(); // return
 
 			List<Trk> ch0RegionTrks = null;
 			var rSBI = RegionStartBarIndices;
 
-			ch0RegionTrks = GetCh0_Region0_Trks(gamuts, rSBI[0], rSBI[1]);
+			ch0RegionTrks = GetCh0RegionTrks(0, gamuts, rSBI[0], rSBI[1]);
 			topTrks.AddRange(ch0RegionTrks);
 
 			ch0RegionTrks = GetCh0RegionTrks(1, gamuts, rSBI[1], rSBI[2]);
@@ -104,49 +104,19 @@ namespace Moritz.Algorithm.Study4
 			{
 				msPos += trk.MsDuration;
 				barlineMsPositions.Add(msPos);
-			}			
-
-			return topTrks;
-		}
-
-		// endIndex is non-inclusive
-		private List<Trk> GetCh0_Region0_Trks(IReadOnlyList<Gamut> gamuts, int startGamutIndex, int endGamutIndex)
-		{
-			List<Trk> regionTrks = new List<Trk>(); // return
-
-			Palette palette = _palettes[0];
-			int iudIndex = 0;
-			int minBarMsDuration = 6000;
-
-			for(int i = startGamutIndex; i < endGamutIndex; i++)
-			{
-				Trk barTrk = new Trk(0);
-				regionTrks.Add(barTrk); // region 0 only has one bar
-				var barMsDuration = 0;
-				while(barMsDuration <= minBarMsDuration)
-				{
-					var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
-					if(iud is MidiChordDef mcd)
-					{
-						mcd = FitToGamut(gamuts[i], mcd, 0);
-
-						barMsDuration += mcd.MsDuration;
-
-						barTrk.Add(mcd);
-					}
-				}
 			}
 
-			return regionTrks;
+			return topTrks;
 		}
 
 		// endIndex is non-inclusive
 		private List<Trk> GetCh0RegionTrks(int regionIndex, IReadOnlyList<Gamut> gamuts, int startGamutIndex, int endGamutIndex)
 		{
 			List<Trk> regionTrks = new List<Trk>(); // return
-			Palette defaultPalette = _palettes[0];
+			Palette palette = _palettes[0];
 			int iudIndex = 0;
 			int minBarMsDuration = 6000;
+			int previousBasePitch = -1;
 
 			for(int i = startGamutIndex; i < endGamutIndex; i++)
 			{
@@ -155,10 +125,18 @@ namespace Moritz.Algorithm.Study4
 				var barMsDuration = 0;
 				while(barMsDuration <= minBarMsDuration)
 				{
-					var iud = defaultPalette.GetIUniqueDef((iudIndex++) % defaultPalette.Count);
+					var iud = palette.GetIUniqueDef((iudIndex++) % palette.Count);
+
 					if(iud is MidiChordDef mcd)
 					{
 						mcd = FitToGamut(gamuts[i], mcd, 0);
+
+						if(previousBasePitch != -1)
+						{
+							int initialMCDBasePitch = mcd.BasicMidiChordDefs[0].Pitches[0];
+						    MinimizeBasePitchInterval(previousBasePitch, initialMCDBasePitch, mcd);
+						}
+						previousBasePitch = mcd.BasicMidiChordDefs[0].Pitches[0];
 
 						barMsDuration += mcd.MsDuration;
 
@@ -166,8 +144,25 @@ namespace Moritz.Algorithm.Study4
 					}
 				}
 			}
-
 			return regionTrks;
+		}
+
+		private static void MinimizeBasePitchInterval(int previousBasePitch, int firstBasePitch, MidiChordDef midiChordDef)
+		{
+			int interval = previousBasePitch - firstBasePitch;
+			while(System.Math.Abs(interval) > 6)
+			{
+				if(interval > 6)
+				{
+					midiChordDef.Transpose(12);
+					interval -= 12;
+				}
+				else if(interval < -6)
+				{
+					midiChordDef.Transpose(-12);
+					interval += 12;
+				}
+			}
 		}
 
 		/// <summary>
