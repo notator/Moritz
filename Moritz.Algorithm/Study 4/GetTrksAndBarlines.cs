@@ -146,7 +146,7 @@ namespace Moritz.Algorithm.Study4
 			List<Trk> regionTrks = new List<Trk>(); // return
 			Palette defaultPalette = _palettes[0];
 			int iudIndex = 0;
-			int minBarMsDuration = 1000;
+			int minBarMsDuration = 6000;
 
 			for(int i = startGamutIndex; i < endGamutIndex; i++)
 			{
@@ -219,8 +219,8 @@ namespace Moritz.Algorithm.Study4
 				for(int j = 0; j < inputBMCD.Pitches.Count; j++)
 				{
 					int csIndex = j % chordShape.Count;
-					byte absPitch = chordShape[csIndex];
-					var pitchIndex = baseIndex + ((List<int>)gamut.AbsolutePitches).FindIndex(x => x == absPitch);
+					int relPitch = chordShape[csIndex] - chordShape[0] + relRootPitch;
+					var pitchIndex = ((List<PitchWeight>)gamut.PitchWeights).FindIndex(x => x.Pitch == relPitch);
 
 					PitchWeight pitchWeight = gamut.PitchWeights[pitchIndex];
 					while(pitchWeight.Pitch <= prevPitch)
