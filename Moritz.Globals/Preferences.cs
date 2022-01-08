@@ -167,10 +167,10 @@ namespace Moritz.Globals
 		public string PreferredOutputDevice = null;
 
 		#region folders in the LocalMoritzFolder
-		public string LocalMoritzAudioFolder { get { return LocalMoritzFolderLocation + @"\Moritz\audio"; } }
-		public string LocalMoritzKrystalsFolder	{ get { return LocalMoritzFolderLocation + @"\Moritz\krystals\krystals"; } }
-		public string LocalMoritzExpansionFieldsFolder { get { return LocalMoritzFolderLocation + @"\Moritz\krystals\expansion operators"; } }
-		public string LocalMoritzModulationOperatorsFolder { get { return LocalMoritzFolderLocation + @"\Moritz\krystals\modulation operators"; } }
+		public string LocalMoritzAudioFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\audio"; } }
+		public string LocalMoritzKrystalsFolder	{ get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals"; } }
+		public string LocalMoritzExpansionFieldsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\expansion operators"; } }
+		public string LocalMoritzModulationOperatorsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\modulation operators"; } }
 		public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores"; } }
 		#endregion folders in the LocalMoritzFolder
 		#region online folders
