@@ -20,9 +20,8 @@ namespace Moritz.Globals
 			// C:\Users\James\AppData\Roaming\Moritz
 			M.CreateDirectoryIfItDoesNotExist(moritzAppDataFolder);
 
-			LocalMoritzPreferencesPath = moritzAppDataFolder + @"\Preferences.mzpf";
             #region read prefs
-			if(!File.Exists(LocalMoritzPreferencesPath))
+			if(!File.Exists(M.LocalMoritzPreferencesPath))
             {
 				LocalMoritzFolderLocation = "C://Documents";
                 PreferredOutputDevice = "";
@@ -30,14 +29,14 @@ namespace Moritz.Globals
                 Save();
 
 				string msg = "A preferences file could not be found at\n" +
-							"\t" + LocalMoritzPreferencesPath + ".\n\n" +
+							"\t" + M.LocalMoritzPreferencesPath + ".\n\n" +
 							"A new one has been created with default values.";
 				MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
   
 			try
 			{
-				using(XmlReader r = XmlReader.Create(LocalMoritzPreferencesPath))
+				using(XmlReader r = XmlReader.Create(M.LocalMoritzPreferencesPath))
 				{
 					M.ReadToXmlElementTag(r, "moritzPreferences"); // check that this is a moritz preferences file
 
@@ -110,14 +109,14 @@ namespace Moritz.Globals
 				IndentChars = ("\t"),
 				CloseOutput = true
 			}; // not disposable
-			using(XmlWriter w = XmlWriter.Create(LocalMoritzPreferencesPath, settings))
+			using(XmlWriter w = XmlWriter.Create(M.LocalMoritzPreferencesPath, settings))
 			{
 				w.WriteStartDocument();
 				w.WriteComment("file created: " + M.NowString);
 
 				w.WriteStartElement("moritzPreferences");
 				w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-				w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, OnlineXMLSchemasFolder + @"\moritzPreferences.xsd");
+				w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + @"\moritzPreferences.xsd");
 
 				w.WriteStartElement("localMoritzFolderLocation");
 				w.WriteString(LocalMoritzFolderLocation);
@@ -161,20 +160,20 @@ namespace Moritz.Globals
 
 		#endregion IDisposable pattern
 
-		public readonly string LocalMoritzPreferencesPath;
+
 		
 		public string LocalMoritzFolderLocation = null;
 		public string PreferredOutputDevice = null;
 
-		#region folders in the LocalMoritzFolder
-		public string LocalMoritzAudioFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\audio"; } }
-		public string LocalMoritzKrystalsFolder	{ get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals"; } }
-		public string LocalMoritzExpansionFieldsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\expansion operators"; } }
-		public string LocalMoritzModulationOperatorsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\modulation operators"; } }
-		public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores"; } }
-		#endregion folders in the LocalMoritzFolder
+		#region local folders
+		//public string LocalMoritzAudioFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\audio"; } }
+		//public string LocalMoritzKrystalsFolder	{ get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals"; } }
+		//public string LocalMoritzExpansionFieldsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\expansion operators"; } }
+		//public string LocalMoritzModulationOperatorsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\modulation operators"; } }
+		//public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores"; } }
+		#endregion local folders
 		#region online folders
-		public string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
+		//public string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
 		#endregion online folders
 
 		/// <summary>

@@ -227,7 +227,7 @@ namespace Moritz.Composer
         {
             get
             {
-                string path = M.Preferences.LocalMoritzAudioFolder + @"\" + _scoreTitle;
+                string path = M.LocalMoritzAudioFolder + @"\" + _scoreTitle;
                 return path;
             }
         }
@@ -679,12 +679,16 @@ namespace Moritz.Composer
         private void QuitMoritzButton_Click(object sender, EventArgs e)
         {
             if(DiscardAnyChanges())
-                _moritzForm1.Close();
+            { 
+                //_moritzForm1.Close();
+            }
         }
         private void QuitAssistantComposerButton_Click(object sender, EventArgs e)
         {
             if(DiscardAnyChanges())
+            { 
                 _moritzForm1.CloseAssistantComposer();
+            }
         }
         #region helper
         /// <summary>
@@ -1462,7 +1466,7 @@ namespace Moritz.Composer
             Krystal selectedKrystal = null;
             if(KrystalsListBox.SelectedIndex >= 0)
                 selectedKrystal = KrystalsListBox.SelectedItem as Krystal;
-            Moritz.Krystals.KrystalBrowser krystalBrowser = new Moritz.Krystals.KrystalBrowser(selectedKrystal, M.Preferences.LocalMoritzKrystalsFolder, SetKrystal);
+            Moritz.Krystals.KrystalBrowser krystalBrowser = new Moritz.Krystals.KrystalBrowser(selectedKrystal, M.LocalMoritzKrystalsFolder, SetKrystal);
             krystalBrowser.Show();
             // the krystalBrowser calls SetKrystal() as a delegate just before it closes.
         }
@@ -1490,7 +1494,7 @@ namespace Moritz.Composer
             }
             else
             {
-                string staffKrystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + newKrystal.Name;
+                string staffKrystalPath = M.LocalMoritzKrystalsFolder + @"\" + newKrystal.Name;
                 Krystal krystal = K.LoadKrystal(staffKrystalPath);
                 this.KrystalsListBox.SuspendLayout();
                 this.KrystalsListBox.Items.Add(krystal);
@@ -1505,7 +1509,7 @@ namespace Moritz.Composer
 			if(this.KrystalsListBox.SelectedItem is Krystal krystal)
 			{
 				_krystalBrowser =
-					new Moritz.Krystals.KrystalBrowser(krystal, M.Preferences.LocalMoritzKrystalsFolder, null);
+					new Moritz.Krystals.KrystalBrowser(krystal, M.LocalMoritzKrystalsFolder, null);
 				_krystalBrowser.Show();
 			}
 		}
@@ -1831,7 +1835,7 @@ namespace Moritz.Composer
             Krystal krystal = null;
             try
             {
-                string krystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + krystalFileName;
+                string krystalPath = M.LocalMoritzKrystalsFolder + @"\" + krystalFileName;
                 krystal = K.LoadKrystal(krystalPath);
             }
             catch(Exception ex)
@@ -1911,7 +1915,7 @@ namespace Moritz.Composer
 
                 w.WriteStartElement("moritzKrystalScore");
                 w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.Preferences.OnlineXMLSchemasFolder + "/moritzKrystalScore.xsd");
+                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzKrystalScore.xsd");
 
                 _dimensionsAndMetadataForm.Write(w);
 

@@ -170,7 +170,7 @@ namespace Moritz.Palettes
             Krystal krystal = null;
             try
             {
-                string krystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + krystalFileName;
+                string krystalPath = M.LocalMoritzKrystalsFolder + @"\" + krystalFileName;
                 krystal = K.LoadKrystal(krystalPath);
             }
             catch(Exception ex)

@@ -112,6 +112,19 @@ namespace Moritz.Globals
 			return folder;
 		}
 
+		public static string moritzAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Moritz";
+		public static string LocalMoritzPreferencesPath = moritzAppDataFolder + @"\Preferences.mzpf";
+
+		public static string LocalMoritzFolderLocation = "D:";
+	    public static string LocalMoritzAudioFolder = @"D:\My Work\Programming\Moritz\Moritz\audio";
+		public static string LocalMoritzKrystalsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals";
+		public static string LocalMoritzExpansionFieldsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\expansion operators";
+		public static string LocalMoritzModulationOperatorsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\modulation operators";
+		public static string LocalMoritzScoresFolder = LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
+
+		public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
+
+
 		/// <summary>
 		/// Adapted from CapXML Utilities.
 		/// Reads to the next start or end tag having a name which is in the parameter list.
