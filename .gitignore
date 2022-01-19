@@ -6,6 +6,9 @@
 *.user
 *.sln.docstates
 
+# stop tracking .vs files (ji 19.01.2022)
+.vs/*
+
 # Build results
 
 [Dd]ebug/
