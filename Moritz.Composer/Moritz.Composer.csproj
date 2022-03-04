@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moritz.Composer</RootNamespace>
     <AssemblyName>Moritz.Composer</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,6 +84,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Krystals4Application\Krystals4Application.csproj">
+      <Project>{93791484-2ca8-427a-9d19-3232d3753983}</Project>
+      <Name>Krystals4Application</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
       <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
       <Name>Krystals4ObjectLibrary</Name>
@@ -98,10 +106,6 @@
     <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
       <Project>{df448bec-155b-4a56-82bd-8fd1978a85af}</Project>
       <Name>Moritz.Krystals</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
-      <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
-      <Name>Moritz.Midi</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Palettes\Moritz.Palettes.csproj">
       <Project>{a240ecd4-6ec2-4a0e-99e4-70cec7b603ca}</Project>
@@ -119,9 +123,6 @@
       <Project>{b239c302-a15d-4397-9f3c-ee6cc85440f3}</Project>
       <Name>Moritz.Xml</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
