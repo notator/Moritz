@@ -120,6 +120,7 @@ namespace Moritz.Globals
 		public static string LocalMoritzKrystalsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals";
 		public static string LocalMoritzExpansionFieldsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\expansion operators";
 		public static string LocalMoritzModulationOperatorsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\modulation operators";
+		public static string LocalMoritzKrystalsSVGFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\svg";
 		public static string LocalMoritzScoresFolder = LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
 
 		public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
@@ -150,6 +151,33 @@ namespace Moritz.Globals
 				MessageBox.Show(msg.ToString(), "Title", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 				throw new ApplicationException(msg.ToString());
 			}
+		}
+		/// <summary>
+		/// This function is a replacement for XmlDocument.GetElementById(idStr), which
+		/// only works if there is a DTD for the XML file. So it won't work with inkscape's SVG.
+		/// See: https://docs.microsoft.com/en-us/dotnet/api/system.xml.xmldocument.getelementbyid?view=net-6.0
+		/// </summary>
+		/// <param name="svgDoc"></param>
+		/// <param name="idStr"></param>
+		/// <returns></returns>
+		public static XmlElement GetElementById(XmlDocument svgDoc, string tagName, string idStr)
+		{
+			var pathElems = svgDoc.GetElementsByTagName(tagName);
+
+			XmlElement rvalElem = null;
+
+			foreach(XmlElement pathElem in pathElems)
+			{
+				var id = pathElem.GetAttribute("id");
+
+				if( !string.IsNullOrEmpty(id) && id == idStr)
+                {
+					rvalElem = pathElem;
+					break;
+				}
+			}
+
+			return rvalElem;
 		}
 
 		/// <summary>

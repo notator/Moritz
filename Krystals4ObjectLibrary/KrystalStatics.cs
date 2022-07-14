@@ -29,6 +29,7 @@ namespace Krystals4ObjectLibrary
             ModulationOperatorsFolder = M.LocalMoritzModulationOperatorsFolder;
             // The Schemas location is a programmer's preference. The user need not bother with it.
 			MoritzXmlSchemasFolder = M.OnlineXMLSchemasFolder;
+            KrystalsSVGFolder = M.LocalMoritzKrystalsSVGFolder;
         }
 
 		public static Krystal LoadKrystal(string pathname)
@@ -528,7 +529,7 @@ namespace Krystals4ObjectLibrary
         /// <summary>
         /// Gets a file path from a standard OpenFileDialog, filtering for various types of file.
         /// </summary>
-        /// <returns>A path to a krystal, expander or modulator - or an empty string if the user cancels the dialog.</returns>
+        /// <returns>A path to a krystal, expander, modulator or SVG file - or an empty string if the user cancels the dialog.</returns>
         public static string GetFilepathFromOpenFileDialog(DialogFilterIndex defaultFilterIndex)
         {
             string pathname = "";
@@ -541,13 +542,16 @@ namespace Krystals4ObjectLibrary
                 case DialogFilterIndex.expansion:
                 case DialogFilterIndex.shapedExpansion:
                 case DialogFilterIndex.modulation:
-                    openFileDialog.InitialDirectory = K.KrystalsFolder;// @"D:\krystals\krystals";
+                    openFileDialog.InitialDirectory = K.KrystalsFolder;
                     break;
                 case DialogFilterIndex.expander:
-                    openFileDialog.InitialDirectory = K.ExpansionOperatorsFolder;// @"D:\krystals\operators\expansion fields";
+                    openFileDialog.InitialDirectory = K.ExpansionOperatorsFolder;
                     break;
                 case DialogFilterIndex.modulator:
-                    openFileDialog.InitialDirectory = K.ModulationOperatorsFolder;// @"D:\krystals\operators\modulation operators";
+                    openFileDialog.InitialDirectory = K.ModulationOperatorsFolder;
+                    break;
+                case DialogFilterIndex.svg:
+                    openFileDialog.InitialDirectory = K.KrystalsSVGFolder;
                     break;
             }
 
@@ -710,6 +714,7 @@ namespace Krystals4ObjectLibrary
         public static readonly string ExpansionOperatorsFolder = "";
         public static readonly string ModulationOperatorsFolder = "";
         public static readonly string MoritzXmlSchemasFolder = "";
+        public static readonly string KrystalsSVGFolder = "";
 
         public static readonly string UntitledKrystalName = "Untitled.krys";
         public static readonly string UntitledExpanderName = "Untitled.kexp";
@@ -722,13 +727,14 @@ namespace Krystals4ObjectLibrary
             + "shaped expansions (sk*.krys)|sk*.krys|"
             + "modulations (mk*.krys)|mk*.krys|"
             + "expanders (e*.kexp) |e*.kexp|"
-            + "modulators (m*.kmod) |m*.kmod";
+            + "modulators (m*.kmod) |m*.kmod|"
+            + "SVG files (*.svg) |*.svg";
         public static readonly string KrystalFilenameSuffix = ".krys";
         public static readonly string ExpanderFilenameSuffix = ".kexp";
         public static readonly string ModulatorFilenameSuffix = ".kmod";
  
         // used to index the Krystal dialog filter (see above)
-        public enum DialogFilterIndex { allKrystals, constant, line, expansion, shapedExpansion, modulation, expander, modulator };
+        public enum DialogFilterIndex { allKrystals, constant, line, expansion, shapedExpansion, modulation, expander, modulator, svg };
         public enum PointGroupShape { circle, spiral, straightLine };
         public enum DisplayColor { black, red, green, blue, orange, purple, magenta };
         #endregion public variables

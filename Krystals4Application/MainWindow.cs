@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Windows.Forms;
+using System.Xml;
+
 using Krystals4ObjectLibrary;
 
 using Moritz.Globals;
@@ -87,6 +90,24 @@ namespace Krystals4Application
                 }
             }
             catch (ApplicationException ae)
+            {
+                MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
+        private void NewPathKrystalMenuItem_Click(object sender, EventArgs e)
+        {
+            string svgFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.svg);
+            string svgFilename = Path.GetFileName(svgFilepath);
+
+            XmlDocument svgDoc = new XmlDocument();
+            svgDoc.PreserveWhitespace = true;
+            try
+            { 
+                svgDoc.Load(svgFilepath);
+                var pathKrystal = new PathKrystal(svgFilename, svgDoc);
+            }
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -244,6 +265,5 @@ namespace Krystals4Application
             Form about = new AboutKrystals4();
             about.ShowDialog();
         }
-
-     }
+    }
 }
