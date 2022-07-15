@@ -106,6 +106,8 @@ namespace Krystals4Application
             { 
                 svgDoc.Load(svgFilepath);
                 var pathKrystal = new PathKrystal(svgFilename, svgDoc);
+
+                pathKrystal.Save(true);
             }
             catch(ApplicationException ae)
             {

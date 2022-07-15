@@ -10,20 +10,22 @@ namespace Krystals4ObjectLibrary
 {
     internal class StrandArgs
     {
-        public StrandArgs(uint level, uint density, PointF trajectoryPoint)
+        public StrandArgs(int level, int density, PointF trajectoryPoint)
         {
             this.Level = level;
             this.Density = density;
             this.TrajectoryPoint = trajectoryPoint;
         }
 
-        public uint Level;
-        public uint Density;
+        public int Level;
+        public int Density;
         public PointF TrajectoryPoint;
     }
 
     internal class Trajectory
     {
+        public readonly int Level = int.MinValue;
+        public readonly string DensityInputKrystalName;
         public List<StrandArgs> StrandsInput = new List<StrandArgs>();
 
         public Trajectory(XmlElement trajectoryPathElement)
@@ -31,15 +33,15 @@ namespace Krystals4ObjectLibrary
             var svgPath = new SvgPath(trajectoryPathElement);
             var nodes = svgPath.Nodes;
             var nodeIndex = 0;
-            string densityInputKrystalName = trajectoryPathElement.GetAttribute("densityInputKrystal");
-            string densityInputKrystalPath = M.LocalMoritzKrystalsFolder + @"\" + densityInputKrystalName;
+            DensityInputKrystalName = trajectoryPathElement.GetAttribute("densityInputKrystal");
+            string densityInputKrystalPath = M.LocalMoritzKrystalsFolder + @"\" + DensityInputKrystalName;
             var densityInputKrystal = new DensityInputKrystal(densityInputKrystalPath);
             var leveledDensityValues = densityInputKrystal.LeveledValues;
-            
 
             foreach(var leveledValue in leveledDensityValues)
             {
-                var strandArgs = new StrandArgs((uint)leveledValue.level, (uint)leveledValue.value, nodes[nodeIndex++].position);
+                Level = (Level > leveledValue.level) ? Level : leveledValue.level;
+                var strandArgs = new StrandArgs(leveledValue.level, leveledValue.value, nodes[nodeIndex++].position);
                 StrandsInput.Add(strandArgs);
             }
 

@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Xml;
 
 namespace Krystals4ObjectLibrary
@@ -26,9 +28,10 @@ namespace Krystals4ObjectLibrary
     
     public class PathKrystal : PathKrystalBase
     {
-        private string _svgInputFilename;
-        private Field _field;
-        private Trajectory _trajectory;
+        private readonly string _svgInputFilename;
+        private readonly string _densityInputKrystalName;
+        private readonly Field _field;
+        private readonly Trajectory _trajectory;
 
         /// <summary>
         /// constructor for loading a complete path krystal from a .krys file
@@ -45,7 +48,9 @@ namespace Krystals4ObjectLibrary
         public PathKrystal(string svgInputFilename, XmlDocument svgDoc)
             : base()
         {
-            this._svgInputFilename = svgInputFilename;
+            _svgInputFilename = svgInputFilename;
+
+            this._name = svgInputFilename.Replace(".svg", ".krys");
 
             XmlElement fieldPathElem = M.GetElementById(svgDoc, "path", "field");
 
@@ -55,12 +60,86 @@ namespace Krystals4ObjectLibrary
 
             _trajectory = new Trajectory(trajectoryPathElement);
 
-            _strands = GetStrands(_field, _trajectory);
+            List<List<uint>> expansionDistances = GetExpansionDistances(_field.Foci, _trajectory.StrandsInput);
+
+            _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
+
+            _level = (uint) _trajectory.Level;
+
+            _densityInputKrystalName = _trajectory.DensityInputKrystalName;
         }
 
-        private List<Strand> GetStrands(Field field, Trajectory trajectory)
+        /// <summary>
+        /// The "distance" used in an expansion is actually the square of the distance between a trajectory point and a focus.
+        /// Also, the distance is a uint, not a float: distance = (uint)(float * scale)
+        /// </summary>
+        /// <param name="focusPoints"></param>
+        /// <param name="strandsInput"></param>
+        /// <returns></returns>
+        private List<List<uint>> GetExpansionDistances(List<PointF> focusPoints, List<StrandArgs> strandsInput)
         {
-            throw new NotImplementedException();
+            var rval = new List<List<uint>>();
+            const int scale = 1; // expansions are created by using large ints, not floats.
+
+            foreach(StrandArgs strandArgs in strandsInput)
+            {
+                var trajectoryPoint = strandArgs.TrajectoryPoint;
+                var distances = new List<uint>();
+                for(int focusIndex = 0; focusIndex < focusPoints.Count; focusIndex++)
+                {
+                    var focusPoint = focusPoints[focusIndex];
+                    double distance = Math.Pow((double)(focusPoint.X - trajectoryPoint.X), 2) + Math.Pow((double)(focusPoint.Y - trajectoryPoint.Y), 2);
+                    distances.Add((uint) Math.Round((distance * scale)));
+                }
+                rval.Add(distances);
+            }
+            return rval;
+        }
+        private List<Strand> ExpandStrands(List<StrandArgs> strandsInput, List<string> focusValues, List<List<uint>> expansionDistances)
+        {
+            Debug.Assert(strandsInput.Count == expansionDistances.Count);
+
+            _numValues = 0;
+            _maxValue = uint.MinValue;
+            _minValue = uint.MaxValue;
+
+            List<TrammelMark> trammel = new List<TrammelMark>();
+
+            for(int i = 0; i < focusValues.Count; i++)
+            {
+                TrammelMark tm = new TrammelMark(int.Parse(focusValues[i]));
+                trammel.Add(tm);
+            }
+
+            var rval = new List<Strand>();
+
+            for(int strandIndex = 0; strandIndex < strandsInput.Count; strandIndex++)
+            {
+                var strandArgs = strandsInput[strandIndex];
+                var level = strandArgs.Level;
+                var density = strandArgs.Density;
+                var distances = expansionDistances[strandIndex];
+
+                Debug.Assert(distances.Count == trammel.Count);
+                for(int tmIndex = 0; tmIndex < trammel.Count; tmIndex++)
+                {
+                    trammel[tmIndex].Distance = distances[tmIndex];
+                }
+
+                Strand strand = Expansion.ExpandStrand(level, density, trammel);
+
+                _numValues += (uint) density;
+
+                foreach(uint value in strand.Values)
+                {
+                    _maxValue = (_maxValue > value) ? _maxValue : value;
+                    _minValue = (_minValue < value) ? _minValue : value;
+                } 
+
+                rval.Add(strand);
+            }
+
+            return rval;
         }
 
         /// <summary>
@@ -74,6 +153,7 @@ namespace Krystals4ObjectLibrary
                 #region save heredity info
                 w.WriteStartElement("path");
                 w.WriteAttributeString("svg", this._svgInputFilename);
+                w.WriteAttributeString("density", this._densityInputKrystalName);
                 w.WriteEndElement(); // path
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
@@ -86,7 +166,10 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Rebuild()
         {
-            GetStrands(this._field, this._trajectory);
+            List<List<uint>> expansionDistances = GetExpansionDistances(_field.Foci, _trajectory.StrandsInput);
+
+            _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
+
             this.Save(true);
         }
     }

@@ -110,7 +110,7 @@ namespace Krystals4ObjectLibrary
 
                     w.WriteStartElement("modulator");
                     w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-                    w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, K.MoritzXmlSchemasFolder + @"\krystals.xsd");
+                    w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, K.MoritzXmlSchemasFolder + @"/krystals.xsd");
 
                     w.WriteStartElement("array");
                     w.WriteAttributeString("xdim", _xDim.ToString());

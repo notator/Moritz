@@ -194,7 +194,7 @@ namespace Krystals4ObjectLibrary
 
                     w.WriteStartElement("expander");
                     w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-                    w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, K.MoritzXmlSchemasFolder + @"\krystals.xsd");
+                    w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, K.MoritzXmlSchemasFolder + @"/krystals.xsd");
 
                     if(String.IsNullOrEmpty(_inputGameteName))
                     {

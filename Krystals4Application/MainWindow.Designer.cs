@@ -261,7 +261,7 @@ namespace Krystals4Application
             this.NewConstKrysButton.Location = new System.Drawing.Point(42, 67);
             this.NewConstKrysButton.Name = "NewConstKrysButton";
             this.NewConstKrysButton.Size = new System.Drawing.Size(160, 42);
-            this.NewConstKrysButton.TabIndex = 3;
+            this.NewConstKrysButton.TabIndex = 1;
             this.NewConstKrysButton.Text = "new constant krystal";
             this.NewConstKrysButton.Click += new System.EventHandler(this.NewConstantKrystalMenuItem_Click);
             // 
@@ -271,7 +271,7 @@ namespace Krystals4Application
             this.NewExpKrysButton.Location = new System.Drawing.Point(228, 67);
             this.NewExpKrysButton.Name = "NewExpKrysButton";
             this.NewExpKrysButton.Size = new System.Drawing.Size(160, 42);
-            this.NewExpKrysButton.TabIndex = 1;
+            this.NewExpKrysButton.TabIndex = 3;
             this.NewExpKrysButton.Text = "open expansion editor";
             this.NewExpKrysButton.Click += new System.EventHandler(this.NewExpansionKrystalMenuItem_Click);
             // 
@@ -281,7 +281,7 @@ namespace Krystals4Application
             this.NewModKrysButton.Location = new System.Drawing.Point(228, 127);
             this.NewModKrysButton.Name = "NewModKrysButton";
             this.NewModKrysButton.Size = new System.Drawing.Size(160, 42);
-            this.NewModKrysButton.TabIndex = 0;
+            this.NewModKrysButton.TabIndex = 4;
             this.NewModKrysButton.Text = "open modulation editor";
             this.NewModKrysButton.Click += new System.EventHandler(this.NewModulatedKrystalMenuItem_Click);
             // 
@@ -301,7 +301,7 @@ namespace Krystals4Application
             this.NewPathKrysButton.Location = new System.Drawing.Point(42, 187);
             this.NewPathKrysButton.Name = "NewPathKrysButton";
             this.NewPathKrysButton.Size = new System.Drawing.Size(160, 42);
-            this.NewPathKrysButton.TabIndex = 6;
+            this.NewPathKrysButton.TabIndex = 0;
             this.NewPathKrysButton.Text = "new path krystal";
             this.NewPathKrysButton.Click += new System.EventHandler(this.NewPathKrystalMenuItem_Click);
             // 

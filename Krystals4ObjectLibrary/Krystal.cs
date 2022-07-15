@@ -318,7 +318,7 @@ namespace Krystals4ObjectLibrary
 
             w.WriteStartElement("krystal"); // ended in EndSaveKrystal()
             w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-            w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, K.MoritzXmlSchemasFolder + @"\krystals.xsd");
+            w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, K.MoritzXmlSchemasFolder + @"/krystals.xsd");
 
             return w;
         }
