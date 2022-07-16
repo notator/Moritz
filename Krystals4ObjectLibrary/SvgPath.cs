@@ -166,7 +166,6 @@ namespace Krystals4ObjectLibrary
                     pointF = GetPointF(components, ref index);
                     pointF = new PointF(currentSvgNode.position.X + pointF.X, currentSvgNode.position.Y + pointF.Y);
                     currentSvgNode = new SvgNode(pointF, pointF, pointF);
-                    index += 2;
                     break;
                 case "H":
                     f = float.Parse(components[index++]);

@@ -40,6 +40,8 @@ namespace Krystals4ObjectLibrary
 
             foreach(var leveledValue in leveledDensityValues)
             {
+                Debug.Assert(nodeIndex < nodes.Count);
+
                 Level = (Level > leveledValue.level) ? Level : leveledValue.level;
                 var strandArgs = new StrandArgs(leveledValue.level, leveledValue.value, nodes[nodeIndex++].position);
                 StrandsInput.Add(strandArgs);
