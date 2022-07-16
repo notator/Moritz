@@ -50,8 +50,6 @@ namespace Krystals4ObjectLibrary
         {
             _svgInputFilename = svgInputFilename;
 
-            this._name = svgInputFilename.Replace(".svg", ".krys");
-
             XmlElement fieldPathElem = M.GetElementById(svgDoc, "path", "field");
 
             _field = new Field(fieldPathElem);
@@ -67,6 +65,16 @@ namespace Krystals4ObjectLibrary
             _level = (uint) _trajectory.Level;
 
             _densityInputKrystalName = _trajectory.DensityInputKrystalName;
+
+            this._name = GetTrajectoryKrystalName(svgInputFilename);
+        }
+
+        private string GetTrajectoryKrystalName(string svgInputFilename)
+        {
+            string name = "";
+            string newSuffix = "." + NumValues.ToString() + ".krys";
+            name = svgInputFilename.Replace(".svg", newSuffix);
+            return name;
         }
 
         /// <summary>
@@ -151,7 +159,7 @@ namespace Krystals4ObjectLibrary
             {
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
-                w.WriteStartElement("path");
+                w.WriteStartElement("trajectory");
                 w.WriteAttributeString("svg", this._svgInputFilename);
                 w.WriteAttributeString("density", this._densityInputKrystalName);
                 w.WriteEndElement(); // path
