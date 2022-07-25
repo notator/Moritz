@@ -473,7 +473,7 @@ namespace Krystals4ObjectLibrary
             }
             return returnValue;
         }
-        private int[] ShapeArray
+        public int[] ShapeArray
         {
             get
             {
