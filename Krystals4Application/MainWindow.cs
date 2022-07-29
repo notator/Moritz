@@ -97,21 +97,26 @@ namespace Krystals4Application
 
         private void NewPathKrystalMenuItem_Click(object sender, EventArgs e)
         {
-            string svgFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.svg);
-            string svgFilename = Path.GetFileName(svgFilepath);
+            string svgFilepath = "";
+            string densityInputKrystalFilePath = "";
 
-            XmlDocument svgDoc = new XmlDocument();
-            svgDoc.PreserveWhitespace = true;
-            try
-            { 
-                svgDoc.Load(svgFilepath);
-                var pathKrystal = new PathKrystal(svgFilename, svgDoc);
-
-                pathKrystal.Save(true);
-            }
-            catch(ApplicationException ae)
+            using(NewPathExpansionDialog dlg = new NewPathExpansionDialog())
             {
-                MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                DialogResult result = dlg.ShowDialog();
+                if(result == DialogResult.OK)
+                {
+                    svgFilepath = dlg.TrajectorySVGFilepath;
+                    densityInputKrystalFilePath = dlg.DensityInputKrystalFilepath;
+                }
+            }
+
+            if(!String.IsNullOrEmpty(svgFilepath) && !String.IsNullOrEmpty(densityInputKrystalFilePath))
+            {
+                var pathKrystal = new PathKrystal(svgFilepath, densityInputKrystalFilePath);
+                pathKrystal.Save(true);
+
+                string msg = "Saved Path Krystal:\n\n" + pathKrystal.Name; 
+                MessageBox.Show(msg, "Saved Path Krystal", MessageBoxButtons.OK);
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using Moritz.Globals;
-
+﻿
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -7,7 +6,7 @@ using System.Xml;
 
 namespace Krystals4ObjectLibrary
 {
-    internal class StrandArgs
+    public class StrandArgs
     {
         public StrandArgs(int level, int density, PointF trajectoryPoint)
         {
@@ -21,17 +20,17 @@ namespace Krystals4ObjectLibrary
         public PointF TrajectoryPoint;
     }
 
-    internal class Trajectory
+    public class Trajectory
     {
         public readonly int Level = int.MinValue;
         public readonly string DensityInputKrystalName;
         public List<StrandArgs> StrandsInput = new List<StrandArgs>();
 
-        public Trajectory(XmlElement trajectoryPathElement)
+        public Trajectory(XmlElement trajectoryPathElement, DensityInputKrystal densityInputKrystal)
         {
-            DensityInputKrystalName = trajectoryPathElement.GetAttribute("densityInputKrystal");
-            string densityInputKrystalPath = M.LocalMoritzKrystalsFolder + @"\" + DensityInputKrystalName;
-            var densityInputKrystal = new DensityInputKrystal(densityInputKrystalPath);
+            Debug.Assert(densityInputKrystal.Level > 0, "The density input cannot be a constant."); // The trajectory must contain at least two nodes..."); 
+
+            DensityInputKrystalName = densityInputKrystal.Name;
             var leveledDensityValues = densityInputKrystal.LeveledValues;
             Level = (int)densityInputKrystal.Level + 1;
 
@@ -66,7 +65,9 @@ namespace Krystals4ObjectLibrary
                 }
             }
 
-            Debug.Assert(nodesLevel > 0, "The (input) nodes count must exist somewhere in the (output) shapeArray");
+            Debug.Assert(nodesLevel > 0, "The (input) nodes count must exist somewhere in the (output) shapeArray.\n\n" +
+                "In other words: The density input krystal must have a shape that includes\n" +
+                "the number of nodes in the trajectory path (in the SVG input).");
 
             return nodesLevel;
         }

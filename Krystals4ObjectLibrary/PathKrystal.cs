@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Xml;
 
 namespace Krystals4ObjectLibrary
@@ -34,29 +36,28 @@ namespace Krystals4ObjectLibrary
         private readonly Trajectory _trajectory;
 
         /// <summary>
-        /// constructor for loading a complete path krystal from a .krys file
+        /// constructor for creating a path krystal from an (SVG) XmlDocument and a krystal
         /// </summary>
-        public PathKrystal(string filepath)
-            : base(filepath)
-        {
-
-        }
-
-        /// <summary>
-        /// constructor for creating a path krystal from an (SVG) XmlDocument
-        /// </summary>
-        public PathKrystal(string svgInputFilename, XmlDocument svgDoc)
+        public PathKrystal(string svgFilepath, string densityInputKrystalFilePath)
             : base()
         {
-            _svgInputFilename = svgInputFilename;
+            _svgInputFilename = Path.GetFileName(svgFilepath);
+            _densityInputKrystalName = Path.GetFileName(densityInputKrystalFilePath);
+
+            Debug.Assert(_svgInputFilename.StartsWith("path.") && _svgInputFilename.EndsWith(".svg") && _densityInputKrystalName.EndsWith(".krys"));
+
+            XmlDocument svgDoc = new XmlDocument();
+            svgDoc.PreserveWhitespace = true;
+            svgDoc.Load(svgFilepath);
 
             XmlElement fieldPathElem = M.GetElementById(svgDoc, "path", "field");
 
             _field = new Field(fieldPathElem);
 
             XmlElement trajectoryPathElement = M.GetElementById(svgDoc, "path", "trajectory");
+            DensityInputKrystal densityInputKrystal = new DensityInputKrystal(densityInputKrystalFilePath);
 
-            _trajectory = new Trajectory(trajectoryPathElement);
+            _trajectory = new Trajectory(trajectoryPathElement, densityInputKrystal);
 
             List<List<uint>> expansionDistances = GetExpansionDistances(_field.Foci, _trajectory.StrandsInput);
 
@@ -64,17 +65,26 @@ namespace Krystals4ObjectLibrary
 
             _level = (uint) _trajectory.Level;
 
-            _densityInputKrystalName = _trajectory.DensityInputKrystalName;
-
-            this._name = GetTrajectoryKrystalName(svgInputFilename);
+            _name = GetName(_svgInputFilename);
         }
 
-        private string GetTrajectoryKrystalName(string svgInputFilename)
+        private string GetName(string svgInputFilename)
         {
-            string name = "";
-            string newSuffix = "." + NumValues.ToString() + ".krys";
-            name = svgInputFilename.Replace(".svg", newSuffix);
-            return name;
+            var dirPath = M.LocalMoritzKrystalsFolder;
+            var krysFilenames = Directory.EnumerateFiles(dirPath, "*.krys").Select(Path.GetFileName);
+            var components = svgInputFilename.Split(new char[] {'.'});
+            var nameRoot = "path." + components[1].ToString() + "." + NumValues.ToString() + ".";
+            int index = 1; // default
+            foreach(var krysFilename in krysFilenames)
+            {
+                if(krysFilename.StartsWith(nameRoot))
+                {
+                    index++;
+                }
+            }
+            string outputPathKrystalName = nameRoot + index.ToString() + ".krys";
+
+            return outputPathKrystalName;
         }
 
         /// <summary>
@@ -159,7 +169,7 @@ namespace Krystals4ObjectLibrary
             {
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
-                w.WriteStartElement("trajectory");
+                w.WriteStartElement("path");
                 w.WriteAttributeString("svg", this._svgInputFilename);
                 w.WriteAttributeString("density", this._densityInputKrystalName);
                 w.WriteEndElement(); // path

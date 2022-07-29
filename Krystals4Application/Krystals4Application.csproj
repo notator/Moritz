@@ -85,6 +85,12 @@
     <Compile Include="ExpansionEditor.Designer.cs">
       <DependentUpon>ExpansionEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="NewPathExpansionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewPathExpansionDialog.Designer.cs">
+      <DependentUpon>NewPathExpansionDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Krystals4ControlLibrary\FloatControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -223,6 +229,9 @@
     <EmbeddedResource Include="NewModulationDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>NewModulationDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewPathExpansionDialog.resx">
+      <DependentUpon>NewPathExpansionDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NewPlanetDialog.resx">
       <DependentUpon>NewPlanetDialog.cs</DependentUpon>
