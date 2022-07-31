@@ -57,6 +57,7 @@ namespace Krystals4Application
             this.NewModKrysButton = new System.Windows.Forms.Button();
             this.RebuildKrystalFamilyButton = new System.Windows.Forms.Button();
             this.NewPathKrysButton = new System.Windows.Forms.Button();
+            this.OpenKrystalsBrowserButton = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -288,7 +289,7 @@ namespace Krystals4Application
             // RebuildKrystalFamilyButton
             // 
             this.RebuildKrystalFamilyButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.RebuildKrystalFamilyButton.Location = new System.Drawing.Point(129, 317);
+            this.RebuildKrystalFamilyButton.Location = new System.Drawing.Point(129, 338);
             this.RebuildKrystalFamilyButton.Name = "RebuildKrystalFamilyButton";
             this.RebuildKrystalFamilyButton.Size = new System.Drawing.Size(160, 42);
             this.RebuildKrystalFamilyButton.TabIndex = 5;
@@ -305,12 +306,23 @@ namespace Krystals4Application
             this.NewPathKrysButton.Text = "new path krystal";
             this.NewPathKrysButton.Click += new System.EventHandler(this.NewPathKrystalMenuItem_Click);
             // 
+            // OpenKrystalsBrowserButton
+            // 
+            this.OpenKrystalsBrowserButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.OpenKrystalsBrowserButton.Location = new System.Drawing.Point(129, 278);
+            this.OpenKrystalsBrowserButton.Name = "OpenKrystalsBrowserButton";
+            this.OpenKrystalsBrowserButton.Size = new System.Drawing.Size(160, 42);
+            this.OpenKrystalsBrowserButton.TabIndex = 6;
+            this.OpenKrystalsBrowserButton.Text = "open krystals browser";
+            this.OpenKrystalsBrowserButton.Click += new System.EventHandler(this.OpenKrystalsBrowserButton_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
             this.ClientSize = new System.Drawing.Size(424, 410);
+            this.Controls.Add(this.OpenKrystalsBrowserButton);
             this.Controls.Add(this.NewPathKrysButton);
             this.Controls.Add(this.RebuildKrystalFamilyButton);
             this.Controls.Add(this.NewModKrysButton);
@@ -360,6 +372,7 @@ namespace Krystals4Application
         private System.Windows.Forms.ToolStripMenuItem MenuItemRebuildKrystalFamily;
         private System.Windows.Forms.Button RebuildKrystalFamilyButton;
         private System.Windows.Forms.Button NewPathKrysButton;
+        private System.Windows.Forms.Button OpenKrystalsBrowserButton;
     }
 }
 

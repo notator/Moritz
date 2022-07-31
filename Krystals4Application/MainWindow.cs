@@ -6,6 +6,7 @@ using System.Xml;
 using Krystals4ObjectLibrary;
 
 using Moritz.Globals;
+using Moritz.Krystals;
 
 namespace Krystals4Application
 {
@@ -242,6 +243,12 @@ namespace Krystals4Application
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+        }
+
+        private void OpenKrystalsBrowserButton_Click(object sender, EventArgs e)
+        {
+            KrystalBrowser krystalBrowser = new KrystalBrowser(null, M.LocalMoritzKrystalsFolder, null);
+            krystalBrowser.Show();
         }
 
         private void MenuItemRebuildKrystalFamily_Click(object sender, EventArgs e)
