@@ -44,9 +44,11 @@
             // 
             // OKBtn
             // 
+            this.OKBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.OKBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.OKBtn.Enabled = false;
             this.OKBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.OKBtn.Location = new System.Drawing.Point(79, 237);
+            this.OKBtn.Location = new System.Drawing.Point(144, 216);
             this.OKBtn.Name = "OKBtn";
             this.OKBtn.Size = new System.Drawing.Size(75, 23);
             this.OKBtn.TabIndex = 6;
@@ -56,9 +58,10 @@
             // 
             // CancelBtn
             // 
+            this.CancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.CancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.CancelBtn.Location = new System.Drawing.Point(172, 237);
+            this.CancelBtn.Location = new System.Drawing.Point(238, 216);
             this.CancelBtn.Name = "CancelBtn";
             this.CancelBtn.Size = new System.Drawing.Size(75, 23);
             this.CancelBtn.TabIndex = 7;
@@ -70,21 +73,21 @@
             // 
             this.SVGInputFilenameLabel.AutoSize = true;
             this.SVGInputFilenameLabel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.SVGInputFilenameLabel.Location = new System.Drawing.Point(102, 23);
+            this.SVGInputFilenameLabel.Location = new System.Drawing.Point(97, 23);
             this.SVGInputFilenameLabel.Name = "SVGInputFilenameLabel";
-            this.SVGInputFilenameLabel.Size = new System.Drawing.Size(77, 13);
+            this.SVGInputFilenameLabel.Size = new System.Drawing.Size(73, 13);
             this.SVGInputFilenameLabel.TabIndex = 22;
-            this.SVGInputFilenameLabel.Text = "<unassigned>*";
+            this.SVGInputFilenameLabel.Text = "<unassigned>";
             // 
             // DensityInputFilenameLabel
             // 
             this.DensityInputFilenameLabel.AutoSize = true;
             this.DensityInputFilenameLabel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.DensityInputFilenameLabel.Location = new System.Drawing.Point(102, 127);
+            this.DensityInputFilenameLabel.Location = new System.Drawing.Point(97, 114);
             this.DensityInputFilenameLabel.Name = "DensityInputFilenameLabel";
-            this.DensityInputFilenameLabel.Size = new System.Drawing.Size(77, 13);
+            this.DensityInputFilenameLabel.Size = new System.Drawing.Size(73, 13);
             this.DensityInputFilenameLabel.TabIndex = 21;
-            this.DensityInputFilenameLabel.Text = "<unassigned>*";
+            this.DensityInputFilenameLabel.Text = "<unassigned>";
             // 
             // SVGInputLabel
             // 
@@ -100,7 +103,7 @@
             // 
             this.DensityInputLabel.AutoSize = true;
             this.DensityInputLabel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.DensityInputLabel.Location = new System.Drawing.Point(21, 127);
+            this.DensityInputLabel.Location = new System.Drawing.Point(21, 114);
             this.DensityInputLabel.Name = "DensityInputLabel";
             this.DensityInputLabel.Size = new System.Drawing.Size(71, 13);
             this.DensityInputLabel.TabIndex = 19;
@@ -108,8 +111,9 @@
             // 
             // SetSVGInputButton
             // 
+            this.SetSVGInputButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.SetSVGInputButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.SetSVGInputButton.Location = new System.Drawing.Point(245, 18);
+            this.SetSVGInputButton.Location = new System.Drawing.Point(253, 16);
             this.SetSVGInputButton.Name = "SetSVGInputButton";
             this.SetSVGInputButton.Size = new System.Drawing.Size(60, 23);
             this.SetSVGInputButton.TabIndex = 18;
@@ -119,8 +123,9 @@
             // 
             // SetDensityInputButton
             // 
+            this.SetDensityInputButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.SetDensityInputButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.SetDensityInputButton.Location = new System.Drawing.Point(245, 122);
+            this.SetDensityInputButton.Location = new System.Drawing.Point(253, 107);
             this.SetDensityInputButton.Name = "SetDensityInputButton";
             this.SetDensityInputButton.Size = new System.Drawing.Size(60, 23);
             this.SetDensityInputButton.TabIndex = 17;
@@ -131,31 +136,30 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.label1.ForeColor = System.Drawing.Color.MediumBlue;
             this.label1.Location = new System.Drawing.Point(16, 78);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(308, 39);
+            this.label1.Size = new System.Drawing.Size(270, 26);
             this.label1.TabIndex = 23;
-            this.label1.Text = "The density input shape must have a level that contains\r\n the number of nodes in " +
-    "the trajectory path.\r\nThe density input must therefore have a level greater than" +
-    " zero. ";
+            this.label1.Text = "The density input shape must have a level that contains\r\n the number of (effectiv" +
+    "e) nodes in the trajectory.";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.label2.ForeColor = System.Drawing.Color.MediumBlue;
             this.label2.Location = new System.Drawing.Point(16, 46);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(289, 26);
+            this.label2.Size = new System.Drawing.Size(274, 26);
             this.label2.TabIndex = 24;
-            this.label2.Text = "The SVG input filename has the following structure:\r\n    path.<domain>.<number of" +
-    " trajectory nodes>.<index>.svg\r\n";
+            this.label2.Text = "The SVG input filename has the following structure:\r\n    <n field nodes>.<n traje" +
+    "ctory nodes>.<index>.path.svg\r\n";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.ForeColor = System.Drawing.Color.CornflowerBlue;
-            this.label3.Location = new System.Drawing.Point(16, 157);
+            this.label3.ForeColor = System.Drawing.Color.MediumBlue;
+            this.label3.Location = new System.Drawing.Point(16, 136);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(278, 65);
             this.label3.TabIndex = 25;
@@ -165,7 +169,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(328, 272);
+            this.ClientSize = new System.Drawing.Size(338, 257);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);

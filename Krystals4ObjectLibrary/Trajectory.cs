@@ -26,16 +26,24 @@ namespace Krystals4ObjectLibrary
         public readonly string DensityInputKrystalName;
         public List<StrandArgs> StrandsInput = new List<StrandArgs>();
 
-        public Trajectory(XmlElement trajectoryPathElement, DensityInputKrystal densityInputKrystal)
+        public Trajectory(XmlElement trajectoryPathElement, int nEffectiveTrajectoryNodes, DensityInputKrystal densityInputKrystal)
         {
-            Debug.Assert(densityInputKrystal.Level > 0, "The density input cannot be a constant."); // The trajectory must contain at least two nodes..."); 
+            if(nEffectiveTrajectoryNodes > 1)
+            {
+                Debug.Assert(densityInputKrystal.Level > 0, "The density input cannot be a constant."); // The trajectory must contain at least two nodes...");
+            }
 
             DensityInputKrystalName = densityInputKrystal.Name;
             var leveledDensityValues = densityInputKrystal.LeveledValues;
             Level = (int)densityInputKrystal.Level + 1;
 
             var svgPath = new SvgPath(trajectoryPathElement);
-            var nodes = svgPath.Nodes;
+            var nodes = svgPath.Nodes; // default
+            if(nEffectiveTrajectoryNodes == 1)
+            {
+                nodes = new List<SvgNode>() { svgPath.Nodes[0] };
+            }
+                
             int nodesLevel = GetNodesLevel(densityInputKrystal.ShapeArray, nodes.Count);
             var nodeIndex = -1;
 

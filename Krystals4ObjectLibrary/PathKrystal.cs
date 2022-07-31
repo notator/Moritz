@@ -44,7 +44,12 @@ namespace Krystals4ObjectLibrary
             _svgInputFilename = Path.GetFileName(svgFilepath);
             _densityInputKrystalName = Path.GetFileName(densityInputKrystalFilePath);
 
-            Debug.Assert(_svgInputFilename.StartsWith("path.") && _svgInputFilename.EndsWith(".svg") && _densityInputKrystalName.EndsWith(".krys"));
+            char[] splitChar = { '.' };
+            var svgInputFilenameComponents = _svgInputFilename.Split(splitChar);
+            
+            Debug.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && _densityInputKrystalName.EndsWith(".krys"));
+
+            int nEffectiveTrajectoryNodes = int.Parse(svgInputFilenameComponents[1]); // can be 1 (A constant: the first node in the trajectory path)
 
             XmlDocument svgDoc = new XmlDocument();
             svgDoc.PreserveWhitespace = true;
@@ -57,7 +62,7 @@ namespace Krystals4ObjectLibrary
             XmlElement trajectoryPathElement = M.GetElementById(svgDoc, "path", "trajectory");
             DensityInputKrystal densityInputKrystal = new DensityInputKrystal(densityInputKrystalFilePath);
 
-            _trajectory = new Trajectory(trajectoryPathElement, densityInputKrystal);
+            _trajectory = new Trajectory(trajectoryPathElement, nEffectiveTrajectoryNodes, densityInputKrystal);
 
             List<List<uint>> expansionDistances = GetExpansionDistances(_field.Foci, _trajectory.StrandsInput);
 
@@ -65,15 +70,14 @@ namespace Krystals4ObjectLibrary
 
             _level = (uint) _trajectory.Level;
 
-            _name = GetName(_svgInputFilename);
+            _name = GetName();
         }
 
-        private string GetName(string svgInputFilename)
+        private string GetName()
         {
             var dirPath = M.LocalMoritzKrystalsFolder;
             var krysFilenames = Directory.EnumerateFiles(dirPath, "*.krys").Select(Path.GetFileName);
-            var components = svgInputFilename.Split(new char[] {'.'});
-            var nameRoot = "path." + components[1].ToString() + "." + NumValues.ToString() + ".";
+            var nameRoot = MaxValue.ToString() + "." + NumValues.ToString() + ".";
             int index = 1; // default
             foreach(var krysFilename in krysFilenames)
             {
@@ -82,7 +86,7 @@ namespace Krystals4ObjectLibrary
                     index++;
                 }
             }
-            string outputPathKrystalName = nameRoot + index.ToString() + ".krys";
+            string outputPathKrystalName = nameRoot + index.ToString() + ".path.krys";
 
             return outputPathKrystalName;
         }

@@ -122,6 +122,6 @@
 derived from the density input krystal.
 The output path krystal's filename will have the following
 structure:
-    path.&lt;domain&gt;.&lt;number of values&gt;.&lt;index&gt;.krys</value>
+    &lt;domain&gt;.&lt;n lowest level values&gt;.&lt;index&gt;.path.krys</value>
   </data>
 </root>
