@@ -44,7 +44,7 @@ namespace Krystals4ObjectLibrary
                 nodes = new List<SvgNode>() { svgPath.Nodes[0] };
             }
                 
-            int nodesLevel = GetNodesLevel(densityInputKrystal.ShapeArray, nodes.Count);
+            int nodesLevel = GetNodesLevel(densityInputKrystal, nodes.Count);
             var nodeIndex = -1;
 
             foreach(var leveledValue in leveledDensityValues)
@@ -54,6 +54,7 @@ namespace Krystals4ObjectLibrary
                     nodeIndex++;
                 }
                 Debug.Assert(nodeIndex >= 0 && nodeIndex < nodes.Count);
+
                 var strandArgs = new StrandArgs(leveledValue.level, leveledValue.value, nodes[nodeIndex].position);
                 StrandsInput.Add(strandArgs);
             }
@@ -61,15 +62,23 @@ namespace Krystals4ObjectLibrary
             Debug.Assert(nodeIndex == (nodes.Count - 1));
         }
 
-        private int GetNodesLevel(int[] shapeArray, int trajectoryNodesCount)
+        private int GetNodesLevel(Krystal densityInputKrystal, int trajectoryNodesCount)
         {
-            int nodesLevel = -1;
-            for(int level = 0; level < shapeArray.Length; level++)
+            int nodesLevel = 1;
+
+            if(densityInputKrystal.Level > 0)
             {
-                if(trajectoryNodesCount == shapeArray[level])
+                Debug.Assert(densityInputKrystal.ShapeArray.Length > 0);
+
+                int[] shapeArray = densityInputKrystal.ShapeArray;
+
+                for(int level = 0; level < shapeArray.Length; level++)
                 {
-                    nodesLevel = level + 1;
-                    break;
+                    if(trajectoryNodesCount == shapeArray[level])
+                    {
+                        nodesLevel = level + 1;
+                        break;
+                    }
                 }
             }
 

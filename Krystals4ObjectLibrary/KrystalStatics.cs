@@ -703,7 +703,6 @@ namespace Krystals4ObjectLibrary
             else
                 return (float)Convert.ToDouble(value, _numberFormat);
         }
-
         public static string Now
         {
             get { return DateTime.Today.ToString("dddd dd.MM.yyyy", _dateTimeFormat) + ", " + DateTime.Now.ToLongTimeString();}
@@ -732,6 +731,19 @@ namespace Krystals4ObjectLibrary
         public static readonly string KrystalFilenameSuffix = ".krys";
         public static readonly string ExpanderFilenameSuffix = ".kexp";
         public static readonly string ModulatorFilenameSuffix = ".kmod";
+
+        // These values are used as strings in krystal names to describe their type.
+        // A krystal's type defines how its heredity information is stored in the file.
+        public enum KrystalType
+        {
+            constant,
+            line,
+            exp,
+            path,
+            shaped,
+            mod,
+            perm
+        };
  
         // used to index the Krystal dialog filter (see above)
         public enum DialogFilterIndex { allKrystals, constant, line, expansion, shapedExpansion, modulation, expander, modulator, svg };

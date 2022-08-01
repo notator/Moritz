@@ -695,7 +695,7 @@ namespace Krystals4ObjectLibrary
                 int valueLevel = (int)this._level + 1;
                 foreach(Strand strand in _strands)
                 {
-                    leveledValue.level = (int)strand.Level;
+                    leveledValue.level = (int)((strand.Level == 0) ? 1 : strand.Level);
                     leveledValue.value = (int)strand.Values[0];
                     yield return leveledValue;
                     if(strand.Values.Count > 1)

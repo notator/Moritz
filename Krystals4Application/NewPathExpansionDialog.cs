@@ -40,7 +40,7 @@ namespace Krystals4Application
             var components = SVGInputFilenameLabel.Text.Split(splitChar);
             int nEffectiveTrajectoryNodes = int.Parse(components[1]); // can be 1 (A constant: the first node in the trajectory)
 
-            if(DensityShapeContainsNTrajectoryNodes(nEffectiveTrajectoryNodes, krystal))
+            if(nEffectiveTrajectoryNodes == 1 || (krystal.Level > 0 && DensityShapeContainsNTrajectoryNodes(nEffectiveTrajectoryNodes, krystal)))
             {
                 DensityInputFilenameLabel.Text = krystal.Name;
                 _densityInputKrystalFilepath = _krystalsFolder + @"\" + krystal.Name;
