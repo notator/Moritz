@@ -74,65 +74,6 @@ namespace Krystals4ObjectLibrary
             _name = GetName(K.KrystalType.path);
         }
 
-        private string GetName(K.KrystalType krystalType)
-        {
-            var dirPath = M.LocalMoritzKrystalsFolder;
-            var krysFilenames = Directory.EnumerateFiles(dirPath, "*.krys").Select(Path.GetFileName);
-            var nameRoot = GetNameRoot();
-            int index = 1;
-
-            foreach(var krysFilename in krysFilenames)
-            {
-                if(krysFilename.StartsWith(nameRoot))
-                {
-                    index++;
-                }
-            }
-            string outputPathKrystalName = nameRoot + index.ToString() + "." + krystalType.ToString() + K.KrystalFilenameSuffix;
-
-            return outputPathKrystalName;
-        }
-
-        /// <summary>
-        /// A Krystal's name root consists of its domain (=MaxValue) followed by a '.' character, followed by a shapeNameString followed by a '.' character.
-        /// The shapeNameString contains one or more integers separated by '_' characters.
-        /// The first int in the shapeNameString is the number of level 1 and level 2 strands, so:
-        ///  "0" is a constant krystal -- containing one strand having level 0 and one value (=domain) (no level 1 or level 2 strands).
-        ///  "1_[nValues]" is a line krystal -- containing one strand having level 1 and [nValues] values (no level 2 strands).
-        ///  "7_[nValues)" is a level 2 krystal -- containing 7 strands (1 level 1 and 6 level 2 strands) and [nValues] values.
-        ///  "7_28_[nValues]" is a level 3 krystal - containing 28 strands having level 1, 2, or 3, and [nValues] values.
-        ///  "7_28_206_[nValues]" is a level 4 krystal - containing 206 strands having level 1, 2, 3 or 4, and [nValues] values. 
-        /// </summary>
-        /// <returns></returns>
-        private string GetNameRoot()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(MaxValue.ToString() + ".");
-
-            if(Level == 0)
-            {
-                sb.Append("0");
-            }
-            else if(Level == 1)
-            {
-                sb.Append("1");
-                sb.Append("_");
-                sb.Append(Strands[0].Values.Count().ToString());
-            }
-            else
-            {
-                for(int i = 1; i < ShapeArray.Length; i++)
-                {
-                    sb.Append(ShapeArray[i].ToString() + '_');
-                }
-                sb.Remove(sb.Length - 1, 1);
-            }
-
-            sb.Append('.');
-
-            return sb.ToString();
-        }
-
         /// <summary>
         /// The "distance" used in an expansion is actually the square of the distance between a trajectory point and a focus.
         /// Also, the distance is a uint, not a float: distance = (uint)(float * scale)
