@@ -158,7 +158,7 @@ namespace Krystals4ObjectLibrary
             if(MaxValueHasChanged())
             {
                 File.Delete(pathname);
-                _name = "";
+                _name = GetName(K.KrystalType.mod);
                 Save(false); // false means do not overwrite. This (recursive) call saves under a new name
             }
             else
@@ -182,8 +182,8 @@ namespace Krystals4ObjectLibrary
 
         private bool MaxValueHasChanged()
         {
-            string[] segs = _name.Split('(', ')');
-            uint max = uint.Parse(segs[1]);
+            string[] segs = _name.Split('.');
+            uint max = uint.Parse(segs[0]);
             if(max == MaxValue)
                 return false;
             else

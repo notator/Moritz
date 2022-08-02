@@ -954,7 +954,10 @@ namespace Krystals4Application
                 {
                     bool abort = true;                                                                                  
                     string krystalName = Path.GetFileName(expansionKrystalFilepath);
+                    // *******************
+                    // 02.08.2022 CheckExpansionKrystalName is out of date (TODO)
                     CheckExpansionKrystalName(krystalName); // throws exception if name is invalid
+                    // *******************
                     string expanderName = K.ExpansionOperatorFilename(krystalName);
                     string expanderPath = K.KrystalsFolder + @"\" +  expanderName;
                     if (File.Exists(expanderPath))

@@ -376,8 +376,8 @@ namespace Krystals4ObjectLibrary
 
         private bool MaxValueHasChanged()
         {
-            string[] segs = _name.Split('(', ')');
-            uint max = uint.Parse(segs[1]);
+            string[] segs = _name.Split('.');
+            uint max = uint.Parse(segs[0]);
             if(max == MaxValue)
                 return false;
             else

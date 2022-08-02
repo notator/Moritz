@@ -121,33 +121,6 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public abstract void Save(bool overwriteKrystal, bool overwriteExpander);
 
-        /// <summary>
-        /// Creates a unique name for a new expansion or shaped expansion krystal
-        /// </summary>
-        /// <param name="nameIntro">"xk" or "sk"</param>
-        /// <param name="expanderSignature">The portion of the expanders name in brackets.</param>
-        /// <returns></returns>
-        protected string GetPathName(string nameIntro, string expanderSignature)
-        {
-            string pathName;
-            if(_name.Equals(K.UntitledKrystalName))
-                _name = base.GetNameOfEquivalentSavedKrystal(nameIntro);
-            if(string.IsNullOrEmpty(_name))
-            {
-                int krystalIDNumber = 1;
-                do
-                {
-                    _name = String.Format("{0}{1}{2}-{3}{4}",
-                        nameIntro, _level, expanderSignature, krystalIDNumber, K.KrystalFilenameSuffix);
-                    pathName = K.KrystalsFolder + @"\" + _name;
-                    krystalIDNumber++;
-                } while(File.Exists(pathName));
-            }
-            else
-                pathName = K.KrystalsFolder + @"\" + _name;
-
-            return pathName;
-        }
         #region virtual
         public abstract void Expand();
         public abstract List<StrandNode> StrandNodeList();
@@ -265,7 +238,8 @@ namespace Krystals4ObjectLibrary
         {
             string expanderSignature = _expander.Save(overwriteExpander); // false means: dont overwrite existing expanders
 
-            string pathname = GetPathName("xk", expanderSignature);
+            _name = GetName(K.KrystalType.exp);
+            string pathname = K.KrystalsFolder + @"\" + _name;
 
             if(File.Exists(pathname) == false || overwriteKrystal)
             {
@@ -430,7 +404,8 @@ namespace Krystals4ObjectLibrary
         {
             string expanderID = _expander.Save(overwriteExpander); // false means: dont overwrite existing expanders
 
-            string pathname = GetPathName("sk", expanderID);
+            _name = GetName(K.KrystalType.shaped);
+            string pathname = K.KrystalsFolder + @"\" + _name;
 
             if(File.Exists(pathname) == false || overwriteKrystal)
             {

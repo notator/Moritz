@@ -1,12 +1,12 @@
-using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml;
-
 using Krystals4ObjectLibrary;
 
 using Moritz.Globals;
 using Moritz.Krystals;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
 
 namespace Krystals4Application
 {
@@ -29,7 +29,7 @@ namespace Krystals4Application
                     {
                         uint constantValue = uint.Parse(constantValueStr);
                         ConstantKrystal ck = new ConstantKrystal(K.UntitledKrystalName, constantValue);
-                        ck.Save(false);  // false: do not ovewrite existing files
+                        ck.Save(false);  // false: do not overwrite existing files
                     }
                 }
             }
@@ -268,6 +268,82 @@ namespace Krystals4Application
 			}
         }
 
+        #region SaveKrystalsWithNewNames
+        /// <summary>
+        /// ACHTUNG: Before running this function, delete all the newly named krystals in the krystals folder.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveKrystalsWithNewNamesButton_Click(object sender, EventArgs e)
+        {
+            var dirPath = M.LocalMoritzKrystalsFolder;
+            var krysFilePaths = Directory.EnumerateFiles(dirPath, "*.krys");
+            // ACHTUNG: Before running this function, delete all the newly named
+            // krystals in the krystals folder, otherwise the name indices get confused.
+            Dictionary<string, string> namesDict = SaveNewFilesAndGetNamesDict(krysFilePaths);
+
+            //TODO: now open the new files and change their heredity info according to the namesDict.
+        }
+        private Dictionary<string, string> SaveNewFilesAndGetNamesDict(IEnumerable<string> krysFilePaths)
+        {
+            Dictionary<string, string> rval = new Dictionary<string, string>();
+
+            foreach(var krysFilePath in krysFilePaths)
+            {
+                var originalKrysFilename = Path.GetFileName(krysFilePath);
+                if(originalKrysFilename.StartsWith("ck"))
+                {
+                    ConstantKrystal krystal = new ConstantKrystal(krysFilePath);
+                    krystal.SetName(K.KrystalType.constant);
+                    krystal.Save(false);
+
+                    rval.Add(originalKrysFilename, krystal.Name);
+                }
+                if(originalKrysFilename.StartsWith("lk"))
+                {
+                    LineKrystal krystal = new LineKrystal(krysFilePath);
+                    krystal.SetName(K.KrystalType.line);
+                    krystal.Save(false);
+
+                    rval.Add(originalKrysFilename, krystal.Name);
+                }
+                if(originalKrysFilename.StartsWith("xk"))
+                {
+                    ExpansionKrystal krystal = new ExpansionKrystal(krysFilePath);
+                    krystal.SetName(K.KrystalType.exp);
+                    krystal.Save(false);
+
+                    rval.Add(originalKrysFilename, krystal.Name);
+                }
+                if(originalKrysFilename.StartsWith("mk"))
+                {
+                    ModulationKrystal krystal = new ModulationKrystal(krysFilePath);
+                    krystal.SetName(K.KrystalType.mod);
+                    krystal.Save(false);
+
+                    rval.Add(originalKrysFilename, krystal.Name);
+                }
+                if(originalKrysFilename.StartsWith("pk"))
+                {
+                    PermutationKrystal krystal = new PermutationKrystal(krysFilePath);
+                    krystal.SetName(K.KrystalType.perm);
+                    krystal.Save(false);
+
+                    rval.Add(originalKrysFilename, krystal.Name);
+                }
+                if(originalKrysFilename.StartsWith("sk"))
+                {
+                    ShapedExpansionKrystal krystal = new ShapedExpansionKrystal(krysFilePath);
+                    krystal.SetName(K.KrystalType.shaped);
+                    krystal.Save(false);
+
+                    rval.Add(originalKrysFilename, krystal.Name);
+                }
+            }
+
+            return rval;
+        }
+        #endregion SaveKrystalsWithNewNames
         private void MenuItemQuit_Click(object sender, EventArgs e)
         {
             M.Preferences.Dispose();

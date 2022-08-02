@@ -58,6 +58,7 @@ namespace Krystals4Application
             this.RebuildKrystalFamilyButton = new System.Windows.Forms.Button();
             this.NewPathKrysButton = new System.Windows.Forms.Button();
             this.OpenKrystalsBrowserButton = new System.Windows.Forms.Button();
+            this.SaveKrystalsWithNewNamesButton = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -289,7 +290,7 @@ namespace Krystals4Application
             // RebuildKrystalFamilyButton
             // 
             this.RebuildKrystalFamilyButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.RebuildKrystalFamilyButton.Location = new System.Drawing.Point(129, 338);
+            this.RebuildKrystalFamilyButton.Location = new System.Drawing.Point(44, 338);
             this.RebuildKrystalFamilyButton.Name = "RebuildKrystalFamilyButton";
             this.RebuildKrystalFamilyButton.Size = new System.Drawing.Size(160, 42);
             this.RebuildKrystalFamilyButton.TabIndex = 5;
@@ -309,12 +310,22 @@ namespace Krystals4Application
             // OpenKrystalsBrowserButton
             // 
             this.OpenKrystalsBrowserButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.OpenKrystalsBrowserButton.Location = new System.Drawing.Point(129, 278);
+            this.OpenKrystalsBrowserButton.Location = new System.Drawing.Point(44, 278);
             this.OpenKrystalsBrowserButton.Name = "OpenKrystalsBrowserButton";
             this.OpenKrystalsBrowserButton.Size = new System.Drawing.Size(160, 42);
             this.OpenKrystalsBrowserButton.TabIndex = 6;
             this.OpenKrystalsBrowserButton.Text = "open krystals browser";
             this.OpenKrystalsBrowserButton.Click += new System.EventHandler(this.OpenKrystalsBrowserButton_Click);
+            // 
+            // SaveKrystalsWithNewNamesButton
+            // 
+            this.SaveKrystalsWithNewNamesButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.SaveKrystalsWithNewNamesButton.Location = new System.Drawing.Point(228, 278);
+            this.SaveKrystalsWithNewNamesButton.Name = "SaveKrystalsWithNewNamesButton";
+            this.SaveKrystalsWithNewNamesButton.Size = new System.Drawing.Size(160, 42);
+            this.SaveKrystalsWithNewNamesButton.TabIndex = 7;
+            this.SaveKrystalsWithNewNamesButton.Text = "save krystals with new names";
+            this.SaveKrystalsWithNewNamesButton.Click += new System.EventHandler(this.SaveKrystalsWithNewNamesButton_Click);
             // 
             // MainWindow
             // 
@@ -322,6 +333,7 @@ namespace Krystals4Application
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
             this.ClientSize = new System.Drawing.Size(424, 410);
+            this.Controls.Add(this.SaveKrystalsWithNewNamesButton);
             this.Controls.Add(this.OpenKrystalsBrowserButton);
             this.Controls.Add(this.NewPathKrysButton);
             this.Controls.Add(this.RebuildKrystalFamilyButton);
@@ -373,6 +385,7 @@ namespace Krystals4Application
         private System.Windows.Forms.Button RebuildKrystalFamilyButton;
         private System.Windows.Forms.Button NewPathKrysButton;
         private System.Windows.Forms.Button OpenKrystalsBrowserButton;
+        private System.Windows.Forms.Button SaveKrystalsWithNewNamesButton;
     }
 }
 

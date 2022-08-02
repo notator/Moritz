@@ -515,6 +515,10 @@ namespace Krystals4ObjectLibrary
         }
         #endregion public properties
 
+        public void SetName(K.KrystalType krystalType)
+        {
+            _name = GetName(krystalType);
+        }
         /// <summary>
         /// Returns the file name for a newly constructed Krystal
         /// </summary>
@@ -525,16 +529,17 @@ namespace Krystals4ObjectLibrary
             var dirPath = M.LocalMoritzKrystalsFolder;
             var krysFilenames = Directory.EnumerateFiles(dirPath, "*.krys").Select(Path.GetFileName);
             var nameRoot = GetNameRoot();
+            var nameSuffix = "." + krystalType.ToString() + K.KrystalFilenameSuffix;
             int index = 1;
 
             foreach(var krysFilename in krysFilenames)
             {
-                if(krysFilename.StartsWith(nameRoot))
+                if(krysFilename.StartsWith(nameRoot) && krysFilename.EndsWith(nameSuffix))
                 {
                     index++;
                 }
             }
-            string krystalName = nameRoot + index.ToString() + "." + krystalType.ToString() + K.KrystalFilenameSuffix;
+            string krystalName = nameRoot + index.ToString() + nameSuffix;
 
             return krystalName;
         }
@@ -621,20 +626,20 @@ namespace Krystals4ObjectLibrary
 			};
 			Strand strand = new Strand(0, valueList);
             _strands.Add(strand);
+
+            _name = GetName(K.KrystalType.constant);
         }
         #region overridden functions
         public override void Save(bool overwrite)
         {
-            _name = String.Format("ck0({0}){1}", this.MaxValue, K.KrystalFilenameSuffix);
-            if(File.Exists(K.KrystalsFolder + @"\" + _name) == false || overwrite)
-            {
-                XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
-                #region save heredity info (only that this is a constant...)
-                w.WriteStartElement("constant");
-                w.WriteEndElement(); // constant
-                #endregion
-                base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
-            }
+            _name = GetName(K.KrystalType.constant);
+
+            XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
+            #region save heredity info (only that this is a constant...)
+            w.WriteStartElement("constant");
+            w.WriteEndElement(); // constant
+            #endregion
+            base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
 
             string msg = "Constant krystal saved as \r\n\r\n" +
                          "   " + _name;
@@ -683,6 +688,8 @@ namespace Krystals4ObjectLibrary
             }
             Strand strand = new Strand(1, valueList);
             _strands.Add(strand);
+
+            _name = GetName(K.KrystalType.line);
         }
         #region overridden functions
         public override void Save(bool overwrite)
