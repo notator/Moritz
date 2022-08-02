@@ -26,10 +26,10 @@ namespace Krystals4ObjectLibrary
                     switch(r.Name)
                     {
                         case "x":
-                            this._xInputFilename = r.Value;
+                            this.XInputFilename = r.Value;
                             break;
                         case "y":
-                            this._yInputFilename = r.Value;
+                            this.YInputFilename = r.Value;
                             break;
                         case "modulator":
                             modulatorName = r.Value;
@@ -37,8 +37,8 @@ namespace Krystals4ObjectLibrary
                     }
                 }
             }
-            string xInputFilepath = K.KrystalsFolder + @"\" + _xInputFilename;
-            string yInputFilepath = K.KrystalsFolder + @"\" + _yInputFilename;
+            string xInputFilepath = K.KrystalsFolder + @"\" + XInputFilename;
+            string yInputFilepath = K.KrystalsFolder + @"\" + YInputFilename;
             string modulatorFilepath = K.ModulationOperatorsFolder + @"\" + modulatorName;
 
             _xInputKrystal = new ModulationInputKrystal(xInputFilepath);
@@ -58,8 +58,8 @@ namespace Krystals4ObjectLibrary
         public ModulationKrystal(string xInputFilepath, string yInputFilepath, string modulatorFilepath)
             : base()
         {
-            _xInputFilename = Path.GetFileName(xInputFilepath);
-            _yInputFilename = Path.GetFileName(yInputFilepath);
+            XInputFilename = Path.GetFileName(xInputFilepath);
+            YInputFilename = Path.GetFileName(yInputFilepath);
 
             _xInputKrystal = new ModulationInputKrystal(xInputFilepath);
             _yInputKrystal = new ModulationInputKrystal(yInputFilepath);
@@ -171,8 +171,8 @@ namespace Krystals4ObjectLibrary
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
                 w.WriteStartElement("modulation");
-                w.WriteAttributeString("x", this._xInputFilename);
-                w.WriteAttributeString("y", this._yInputFilename);
+                w.WriteAttributeString("x", this.XInputFilename);
+                w.WriteAttributeString("y", this.YInputFilename);
                 w.WriteAttributeString("modulator", this._modulator.Name);
                 w.WriteEndElement(); // expansion
                 #endregion
@@ -239,8 +239,8 @@ namespace Krystals4ObjectLibrary
         /// modulator, but which do not have corresponding values in the Y-input krystal.
         /// </summary>
         public List<uint> RedundantQualifierYInputValues { get { return _redundantModifierYInputValues; } }
-        public string XInputFilename { get { return _xInputFilename; } }
-        public string YInputFilename { get { return _yInputFilename; } }
+        public string XInputFilename { get; set; }
+        public string YInputFilename { get; set; }
         public string ModulatorFilename
         {
             get
@@ -340,8 +340,6 @@ namespace Krystals4ObjectLibrary
         #region private variables
         private List<uint> _redundantModifierXInputValues = new List<uint>();
         private List<uint> _redundantModifierYInputValues = new List<uint>();
-        private readonly string _xInputFilename;
-        private readonly string _yInputFilename;
         //private string _modulatorFilename;
         private ModulationInputKrystal _xInputKrystal;
         private ModulationInputKrystal _yInputKrystal;

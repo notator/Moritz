@@ -26,13 +26,13 @@ namespace Krystals4ObjectLibrary
                     switch(r.Name)
                     {
                         case "source":
-                            this._sourceInputFilename = r.Value;
+                            this.SourceInputFilename = r.Value;
                             break;
                         case "axis":
-                            this._axisInputFilename = r.Value;
+                            this.AxisInputFilename = r.Value;
                             break;
                         case "contour":
-                            this._contourInputFilename = r.Value;
+                            this.ContourInputFilename = r.Value;
                             break;
                         case "pLevel":
                             this._permutationLevel = uint.Parse(r.Value);
@@ -43,9 +43,9 @@ namespace Krystals4ObjectLibrary
                     }
                 }
             }
-            string sourceInputFilepath = K.KrystalsFolder + @"\" + _sourceInputFilename;
-            string axisInputFilepath = K.KrystalsFolder + @"\" + _axisInputFilename;
-            string contourInputFilepath = K.KrystalsFolder + @"\" + _contourInputFilename;
+            string sourceInputFilepath = K.KrystalsFolder + @"\" + SourceInputFilename;
+            string axisInputFilepath = K.KrystalsFolder + @"\" + AxisInputFilename;
+            string contourInputFilepath = K.KrystalsFolder + @"\" + ContourInputFilename;
 
             _sourceInputKrystal = new PermutationSourceInputKrystal(sourceInputFilepath);
             _axisInputKrystal = new AxisInputKrystal(axisInputFilepath);
@@ -64,9 +64,9 @@ namespace Krystals4ObjectLibrary
         public PermutationKrystal(string sourcePath, string axisPath, string contourPath, int permutationLevel, bool sortFirst)
             : base()
         {
-            _sourceInputFilename = Path.GetFileName(sourcePath);
-            _axisInputFilename = Path.GetFileName(axisPath);
-            _contourInputFilename = Path.GetFileName(contourPath);
+            SourceInputFilename = Path.GetFileName(sourcePath);
+            AxisInputFilename = Path.GetFileName(axisPath);
+            ContourInputFilename = Path.GetFileName(contourPath);
 
             _sourceInputKrystal = new PermutationSourceInputKrystal(sourcePath);
             _axisInputKrystal = new AxisInputKrystal(axisPath);
@@ -360,9 +360,9 @@ namespace Krystals4ObjectLibrary
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
                 w.WriteStartElement("permutation");
-                w.WriteAttributeString("source", this._sourceInputFilename);
-                w.WriteAttributeString("axis", this._axisInputFilename);
-                w.WriteAttributeString("contour", this._contourInputFilename);
+                w.WriteAttributeString("source", this.SourceInputFilename);
+                w.WriteAttributeString("axis", this.AxisInputFilename);
+                w.WriteAttributeString("contour", this.ContourInputFilename);
                 w.WriteAttributeString("pLevel", this._permutationLevel.ToString());
                 if(this._sortFirst == true)
                     w.WriteAttributeString("sortFirst", "true");
@@ -395,9 +395,9 @@ namespace Krystals4ObjectLibrary
         }
         #endregion public functions
         #region Properties
-        public string SourceInputFilename { get { return _sourceInputFilename; } }
-        public string AxisInputFilename { get { return _axisInputFilename; } }
-        public string ContourInputFilename { get { return _contourInputFilename; } }
+        public string SourceInputFilename { get; set; }
+        public string AxisInputFilename { get; set; }
+        public string ContourInputFilename { get; set; }
         public PermutationSourceInputKrystal SourceInputKrystal
         {
             get { return _sourceInputKrystal; }
@@ -432,9 +432,6 @@ namespace Krystals4ObjectLibrary
         #endregion Properties
 
         #region private variables
-        private string _sourceInputFilename;
-        private string _axisInputFilename;
-        private string _contourInputFilename;
         private uint _permutationLevel;
         private bool _sortFirst;
         private PermutationSourceInputKrystal _sourceInputKrystal;

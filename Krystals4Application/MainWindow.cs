@@ -278,12 +278,94 @@ namespace Krystals4Application
         {
             var dirPath = M.LocalMoritzKrystalsFolder;
             var krysFilePaths = Directory.EnumerateFiles(dirPath, "*.krys");
-            // ACHTUNG: Before running this function, delete all the newly named
+            // ACHTUNG: Before running this function, delete any newly named
             // krystals in the krystals folder, otherwise the name indices get confused.
             Dictionary<string, string> namesDict = SaveNewFilesAndGetNamesDict(krysFilePaths);
-
-            //TODO: now open the new files and change their heredity info according to the namesDict.
+            CorrectHeredity(namesDict);
         }
+
+        private static void CorrectHeredity(Dictionary<string, string> namesDict)
+        {
+            foreach(var pair in namesDict)
+            {
+                var newName = pair.Value;
+                var path = M.LocalMoritzKrystalsFolder + "/" + newName;
+                if(newName.Contains(K.KrystalType.exp.ToString()))
+                {
+                    var krystal = new ExpansionKrystal(path);
+                    if(namesDict.ContainsKey(krystal.DensityInputFilename))
+                    {
+                        krystal.DensityInputFilename = namesDict[krystal.DensityInputFilename];
+                    }
+                    if(namesDict.ContainsKey(krystal.PointsInputFilename))
+                    {
+                        krystal.PointsInputFilename = namesDict[krystal.PointsInputFilename];
+                    }
+                    krystal.Save(true);
+                }
+                if(newName.Contains(K.KrystalType.mod.ToString()))
+                {
+                    var krystal = new ModulationKrystal(path);
+                    if(namesDict.ContainsKey(krystal.XInputFilename))
+                    {
+                        krystal.XInputFilename = namesDict[krystal.XInputFilename];
+                    }
+                    if(namesDict.ContainsKey(krystal.YInputFilename))
+                    {
+                        krystal.YInputFilename = namesDict[krystal.YInputFilename];
+                    }
+                    krystal.Save(true);
+                }
+                if(newName.Contains(K.KrystalType.perm.ToString()))
+                {
+                    var krystal = new PermutationKrystal(path);
+                    if(namesDict.ContainsKey(krystal.AxisInputFilename))
+                    {
+                        krystal.AxisInputFilename = namesDict[krystal.AxisInputFilename];
+                    }
+                    if(namesDict.ContainsKey(krystal.SourceInputFilename))
+                    {
+                        krystal.SourceInputFilename = namesDict[krystal.SourceInputFilename];
+                    }
+                    if(namesDict.ContainsKey(krystal.ContourInputFilename))
+                    {
+                        krystal.ContourInputFilename = namesDict[krystal.ContourInputFilename];
+                    }
+                    krystal.Save(true);
+                }
+                if(newName.Contains(K.KrystalType.shaped.ToString()))
+                {
+                    var krystal = new ShapedExpansionKrystal(path);
+                    if(namesDict.ContainsKey(krystal.DensityInputFilename))
+                    {
+                        krystal.DensityInputFilename = namesDict[krystal.DensityInputFilename];
+                    }
+                    if(namesDict.ContainsKey(krystal.PointsInputFilename))
+                    {
+                        krystal.PointsInputFilename = namesDict[krystal.PointsInputFilename];
+                    }
+                    if(namesDict.ContainsKey(krystal.AxisInputFilename))
+                    {
+                        krystal.AxisInputFilename = namesDict[krystal.AxisInputFilename];
+                    }
+                    if(namesDict.ContainsKey(krystal.ContourInputFilename))
+                    {
+                        krystal.ContourInputFilename = namesDict[krystal.ContourInputFilename];
+                    }
+                    krystal.Save(true);
+                }
+                if(newName.Contains(K.KrystalType.path.ToString()))
+                {
+                    var krystal = new PathKrystal(path);
+                    if(namesDict.ContainsKey(krystal.DensityInputKrystalName))
+                    {
+                        krystal.DensityInputKrystalName = namesDict[krystal.DensityInputKrystalName];
+                    }
+                    krystal.Save(true);
+                }
+            }
+        }
+
         private Dictionary<string, string> SaveNewFilesAndGetNamesDict(IEnumerable<string> krysFilePaths)
         {
             Dictionary<string, string> rval = new Dictionary<string, string>();

@@ -32,7 +32,7 @@ namespace Krystals4ObjectLibrary
     public class PathKrystal : PathKrystalBase
     {
         private readonly string _svgInputFilename;
-        private readonly string _densityInputKrystalName;
+        public string DensityInputKrystalName;
         private readonly Field _field;
         private readonly Trajectory _trajectory;
 
@@ -43,12 +43,12 @@ namespace Krystals4ObjectLibrary
             : base()
         {
             _svgInputFilename = Path.GetFileName(svgFilepath);
-            _densityInputKrystalName = Path.GetFileName(densityInputKrystalFilePath);
+            DensityInputKrystalName = Path.GetFileName(densityInputKrystalFilePath);
 
             char[] splitChar = { '.' };
             var svgInputFilenameComponents = _svgInputFilename.Split(splitChar);
             
-            Debug.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && _densityInputKrystalName.EndsWith(".krys"));
+            Debug.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && DensityInputKrystalName.EndsWith(".krys"));
 
             int nEffectiveTrajectoryNodes = int.Parse(svgInputFilenameComponents[1]); // can be 1 (A constant: the first node in the trajectory path)
 
@@ -72,6 +72,10 @@ namespace Krystals4ObjectLibrary
             _level = (uint) _trajectory.Level;
 
             _name = GetName(K.KrystalType.path);
+        }
+
+        public PathKrystal(string filepath) : base(filepath)
+        {
         }
 
         /// <summary>
@@ -158,7 +162,7 @@ namespace Krystals4ObjectLibrary
                 #region save heredity info
                 w.WriteStartElement("path");
                 w.WriteAttributeString("svg", this._svgInputFilename);
-                w.WriteAttributeString("density", this._densityInputKrystalName);
+                w.WriteAttributeString("density", this.DensityInputKrystalName);
                 w.WriteEndElement(); // path
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
