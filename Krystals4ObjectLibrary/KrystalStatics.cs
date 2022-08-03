@@ -190,33 +190,35 @@ namespace Krystals4ObjectLibrary
         #region Regex Filename verification
         public static bool IsConstantKrystalFilename(string name)
         {
-            return Regex.IsMatch(name, @"^[c][k][0][\(]([0-9])+[\)][.][k][r][y][s]$");
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]constant\.krys$");
         }
         public static bool IsLineKrystalFilename(string name)
         {
-            return Regex.IsMatch(name, @"^[l][k][1][\(]([0-9])+[\)][\-]([0-9])+[.][k][r][y][s]$");
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]line\.krys$");
         }
         public static bool IsModulationKrystalFilename(string name)
         {
-            return Regex.IsMatch(name, @"^[m][k]([0-9])+[\(]([0-9])+[\)][\-]([0-9])+[.][k][r][y][s]$");
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]mod\.krys$");
         }
         public static bool IsPermutationKrystalFilename(string name)
         {
-            return Regex.IsMatch(name, @"^[p][k]([0-9])+[\(]([0-9])+[\)][\-]([0-9])+[.][k][r][y][s]$");
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]perm\.krys$");
         }
         public static bool IsExpansionKrystalFilename(string name)
         {
-            return Regex.IsMatch(name, @"^[x][k]([0-9])+[\(]([0-9])+[.]([0-9])+[.]([0-9])+[\)][\-]([0-9])+[.][k][r][y][s]$");
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]exp\.krys$");
         }
         public static bool IsShapedExpansionKrystalFilename(string name)
         {
-            return Regex.IsMatch(name, @"^[s][k]([0-9])+[\(]([0-9])+[.]([0-9])+[.]([0-9])+[\)][\-]([0-9])+[.][k][r][y][s]$");
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]shaped\.krys$");
+        }
+        public static bool IsPathKrystalFilename(string name)
+        {
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]path\.krys$");
         }
         public static bool IsKrystalFilename(string name)
         {
-            return (IsConstantKrystalFilename(name) || IsLineKrystalFilename(name)
-                    || IsExpansionKrystalFilename(name) || IsShapedExpansionKrystalFilename(name)
-                    || IsModulationKrystalFilename(name) || IsPermutationKrystalFilename(name));
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.](constant|line|exp|path|shaped|mod|perm)(\.krys)$");
         }
         public static bool IsModulationOperatorFilename(string name)
         {
@@ -301,65 +303,103 @@ namespace Krystals4ObjectLibrary
                 throw new ApplicationException("Argument to K:CompareKrystalNames() was not a krystal file name");
             }
 
-            string k1ID = krystalName1.Substring(0, 2);
-            string k2ID = krystalName2.Substring(0, 2);
-            int rval = String.Compare(k1ID, k2ID);
-            if(rval == 0) // both krystals are of the same type
-            {
-                int k1InBracketIndex = krystalName1.IndexOf('(') + 1;
-                int k2InBracketIndex = krystalName2.IndexOf('(') + 1;
-                string k1LevelString = krystalName1.Substring(2, k1InBracketIndex - 3);
-                string k2LevelString = krystalName2.Substring(2, k2InBracketIndex - 3);
-                int k1Level, k2Level;
-                try
-                {
-                    k1Level = int.Parse(k1LevelString);
-                    k2Level = int.Parse(k2LevelString);
-                    rval = K.CompareInts(k1Level, k2Level);
-                    if(rval == 0) // the two names have the same level, so may differ by the content of the bracket
-                    {
-                        int k1CloseIndex = krystalName1.IndexOf(')');
-                        int k2CloseIndex = krystalName2.IndexOf(')');
-                        switch(k1ID)
-                        {
-                            case "ck":
-                            case "lk":
-                            case "mk":
-                            case "pk":
-                                rval = CompareDomains(
-                                    krystalName1.Substring(k1InBracketIndex, k1CloseIndex - k1InBracketIndex),
-                                    krystalName2.Substring(k2InBracketIndex, k2CloseIndex - k2InBracketIndex));
-                                break;
-                            case "sk":
-                            case "xk":
-                                rval = CompareFields(
-                                    krystalName1.Substring(k1InBracketIndex, k1CloseIndex - k1InBracketIndex),
-                                    krystalName2.Substring(k2InBracketIndex, k2CloseIndex - k2InBracketIndex));
-                                break;
-                        }
-                        if(rval == 0 && k1ID != "ck") // compare numbers
-                        {
-                            int k1NumberIndex = krystalName1.IndexOf('-') + 1;
-                            int k2NumberIndex = krystalName2.IndexOf('-') + 1;
-                            int k1SuffixIndex = krystalName1.IndexOf(".krys");
-                            int k2SuffixIndex = krystalName2.IndexOf(".krys");
+            int rval = String.Compare(krystalName1, krystalName2);
 
-                            string k1Number = krystalName1.Substring(k1NumberIndex, k1SuffixIndex - k1NumberIndex);
-                            string k2Number = krystalName2.Substring(k2NumberIndex, k2SuffixIndex - k2NumberIndex);
-                            int k1Int = int.Parse(k1Number);
-                            int k2Int = int.Parse(k2Number);
-                            rval = K.CompareInts(k1Int, k2Int);
-                        }
-                    }
-                }
-                catch
+            // The sort criteria are: domain->level->shape->type->index
+            if(rval != 0)
+            {
+                rval = 1; // assume krystalName1 > krystalName2
+                GetNameInfo(krystalName1, out int domain1, out string[] shapeComponents1, out int index1, out string type1);
+                GetNameInfo(krystalName2, out int domain2, out string[] shapeComponents2, out int index2, out string type2);
+
+                var shapeComparison = CompareKrystalShapes(shapeComponents1, shapeComponents2);
+                var typeComparison = CompareKrystalTypes(type1, type2);
+
+                if((domain1 < domain2)
+                || (domain1 == domain2 && shapeComparison < 0)
+                || (domain1 == domain2 && shapeComparison == 0 && typeComparison < 0)
+                || (domain1 == domain2 && shapeComparison == 0 && typeComparison == 0 && index1 < index2))
                 {
-                    throw new ApplicationException("Error comparing krystal names.");
+                    rval = -1;
                 }
             }
 
 			return rval;
 		}
+
+        /// <summary>
+        /// returns 0 if the shape components are equal
+        /// -1 if shapeComponents1 less than shapeComponents2
+        /// 1 if shapeComponents1 greater than shapeComponents2
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private static int CompareKrystalShapes(string[] shapeComponents1, string[] shapeComponents2)
+        {
+            var rval = 0;
+            if(shapeComponents1.Length < shapeComponents2.Length)
+                rval = -1;
+            else if(shapeComponents1.Length > shapeComponents2.Length)
+                rval = 1;
+            else // components are the same length
+            {
+                for(int i = 0; i < shapeComponents1.Length; i++)
+                {
+                    var int1 = int.Parse(shapeComponents1[i]);
+                    var int2 = int.Parse(shapeComponents2[i]);
+                    if(int1 == int2)
+                    {
+                        continue;
+                    }
+                    else if(int1 < int2)
+                    {
+                        rval = -1;
+                        break;
+                    }
+                    else if(int1 > int2)
+                    {
+                        rval = 1;
+                        break;
+                    }
+                }   
+            }
+
+            return rval;
+        }
+
+        /// <summary>
+        /// Krystal type names are sorted in the order they are defined in the enum KrystalType.
+        /// </summary>
+        /// <returns></returns>
+        private static int CompareKrystalTypes(string type1, string type2)
+        {
+            Enum.TryParse(type1, out KrystalType t1);
+            Enum.TryParse(type2, out KrystalType t2);
+
+            int rval = 0; // assume the types are equal
+            
+            if(t1 < t2) 
+            {
+                rval = -1;
+            }
+            else if(t1 > t2)
+            {
+                rval = 1;
+            }
+            return rval;
+        }        
+
+        private static void GetNameInfo(string krystalName1, out int domain, out string[] shapeComponents, out int index, out string type )
+        {
+            var dot = new char[] { '.' };
+            var underscore = new char[] { '_' };
+
+            var components1 = krystalName1.Split(dot);
+            domain = int.Parse(components1[0]);
+            shapeComponents = components1[1].Split(underscore);
+            index = int.Parse(components1[2]);
+            type = components1[3];
+        }
 
         private static int CompareDomains(string domStr1, string domStr2)
         {

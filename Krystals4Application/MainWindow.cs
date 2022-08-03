@@ -377,7 +377,7 @@ namespace Krystals4Application
                 {
                     ConstantKrystal krystal = new ConstantKrystal(krysFilePath);
                     krystal.SetName(K.KrystalType.constant);
-                    krystal.Save(false);
+                    krystal.Save(true);
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
@@ -385,7 +385,7 @@ namespace Krystals4Application
                 {
                     LineKrystal krystal = new LineKrystal(krysFilePath);
                     krystal.SetName(K.KrystalType.line);
-                    krystal.Save(false);
+                    krystal.Save(true);
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
@@ -393,7 +393,7 @@ namespace Krystals4Application
                 {
                     ExpansionKrystal krystal = new ExpansionKrystal(krysFilePath);
                     krystal.SetName(K.KrystalType.exp);
-                    krystal.Save(false);
+                    krystal.Save(true);
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
@@ -401,7 +401,7 @@ namespace Krystals4Application
                 {
                     ModulationKrystal krystal = new ModulationKrystal(krysFilePath);
                     krystal.SetName(K.KrystalType.mod);
-                    krystal.Save(false);
+                    krystal.Save(true);
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
@@ -409,7 +409,7 @@ namespace Krystals4Application
                 {
                     PermutationKrystal krystal = new PermutationKrystal(krysFilePath);
                     krystal.SetName(K.KrystalType.perm);
-                    krystal.Save(false);
+                    krystal.Save(true);
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
@@ -417,7 +417,7 @@ namespace Krystals4Application
                 {
                     ShapedExpansionKrystal krystal = new ShapedExpansionKrystal(krysFilePath);
                     krystal.SetName(K.KrystalType.shaped);
-                    krystal.Save(false);
+                    krystal.Save(true);
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }

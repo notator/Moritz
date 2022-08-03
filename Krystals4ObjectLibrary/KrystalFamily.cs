@@ -52,7 +52,7 @@ namespace Krystals4ObjectLibrary
         public KrystalFamily(string krystalsFolder)
         {
             DirectoryInfo dir = new DirectoryInfo(krystalsFolder);
-            string allConstants = "ck*.krys";
+            string allConstants = "*.constant.krys";
             foreach(FileInfo f in dir.GetFiles(allConstants))
             {
 				Dependency d = new Dependency
@@ -61,7 +61,7 @@ namespace Krystals4ObjectLibrary
 				};
 				_dependencyList.Add(d);
             }
-            string allLines = "lk*.krys";
+            string allLines = "*.line.krys";
             foreach(FileInfo f in dir.GetFiles(allLines))
             {
 				Dependency d = new Dependency
@@ -72,7 +72,7 @@ namespace Krystals4ObjectLibrary
             }
 
             #region add expansions to the _unknownParentsList
-            string expansions = "xk*.krys";
+            string expansions = "*.exp.krys";
             ExpansionKrystal xk = null;
             foreach(FileInfo f in dir.GetFiles(expansions))
             {
@@ -93,7 +93,7 @@ namespace Krystals4ObjectLibrary
             #endregion add expansions to the _unknownParentsList
 
             #region add shaped expansions to the _unknownParentsList
-            string shapedExpansions = "sk*.krys";
+            string shapedExpansions = "*.shaped.krys";
             ShapedExpansionKrystal sk = null;
             foreach(FileInfo f in dir.GetFiles(shapedExpansions))
             {
@@ -116,7 +116,7 @@ namespace Krystals4ObjectLibrary
             #endregion add shaped expansions to the _unknownParentsList
 
             #region add modulations to the _unknownParentsList
-            string allModulations = "mk*.krys";
+            string allModulations = "*.mod.krys";
             ModulationKrystal mk = null;
             foreach(FileInfo f in dir.GetFiles(allModulations))
             {
@@ -136,7 +136,7 @@ namespace Krystals4ObjectLibrary
             }
             #endregion add modulations to the _unknownParentsList
             #region add permutation krystals to the _unknownParentsList
-            string allPermutations = "pk*.krys";
+            string allPermutations = "*.perm.krys";
             PermutationKrystal pk = null;
             foreach(FileInfo f in dir.GetFiles(allPermutations))
             {

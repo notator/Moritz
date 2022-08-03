@@ -238,7 +238,10 @@ namespace Krystals4ObjectLibrary
         {
             string expanderSignature = _expander.Save(overwriteExpander); // false means: dont overwrite existing expanders
 
-            _name = GetName(K.KrystalType.exp);
+            if(!K.IsExpansionKrystalFilename(_name))
+            {
+                _name = GetName(K.KrystalType.exp);
+            }
             string pathname = K.KrystalsFolder + @"\" + _name;
 
             if(File.Exists(pathname) == false || overwriteKrystal)

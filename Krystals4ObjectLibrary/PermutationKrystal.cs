@@ -329,59 +329,26 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save(bool overwrite)
         {
-            string pathname;
-            if(string.IsNullOrEmpty(_name) || overwrite == false) // this is a new or changed krystal, so generate a new name
+            if(!K.IsPermutationKrystalFilename(_name))
             {
-                if(_name != null && _name == "") // used by Krystals4
-                    _name = base.GetNameOfEquivalentSavedKrystal("pk");
-                if(string.IsNullOrEmpty(_name)) // null is used by Moritz
-                {
-                    int fileIndex = 1;
-                    do
-                    {
-                        _name = String.Format("pk{0}({1})-{2}{3}",
-                            _level, _maxValue, fileIndex, K.KrystalFilenameSuffix);
-                        pathname = K.KrystalsFolder + @"\" + _name;
-                        fileIndex++;
-                    } while(File.Exists(pathname));
-                }
-                else pathname = K.KrystalsFolder + @"\" + _name;
+                _name = GetName(K.KrystalType.perm);
             }
-            else pathname = K.KrystalsFolder + @"\" + _name;
 
-            if(MaxValueHasChanged())
-            {
-                File.Delete(pathname);
-                _name = "";
-                Save(false); // false means do not overwrite. This (recursive) call saves under a new name
-            }
+            XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
+            #region save heredity info
+            w.WriteStartElement("permutation");
+            w.WriteAttributeString("source", this.SourceInputFilename);
+            w.WriteAttributeString("axis", this.AxisInputFilename);
+            w.WriteAttributeString("contour", this.ContourInputFilename);
+            w.WriteAttributeString("pLevel", this._permutationLevel.ToString());
+            if(this._sortFirst == true)
+                w.WriteAttributeString("sortFirst", "true");
             else
-            {
-                XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
-                #region save heredity info
-                w.WriteStartElement("permutation");
-                w.WriteAttributeString("source", this.SourceInputFilename);
-                w.WriteAttributeString("axis", this.AxisInputFilename);
-                w.WriteAttributeString("contour", this.ContourInputFilename);
-                w.WriteAttributeString("pLevel", this._permutationLevel.ToString());
-                if(this._sortFirst == true)
-                    w.WriteAttributeString("sortFirst", "true");
-                else
-                    w.WriteAttributeString("sortFirst", "false");
-                w.WriteEndElement(); // permutation
-                #endregion
-                base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
-            }
-        }
+                w.WriteAttributeString("sortFirst", "false");
+            w.WriteEndElement(); // permutation
+            #endregion
+            base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
 
-        private bool MaxValueHasChanged()
-        {
-            string[] segs = _name.Split('.');
-            uint max = uint.Parse(segs[0]);
-            if(max == MaxValue)
-                return false;
-            else
-                return true;
         }
 
         /// <summary>

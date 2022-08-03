@@ -632,18 +632,25 @@ namespace Krystals4ObjectLibrary
         #region overridden functions
         public override void Save(bool overwrite)
         {
-            _name = GetName(K.KrystalType.constant);
+            if(!K.IsConstantKrystalFilename(_name))
+            {
+                _name = GetName(K.KrystalType.constant);
+            }
 
-            XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
-            #region save heredity info (only that this is a constant...)
-            w.WriteStartElement("constant");
-            w.WriteEndElement(); // constant
-            #endregion
-            base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+            var pathname = K.KrystalsFolder + @"\" + _name;
 
-            string msg = "Constant krystal saved as \r\n\r\n" +
-                         "   " + _name;
-            MessageBox.Show(msg, "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if(File.Exists(pathname) == false || overwrite)
+            {
+                XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
+                #region save heredity info (only that this is a constant...)
+                w.WriteStartElement("constant");
+                w.WriteEndElement(); // constant
+                #endregion
+                base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+            }
+            //string msg = "Constant krystal saved as \r\n\r\n" +
+            //             "   " + _name;
+            //MessageBox.Show(msg, "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         public override void Rebuild()
         {
@@ -695,23 +702,11 @@ namespace Krystals4ObjectLibrary
         public override void Save(bool overwrite)
         {
             string pathname;
-            bool alreadyExisted = true;
-            if(_name != null && _name.Equals(K.UntitledKrystalName))
-                _name = base.GetNameOfEquivalentSavedKrystal("lk");
-            if(string.IsNullOrEmpty(_name))
+            if(!K.IsLineKrystalFilename(_name))
             {
-                alreadyExisted = false;
-                int fileIndex = 1;
-                do
-                {
-                    _name = String.Format("lk1({0})-{1}{2}",
-                        _maxValue, fileIndex, K.KrystalFilenameSuffix);
-                    pathname = K.KrystalsFolder + @"\" + _name;
-                    fileIndex++;
-                } while(File.Exists(pathname));
+                _name = GetName(K.KrystalType.line);
             }
-            else
-                pathname = K.KrystalsFolder + @"\" + _name;
+            pathname = K.KrystalsFolder + @"\" + _name;
 
             if(File.Exists(pathname) == false || overwrite)
             {
@@ -722,18 +717,18 @@ namespace Krystals4ObjectLibrary
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
             }
-            StringBuilder msgSB = new StringBuilder("Line krystal:\r\n\r\n    ");
-            foreach(uint value in this.Strands[0].Values)
-            {
-                msgSB.Append(value.ToString() + " ");
-            }
-            msgSB.Append("      \r\n\r\nsaved as:");
-            msgSB.Append("\r\n\r\n    " + _name + "  ");
-            if(alreadyExisted)
-            {
-                msgSB.Append("\r\n\r\n(This line krystal already existed.)");
-            }
-            MessageBox.Show(msgSB.ToString(), "Saved", MessageBoxButtons.OK, MessageBoxIcon.None);
+            //StringBuilder msgSB = new StringBuilder("Line krystal:\r\n\r\n    ");
+            //foreach(uint value in this.Strands[0].Values)
+            //{
+            //    msgSB.Append(value.ToString() + " ");
+            //}
+            //msgSB.Append("      \r\n\r\nsaved as:");
+            //msgSB.Append("\r\n\r\n    " + _name + "  ");
+            //if(alreadyExisted)
+            //{
+            //    msgSB.Append("\r\n\r\n(This line krystal already existed.)");
+            //}
+            //MessageBox.Show(msgSB.ToString(), "Saved", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
         public override void Rebuild()
         {
