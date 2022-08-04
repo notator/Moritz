@@ -260,12 +260,9 @@ namespace Krystals4Application
 				"Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
 
 			if(result == DialogResult.OK)
-			{
-                KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
-				kFamily.Rebuild();
-				MessageBox.Show("All expansion and modulation krystals have been successfully recreated",
-					"Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-			}
+            {
+                K.RebuildKrystalFamily();
+            }
         }
 
         #region SaveKrystalsWithNewNames

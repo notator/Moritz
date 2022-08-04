@@ -316,6 +316,14 @@ namespace Krystals4ObjectLibrary
 
         #endregion
 
+        public static void RebuildKrystalFamily()
+        {
+            KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
+            kFamily.Rebuild();
+            MessageBox.Show("All krystals have been successfully recreated",
+                "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         /// <summary>
         /// If krystalNameList is a list of krystal names, it can be sorted into ascending order by calling
         ///     krystalNameList.Sort(K.CompareKrystalNames);
