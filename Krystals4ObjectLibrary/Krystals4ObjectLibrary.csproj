@@ -47,6 +47,9 @@
   <ItemGroup>
     <Compile Include="Envelope.cs" />
     <Compile Include="Field.cs" />
+    <Compile Include="ConstantKrystal.cs" />
+    <Compile Include="InputKrystal.cs" />
+    <Compile Include="LineKrystal.cs" />
     <Compile Include="SvgNode.cs" />
     <Compile Include="SvgPath.cs" />
     <Compile Include="PathKrystal.cs" />
