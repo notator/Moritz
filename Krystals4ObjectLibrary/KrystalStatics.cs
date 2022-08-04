@@ -234,57 +234,87 @@ namespace Krystals4ObjectLibrary
         }
         #endregion
 
-        public static uint KrystalMaxValue(string krystalName)
+        #region krystalName information
+        public static int KrystalMaxValue(string krystalName)
         {
-            string maxValueString = "0";
-            int firstBracketIndex = krystalName.IndexOf('(');
-            int secondBracketIndex = krystalName.IndexOf(')');
-            string bracketContentString = krystalName.Substring(firstBracketIndex + 1, secondBracketIndex - firstBracketIndex - 1);
+            char[] dot = new char[] { '.' };
 
-            if(IsConstantKrystalFilename(krystalName)
-            || IsLineKrystalFilename(krystalName)
-            || IsModulationKrystalFilename(krystalName)
-            || IsPermutationKrystalFilename(krystalName))
-            {
-                maxValueString = bracketContentString;
-            }
-            else if(IsExpansionKrystalFilename(krystalName) || IsShapedExpansionKrystalFilename(krystalName))
-            {
-                string[] substrings = bracketContentString.Split(new char[] { '.' });
-                maxValueString = substrings[1];
-            }
+            var components = krystalName.Split(dot);
 
-            return uint.Parse(maxValueString);
+            return int.Parse(components[0]);
         }
 
-        public static uint KrystalLevel(string krystalName)
+        public static List<int> KrystalShape(string krystalName)
         {
-            uint level = 0;
-            string head = krystalName.Substring(0, 2);
-            switch(head)
+            char[] dot = new char[] { '.' };
+            char[] underline = new char[] { '_' };
+
+            var components = krystalName.Split(dot);
+            var shapeComponents = components[1].Split(underline);
+
+            var rval = new List<int>();
+            foreach(var value in shapeComponents)
             {
-                case "ck":
+                rval.Add(int.Parse(value));
+            }
+
+            return rval;
+        }
+
+        public static int KrystalLevel(string krystalName)
+        {
+            char[] dot = new char[] { '.' };
+            char[] underline = new char[] { '_' };
+
+            var components = krystalName.Split(dot);
+            var shapeComponents = components[1].Split(underline);
+            int level;
+
+            switch(shapeComponents.Length)
+            {
+                case 1:
                     level = 0;
                     break;
-                case "lk":
-                    level = 1;
-                    break;
-                case "mk":
-                case "pk":
-                case "sk":
-                case "xk":
-                    string levelString = krystalName.Substring(2);
-                    int index = 0;
-                    while(Char.IsDigit(levelString[index]))
-                        index++;
-                    levelString = levelString.Substring(0, index);
-                    level = uint.Parse(levelString);
+                case 2:
+                    level = int.Parse(shapeComponents[0]); // 1 or 2
                     break;
                 default:
+                    level = shapeComponents.Length;
                     break;
             }
             return level;
         }
+
+        public static int KrystalNameIndex(string krystalName)
+        {
+            char[] dot = new char[] { '.' };
+
+            var components = krystalName.Split(dot);
+
+            return int.Parse(components[3]);
+        }
+
+        public static string KrystalTypeString(string krystalName)
+        {
+            char[] dot = new char[] { '.' };
+
+            var components = krystalName.Split(dot);
+
+            return components[4];
+        }
+
+        public static KrystalType KrystalTypeEnum(string krystalName)
+        {
+            char[] dot = new char[] { '.' };
+
+            var components = krystalName.Split(dot);
+
+            Enum.TryParse(components[4], out KrystalType krystalType);
+
+            return krystalType;
+        }
+
+        #endregion
 
         /// <summary>
         /// If krystalNameList is a list of krystal names, it can be sorted into ascending order by calling
