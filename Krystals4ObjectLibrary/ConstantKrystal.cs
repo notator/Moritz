@@ -47,16 +47,27 @@ namespace Krystals4ObjectLibrary
             _name = GetName(K.KrystalType.constant);
         }
         #region overridden functions
+        /// <summary>
+        /// Sets the krystal's Name, and saves it.
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (with a new date),
+        ///    or abort the save.
+        /// </summary>
         public override void Save()
         {
-            if(!K.IsConstantKrystalFilename(_name))
-            {
-                _name = GetName(K.KrystalType.constant);
-            }
+            _name = GetName(K.KrystalType.constant);
 
             var pathname = K.KrystalsFolder + @"\" + _name;
 
-            if(File.Exists(pathname) == false)
+            DialogResult answer = DialogResult.Yes;
+            if(File.Exists(pathname))
+            {
+                string msg = $"Constant krystal {_name} already exists. Save it again with a new date?";
+                answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            }
+
+            if(answer == DialogResult.Yes)
             {
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info (only that this is a constant...)
@@ -64,11 +75,6 @@ namespace Krystals4ObjectLibrary
                 w.WriteEndElement(); // constant
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
-            }
-            else
-            {
-                string msg = $"Constant krystal {_name} already exists.\n\nSave aborted.";
-                MessageBox.Show(msg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
         public override void Rebuild()

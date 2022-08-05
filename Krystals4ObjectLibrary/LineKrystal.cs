@@ -65,9 +65,10 @@ namespace Krystals4ObjectLibrary
                 var isUnique = true;
                 name = GetName(K.KrystalType.line); // default name (with an index that is not used in the krystals folder)
 
-                var lineKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.line.krys");
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+
                 var theseValues = Strands[0].Values;
-                foreach(var existingPath in lineKrystalPaths)
+                foreach(var existingPath in similarKrystalPaths)
                 {
                     var existingKrystal = new LineKrystal(existingPath);
                     var existingValues = existingKrystal.Strands[0].Values;
@@ -98,6 +99,7 @@ namespace Krystals4ObjectLibrary
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
             }
         }
+
         public override void Rebuild()
         {
             // This function does nothing. Line krystals are not dependent on other krystals!

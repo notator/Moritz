@@ -336,10 +336,11 @@ namespace Krystals4ObjectLibrary
             bool PermutationKrystalIsUnique(out string name)
             {
                 var isUnique = true;
-                name = GetName(K.KrystalType.mod); // default name (with an index that is not used in the krystals folder)
+                name = GetName(K.KrystalType.perm); // default name (with an index that is not used in the krystals folder)
 
-                var permKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.perm.krys");
-                foreach(var existingPath in permKrystalPaths)
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+
+                foreach(var existingPath in similarKrystalPaths)
                 {
                     var existingKrystal = new PermutationKrystal(existingPath);
                     if(existingKrystal.SourceInputFilename == this.SourceInputFilename

@@ -543,6 +543,21 @@ namespace Krystals4ObjectLibrary
 
             return krystalName;
         }
+        /// <summary>
+        /// returns the paths to all the krystals whose name is krystalName except for the index.
+        /// </summary>
+        /// <param name="krystalName"></param>
+        /// <returns></returns>
+        protected static IEnumerable<string> GetSimilarKrystalPaths(string krystalName)
+        {
+            var dot = new char[] { '.' };
+            var components = krystalName.Split(dot);
+            var searchString = components[0] + '.' + components[1] + ".*." + components[3] + ".krys";
+
+            var similarKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, searchString);
+
+            return similarKrystalPaths;
+        }
 
         /// <summary>
         /// A Krystal's name root consists of its domain (=MaxValue) followed by a '.' character, followed by a shapeNameString followed by a '.' character.

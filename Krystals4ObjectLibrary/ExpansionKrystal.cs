@@ -223,8 +223,9 @@ namespace Krystals4ObjectLibrary
                 var isUnique = true;
                 name = GetName(K.KrystalType.exp); // default name (with an index that is not used in the krystals folder)
 
-                var expKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.exp.krys");                
-                foreach(var existingPath in expKrystalPaths)
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+               
+                foreach(var existingPath in similarKrystalPaths)
                 {
                     var existingKrystal = new ExpansionKrystal(existingPath);
                     if(existingKrystal.PointsInputFilename == PointsInputFilename
@@ -416,8 +417,9 @@ namespace Krystals4ObjectLibrary
                 var isUnique = true;
                 name = GetName(K.KrystalType.shaped); // default name (with an index that is not used in the krystals folder)
 
-                var shapedKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.shaped.krys");
-                foreach(var existingPath in shapedKrystalPaths)
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+
+                foreach(var existingPath in similarKrystalPaths)
                 {
                     var existingKrystal = new ShapedExpansionKrystal(existingPath);
                     if(existingKrystal.DensityInputFilename == DensityInputFilename

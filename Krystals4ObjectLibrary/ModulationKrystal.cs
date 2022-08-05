@@ -144,8 +144,9 @@ namespace Krystals4ObjectLibrary
                 var isUnique = true;
                 name = GetName(K.KrystalType.mod); // default name (with an index that is not used in the krystals folder)
 
-                var modKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.mod.krys");
-                foreach(var existingPath in modKrystalPaths)
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+
+                foreach(var existingPath in similarKrystalPaths)
                 {
                     var existingKrystal = new ModulationKrystal(existingPath);
                     if(existingKrystal.XInputFilename == this.XInputFilename
