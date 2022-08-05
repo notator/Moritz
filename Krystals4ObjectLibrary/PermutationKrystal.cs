@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Xml;
 using System.IO;
+using Moritz.Globals;
 
 namespace Krystals4ObjectLibrary
 {
@@ -323,32 +324,62 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Saves the krystal to a file.
-        /// Throws an exception if an error occurs.
-        /// The 'overwrite' argument is always ignored.
+        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (using that krystal's index),
+        ///    or abort the save.
+        /// This means that a given set of ancestors should always have the same index.
         /// </summary>
-        public override void Save(bool overwrite)
+        public override void Save()
         {
-            if(!K.IsPermutationKrystalFilename(_name))
+            bool PermutationKrystalIsUnique(out string name)
             {
-                _name = GetName(K.KrystalType.perm);
+                var isUnique = true;
+                name = GetName(K.KrystalType.mod); // default name (with an index that is not used in the krystals folder)
+
+                var permKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.perm.krys");
+                foreach(var existingPath in permKrystalPaths)
+                {
+                    var existingKrystal = new PermutationKrystal(existingPath);
+                    if(existingKrystal.SourceInputFilename == this.SourceInputFilename
+                    && existingKrystal.AxisInputFilename == this.AxisInputFilename
+                    && existingKrystal.ContourInputFilename == this.ContourInputFilename
+                    && existingKrystal.PermutationLevel == this.PermutationLevel
+                    && existingKrystal.SortFirst == this.SortFirst)
+                    {
+                        isUnique = false;
+                        name = Path.GetFileName(existingPath);
+                        break;
+                    }
+                }
+                return isUnique;
             }
 
-            XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
-            #region save heredity info
-            w.WriteStartElement("permutation");
-            w.WriteAttributeString("source", this.SourceInputFilename);
-            w.WriteAttributeString("axis", this.AxisInputFilename);
-            w.WriteAttributeString("contour", this.ContourInputFilename);
-            w.WriteAttributeString("pLevel", this._permutationLevel.ToString());
-            if(this._sortFirst == true)
-                w.WriteAttributeString("sortFirst", "true");
-            else
-                w.WriteAttributeString("sortFirst", "false");
-            w.WriteEndElement(); // permutation
-            #endregion
-            base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+            DialogResult answer = DialogResult.Yes;
+            if(PermutationKrystalIsUnique(out _name) == false)
+            {
+                string msg = $"PermutationKrystal {_name} already existed. Save it again with a new date?";
+                answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            }
 
+            if(answer == DialogResult.Yes)
+            {
+                XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
+                #region save heredity info
+                w.WriteStartElement("permutation");
+                w.WriteAttributeString("source", this.SourceInputFilename);
+                w.WriteAttributeString("axis", this.AxisInputFilename);
+                w.WriteAttributeString("contour", this.ContourInputFilename);
+                w.WriteAttributeString("pLevel", this._permutationLevel.ToString());
+                if(this._sortFirst == true)
+                    w.WriteAttributeString("sortFirst", "true");
+                else
+                    w.WriteAttributeString("sortFirst", "false");
+                w.WriteEndElement(); // permutation
+                #endregion
+                base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+            }
         }
 
         /// <summary>
@@ -358,7 +389,7 @@ namespace Krystals4ObjectLibrary
         public override void Rebuild()
         {
             this.Permute();
-            Save(true); // true means overwrite
+            Save(); // true means overwrite
         }
         #endregion public functions
         #region Properties

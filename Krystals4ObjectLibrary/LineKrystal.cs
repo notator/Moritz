@@ -50,16 +50,45 @@ namespace Krystals4ObjectLibrary
             _name = GetName(K.KrystalType.line);
         }
         #region overridden functions
-        public override void Save(bool overwrite)
+        /// <summary>
+        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (using that krystal's index),
+        ///    or abort the save.
+        /// This means that a given set of ancestors should always have the same index.
+        /// </summary>
+        public override void Save()
         {
-            string pathname;
-            if(!K.IsLineKrystalFilename(_name))
+            bool LineIsUnique(out string name)
             {
-                _name = GetName(K.KrystalType.line);
-            }
-            pathname = K.KrystalsFolder + @"\" + _name;
+                var isUnique = true;
+                name = GetName(K.KrystalType.line); // default name (with an index that is not used in the krystals folder)
 
-            if(File.Exists(pathname) == false || overwrite)
+                var lineKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.line.krys");
+                var theseValues = Strands[0].Values;
+                foreach(var existingPath in lineKrystalPaths)
+                {
+                    var existingKrystal = new LineKrystal(existingPath);
+                    var existingValues = existingKrystal.Strands[0].Values;
+                    if(theseValues.SequenceEqual(existingValues))
+                    {
+                        isUnique = false;
+                        name = Path.GetFileName(existingPath);
+                        break;
+                    }
+                }
+                return isUnique;
+            }
+
+            DialogResult answer = DialogResult.Yes;
+            if(LineIsUnique(out _name) == false)
+            {
+                string msg = $"Line krystal {_name} already existed. Save it again with a new date?";
+                answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            }
+
+            if(answer == DialogResult.Yes)
             {
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info (only that this is a line)
@@ -68,18 +97,6 @@ namespace Krystals4ObjectLibrary
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
             }
-            //StringBuilder msgSB = new StringBuilder("Line krystal:\r\n\r\n    ");
-            //foreach(uint value in this.Strands[0].Values)
-            //{
-            //    msgSB.Append(value.ToString() + " ");
-            //}
-            //msgSB.Append("      \r\n\r\nsaved as:");
-            //msgSB.Append("\r\n\r\n    " + _name + "  ");
-            //if(alreadyExisted)
-            //{
-            //    msgSB.Append("\r\n\r\n(This line krystal already existed.)");
-            //}
-            //MessageBox.Show(msgSB.ToString(), "Saved", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
         public override void Rebuild()
         {

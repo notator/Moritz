@@ -288,7 +288,7 @@ namespace Krystals4Application
 				_outputKrystal.Modulator.Name = _originalModulatorName;
 				saveWithOriginalModulatorName = true;
 			}
-			_outputKrystal.Save(false);  // the argument is always ignored
+			_outputKrystal.Save();
 			if( saveWithOriginalModulatorName )
 				_outputKrystal.Modulator.Name = "";
 			this.SetFormTextAndButtons();

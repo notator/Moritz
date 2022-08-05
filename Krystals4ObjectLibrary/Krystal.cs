@@ -125,11 +125,15 @@ namespace Krystals4ObjectLibrary
             }
         }
         /// <summary>
-        /// Saves the krystal and any non-krystal associated files (e.g. expander or modulator).
-        /// If overwrite is true, the file(s) are overwritten if they exist.
+        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (using that krystal's index),
+        ///    or abort the save.
+        /// This means that a given set of ancestors should always have the same index.
         /// </summary>
-        /// <param name="overwrite"></param>
-        public abstract void Save(bool overwrite);
+        public abstract void Save();
+
         /// <summary>
         /// This function returns 0 if the shape and numeric content are the same,
         /// Otherwise it compares the two names.
@@ -515,10 +519,6 @@ namespace Krystals4ObjectLibrary
         }
         #endregion public properties
 
-        public void SetName(K.KrystalType krystalType)
-        {
-            _name = GetName(krystalType);
-        }
         /// <summary>
         /// Returns the file name for a newly constructed Krystal
         /// </summary>

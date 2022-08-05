@@ -289,6 +289,11 @@ namespace Krystals4ObjectLibrary
                     PermutationKrystal pk = new PermutationKrystal(path);
                     pk.Rebuild();
                 }
+                if(K.IsPathKrystalFilename(d.Name))
+                {
+                    PathKrystal pk = new PathKrystal(path);
+                    pk.Rebuild();
+                }
             }
         }
         public List<Dependency> DependencyList { get { return _dependencyList; } }

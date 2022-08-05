@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 using System.IO;
+using System.Windows.Forms;
+using Moritz.Globals;
 
 namespace Krystals4ObjectLibrary
 {
@@ -87,24 +89,6 @@ namespace Krystals4ObjectLibrary
         #endregion
         #region public
         /// <summary>
-        /// Saves the krystal and its expander.
-        /// Displays an error message and may throw a system exception if an error occurs.
-        /// If the expander's name is currently K.UntitledExpanderName, it is saved under a new, automatically
-        /// generated name.
-        /// If the krystal's name is currently K.UntitledKrystalName, it is saved under a new, automatically
-        /// generated name.
-        /// If the expander and/or krystal have names which do not currently exist, they are saved using these
-        /// names.
-        /// If the 'overwrite' argument is false and the expander and/or krystal already exist, they are *not*
-        /// overwritten.
-        /// If the 'overwrite' argument is true and the expander and/or krystal already exist, they *are*
-        /// overwritten.
-        /// </summary>
-        public override void Save(bool overwrite)
-        {
-            Save(overwrite, overwrite);
-        }
-        /// <summary>
         /// Re-expands this krystal (using the existing input krystals and expander), then saves it,
         /// overwriting the existing file.
         /// All the krystals in the krystals folder are rebuilt, when one of them has been changed.
@@ -112,14 +96,8 @@ namespace Krystals4ObjectLibrary
         public override void Rebuild()
         {
             Expand();
-            this.Save(true, false);
+            this.Save(); // old was this.Save(true, false); Save(bool overwriteKrystal, bool overwriteExpander);
         }
-
-        /// <summary>
-        /// This version of Save() is used by ExpansionKrystal.Rebuild() to overwrite krystals but not expanders.
-        /// Otherwise identical in behaviour to Save(bool overwrite) - see the comment there.
-        /// </summary>
-        public abstract void Save(bool overwriteKrystal, bool overwriteExpander);
 
         #region virtual
         public abstract void Expand();
@@ -231,20 +209,44 @@ namespace Krystals4ObjectLibrary
 
         #region public virtual
         /// <summary>
-        /// This version of Save() is used by ExpansionKrystal.Rebuild() to overwrite krystals but not expanders.
-        /// Otherwise identical in behaviour to Save(bool overwrite) - see the comment there.
+        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (using that krystal's index),
+        ///    or abort the save.
+        /// This means that a given set of ancestors should always have the same index.
         /// </summary>
-        public override void Save(bool overwriteKrystal, bool overwriteExpander)
+        public override void Save()
         {
-            string expanderSignature = _expander.Save(overwriteExpander); // false means: dont overwrite existing expanders
-
-            if(!K.IsExpansionKrystalFilename(_name))
+            bool ExpansionIsUnique(out string name)
             {
-                _name = GetName(K.KrystalType.exp);
-            }
-            string pathname = K.KrystalsFolder + @"\" + _name;
+                var isUnique = true;
+                name = GetName(K.KrystalType.exp); // default name (with an index that is not used in the krystals folder)
 
-            if(File.Exists(pathname) == false || overwriteKrystal)
+                var expKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.exp.krys");                
+                foreach(var existingPath in expKrystalPaths)
+                {
+                    var existingKrystal = new ExpansionKrystal(existingPath);
+                    if(existingKrystal.PointsInputFilename == PointsInputFilename
+                    && existingKrystal.DensityInputFilename == DensityInputFilename
+                    && existingKrystal.Expander.Name == Expander.Name)
+                    {
+                        isUnique = false;
+                        name = Path.GetFileName(existingPath);
+                        break;
+                    }
+                }
+                return isUnique;
+            }
+
+            DialogResult answer = DialogResult.Yes;
+            if(ExpansionIsUnique(out _name) == false)
+            {
+                string msg = $"Expansion krystal {_name} already existed. Save it again with a new date?";
+                answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            }
+
+            if(answer == DialogResult.Yes)
             {
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
@@ -400,17 +402,46 @@ namespace Krystals4ObjectLibrary
         #region public virtual
 
         /// <summary>
-        /// This version of Save() is used by ExpansionKrystal.Rebuild() to overwrite krystals but not expanders.
-        /// Otherwise identical in behaviour to Save(bool overwrite) - see the comment there.
+        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (using that krystal's index),
+        ///    or abort the save.
+        /// This means that a given set of ancestors should always have the same index.
         /// </summary>
-        public override void Save(bool overwriteKrystal, bool overwriteExpander)
+        public override void Save()
         {
-            string expanderID = _expander.Save(overwriteExpander); // false means: dont overwrite existing expanders
+            bool ShapedExpansionIsUnique(out string name)
+            {
+                var isUnique = true;
+                name = GetName(K.KrystalType.shaped); // default name (with an index that is not used in the krystals folder)
 
-            _name = GetName(K.KrystalType.shaped);
-            string pathname = K.KrystalsFolder + @"\" + _name;
+                var shapedKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.shaped.krys");
+                foreach(var existingPath in shapedKrystalPaths)
+                {
+                    var existingKrystal = new ShapedExpansionKrystal(existingPath);
+                    if(existingKrystal.DensityInputFilename == DensityInputFilename
+                    && existingKrystal.PointsInputFilename == PointsInputFilename
+                    && existingKrystal.AxisInputFilename == AxisInputFilename
+                    && existingKrystal.ContourInputFilename == ContourInputFilename
+                    && existingKrystal.Expander.Name == Expander.Name)
+                    {
+                        isUnique = false;
+                        name = Path.GetFileName(existingPath);
+                        break;
+                    }
+                }
+                return isUnique;
+            }
 
-            if(File.Exists(pathname) == false || overwriteKrystal)
+            DialogResult answer = DialogResult.Yes;
+            if(ShapedExpansionIsUnique(out _name) == false)
+            {
+                string msg = $"ShapedExpansionKrystal {_name} already existed. Save it again with a new date?";
+                answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            }
+
+            if(answer == DialogResult.Yes)
             {
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
@@ -425,6 +456,7 @@ namespace Krystals4ObjectLibrary
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
             }
         }
+
         public override void Expand()
         {
             try

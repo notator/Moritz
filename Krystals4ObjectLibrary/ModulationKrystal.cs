@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Xml;
 using System.IO;
+using Moritz.Globals;
 
 namespace Krystals4ObjectLibrary
 {
@@ -129,45 +130,45 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Saves the krystal to a file.
-        /// Throws an exception if an error occurs.
-        /// The 'overwrite' argument is always ignored.
+        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (using that krystal's index),
+        ///    or abort the save.
+        /// This means that a given set of ancestors should always have the same index.
         /// </summary>
-        public override void Save(bool overwrite)
+        public override void Save()
         {
-            string pathname;
-            if(string.IsNullOrEmpty(_name) || overwrite == false) // this is a new or changed krystal, so generate a new name
+            bool ModulationKrystalIsUnique(out string name)
             {
-                if(_name != null && _name == "") // used by Krystals4
-                    _name = base.GetNameOfEquivalentSavedKrystal("mk");
-                if(string.IsNullOrEmpty(_name)) // null is used by Moritz
+                var isUnique = true;
+                name = GetName(K.KrystalType.mod); // default name (with an index that is not used in the krystals folder)
+
+                var modKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.mod.krys");
+                foreach(var existingPath in modKrystalPaths)
                 {
-                    int fileIndex = 1;
-                    do
+                    var existingKrystal = new ModulationKrystal(existingPath);
+                    if(existingKrystal.XInputFilename == this.XInputFilename
+                    && existingKrystal.YInputFilename == this.YInputFilename
+                    && existingKrystal.Modulator.Name == this.Modulator.Name)
                     {
-                        _name = String.Format("mk{0}({1})-{2}{3}",
-                            _level, _maxValue, fileIndex, K.KrystalFilenameSuffix);
-                        pathname = K.KrystalsFolder + @"\" + _name;
-                        fileIndex++;
-                    } while(File.Exists(pathname));
+                        isUnique = false;
+                        name = Path.GetFileName(existingPath);
+                        break;
+                    }
                 }
-                else pathname = K.KrystalsFolder + @"\" + _name;
+                return isUnique;
             }
-            else pathname = K.KrystalsFolder + @"\" + _name;
 
-            if(MaxValueHasChanged())
+            DialogResult answer = DialogResult.Yes;
+            if(ModulationKrystalIsUnique(out _name) == false)
             {
-                File.Delete(pathname);
-                _name = GetName(K.KrystalType.mod);
-                Save(false); // false means do not overwrite. This (recursive) call saves under a new name
+                string msg = $"ModulationKrystal {_name} already existed. Save it again with a new date?";
+                answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
-            else
-            {
-                if(_modulator == null || string.IsNullOrEmpty(_modulator.Name))
-                {
-                    throw new ApplicationException("Program error: The modulation krystal's modulator has not been set!");
-                }
 
+            if(answer == DialogResult.Yes)
+            {
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
                 w.WriteStartElement("modulation");
@@ -225,7 +226,7 @@ namespace Krystals4ObjectLibrary
         public override void Rebuild()
         {
             this.Modulate();
-            Save(true); // true means overwrite
+            Save();
         }
         #endregion public functions
         #region Properties

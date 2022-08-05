@@ -985,7 +985,7 @@ namespace Krystals4Application
                     {
                         _expander.Name = expanderName;
                         _outputKrystal.Name = krystalName;
-                        _outputKrystal.Save(false, true); // save expander, but not krystal
+                        _outputKrystal.Expander.Save(true); // save expander, but not krystal
 
                         KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
                         kFamily.Rebuild();
@@ -1182,7 +1182,8 @@ namespace Krystals4Application
 
         private void Save()
         {
-            _outputKrystal.Save(false); // false: do not overwrite existing files
+            _outputKrystal.Save(); // false: do not overwrite existing files
+            _outputKrystal.Expander.Save(true);
             SetStatusText();
             DisableSimpleSaving();
         }

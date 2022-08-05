@@ -29,7 +29,7 @@ namespace Krystals4Application
                     {
                         uint constantValue = uint.Parse(constantValueStr);
                         ConstantKrystal ck = new ConstantKrystal(K.UntitledKrystalName, constantValue);
-                        ck.Save(false);  // false: do not overwrite existing files
+                        ck.Save();
                     }
                 }
             }
@@ -68,7 +68,7 @@ namespace Krystals4Application
                     if(lineValue.Length > 0)
                     {
                         LineKrystal lk = new LineKrystal(K.UntitledKrystalName, lineValue);
-                        lk.Save(false);  // false: do not ovewrite existing files
+                        lk.Save();
                     }
                 }
             }
@@ -114,7 +114,7 @@ namespace Krystals4Application
             if(!String.IsNullOrEmpty(svgFilepath) && !String.IsNullOrEmpty(densityInputKrystalFilePath))
             {
                 var pathKrystal = new PathKrystal(svgFilepath, densityInputKrystalFilePath);
-                pathKrystal.Save(true);
+                pathKrystal.Save();
 
                 string msg = "Saved Path Krystal:\n\n" + pathKrystal.Name; 
                 MessageBox.Show(msg, "Saved Path Krystal", MessageBoxButtons.OK);
@@ -298,7 +298,7 @@ namespace Krystals4Application
                     {
                         krystal.PointsInputFilename = namesDict[krystal.PointsInputFilename];
                     }
-                    krystal.Save(true);
+                    krystal.Save();
                 }
                 if(newName.Contains(K.KrystalType.mod.ToString()))
                 {
@@ -311,7 +311,7 @@ namespace Krystals4Application
                     {
                         krystal.YInputFilename = namesDict[krystal.YInputFilename];
                     }
-                    krystal.Save(true);
+                    krystal.Save();
                 }
                 if(newName.Contains(K.KrystalType.perm.ToString()))
                 {
@@ -328,7 +328,7 @@ namespace Krystals4Application
                     {
                         krystal.ContourInputFilename = namesDict[krystal.ContourInputFilename];
                     }
-                    krystal.Save(true);
+                    krystal.Save();
                 }
                 if(newName.Contains(K.KrystalType.shaped.ToString()))
                 {
@@ -349,7 +349,7 @@ namespace Krystals4Application
                     {
                         krystal.ContourInputFilename = namesDict[krystal.ContourInputFilename];
                     }
-                    krystal.Save(true);
+                    krystal.Save();
                 }
                 if(newName.Contains(K.KrystalType.path.ToString()))
                 {
@@ -358,7 +358,7 @@ namespace Krystals4Application
                     {
                         krystal.DensityInputKrystalName = namesDict[krystal.DensityInputKrystalName];
                     }
-                    krystal.Save(true);
+                    krystal.Save();
                 }
             }
         }
@@ -373,48 +373,42 @@ namespace Krystals4Application
                 if(originalKrysFilename.StartsWith("ck"))
                 {
                     ConstantKrystal krystal = new ConstantKrystal(krysFilePath);
-                    krystal.SetName(K.KrystalType.constant);
-                    krystal.Save(true);
+                    krystal.Save();
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
                 if(originalKrysFilename.StartsWith("lk"))
                 {
                     LineKrystal krystal = new LineKrystal(krysFilePath);
-                    krystal.SetName(K.KrystalType.line);
-                    krystal.Save(true);
+                    krystal.Save();
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
                 if(originalKrysFilename.StartsWith("xk"))
                 {
                     ExpansionKrystal krystal = new ExpansionKrystal(krysFilePath);
-                    krystal.SetName(K.KrystalType.exp);
-                    krystal.Save(true);
+                    krystal.Save();
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
                 if(originalKrysFilename.StartsWith("mk"))
                 {
                     ModulationKrystal krystal = new ModulationKrystal(krysFilePath);
-                    krystal.SetName(K.KrystalType.mod);
-                    krystal.Save(true);
+                    krystal.Save();
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
                 if(originalKrysFilename.StartsWith("pk"))
                 {
                     PermutationKrystal krystal = new PermutationKrystal(krysFilePath);
-                    krystal.SetName(K.KrystalType.perm);
-                    krystal.Save(true);
+                    krystal.Save();
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }
                 if(originalKrysFilename.StartsWith("sk"))
                 {
                     ShapedExpansionKrystal krystal = new ShapedExpansionKrystal(krysFilePath);
-                    krystal.SetName(K.KrystalType.shaped);
-                    krystal.Save(true);
+                    krystal.Save();
 
                     rval.Add(originalKrysFilename, krystal.Name);
                 }

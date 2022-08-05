@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using System.Xml;
 
 namespace Krystals4ObjectLibrary
@@ -22,17 +23,12 @@ namespace Krystals4ObjectLibrary
             : base(filepath)
         {
         }
-
-        public override void Save(bool overwrite)
-        {
-            Save(overwrite);
-        }
     }
     
     public class PathKrystal : PathKrystalBase
     {
-        private readonly string _svgInputFilename;
-        public string DensityInputKrystalName;
+        public readonly string SVGInputFilename;
+        public string DensityInputKrystalName; // to be made readonly when the krystalNames have all been changed
         private readonly Field _field;
         private readonly Trajectory _trajectory;
 
@@ -42,11 +38,11 @@ namespace Krystals4ObjectLibrary
         public PathKrystal(string svgFilepath, string densityInputKrystalFilePath)
             : base()
         {
-            _svgInputFilename = Path.GetFileName(svgFilepath);
+            SVGInputFilename = Path.GetFileName(svgFilepath);
             DensityInputKrystalName = Path.GetFileName(densityInputKrystalFilePath);
 
             char[] splitChar = { '.' };
-            var svgInputFilenameComponents = _svgInputFilename.Split(splitChar);
+            var svgInputFilenameComponents = SVGInputFilename.Split(splitChar);
             
             Debug.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && DensityInputKrystalName.EndsWith(".krys"));
 
@@ -152,16 +148,48 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// This version of Save() is used by PathKrystal.Rebuild() to overwrite krystals.
+        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (using that krystal's index),
+        ///    or abort the save.
+        /// This means that a given set of ancestors should always have the same index.
         /// </summary>
-        public override void Save(bool overwriteKrystal)
+        public override void Save()
         {
-            if(overwriteKrystal)
+            bool PathKrystalIsUnique(out string name)
+            {
+                var isUnique = true;
+                name = GetName(K.KrystalType.mod); // default name (with an index that is not used in the krystals folder)
+
+                var pathKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.path.krys");
+                foreach(var existingPath in pathKrystalPaths)
+                {
+                    var existingKrystal = new PathKrystal(existingPath);
+                    if( existingKrystal.DensityInputKrystalName == this.DensityInputKrystalName
+                    && existingKrystal.SVGInputFilename == this.SVGInputFilename)
+                    {
+                        isUnique = false;
+                        name = Path.GetFileName(existingPath);
+                        break;
+                    }
+                }
+                return isUnique;
+            }
+
+            DialogResult answer = DialogResult.Yes;
+            if(PathKrystalIsUnique(out _name) == false)
+            {
+                string msg = $"PathKrystal {_name} already existed. Save it again with a new date?";
+                answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            }
+
+            if(answer == DialogResult.Yes)
             {
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
                 w.WriteStartElement("path");
-                w.WriteAttributeString("svg", this._svgInputFilename);
+                w.WriteAttributeString("svg", this.SVGInputFilename);
                 w.WriteAttributeString("density", this.DensityInputKrystalName);
                 w.WriteEndElement(); // path
                 #endregion
@@ -179,7 +207,7 @@ namespace Krystals4ObjectLibrary
 
             _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
 
-            this.Save(true);
+            this.Save();
         }
     }
 }
