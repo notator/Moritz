@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Xml;
 using System.IO;
 using Moritz.Globals;
+using System.Linq;
 
 namespace Krystals4ObjectLibrary
 {
@@ -336,9 +337,11 @@ namespace Krystals4ObjectLibrary
             bool PermutationKrystalIsUnique(out string name)
             {
                 var isUnique = true;
-                name = GetName(K.KrystalType.perm); // default name (with an index that is not used in the krystals folder)
+                var nameRoot = GetNameRoot();
 
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.perm);
+
+                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
 
                 foreach(var existingPath in similarKrystalPaths)
                 {

@@ -28,7 +28,7 @@ namespace Krystals4Application
                     if(constantValueStr.Length > 0)
                     {
                         uint constantValue = uint.Parse(constantValueStr);
-                        ConstantKrystal ck = new ConstantKrystal(K.UntitledKrystalName, constantValue);
+                        ConstantKrystal ck = new ConstantKrystal(constantValue);
                         ck.Save();
                     }
                 }
@@ -67,7 +67,7 @@ namespace Krystals4Application
                     string lineValue = dlg.LineKrystalValue;
                     if(lineValue.Length > 0)
                     {
-                        LineKrystal lk = new LineKrystal(K.UntitledKrystalName, lineValue);
+                        LineKrystal lk = new LineKrystal(lineValue);
                         lk.Save();
                     }
                 }

@@ -49,8 +49,6 @@ namespace Krystals4Application
             this.FieldPanel.MouseDown += new MouseEventHandler(FieldPanel_MouseDown);
 
             _outputKrystal = krystal;
-            if(string.IsNullOrEmpty(_outputKrystal.Name))
-                _outputKrystal.Name = K.UntitledKrystalName;
             _expander = _outputKrystal.Expander;
 
             _strandNodeList = krystal.StrandNodeList();
@@ -817,7 +815,7 @@ namespace Krystals4Application
                 if (expanderFilepath.Length > 0)
                 {
                     _outputKrystal.Expander = _expander = new Expander(expanderFilepath, _outputKrystal.DensityInputKrystal);
-                    _outputKrystal.Name = K.UntitledKrystalName;
+
                     LoadGametesIntoEditor();
                     SetTreeView();
                     SetStatusText();
@@ -985,7 +983,7 @@ namespace Krystals4Application
                     {
                         _expander.Name = expanderName;
                         _outputKrystal.Name = krystalName;
-                        _outputKrystal.Expander.Save(true); // save expander, but not krystal
+                        _outputKrystal.Expander.Save(); // save expander, but not krystal
 
                         KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
                         kFamily.Rebuild();
@@ -1130,7 +1128,6 @@ namespace Krystals4Application
         /// </summary>
         private void LoadNewKrystalInputFileIntoEditor()
         {
-            _outputKrystal.Name = K.UntitledKrystalName;
             SetTreeView();
             SetStatusText();
             SetPointGroupParameterValues();
@@ -1145,7 +1142,6 @@ namespace Krystals4Application
         /// </summary>
         private void LoadNewGameteIntoEditor()
         {
-            _outputKrystal.Name = K.UntitledKrystalName;
             _expander.Name = K.UntitledExpanderName;
             LoadGametesIntoEditor();
             SetTreeView();
@@ -1183,7 +1179,7 @@ namespace Krystals4Application
         private void Save()
         {
             _outputKrystal.Save(); // false: do not overwrite existing files
-            _outputKrystal.Expander.Save(true);
+            _outputKrystal.Expander.Save();
             SetStatusText();
             DisableSimpleSaving();
         }
@@ -2064,7 +2060,6 @@ namespace Krystals4Application
             RemoveStrands();
 
             //_krystalIsSaved = false;
-            _outputKrystal.Name = K.UntitledKrystalName;
             //_expanderIsSaved = false;
             _expander.Name = K.UntitledExpanderName;
             SetStatusText();
@@ -2206,7 +2201,6 @@ namespace Krystals4Application
 
                     _expansionTreeView.DisplayStrands(_outputKrystal.Strands); // appends the strand values to the existing tree display of the input values
 
-                    _outputKrystal.Name = K.UntitledKrystalName; // force a new name to take account of MaxValue;
                     //_krystalIsSaved = false;
                     this.ExpandButton.Enabled = false;
                     EnableSaving();
@@ -2363,7 +2357,6 @@ namespace Krystals4Application
                     //_expanderIsSaved = false;
                     //_krystalIsSaved = false;
                     _expander.Name = K.UntitledExpanderName;
-                    _outputKrystal.Name = K.UntitledKrystalName;
                     SetStatusText();
                     if (_expander.InputGamete.NumberOfValues > 0 && _expander.OutputGamete.NumberOfValues > 0)
                         this.ExpandButton.Enabled = true;

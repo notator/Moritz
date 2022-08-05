@@ -1,8 +1,12 @@
+using Moritz.Globals;
+
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace Krystals4ObjectLibrary
 {
@@ -47,63 +51,85 @@ namespace Krystals4ObjectLibrary
         }
         public Modulator(int xDim, int yDim)
         {
-            //_name = K.UntitledModulatorName;
-            _name = ""; // is set when the modulator is saved
             _xDim = xDim;
             _yDim = yDim;
             _array = new int[xDim, yDim];
         }
         #endregion constructors
         #region public functions
+        /// <summary>
+        /// Sets the modulator's Name, and saves it.
+        /// If a modulator having identical content exists in the modulators directory,
+        /// the user is given the option to
+        ///    either overwrite the existing modulator (with a new date),
+        ///    or abort the save.
+        /// </summary>
         public void Save()
         {
-            bool equivalentExists = false;
-            string pathname = "";
-            if(string.IsNullOrEmpty(_name)) // this is a new or newly edited modulator
+            bool ModulatorIsUnique(out string name)
             {
-                DirectoryInfo dir = new DirectoryInfo(K.ModulationOperatorsFolder);
-                foreach(FileInfo fileInfo in dir.GetFiles("m*.kmod"))
+                var isUnique = true;
+                var nameRoot = String.Format("{0}.{1}.{2}.", _xDim, _yDim, MaxValue);
+
+                IEnumerable<string> similarModulatorPaths = GetSimilarModulatorPaths(nameRoot);
+
+                // default (with unique index)
+                name = nameRoot + (similarModulatorPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
+
+                foreach(var existingPath in similarModulatorPaths)
                 {
-                    Modulator otherModulator = new Modulator(K.ModulationOperatorsFolder + @"\" + fileInfo.Name);
-                    if(this.CompareTo(otherModulator) == 0)
+                    var existingModulator = new Modulator(existingPath);
+                    bool isIdentical = true;
+                    bool checkNextModulator = false;
+                    for(int x = 0;  x < _xDim; x++)
                     {
-                        equivalentExists = true;
-                        _name = otherModulator.Name;
-                        pathname = K.ModulationOperatorsFolder + @"\" + _name;
+                        for(int y = 0; y < _yDim; y++)
+                        {
+                            if(existingModulator.Array[x,y] != Array[x,y])
+                            {
+                                isIdentical = false;
+                                checkNextModulator = true;
+                                break;
+                            }
+                            if(checkNextModulator)
+                            {
+                                break;
+                            }
+                        }
+                        if(checkNextModulator)
+                        {
+                            break;
+                        }
+                    }
+                    if(isIdentical)
+                    {
+                        isUnique = false;
+                        name = existingModulator.Name;
                         break;
                     }
                 }
+                return isUnique;
+            }
 
-                if(!equivalentExists) // generate a new name
+            DialogResult answer = DialogResult.Yes;
+            if(ModulatorIsUnique(out _name) == false)
+            {
+                string msg = $"An identical modulator ({_name}) already existed. Save it again with a new date?";
+                answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            }
+
+            if(answer == DialogResult.Yes)
+            {
+                var pathname = M.LocalMoritzModulationOperatorsFolder + "/" + Name;
+
+                XmlWriterSettings settings = new XmlWriterSettings
                 {
-                    int fileIndex = 1;
-                    do
-                    {
-                        _name = String.Format("m{0}x{1}({2})-{3}{4}",
-                            _xDim, _yDim, MaxValue, fileIndex, K.ModulatorFilenameSuffix);
-                        pathname = K.ModulationOperatorsFolder + @"\" + _name;
-                        fileIndex++;
-                    } while(File.Exists(pathname));
-                }
-            }
-            else pathname = K.ModulationOperatorsFolder + @"\" + _name;
+                    Indent = true,
+                    IndentChars = ("\t"),
+                    CloseOutput = true
+                };
 
-            if(MaxValueHasChanged()) // rename the current modulator
-            {
-                File.Delete(pathname);
-                _name = "";
-                Save(); // recursive call saves under a new name
-            }
-            else if(!equivalentExists)
-            {
-				XmlWriterSettings settings = new XmlWriterSettings
-				{
-					Indent = true,
-					IndentChars = ("\t"),
-					CloseOutput = true
-				};
-
-				using(XmlWriter w = XmlWriter.Create(pathname, settings))
+                using(XmlWriter w = XmlWriter.Create(pathname, settings))
                 {
                     w.WriteStartDocument();
                     w.WriteComment("created: " + K.Now);
@@ -121,6 +147,16 @@ namespace Krystals4ObjectLibrary
                     w.Close();
                 }
             }
+        }
+
+        private IEnumerable<string> GetSimilarModulatorPaths(string nameRoot)
+        {
+            var dirPath = M.LocalMoritzModulationOperatorsFolder;
+            
+            var searchString = nameRoot + "*" + K.ModulatorFilenameSuffix;
+            var modulatorPaths = Directory.EnumerateFiles(dirPath, searchString);
+
+            return modulatorPaths;
         }
 
         /// <summary>
@@ -227,7 +263,7 @@ namespace Krystals4ObjectLibrary
         }
         #endregion properties
         #region private variables
-        private string _name;
+        private string _name = ""; // is set when the modulator is saved
         private int _xDim = 1;
         private int _yDim = 1;
         private int[,] _array = new int[1, 1];

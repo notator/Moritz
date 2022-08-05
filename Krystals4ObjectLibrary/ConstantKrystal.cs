@@ -30,10 +30,9 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         /// <param name="originalName"></param>
         /// <param name="value"></param>
-        public ConstantKrystal(string originalName, uint value)
+        public ConstantKrystal(uint value)
             : base()
         {
-            _name = originalName;
             _level = 0;
             _minValue = _maxValue = value;
             _numValues = 1;
@@ -43,8 +42,6 @@ namespace Krystals4ObjectLibrary
 			};
 			Strand strand = new Strand(0, valueList);
             _strands.Add(strand);
-
-            _name = GetName(K.KrystalType.constant);
         }
         #region overridden functions
         /// <summary>
@@ -56,7 +53,7 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            _name = GetName(K.KrystalType.constant);
+            _name = String.Format($"{MaxValue}.0.1.{K.KrystalType.constant}{K.KrystalFilenameSuffix}");
 
             var pathname = K.KrystalsFolder + @"\" + _name;
 

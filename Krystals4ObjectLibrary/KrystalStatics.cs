@@ -793,7 +793,6 @@ namespace Krystals4ObjectLibrary
         public static readonly string MoritzXmlSchemasFolder = "";
         public static readonly string KrystalsSVGFolder = "";
 
-        public static readonly string UntitledKrystalName = "Untitled.krys";
         public static readonly string UntitledExpanderName = "Untitled.kexp";
         //public static readonly string UntitledModulatorName = "Untitled.kmod";
         public static readonly string DialogFilter =

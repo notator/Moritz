@@ -66,8 +66,6 @@ namespace Krystals4ObjectLibrary
             _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
 
             _level = (uint) _trajectory.Level;
-
-            _name = GetName(K.KrystalType.path);
         }
 
         public PathKrystal(string filepath) : base(filepath)
@@ -160,9 +158,11 @@ namespace Krystals4ObjectLibrary
             bool PathKrystalIsUnique(out string name)
             {
                 var isUnique = true;
-                name = GetName(K.KrystalType.mod); // default name (with an index that is not used in the krystals folder)
+                var nameRoot = GetNameRoot();
 
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.path);
+
+                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
 
                 foreach(var existingPath in similarKrystalPaths)
                 {

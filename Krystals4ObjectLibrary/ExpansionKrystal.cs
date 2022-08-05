@@ -4,6 +4,7 @@ using System.Xml;
 using System.IO;
 using System.Windows.Forms;
 using Moritz.Globals;
+using System.Linq;
 
 namespace Krystals4ObjectLibrary
 {
@@ -30,9 +31,6 @@ namespace Krystals4ObjectLibrary
                                 string expanderFilepath)
             : base()
         {
-
-            _name = K.UntitledKrystalName;
-
             if(String.IsNullOrEmpty(densityInputFilepath))
                 _densityInputKrystal = null;
             else
@@ -72,8 +70,6 @@ namespace Krystals4ObjectLibrary
                                 Expander expander)
             : base()
         {
-
-            _name = K.UntitledKrystalName;
             _densityInputKrystal = densityInputKrystal;
             _pointsInputKrystal = pointsInputKrystal;
             _expander = expander;
@@ -221,10 +217,12 @@ namespace Krystals4ObjectLibrary
             bool ExpansionIsUnique(out string name)
             {
                 var isUnique = true;
-                name = GetName(K.KrystalType.exp); // default name (with an index that is not used in the krystals folder)
+                var nameRoot = GetNameRoot();
 
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
-               
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.exp);
+
+                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
+
                 foreach(var existingPath in similarKrystalPaths)
                 {
                     var existingKrystal = new ExpansionKrystal(existingPath);
@@ -415,9 +413,11 @@ namespace Krystals4ObjectLibrary
             bool ShapedExpansionIsUnique(out string name)
             {
                 var isUnique = true;
-                name = GetName(K.KrystalType.shaped); // default name (with an index that is not used in the krystals folder)
+                var nameRoot = GetNameRoot();
 
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.shaped);
+
+                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
 
                 foreach(var existingPath in similarKrystalPaths)
                 {

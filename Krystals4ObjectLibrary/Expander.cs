@@ -136,7 +136,7 @@ namespace Krystals4ObjectLibrary
         /// from others which already exist.
         /// </summary>
         /// <returns>The expander's signature<example>(1.7.1), (7.12.5) etc.</example></returns>
-        public string Save(bool overwrite)
+        public string Save()
         {
             string expanderSignature = "";
             string pathname = "";
@@ -178,7 +178,7 @@ namespace Krystals4ObjectLibrary
                 expanderSignature = K.FieldSignature(_name);
             }
 
-            if(!equivalentExists && (File.Exists(pathname) == false || overwrite))
+            if(!equivalentExists && File.Exists(pathname) == false)
             {
 				XmlWriterSettings settings = new XmlWriterSettings
 				{

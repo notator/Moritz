@@ -265,51 +265,6 @@ namespace Krystals4ObjectLibrary
 		}
 		#endregion public functions
 		#region protected functions
-		/// <summary>
-		/// Finds an identical, already saved krystal
-		/// </summary>
-		/// <param name="nameIntro">one of "ck", "lk", "mk", "xk", "sk"</param>
-		/// <returns></returns>
-		protected string GetNameOfEquivalentSavedKrystal(string nameIntro)
-        {
-            Debug.Assert(_name == "" || _name == K.UntitledKrystalName);
-            string newName = "";
-            DirectoryInfo dir = new DirectoryInfo(K.KrystalsFolder);
-            Krystal otherKrystal = null;
-            foreach(FileInfo fileInfo in dir.GetFiles("*.krys"))
-            {
-                if(fileInfo.Name[0] == nameIntro[0])
-                {
-                    switch(fileInfo.Name[0])
-                    {
-                        case 'c':
-                            otherKrystal = new ConstantKrystal(K.KrystalsFolder + @"\" + fileInfo.Name);
-                            break;
-                        case 'l':
-                            otherKrystal = new LineKrystal(K.KrystalsFolder + @"\" + fileInfo.Name);
-                            break;
-                        case 'm':
-                            otherKrystal = new ModulationKrystal(K.KrystalsFolder + @"\" + fileInfo.Name);
-                            break;
-                        case 'p':
-                            otherKrystal = new PermutationKrystal(K.KrystalsFolder + @"\" + fileInfo.Name);
-                            break;
-                        case 's':
-                            otherKrystal = new ShapedExpansionKrystal(K.KrystalsFolder + @"\" + fileInfo.Name);
-                            break;
-                        case 'x':
-                            otherKrystal = new ExpansionKrystal(K.KrystalsFolder + @"\" + fileInfo.Name);
-                            break;
-                    }
-                    if(this.CompareTo(otherKrystal) == 0)
-                    {
-                        newName = otherKrystal.Name;
-                        break;
-                    }
-                }
-            }
-            return newName;
-        }
         protected XmlWriter BeginSaveKrystal()
         {
 			XmlWriterSettings settings = new XmlWriterSettings
@@ -377,22 +332,7 @@ namespace Krystals4ObjectLibrary
                 return sb.ToString();
             }
         }
-        /// <summary>
-        /// At level 1, length is always 1.
-        /// At level krystal.Level, length is the total number of strands.
-        /// At level krystal.Level + 1, length is the total number of strand values.
-        /// An ArgumentOutOfRangeException is thrown if the argument is outside the range 1..krystal.Level + 1.
-        /// </summary>
-        /// <param name="level">Must be in range 1..krystal.Level+1</param>
-        /// <returns>The number of elements at the given level.</returns>
-        public int GetLength(uint level)
-        {
-            level--;
-            if(level < 0 || level > _level)
-                throw new ArgumentOutOfRangeException("Error in Krystal.GetLength().");
-            int[] shapeArray = ShapeArray;
-            return shapeArray[level];
-        }
+
         /// <summary>
         /// At level 1, the single int list contains all the strand values as a single list.
         /// At level krystal.Level, each internal int list contains the values from a single strand.
@@ -439,47 +379,6 @@ namespace Krystals4ObjectLibrary
             return returnList;
         }
 
-        /// <summary>
-        /// The total number of values in the returned list of int lists is equal to the number of values in
-        /// the larger krystal. Each inner list corresponds to a value in this krystal, and contains that value
-        /// repeated the appropriate number of times.
-        /// Values in this krystal's strands are repeated according to the shape of the larger krystal.
-        /// Restrictions:
-        /// 1. the level of the largerKrystal must be greater than the level of this krystal.
-        /// 2. the shape of this krystal must be contained in the shape of the larger krystal.
-        /// </summary>
-        /// <param name="largerKrystal"></param>
-        /// <returns></returns>
-        public List<List<int>> GetValuePerValue(Krystal largerKrystal)
-        {
-            Debug.Assert(largerKrystal.Shape.Contains(this.Shape));
-            Debug.Assert(largerKrystal.Level > this.Level);
-
-            List<List<int>> returnValue = new List<List<int>>();
-            List<List<int>> largerValues = largerKrystal.GetValues(this.Level + 1);
-            // each list in largerValues corresponds to a value in this krystal
-            int thisStrandIndex = 0;
-            int thisValueIndex = 0;
-            uint thisValue = this.Strands[thisStrandIndex].Values[thisValueIndex];
-            foreach(List<int> listInt in largerValues)
-            {
-                List<int> innerList = new List<int>();
-                returnValue.Add(innerList);
-                foreach(int i in listInt)
-                    innerList.Add((int)thisValue);
-
-                thisValueIndex++;
-                if(thisValueIndex == this.Strands[thisStrandIndex].Values.Count)
-                {
-                    thisValueIndex = 0;
-                    thisStrandIndex++;
-                }
- 
-                if(thisStrandIndex < this.Strands.Count)
-                    thisValue = this.Strands[thisStrandIndex].Values[thisValueIndex];
-            }
-            return returnValue;
-        }
         public int[] ShapeArray
         {
             get
@@ -520,39 +419,13 @@ namespace Krystals4ObjectLibrary
         #endregion public properties
 
         /// <summary>
-        /// Returns the file name for a newly constructed Krystal
-        /// </summary>
-        /// <param name="krystalType"></param>
-        /// <returns></returns>
-        protected string GetName(K.KrystalType krystalType)
-        {
-            var dirPath = M.LocalMoritzKrystalsFolder;
-            var krysFilenames = Directory.EnumerateFiles(dirPath, "*.krys").Select(Path.GetFileName);
-            var nameRoot = GetNameRoot();
-            var nameSuffix = "." + krystalType.ToString() + K.KrystalFilenameSuffix;
-            int index = 1;
-
-            foreach(var krysFilename in krysFilenames)
-            {
-                if(krysFilename.StartsWith(nameRoot) && krysFilename.EndsWith(nameSuffix))
-                {
-                    index++;
-                }
-            }
-            string krystalName = nameRoot + index.ToString() + nameSuffix;
-
-            return krystalName;
-        }
-        /// <summary>
         /// returns the paths to all the krystals whose name is krystalName except for the index.
         /// </summary>
         /// <param name="krystalName"></param>
         /// <returns></returns>
-        protected static IEnumerable<string> GetSimilarKrystalPaths(string krystalName)
+        protected IEnumerable<string> GetSimilarKrystalPaths(string nameRoot, K.KrystalType krystalType)
         {
-            var dot = new char[] { '.' };
-            var components = krystalName.Split(dot);
-            var searchString = components[0] + '.' + components[1] + ".*." + components[3] + ".krys";
+            var searchString = nameRoot + ".*." + krystalType.ToString() + ".krys";
 
             var similarKrystalPaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, searchString);
 
@@ -570,7 +443,7 @@ namespace Krystals4ObjectLibrary
         ///  "7_28_206_[nValues]" is a level 4 krystal - containing 206 strands having level 1, 2, 3 or 4, and [nValues] values. 
         /// </summary>
         /// <returns></returns>
-        private string GetNameRoot()
+        protected string GetNameRoot()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(MaxValue.ToString() + ".");
@@ -600,7 +473,7 @@ namespace Krystals4ObjectLibrary
         }
 
         #region protected variables
-        protected string _name; // Used by status line: changed ONLY when writing a newly created krystal's XML
+        protected string _name = ""; // Used by status line: set ONLY by Save() -- i.e. when writing the newly created krystal's XML
         protected uint _level; // the maximum level of any strand in the krystal
         protected uint _minValue; // the minimum value in the krystal
         protected uint _maxValue; // the maximum value in the krystal

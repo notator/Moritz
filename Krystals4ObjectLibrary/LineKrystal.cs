@@ -33,7 +33,6 @@ namespace Krystals4ObjectLibrary
         public LineKrystal(string originalName, string values)
             : base()
         {
-            _name = originalName;
             _level = 1;
             List<uint> valueList = K.GetUIntList(values);
             _numValues = (uint)valueList.Count;
@@ -46,8 +45,6 @@ namespace Krystals4ObjectLibrary
             }
             Strand strand = new Strand(1, valueList);
             _strands.Add(strand);
-
-            _name = GetName(K.KrystalType.line);
         }
         #region overridden functions
         /// <summary>
@@ -63,9 +60,11 @@ namespace Krystals4ObjectLibrary
             bool LineIsUnique(out string name)
             {
                 var isUnique = true;
-                name = GetName(K.KrystalType.line); // default name (with an index that is not used in the krystals folder)
+                var nameRoot = GetNameRoot();
 
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(name);
+                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.line);
+
+                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
 
                 var theseValues = Strands[0].Values;
                 foreach(var existingPath in similarKrystalPaths)
@@ -99,6 +98,7 @@ namespace Krystals4ObjectLibrary
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
             }
         }
+
 
         public override void Rebuild()
         {
