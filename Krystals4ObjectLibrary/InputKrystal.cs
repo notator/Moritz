@@ -170,5 +170,136 @@ namespace Krystals4ObjectLibrary
         private List<int> _missingAbsoluteValues = new List<int>(); // set for the input values krystal of an expansion
         #endregion private variables
     }
+
+    /// <summary>
+    /// The density input krystal for an expansion has this class
+    /// </summary>
+    public sealed class DensityInputKrystal : InputKrystal
+    {
+        public DensityInputKrystal(string filepath)
+            : base(filepath)
+        {
+            CalculateRelativePlanetPointPositions();
+        }
+        #region properties
+        public float[] RelativePlanetPointPositions { get { return _relativePlanetPointPositions; } }
+        #endregion properties
+        #region private functions
+        /// <summary>
+        /// This function sets the private _relativePlanetPointPositions field for this krystal.
+        /// The relative planet point positions are the positions of the points along a straight
+        /// line having a length of one abstract unit. The actual positions of the points are
+        /// calculated by distributing these relative positions along the actual path of the planet.
+        /// </summary>
+        private void CalculateRelativePlanetPointPositions()
+        {
+            int nValues = 0;
+            foreach(Strand strand in this._strands)
+                nValues += strand.Values.Count;
+            _relativePlanetPointPositions = new float[nValues];
+            float[] pos = _relativePlanetPointPositions; // just an alias
+            const float width = 1.0f;
+            float levelWidth;
+
+            if(nValues == 1) // this is a constant krystal or a line krystal with one value
+                return;      // _relativePlanetPointPositions[0] == 0
+            else if(this.Level == 1) // a single strand with more than one value
+            {
+                levelWidth = width / (nValues - 1);
+                for(int i = 0; i < nValues; i++)
+                    pos[i] = levelWidth * i;
+                return;
+            }
+            else // this.Level > 1
+            {
+                pos[0] = 0.0f; // does not change
+                pos[nValues - 1] = width; // does not change
+                uint[] levels = new uint[nValues];
+                #region set levels array
+                uint maxValueLevel = this._level + 1;
+                int index = 0;
+                foreach(Strand strand in this._strands)
+                {
+                    levels[index] = strand.Level;
+                    index++;
+                    int nMaxLevelValues = strand.Values.Count - 1;
+                    while(nMaxLevelValues > 0)
+                    {
+                        levels[index] = maxValueLevel;
+                        index++;
+                        nMaxLevelValues--;
+                    }
+                }
+                #endregion set levels array
+                for(uint currentLevel = 2; currentLevel <= maxValueLevel; currentLevel++)
+                {
+                    int startIndex = 0;
+                    while(startIndex < nValues)
+                    {
+                        int nSections = 0;
+                        int valueIndex;
+                        for(valueIndex = startIndex; valueIndex < nValues; valueIndex++)
+                        {
+                            if(startIndex == valueIndex || levels[valueIndex] == currentLevel)
+                                nSections++;
+                            if(startIndex != valueIndex && levels[valueIndex] < currentLevel)
+                                break;
+                        }
+                        float currentLevelWidth;
+                        if(valueIndex == nValues)
+                            currentLevelWidth = (width - pos[startIndex]) / nSections;
+                        else
+                            currentLevelWidth = (pos[valueIndex] - pos[startIndex]) / nSections;
+                        float position = pos[startIndex] + currentLevelWidth; ;
+                        for(int setValueIndex = startIndex; setValueIndex < valueIndex; setValueIndex++)
+                        {
+                            if(levels[setValueIndex] == currentLevel)
+                            {
+                                pos[setValueIndex] = position;
+                                position += currentLevelWidth;
+                            }
+                        }
+                        startIndex = valueIndex;
+                    } // while
+                }
+            }
+        }
+        #endregion private functions
+        #region private variables
+        private float[] _relativePlanetPointPositions;
+        #endregion private variables
+    }
+    /// <summary>
+    /// The points input krystal for an expansion has this class
+    /// </summary>
+    public sealed class PointsInputKrystal : InputKrystal
+    {
+        public PointsInputKrystal(string filepath)
+            : base(filepath)
+        {
+        }
+    }
+
+    /// <summary>
+    /// When contouring a krystal, the axis input has this class
+    /// </summary>
+    public sealed class AxisInputKrystal : InputKrystal
+    {
+        public AxisInputKrystal(string filepath)
+            : base(filepath)
+        {
+        }
+    }
+
+    /// <summary>
+    /// When contouring a krystal, the contourNumber input has this class
+    /// </summary>
+    public sealed class ContourInputKrystal : InputKrystal
+    {
+        public ContourInputKrystal(string filepath)
+            : base(filepath)
+        {
+        }
+    }
 }
 

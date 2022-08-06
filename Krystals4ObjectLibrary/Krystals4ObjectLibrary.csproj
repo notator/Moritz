@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Envelope.cs" />
+    <Compile Include="ShapedExpansionKrystal.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="ConstantKrystal.cs" />
     <Compile Include="InputKrystal.cs" />
