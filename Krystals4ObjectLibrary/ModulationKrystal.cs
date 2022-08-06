@@ -12,13 +12,14 @@ namespace Krystals4ObjectLibrary
     {
         #region constructors
         /// <summary>
-        /// constructor for loading a complete modulated krystal from a file
+        /// Constructor for loading a complete modulated krystal from a file.
+        /// This constructor reads the heredity info, and constructs the corresponding objects.
+        /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
         public ModulationKrystal(string filepath)
             : base(filepath)
         {
-            string modulatorName = "";
             using(XmlReader r = XmlReader.Create(filepath))
             {
                 K.ReadToXmlElementTag(r, "modulation"); // check that this is a modulation (the other checks have been done in base()
@@ -34,14 +35,14 @@ namespace Krystals4ObjectLibrary
                             this.YInputFilename = r.Value;
                             break;
                         case "modulator":
-                            modulatorName = r.Value;
+                            this.ModulatorFilename = r.Value;
                             break;
                     }
                 }
             }
             string xInputFilepath = K.KrystalsFolder + @"\" + XInputFilename;
             string yInputFilepath = K.KrystalsFolder + @"\" + YInputFilename;
-            string modulatorFilepath = K.ModulationOperatorsFolder + @"\" + modulatorName;
+            string modulatorFilepath = K.ModulationOperatorsFolder + @"\" + ModulatorFilename;
 
             _xInputKrystal = new ModulationInputKrystal(xInputFilepath);
             _yInputKrystal = new ModulationInputKrystal(yInputFilepath);
@@ -246,15 +247,8 @@ namespace Krystals4ObjectLibrary
         public List<uint> RedundantQualifierYInputValues { get { return _redundantModifierYInputValues; } }
         public string XInputFilename { get; set; }
         public string YInputFilename { get; set; }
-        public string ModulatorFilename
-        {
-            get
-            {
-                if(_modulator != null)
-                    return _modulator.Name;
-                else return "";
-            }
-        }
+        public string ModulatorFilename { get; set; }
+
         public ModulationInputKrystal XInputKrystal
         {
             get { return _xInputKrystal; }

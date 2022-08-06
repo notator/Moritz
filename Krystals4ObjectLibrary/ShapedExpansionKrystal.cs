@@ -12,7 +12,9 @@ namespace Krystals4ObjectLibrary
     {
         #region constructors
         /// <summary>
-        /// constructor for loading a complete, shaped expansion krystal from a file
+        /// Constructor that loads a complete, shaped expansion krystal from a file
+        /// This constructor reads the heredity info, and constructs the corresponding objects.
+        /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
         public ShapedExpansionKrystal(string filepath)
@@ -22,7 +24,7 @@ namespace Krystals4ObjectLibrary
             using(XmlReader r = XmlReader.Create(filepath))
             {
                 K.ReadToXmlElementTag(r, "expansion"); // check that this is an expansion (the other checks have been done in base()
-                for(int attr = 0 ; attr < 5 ; attr++)
+                for(int attr = 0 ; attr < r.AttributeCount ; attr++)
                 {
                     r.MoveToAttribute(attr);
                     switch(r.Name)
@@ -34,10 +36,10 @@ namespace Krystals4ObjectLibrary
                             this.PointsInputFilename = r.Value;
                             break;
                         case "axis":
-                            this._axisInputFilename = r.Value;
+                            this.AxisInputFilename = r.Value;
                             break;
                         case "contour":
-                            this._contourInputFilename = r.Value;
+                            this.ContourInputFilename = r.Value;
                             break;
                         case "expander":
                             expanderFilename = r.Value;
@@ -47,8 +49,8 @@ namespace Krystals4ObjectLibrary
             }
             string densityInputFilepath = K.KrystalsFolder + @"\" + DensityInputFilename;
             string pointsInputFilepath = K.KrystalsFolder + @"\" + PointsInputFilename;
-            string axisInputFilepath = K.KrystalsFolder + @"\" + _axisInputFilename;
-            string contourInputFilepath = K.KrystalsFolder + @"\" + _contourInputFilename;
+            string axisInputFilepath = K.KrystalsFolder + @"\" + AxisInputFilename;
+            string contourInputFilepath = K.KrystalsFolder + @"\" + ContourInputFilename;
             string expanderFilepath = K.ExpansionOperatorsFolder + @"\" + expanderFilename;
 
             DensityInputKrystal = new DensityInputKrystal(densityInputFilepath);
@@ -77,7 +79,7 @@ namespace Krystals4ObjectLibrary
                 _axisInputKrystal = null;
             else
             {
-                _axisInputFilename = Path.GetFileName(axisInputFilepath);
+                AxisInputFilename = Path.GetFileName(axisInputFilepath);
                 _axisInputKrystal = new AxisInputKrystal(axisInputFilepath);
             }
 
@@ -85,7 +87,7 @@ namespace Krystals4ObjectLibrary
                 _contourInputKrystal = null;
             else
             {
-                _contourInputFilename = Path.GetFileName(contourInputFilepath);
+                ContourInputFilename = Path.GetFileName(contourInputFilepath);
                 _contourInputKrystal = new ContourInputKrystal(contourInputFilepath);
             }
         }
@@ -141,11 +143,11 @@ namespace Krystals4ObjectLibrary
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
                 w.WriteStartElement("expansion");
-                w.WriteAttributeString("density", this._densityInputFilename);
-                w.WriteAttributeString("inputPoints", this._pointsInputFilename);
-                w.WriteAttributeString("axis", this._axisInputFilename);
-                w.WriteAttributeString("contour", this._contourInputFilename);
-                w.WriteAttributeString("expander", this._expander.Name);
+                w.WriteAttributeString("density", this.DensityInputFilename);
+                w.WriteAttributeString("inputPoints", this.PointsInputFilename);
+                w.WriteAttributeString("axis", this.AxisInputFilename);
+                w.WriteAttributeString("contour", this.ContourInputFilename);
+                w.WriteAttributeString("expander", this.ExpanderFilename);
                 w.WriteEndElement(); // expansion
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
@@ -242,18 +244,9 @@ namespace Krystals4ObjectLibrary
             get { return _contourInputKrystal; }
             set { _contourInputKrystal = value; }
         }
-        public string AxisInputFilename
-        {
-            get { return _axisInputFilename; }
-            set { _axisInputFilename = value; }
-        }
-        public string ContourInputFilename
-        {
-            get { return _contourInputFilename; }
-            set { _contourInputFilename = value; }
-        }
-        private string _axisInputFilename = "";
-        private string _contourInputFilename = "";
+        public string AxisInputFilename { get; set; } = "";
+        public string ContourInputFilename { get; set; } = "";
+
         private AxisInputKrystal _axisInputKrystal = null;
         private ContourInputKrystal _contourInputKrystal = null;
     }

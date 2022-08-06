@@ -15,13 +15,14 @@ namespace Krystals4ObjectLibrary
     {
         #region constructors
         /// <summary>
-        /// constructor for loading a complete expansion krystal from a file
+        /// Constructor for loading a complete expansion krystal from a file.
+        /// This constructor reads the heredity info, and constructs the corresponding objects.
+        /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
         public ExpansionKrystal(string filepath)
             : base(filepath)
         {
-            string expanderFilename = "";
             using(XmlReader r = XmlReader.Create(filepath))
             {
                 K.ReadToXmlElementTag(r, "expansion"); // check that this is an expansion (the other checks have been done in base()
@@ -31,20 +32,20 @@ namespace Krystals4ObjectLibrary
                     switch(r.Name)
                     {
                         case "density":
-                            this._densityInputFilename = r.Value;
+                            _densityInputFilename = r.Value;
                             break;
                         case "inputPoints":
-                            this._pointsInputFilename = r.Value;
+                            _pointsInputFilename = r.Value;
                             break;
                         case "expander":
-                            expanderFilename = r.Value;
+                            ExpanderFilename = r.Value;
                             break;
                     }
                 }
             }
             string densityInputFilepath = K.KrystalsFolder + @"\" + _densityInputFilename;
             string pointsInputFilepath = K.KrystalsFolder + @"\" + _pointsInputFilename;
-            string expanderFilepath = K.ExpansionOperatorsFolder + @"\" + expanderFilename;
+            string expanderFilepath = K.ExpansionOperatorsFolder + @"\" + ExpanderFilename;
 
             _densityInputKrystal = new DensityInputKrystal(densityInputFilepath);
             _pointsInputKrystal = new PointsInputKrystal(pointsInputFilepath);
@@ -124,9 +125,9 @@ namespace Krystals4ObjectLibrary
                 XmlWriter w = base.BeginSaveKrystal(); // disposed of in EndSaveKrystal
                 #region save heredity info
                 w.WriteStartElement("expansion");
-                w.WriteAttributeString("density", this._densityInputFilename);
-                w.WriteAttributeString("inputPoints", this._pointsInputFilename);
-                w.WriteAttributeString("expander", this._expander.Name);
+                w.WriteAttributeString("density", this.DensityInputFilename);
+                w.WriteAttributeString("inputPoints", this.PointsInputFilename);
+                w.WriteAttributeString("expander", this.ExpanderFilename);
                 w.WriteEndElement(); // expansion
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w

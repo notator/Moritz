@@ -14,7 +14,8 @@ namespace Krystals4ObjectLibrary
     public sealed class LineKrystal : Krystal
     {
         /// <summary>
-        /// Constructor used for loading a line krystal from a file
+        /// Constructor used for loading a line krystal from a file.
+        /// The Krystal base class reads the strand. Line krystals have no heredity info.
         /// </summary>
         public LineKrystal(string filepath)
             : base(filepath)

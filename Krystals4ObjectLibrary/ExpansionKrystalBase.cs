@@ -12,12 +12,14 @@ namespace Krystals4ObjectLibrary
     {
         #region constructors
         /// <summary>
-        /// constructor for loading a complete expansion krystal from a file
+        /// Constructor for loading a complete expansion krystal from a file.
+        /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
         public ExpansionKrystalBase(string filepath)
             : base(filepath)
         {
+            // heredity info is read in sub-classes
         }
 
         /// <summary>
@@ -119,6 +121,7 @@ namespace Krystals4ObjectLibrary
             get { return _pointsInputFilename; }
             set { _pointsInputFilename = value; }
         }
+        public string ExpanderFilename { get; set; }
         public Expander Expander
         {
             get { return _expander; }
@@ -133,5 +136,5 @@ namespace Krystals4ObjectLibrary
         protected Expander _expander = new Expander();
         #endregion private
     }
- }
+}
 

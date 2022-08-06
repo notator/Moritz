@@ -14,7 +14,7 @@ namespace Krystals4ObjectLibrary
     /// <summary>
     /// Krystals used as inputs to expansions, modulations etc. have this class.
     /// It contains strands, and functions for dealing with them, but no information
-    /// about the krystal's constructor.
+    /// about the krystal's heredity.
     /// </summary>
     public abstract class InputKrystal : Krystal
     {

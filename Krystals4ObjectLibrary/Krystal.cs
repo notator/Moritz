@@ -65,6 +65,12 @@ namespace Krystals4ObjectLibrary
     public abstract class Krystal : INamedComparable
     {
         public Krystal() { }
+
+        /// <summary>
+        /// Checks that the argument file is a krystal definition, and loads the strands.
+        /// Does not load heredity info.
+        /// </summary>
+        /// <param name="filepath"></param>
         public Krystal(string filepath)
         {
             string filename = Path.GetFileName(filepath);

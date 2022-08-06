@@ -13,7 +13,9 @@ namespace Krystals4ObjectLibrary
     {
         #region constructors
         /// <summary>
-        /// constructor for loading a permuted krystal from a file
+        /// Constructor for loading a complete permutation krystal from a file.
+        /// This constructor reads the heredity info, and constructs the corresponding objects.
+        /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
         public PermutationKrystal(string filepath)

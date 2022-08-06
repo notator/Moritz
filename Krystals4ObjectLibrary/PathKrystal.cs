@@ -12,23 +12,12 @@ using System.Xml;
 
 namespace Krystals4ObjectLibrary
 {
-    public abstract class PathKrystalBase : Krystal
-    {
-        public PathKrystalBase()
-            : base()
-        {
-        }
-
-        public PathKrystalBase(string filepath)
-            : base(filepath)
-        {
-        }
-    }
-    
-    public class PathKrystal : PathKrystalBase
+    public class PathKrystal : Krystal
     {
         public readonly string SVGInputFilename;
         public string DensityInputKrystalName; // to be made readonly when the krystalNames have all been changed
+        public readonly XmlDocument SvgDoc;
+        public readonly InputKrystal DensityInputKrystal;
         private readonly Field _field;
         private readonly Trajectory _trajectory;
 
@@ -48,15 +37,15 @@ namespace Krystals4ObjectLibrary
 
             int nEffectiveTrajectoryNodes = int.Parse(svgInputFilenameComponents[1]); // can be 1 (A constant: the first node in the trajectory path)
 
-            XmlDocument svgDoc = new XmlDocument();
-            svgDoc.PreserveWhitespace = true;
-            svgDoc.Load(svgFilepath);
+            SvgDoc = new XmlDocument();
+            SvgDoc.PreserveWhitespace = true;
+            SvgDoc.Load(svgFilepath);
 
-            XmlElement fieldPathElem = M.GetElementById(svgDoc, "path", "field");
+            XmlElement fieldPathElem = M.GetElementById(SvgDoc, "path", "field");
 
             _field = new Field(fieldPathElem);
 
-            XmlElement trajectoryPathElement = M.GetElementById(svgDoc, "path", "trajectory");
+            XmlElement trajectoryPathElement = M.GetElementById(SvgDoc, "path", "trajectory");
             DensityInputKrystal densityInputKrystal = new DensityInputKrystal(densityInputKrystalFilePath);
 
             _trajectory = new Trajectory(trajectoryPathElement, nEffectiveTrajectoryNodes, densityInputKrystal);
@@ -68,8 +57,40 @@ namespace Krystals4ObjectLibrary
             _level = (uint) _trajectory.Level;
         }
 
-        public PathKrystal(string filepath) : base(filepath)
+        /// <summary>
+        /// Constructor for loading a complete path krystal from a file.
+        /// This constructor reads the heredity info, and constructs the corresponding objects.
+        /// The Krystal base class reads the strands.
+        /// </summary>
+        /// <param name="filepath"></param>
+        public PathKrystal(string filepath)
+            : base(filepath)
         {
+            using(XmlReader r = XmlReader.Create(filepath))
+            {
+                K.ReadToXmlElementTag(r, "path"); // check that this is a path (the other checks have been done in base()
+                for(int attr = 0; attr < r.AttributeCount; attr++)
+                {
+                    r.MoveToAttribute(attr);
+                    switch(r.Name)
+                    {
+                        case "svg":
+                            this.SVGInputFilename = r.Value;
+                            break;
+                        case "density":
+                            this.DensityInputKrystalName = r.Value;
+                            break;
+                    }
+                }
+            }
+
+            string svgInputFilepath = K.KrystalsSVGFolder + @"\" + SVGInputFilename;
+            string densityInputFilepath = K.KrystalsFolder + @"\" + DensityInputKrystalName;
+
+            DensityInputKrystal = new DensityInputKrystal(densityInputFilepath);
+            SvgDoc = new XmlDocument();
+            SvgDoc.PreserveWhitespace = true;
+            SvgDoc.Load(svgInputFilepath);
         }
 
         /// <summary>

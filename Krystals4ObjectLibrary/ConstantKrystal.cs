@@ -14,7 +14,8 @@ namespace Krystals4ObjectLibrary
     public sealed class ConstantKrystal : Krystal
     {
         /// <summary>
-        /// Constructor used for loading a constant krystal from a file
+        /// Constructor used for loading a constant krystal from a file.
+        /// The strand is loaded by the base class. Constant krystals have no heredity info.
         /// </summary>
         public ConstantKrystal(string filepath)
             : base(filepath)
