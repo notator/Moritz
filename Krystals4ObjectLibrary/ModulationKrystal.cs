@@ -155,7 +155,7 @@ namespace Krystals4ObjectLibrary
                     var existingKrystal = new ModulationKrystal(existingPath);
                     if(existingKrystal.XInputFilename == this.XInputFilename
                     && existingKrystal.YInputFilename == this.YInputFilename
-                    && existingKrystal.Modulator.Name == this.Modulator.Name)
+                    && existingKrystal.ModulatorFilename == this.ModulatorFilename)
                     {
                         isUnique = false;
                         name = Path.GetFileName(existingPath);
