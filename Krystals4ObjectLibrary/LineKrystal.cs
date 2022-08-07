@@ -31,11 +31,10 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         /// <param name="originalName"></param>
         /// <param name="values"></param>
-        public LineKrystal(string originalName, string values)
+        public LineKrystal(List<uint> valueList)
             : base()
         {
             _level = 1;
-            List<uint> valueList = K.GetUIntList(values);
             _numValues = (uint)valueList.Count;
             _minValue = uint.MaxValue;
             _maxValue = uint.MinValue;
