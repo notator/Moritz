@@ -121,7 +121,11 @@ namespace Krystals4ObjectLibrary
             get { return _pointsInputFilename; }
             set { _pointsInputFilename = value; }
         }
-        public string ExpanderFilename { get; set; }
+        public string ExpanderFilename
+        {
+            get { return _expander.Name; }
+            set { _expander.Name = value; }
+        }
         public Expander Expander
         {
             get { return _expander; }

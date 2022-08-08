@@ -25,12 +25,13 @@ namespace Krystals4ObjectLibrary
             {
                 K.ReadToXmlElementTag(r, "line"); // check that this is a line krystal (the other checks have been done in base()
             }
+
+            //_name = UniqueLineKrystalName();
         }
         /// <summary>
-        /// Constructor used when creating new line krystals
+        /// Constructor used when creating new line krystals.
+        /// This constructor generates a unique name for the krystal.
         /// </summary>
-        /// <param name="originalName"></param>
-        /// <param name="values"></param>
         public LineKrystal(List<uint> valueList)
             : base()
         {
@@ -46,9 +47,9 @@ namespace Krystals4ObjectLibrary
             Strand strand = new Strand(1, valueList);
             _strands.Add(strand);
         }
+
         #region overridden functions
         /// <summary>
-        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
         /// If a krystal having identical content exists in the krystals directory,
         /// the user is given the option to
         ///    either overwrite the existing krystal (using that krystal's index),
@@ -57,34 +58,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            bool LineIsUnique(out string name)
-            {
-                var isUnique = true;
-                var nameRoot = GetNameRoot();
-
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.line);
-
-                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
-
-                var theseValues = Strands[0].Values;
-                foreach(var existingPath in similarKrystalPaths)
-                {
-                    var existingKrystal = new LineKrystal(existingPath);
-                    var existingValues = existingKrystal.Strands[0].Values;
-                    if(theseValues.SequenceEqual(existingValues))
-                    {
-                        isUnique = false;
-                        name = Path.GetFileName(existingPath);
-                        break;
-                    }
-                }
-                return isUnique;
-            }
-
+            var pathname = K.KrystalsFolder + @"\" + _name;
             DialogResult answer = DialogResult.Yes;
-            if(LineIsUnique(out _name) == false)
+            if(File.Exists(pathname))
             {
-                string msg = $"Line krystal {_name} already existed. Save it again with a new date?";
+                string msg = $"Line krystal {_name} already exists. Save it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 

@@ -25,15 +25,19 @@ namespace Krystals4ObjectLibrary
             {
                 K.ReadToXmlElementTag(r, "constant"); // check that this is a constant krystal (the other checks have been done in base())
             }
+
+            _name = String.Format($"{this.MaxValue}.0.1.{K.KrystalType.constant}{K.KrystalFilenameSuffix}");
         }
         /// <summary>
-        /// Constructor used when creating new constants
+        /// Constructor used when creating new constants.
+        /// This constructor generates a unique name for the krystal.
         /// </summary>
         /// <param name="originalName"></param>
         /// <param name="value"></param>
         public ConstantKrystal(uint value)
             : base()
         {
+            _name = String.Format($"{value}.0.1.{K.KrystalType.constant}{K.KrystalFilenameSuffix}");
             _level = 0;
             _minValue = _maxValue = value;
             _numValues = 1;
@@ -46,16 +50,13 @@ namespace Krystals4ObjectLibrary
         }
         #region overridden functions
         /// <summary>
-        /// Sets the krystal's Name, and saves it.
-        /// If a krystal having identical content exists in the krystals directory,
+        /// If a krystal with the same name already exists in the krystals directory,
         /// the user is given the option to
         ///    either overwrite the existing krystal (with a new date),
         ///    or abort the save.
         /// </summary>
         public override void Save()
         {
-            _name = String.Format($"{MaxValue}.0.1.{K.KrystalType.constant}{K.KrystalFilenameSuffix}");
-
             var pathname = K.KrystalsFolder + @"\" + _name;
 
             DialogResult answer = DialogResult.Yes;

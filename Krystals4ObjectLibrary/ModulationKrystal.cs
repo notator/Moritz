@@ -54,6 +54,7 @@ namespace Krystals4ObjectLibrary
         }
         /// <summary>
         /// Constructor used when beginning to edit a new modulated krystal (which has no modulator or strands yet).
+        /// This constructor generates a unique name for the krystal.
         /// </summary>
         /// <param name="xInputFilepath">The file path to the x input</param>
         /// <param name="yInputFilepath">The file path to the y input</param>
@@ -89,6 +90,7 @@ namespace Krystals4ObjectLibrary
             }
             SetRedundantQualifierCoordinates();
         }
+
         #endregion
         #region public functions
         private List<ModulationNode> GetModulationNodeList()
@@ -132,7 +134,6 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
         /// If a krystal having identical content exists in the krystals directory,
         /// the user is given the option to
         ///    either overwrite the existing krystal (using that krystal's index),
@@ -141,34 +142,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            bool ModulationKrystalIsUnique(out string name)
-            {
-                var isUnique = true;
-                var nameRoot = GetNameRoot();
-
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.mod);
-
-                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
-
-                foreach(var existingPath in similarKrystalPaths)
-                {
-                    var existingKrystal = new ModulationKrystal(existingPath);
-                    if(existingKrystal.XInputFilename == this.XInputFilename
-                    && existingKrystal.YInputFilename == this.YInputFilename
-                    && existingKrystal.ModulatorFilename == this.ModulatorFilename)
-                    {
-                        isUnique = false;
-                        name = Path.GetFileName(existingPath);
-                        break;
-                    }
-                }
-                return isUnique;
-            }
-
+            var pathname = K.KrystalsFolder + @"\" + _name;
             DialogResult answer = DialogResult.Yes;
-            if(ModulationKrystalIsUnique(out _name) == false)
+            if(File.Exists(pathname))
             {
-                string msg = $"ModulationKrystal {_name} already existed. Save it again with a new date?";
+                string msg = $"ModulationKrystal {_name} already exists. Save it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 

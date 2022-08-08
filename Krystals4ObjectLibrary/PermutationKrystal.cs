@@ -59,6 +59,7 @@ namespace Krystals4ObjectLibrary
         }
         /// <summary>
         /// Constructor used when creating a new permuted krystal (which has no strands yet).
+        /// This constructor generates a unique name for the krystal.
         /// </summary>
         /// <param name="sourcePath">The file path to the source krystal</param>
         /// <param name="axisPath">The file path to the axis input</param>
@@ -84,10 +85,10 @@ namespace Krystals4ObjectLibrary
             _sortFirst = sortFirst;
 
             _permutationNodeList = GetPermutationNodeList();
-
         }
+
         #endregion
- 
+
         private void CheckInputs(
             PermutationSourceInputKrystal sourceKrystal, 
             uint axisLevel,
@@ -327,7 +328,6 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
         /// If a krystal having identical content exists in the krystals directory,
         /// the user is given the option to
         ///    either overwrite the existing krystal (using that krystal's index),
@@ -336,36 +336,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            bool PermutationKrystalIsUnique(out string name)
-            {
-                var isUnique = true;
-                var nameRoot = GetNameRoot();
-
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.perm);
-
-                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
-
-                foreach(var existingPath in similarKrystalPaths)
-                {
-                    var existingKrystal = new PermutationKrystal(existingPath);
-                    if(existingKrystal.SourceInputFilename == this.SourceInputFilename
-                    && existingKrystal.AxisInputFilename == this.AxisInputFilename
-                    && existingKrystal.ContourInputFilename == this.ContourInputFilename
-                    && existingKrystal.PermutationLevel == this.PermutationLevel
-                    && existingKrystal.SortFirst == this.SortFirst)
-                    {
-                        isUnique = false;
-                        name = Path.GetFileName(existingPath);
-                        break;
-                    }
-                }
-                return isUnique;
-            }
-
+            var pathname = K.KrystalsFolder + @"\" + _name;
             DialogResult answer = DialogResult.Yes;
-            if(PermutationKrystalIsUnique(out _name) == false)
+            if(File.Exists(pathname))
             {
-                string msg = $"PermutationKrystal {_name} already existed. Save it again with a new date?";
+                string msg = $"PermutationKrystal {_name} already exists. Save it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 

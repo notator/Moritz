@@ -62,6 +62,7 @@ namespace Krystals4ObjectLibrary
 
         /// <summary>
         /// Constructor used by Moritz to construct a shaped expansion krystal (which has no strands yet).
+        /// This constructor generates a unique name for the krystal.
         /// </summary>
         /// <param name="densityInputFilepath">The file path to the density input</param>
         /// <param name="pointsInputFilepath">The file path to the points input values</param>
@@ -91,12 +92,12 @@ namespace Krystals4ObjectLibrary
                 _contourInputKrystal = new ContourInputKrystal(contourInputFilepath);
             }
         }
+
         #endregion
 
         #region public virtual
 
         /// <summary>
-        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
         /// If a krystal having identical content exists in the krystals directory,
         /// the user is given the option to
         ///    either overwrite the existing krystal (using that krystal's index),
@@ -105,36 +106,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            bool ShapedExpansionIsUnique(out string name)
-            {
-                var isUnique = true;
-                var nameRoot = GetNameRoot();
-
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.shaped);
-
-                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
-
-                foreach(var existingPath in similarKrystalPaths)
-                {
-                    var existingKrystal = new ShapedExpansionKrystal(existingPath);
-                    if(existingKrystal.DensityInputFilename == DensityInputFilename
-                    && existingKrystal.PointsInputFilename == PointsInputFilename
-                    && existingKrystal.AxisInputFilename == AxisInputFilename
-                    && existingKrystal.ContourInputFilename == ContourInputFilename
-                    && existingKrystal.Expander.Name == Expander.Name)
-                    {
-                        isUnique = false;
-                        name = Path.GetFileName(existingPath);
-                        break;
-                    }
-                }
-                return isUnique;
-            }
-
+            var pathname = K.KrystalsFolder + @"\" + _name;
             DialogResult answer = DialogResult.Yes;
-            if(ShapedExpansionIsUnique(out _name) == false)
+            if(File.Exists(pathname))
             {
-                string msg = $"ShapedExpansionKrystal {_name} already existed. Save it again with a new date?";
+                string msg = $"ShapedExpansion krystal {_name} already exists. Save it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 

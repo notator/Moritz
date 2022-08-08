@@ -18,6 +18,38 @@ namespace Krystals4ObjectLibrary
         #region constructors
         public Modulator(string filepath)
         {
+            string NewModulatorFilename(string oldModulatorName)
+            {
+                string rval;
+                string on = oldModulatorName;
+                if(on.StartsWith("m"))
+                {
+                    int mInd = on.IndexOf("m"); // = 0
+                    int xInd = on.IndexOf("x");
+                    int bInd = on.IndexOf("(");
+                    int iInd = on.IndexOf("-");
+                    int dotInd = on.IndexOf(".");
+
+                    string xStr = on.Substring(mInd + 1, xInd - mInd - 1);
+                    string yStr = on.Substring(xInd + 1, bInd - xInd - 1);
+                    string dStr = on.Substring(bInd + 1, iInd - bInd - 2);
+                    string iStr = on.Substring(iInd + 1, dotInd - iInd - 1);
+
+                    int.TryParse(xStr, out int xDim);
+                    int.TryParse(yStr, out int yDim);
+                    int.TryParse(dStr, out int maxValue);
+                    int.TryParse(iStr, out int index);
+                    rval = String.Format($"{xDim}.{yDim}.{maxValue}.{index}.kmod");
+                }
+                else rval = oldModulatorName;
+
+                return rval;
+            }
+
+            _name = NewModulatorFilename(Path.GetFileName(filepath));
+
+            filepath = K.ModulationOperatorsFolder + @"/" + _name;
+
             using(XmlReader r = XmlReader.Create(filepath))
             {
                 _name = Path.GetFileName(filepath); ;
@@ -263,7 +295,7 @@ namespace Krystals4ObjectLibrary
         }
         #endregion properties
         #region private variables
-        private string _name = ""; // is set when the modulator is saved
+        private string _name = "";
         private int _xDim = 1;
         private int _yDim = 1;
         private int[,] _array = new int[1, 1];

@@ -22,42 +22,6 @@ namespace Krystals4ObjectLibrary
         private readonly Trajectory _trajectory;
 
         /// <summary>
-        /// constructor for creating a path krystal from an (SVG) XmlDocument and a krystal
-        /// </summary>
-        public PathKrystal(string svgFilepath, string densityInputKrystalFilePath)
-            : base()
-        {
-            SVGInputFilename = Path.GetFileName(svgFilepath);
-            DensityInputKrystalName = Path.GetFileName(densityInputKrystalFilePath);
-
-            char[] splitChar = { '.' };
-            var svgInputFilenameComponents = SVGInputFilename.Split(splitChar);
-            
-            Debug.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && DensityInputKrystalName.EndsWith(".krys"));
-
-            int nEffectiveTrajectoryNodes = int.Parse(svgInputFilenameComponents[1]); // can be 1 (A constant: the first node in the trajectory path)
-
-            SvgDoc = new XmlDocument();
-            SvgDoc.PreserveWhitespace = true;
-            SvgDoc.Load(svgFilepath);
-
-            XmlElement fieldPathElem = M.GetElementById(SvgDoc, "path", "field");
-
-            _field = new Field(fieldPathElem);
-
-            XmlElement trajectoryPathElement = M.GetElementById(SvgDoc, "path", "trajectory");
-            DensityInputKrystal densityInputKrystal = new DensityInputKrystal(densityInputKrystalFilePath);
-
-            _trajectory = new Trajectory(trajectoryPathElement, nEffectiveTrajectoryNodes, densityInputKrystal);
-
-            List<List<uint>> expansionDistances = GetExpansionDistances(_field.Foci, _trajectory.StrandsInput);
-
-            _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
-
-            _level = (uint) _trajectory.Level;
-        }
-
-        /// <summary>
         /// Constructor for loading a complete path krystal from a file.
         /// This constructor reads the heredity info, and constructs the corresponding objects.
         /// The Krystal base class reads the strands.
@@ -91,6 +55,44 @@ namespace Krystals4ObjectLibrary
             SvgDoc = new XmlDocument();
             SvgDoc.PreserveWhitespace = true;
             SvgDoc.Load(svgInputFilepath);
+        }
+        /// <summary>
+        /// constructor for creating a path krystal from an (SVG) XmlDocument and a krystal
+        /// This constructor generates a unique name for the krystal.
+        /// </summary>
+        public PathKrystal(string svgFilepath, string densityInputKrystalFilePath)
+            : base()
+        {
+
+
+            SVGInputFilename = Path.GetFileName(svgFilepath);
+            DensityInputKrystalName = Path.GetFileName(densityInputKrystalFilePath);
+
+            char[] splitChar = { '.' };
+            var svgInputFilenameComponents = SVGInputFilename.Split(splitChar);
+            
+            Debug.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && DensityInputKrystalName.EndsWith(".krys"));
+
+            int nEffectiveTrajectoryNodes = int.Parse(svgInputFilenameComponents[1]); // can be 1 (A constant: the first node in the trajectory path)
+
+            SvgDoc = new XmlDocument();
+            SvgDoc.PreserveWhitespace = true;
+            SvgDoc.Load(svgFilepath);
+
+            XmlElement fieldPathElem = M.GetElementById(SvgDoc, "path", "field");
+
+            _field = new Field(fieldPathElem);
+
+            XmlElement trajectoryPathElement = M.GetElementById(SvgDoc, "path", "trajectory");
+            DensityInputKrystal densityInputKrystal = new DensityInputKrystal(densityInputKrystalFilePath);
+
+            _trajectory = new Trajectory(trajectoryPathElement, nEffectiveTrajectoryNodes, densityInputKrystal);
+
+            List<List<uint>> expansionDistances = GetExpansionDistances(_field.Foci, _trajectory.StrandsInput);
+
+            _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
+
+            _level = (uint) _trajectory.Level;
         }
 
         /// <summary>
@@ -167,7 +169,6 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
         /// If a krystal having identical content exists in the krystals directory,
         /// the user is given the option to
         ///    either overwrite the existing krystal (using that krystal's index),
@@ -176,33 +177,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            bool PathKrystalIsUnique(out string name)
-            {
-                var isUnique = true;
-                var nameRoot = GetNameRoot();
-
-                IEnumerable<string> similarKrystalPaths = GetSimilarKrystalPaths(nameRoot, K.KrystalType.path);
-
-                name = nameRoot + (similarKrystalPaths.Count() + 1).ToString() + K.ModulatorFilenameSuffix;
-
-                foreach(var existingPath in similarKrystalPaths)
-                {
-                    var existingKrystal = new PathKrystal(existingPath);
-                    if( existingKrystal.DensityInputKrystalName == this.DensityInputKrystalName
-                    && existingKrystal.SVGInputFilename == this.SVGInputFilename)
-                    {
-                        isUnique = false;
-                        name = Path.GetFileName(existingPath);
-                        break;
-                    }
-                }
-                return isUnique;
-            }
-
+            var pathname = K.KrystalsFolder + @"\" + _name;
             DialogResult answer = DialogResult.Yes;
-            if(PathKrystalIsUnique(out _name) == false)
+            if(File.Exists(pathname))
             {
-                string msg = $"PathKrystal {_name} already existed. Save it again with a new date?";
+                string msg = $"PathKrystal {_name} already exists. Save it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 
