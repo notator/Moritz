@@ -20,33 +20,6 @@ namespace Krystals4ObjectLibrary
         public ModulationKrystal(string filepath)
             : base(filepath)
         {
-            string NewModulatorFilename(string oldName)
-            {
-                string on = oldName;
-                string newName = oldName;
-                if(on.StartsWith("m"))
-                {
-                    int mInd = on.IndexOf("m"); // = 0
-                    int xInd = on.IndexOf("x");
-                    int bInd = on.IndexOf("(");
-                    int iInd = on.IndexOf("-");
-                    int dotInd = on.IndexOf(".");
-
-                    string xStr = on.Substring(mInd + 1, xInd - mInd - 1);
-                    string yStr = on.Substring(xInd + 1, bInd - xInd - 1);
-                    string dStr = on.Substring(bInd + 1, iInd - bInd - 2);
-                    string iStr = on.Substring(iInd + 1, dotInd - iInd - 1);
-
-                    int.TryParse(xStr, out int xDim);
-                    int.TryParse(yStr, out int yDim);
-                    int.TryParse(dStr, out int maxValue);
-                    int.TryParse(iStr, out int index);
-                    newName = String.Format($"{xDim}.{yDim}.{maxValue}.{index}.kmod");
-                }
-
-                return newName;
-            }
-
             using(XmlReader r = XmlReader.Create(filepath))
             {
                 K.ReadToXmlElementTag(r, "modulation"); // check that this is a modulation (the other checks have been done in base()
@@ -69,11 +42,6 @@ namespace Krystals4ObjectLibrary
             }
             string xInputFilepath = K.KrystalsFolder + @"\" + XInputFilename;
             string yInputFilepath = K.KrystalsFolder + @"\" + YInputFilename;
-
-            if(ModulatorFilename.StartsWith("m"))
-            {
-                ModulatorFilename = NewModulatorFilename(ModulatorFilename);
-            }
             string modulatorFilepath = K.ModulationOperatorsFolder + @"\" + ModulatorFilename;
 
             _xInputKrystal = new ModulationInputKrystal(xInputFilepath);

@@ -274,16 +274,63 @@ namespace Krystals4Application
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void SaveKrystalsWithNewNamesButton_Click(object sender, EventArgs e)
-        {
-            var dirPath = M.LocalMoritzKrystalsFolder;
-            var krysFilePaths = Directory.EnumerateFiles(dirPath, "*.krys");
+        {            
+            Dictionary<string, string> expanderNamesDict = SaveExpandersWithNewNames();
+
+            Console.WriteLine("=================================================");
+            Console.WriteLine("Expander Name Changes");
+            foreach(var pair in expanderNamesDict)
+            {
+                Console.WriteLine(pair.Key + " --> " + pair.Value);
+            }
+
+            var iEnumKrysFilePaths = Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.krys");
+
+            List<string> krysFilePaths = iEnumKrysFilePaths.ToList();
+            krysFilePaths.Sort();
             // ACHTUNG: Before running this function, delete any newly named
             // krystals in the krystals folder, otherwise the name indices get confused.
-            Dictionary<string, string> namesDict = SaveKrystalsWithNewNames(krysFilePaths);
-            // CorrectHeredity(namesDict);
+            Dictionary<string, string> namesDict = SaveKrystalsWithNewNames(krysFilePaths, expanderNamesDict);
+
+            Console.WriteLine("=================================================");
+            Console.WriteLine("Krystal Name Changes");
+            foreach(var pair in namesDict)
+            {
+                Console.WriteLine(pair.Key + " --> " + pair.Value);
+            }
         }
 
-        private Dictionary<string, string> SaveKrystalsWithNewNames(IEnumerable<string> krysFilePaths)
+        /// <summary>
+        /// returns a dictionary of oldExpanderName, newExpanderName pairs.
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<string, string> SaveExpandersWithNewNames()
+        {
+            var expandersNamesDict = new Dictionary<string,string> ();
+            var expanderFilePaths = Directory.EnumerateFiles(M.LocalMoritzExpansionFieldsFolder, "e*.kexp");
+            List<string> sortedExpanderFilePaths = expanderFilePaths.ToList();
+            sortedExpanderFilePaths.Sort();
+
+            int index = 1;
+            char[] dot = new char[] { '.' };
+            foreach(string path in sortedExpanderFilePaths)
+            {
+                string oldName = Path.GetFileName(path);
+                string bracketContent = oldName.Substring(oldName.IndexOf('(') + 1, oldName.IndexOf(')') - oldName.IndexOf('(') - 1);
+                string[] content = bracketContent.Split(dot);
+                string newName = String.Format($"{content[0]}.{content[1]}.{index}.kexp");
+                index++;
+
+                expandersNamesDict.Add(oldName, newName);
+
+                string newPath = K.ExpansionOperatorsFolder + "//" + newName;
+                File.Delete(newPath);
+                File.Copy(path, newPath);
+            }
+            return expandersNamesDict;
+        }
+
+        private Dictionary<string, string> SaveKrystalsWithNewNames(List<string> krysFilePaths, Dictionary<string, string> expanderNamesDict)
         {
             Dictionary<string, string> rval = new Dictionary<string, string>();
 
@@ -297,8 +344,7 @@ namespace Krystals4Application
             {
                 /// <summary>
                 /// A Krystal's name root consists of its domain (=MaxValue) followed by a '.' character,
-                ///   followed by a shapeNameString followed by a '.' character,
-                ///   followed by an index followed by a '.' character.
+                ///   followed by a shapeNameString followed by a '.' character.
                 /// The shapeNameString contains one or more integers separated by '_' characters.
                 /// The first int in the shapeNameString is the number of level 1 and level 2 strands, so:
                 ///  "0" is a constant krystal -- containing one strand having level 0 and one value (=domain) (no level 1 or level 2 strands).
@@ -334,26 +380,50 @@ namespace Krystals4Application
 
                     sb.Append('.');
 
-                    #region get index
-                    int iInd = k.Name.IndexOf("-");
-                    int dotInd = k.Name.LastIndexOf(".");
-                    string iStr = k.Name.Substring(iInd + 1, dotInd - iInd - 1);
+                    return sb.ToString();
+                }
+
+                string GetIndex(string name)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    int iInd = name.IndexOf("-");
+                    int dotInd = name.LastIndexOf(".");
+                    string iStr = name.Substring(iInd + 1, dotInd - iInd - 1);
                     int.TryParse(iStr, out int index);
 
                     sb.Append(index.ToString());
                     sb.Append('.');
 
-                    #endregion
-
                     return sb.ToString();
                 }
 
-                string NewKrystalName(Krystal k, K.KrystalType type )
+                string NewExpandedKrystalName(Krystal k, int expanderID, K.KrystalType type)
                 {
                     var nameRoot = GetNameRoot(k);
-                    string lkName = String.Format($"{nameRoot}{type}.krys");
+                    var index = GetIndex(k.Name);
+                    string kName = String.Format($"{nameRoot}{expanderID}.{index}{type}.krys");
 
-                    return lkName;
+                    return kName;
+                }
+
+                string NewKrystalName(Krystal k, K.KrystalType type)
+                {
+                    var nameRoot = GetNameRoot(k);
+                    var index = GetIndex(k.Name);
+                    string kName = String.Format($"{nameRoot}{index}{type}.krys");
+
+                    return kName;
+                }
+
+                int GetExpanderID(ExpansionKrystalBase k)
+                {
+                    string newEName = expanderNamesDict[k.ExpanderFilename];
+                    char[] dot = new char[] { '.' };
+                    string[] eComponents = newEName.Split(dot);
+                    int.TryParse(eComponents[2], out int id);
+
+                    return id;
                 }
 
                 //string UniquePathKrystalName()
@@ -384,6 +454,7 @@ namespace Krystals4Application
                 }
                 else
                 {
+                    int expanderID;
                     string typeString = oldName.Substring(0, 2);
                     switch(typeString)
                     {
@@ -397,11 +468,13 @@ namespace Krystals4Application
                             break;
                         case "xk":
                             var xk = new ExpansionKrystal(K.KrystalsFolder + "//" + oldName);
-                            newName = NewKrystalName(xk, K.KrystalType.exp);
+                            expanderID = GetExpanderID(xk);
+                            newName = NewExpandedKrystalName(xk, expanderID, K.KrystalType.exp);
                             break;
                         case "sk":
                             var sk = new ShapedExpansionKrystal(K.KrystalsFolder + "//" + oldName);
-                            newName = NewKrystalName(sk, K.KrystalType.shaped);
+                            expanderID = GetExpanderID(sk);
+                            newName = NewExpandedKrystalName(sk, expanderID, K.KrystalType.shaped);
                             break;
                         case "mk":
                             var mk = new ModulationKrystal(K.KrystalsFolder + "//" + oldName);
@@ -416,41 +489,6 @@ namespace Krystals4Application
                 return newName;
             }
 
-            string NewModulatorFilename(string oldName)
-            {
-                string newName = null;
-                if(rval.ContainsKey(oldName))
-                {
-                    newName = rval[oldName];
-                }
-                else
-                {
-                    string on = oldName;
-                    if(on.StartsWith("m"))
-                    {
-                        int mInd = on.IndexOf("m"); // = 0
-                        int xInd = on.IndexOf("x");
-                        int bInd = on.IndexOf("(");
-                        int iInd = on.IndexOf("-");
-                        int dotInd = on.IndexOf(".");
-
-                        string xStr = on.Substring(mInd + 1, xInd - mInd - 1);
-                        string yStr = on.Substring(xInd + 1, bInd - xInd - 1);
-                        string dStr = on.Substring(bInd + 1, iInd - bInd - 2);
-                        string iStr = on.Substring(iInd + 1, dotInd - iInd - 1);
-
-                        int.TryParse(xStr, out int xDim);
-                        int.TryParse(yStr, out int yDim);
-                        int.TryParse(dStr, out int maxValue);
-                        int.TryParse(iStr, out int index);
-                        newName = String.Format($"{xDim}.{yDim}.{maxValue}.{index}.kmod");
-                        rval.Add(oldName, newName);
-                    }
-                    else newName = oldName;                    
-                }
-                return newName;
-            }
-
             foreach(var krysFilePath in krysFilePaths)
             {
                 var originalKrysFilename = Path.GetFileName(krysFilePath);
@@ -459,6 +497,7 @@ namespace Krystals4Application
                     ConstantKrystal cKrystal = new ConstantKrystal(krysFilePath);
                     string newCName = cKrystal.Name;
                     SetRvalDict(originalKrysFilename, newCName);
+                    File.Delete(K.KrystalsFolder + "//" + newCName);
                     cKrystal.Save();
                 }
                 if(originalKrysFilename.StartsWith("lk"))
@@ -467,23 +506,32 @@ namespace Krystals4Application
                     string newLName = NewKrystalFilename(lKrystal.Name);
                     lKrystal.Name = newLName;
                     SetRvalDict(originalKrysFilename, newLName);
+                    File.Delete(K.KrystalsFolder + "//" + newLName);
                     lKrystal.Save();
                 }
                 if(originalKrysFilename.StartsWith("xk"))
                 {
-                    ExpansionKrystal oldKrystal = new ExpansionKrystal(krysFilePath);
-                    //string dInputFilepath = K.KrystalsFolder + @"/" + NewKrystalFilename(oldKrystal.DensityInputFilename);
-                    //string pInputFilepath = K.KrystalsFolder + @"/" + NewKrystalFilename(oldKrystal.PointsInputFilename);
-                    //// decided not to change Expander names
-                    ////string eInputFilepath = K.ExpansionOperatorsFolder + @"/" + NewExpanderFilename(oldKrystal.ExpanderFilename);
-                    ////ExpansionKrystal newKrystal = new ExpansionKrystal(dInputFilepath, pInputFilepath, eInputFilepath); // generates new krystal name
-                    //newKrystal.Save();
-                    //newKrystal.Expander.Save(); // This would be better put in newKrystal.Save().
+                    ExpansionKrystal k = new ExpansionKrystal(krysFilePath);
 
-                    //SetRvalDict(originalKrysFilename, newKrystal.Name);
-                    //SetRvalDict(oldKrystal.DensityInputFilename, newKrystal.DensityInputFilename);
-                    //SetRvalDict(oldKrystal.PointsInputFilename, newKrystal.PointsInputFilename);
-                    //SetRvalDict(oldKrystal.ExpanderFilename, newKrystal.ExpanderFilename);
+                    string oldName = k.Name;
+                    string newName = NewKrystalFilename(k.Name);
+                    k.Name = newName;
+                    SetRvalDict(oldName, newName);
+                    string oldPInput = k.PointsInputFilename;
+                    string newPInput = NewKrystalFilename(k.PointsInputFilename);
+                    k.PointsInputFilename = newPInput;
+                    SetRvalDict(oldPInput, newPInput);
+                    string oldDInput = k.DensityInputFilename;
+                    string newDInput = NewKrystalFilename(k.DensityInputFilename);
+                    k.DensityInputFilename = newDInput;
+                    SetRvalDict(oldDInput, newDInput);
+                    string oldEName = k.ExpanderFilename;
+                    string newEName = expanderNamesDict[oldEName];
+                    k.ExpanderFilename = newEName;
+
+                    File.Delete(K.KrystalsFolder + "//" + newName);
+
+                    k.Save();
                 }
                 if(originalKrysFilename.StartsWith("mk"))
                 {
@@ -500,10 +548,8 @@ namespace Krystals4Application
                     string newYInput = NewKrystalFilename(k.YInputFilename);
                     k.YInputFilename = newYInput;
                     SetRvalDict(oldYInput, newYInput);
-                    string oldModName = k.ModulatorFilename; 
-                    string newModName = NewModulatorFilename(k.ModulatorFilename);                    
-                    k.ModulatorFilename = newYInput;
-                    SetRvalDict(oldModName, newModName);
+
+                    File.Delete(K.KrystalsFolder + "//" + newName);
 
                     k.Save();  
                 }
@@ -527,6 +573,8 @@ namespace Krystals4Application
                     string newCName = NewKrystalFilename(k.ContourInputFilename);
                     k.ContourInputFilename = newCName;
                     SetRvalDict(oldCName, newCName);
+
+                    File.Delete(K.KrystalsFolder + "//" + newName);
 
                     k.Save();
                 }
@@ -554,7 +602,11 @@ namespace Krystals4Application
                     string newCName = NewKrystalFilename(k.ContourInputFilename);
                     k.ContourInputFilename = newCName;
                     SetRvalDict(oldCName, newCName);
-                    // decided not to change expander names
+                    string oldEName = k.ExpanderFilename;
+                    string newEName = expanderNamesDict[oldEName];
+                    k.ExpanderFilename = newEName;
+
+                    File.Delete(K.KrystalsFolder + "//" + newName);
 
                     k.Save();
                 }
