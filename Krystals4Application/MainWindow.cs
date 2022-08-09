@@ -5,6 +5,7 @@ using Moritz.Krystals;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -125,7 +126,27 @@ namespace Krystals4Application
 
         private void NewExpansionKrystalMenuItem_Click(object sender, EventArgs e)
         {
-            NewExpansionKrystal();
+            //  NewExpansionKrystal();
+
+            NewExpansionDialog kd = new NewExpansionDialog();
+            if(kd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var outputKrystal = new ExpansionKrystal(kd.DensityInputFilepath,
+                                                            kd.PointsInputFilepath,
+                                                            kd.ExpanderFilepath);
+                    outputKrystal.Save();
+                }
+                catch(ApplicationException ae)
+                {
+                    MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                //catch (SystemException ae)
+                //{
+                //    MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                //}
+            }
         }
         private void OpenExpansionKrystalMenuItem_Click(object sender, EventArgs e)
         {
@@ -269,12 +290,29 @@ namespace Krystals4Application
 
         #region SaveKrystalsWithNewNames
         /// <summary>
-        /// ACHTUNG: Before running this function, delete all the newly named krystals in the krystals folder.
+        /// 09.08.2022
+        /// ACHTUNG: The following procedure was used to change the naming of existing krystals and expanders:
+        /// Note step 4, and that any krystals not in the old backups will have to be saved separately.
+        /// 1. copy the original files (having the original names) into the appropriate folders:
+        ///    krystals/expansion operators
+        ///    krystals/krystals
+        ///    krystals/modulation operators
+        /// 2. call this function, to create new files parallel to the old ones, and printing a table
+        ///    of the oldName-newName equivalences to the console.
+        ///    This info has been copied to krystals/NameChanges.txt
+        /// 3. Manually delete the old files.
+        /// 4. ACHTUNG: Manually change the remaining names of krystals and expanders inside expander (.kexp) files.
+        /// 5. There was an incorrect schema location (beginning J:) in one of the Expanders.Change it manually.
+        /// 6. Removed the temporary code in ModulationKrystal.cs.
+        ///    See https://github.com/notator/Moritz/commit/407e635bd37f71c434a4b66988973fa5716016e4 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void SaveKrystalsWithNewNamesButton_Click(object sender, EventArgs e)
-        {            
+        {
+            Debug.Assert(false, "This function has only been kept for archiving purposes." +
+                "Before running it, see the comment above it in the code.");
+
             Dictionary<string, string> expanderNamesDict = SaveExpandersWithNewNames();
 
             Console.WriteLine("=================================================");
@@ -288,13 +326,11 @@ namespace Krystals4Application
 
             List<string> krysFilePaths = iEnumKrysFilePaths.ToList();
             krysFilePaths.Sort();
-            // ACHTUNG: Before running this function, delete any newly named
-            // krystals in the krystals folder, otherwise the name indices get confused.
-            Dictionary<string, string> namesDict = SaveKrystalsWithNewNames(krysFilePaths, expanderNamesDict);
+            Dictionary<string, string> krystalNamesDict = SaveKrystalsWithNewNames(krysFilePaths, expanderNamesDict);
 
             Console.WriteLine("=================================================");
             Console.WriteLine("Krystal Name Changes");
-            foreach(var pair in namesDict)
+            foreach(var pair in krystalNamesDict)
             {
                 Console.WriteLine(pair.Key + " --> " + pair.Value);
             }

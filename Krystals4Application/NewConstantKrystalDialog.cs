@@ -17,6 +17,7 @@ namespace Krystals4Application
         public void SetButtons()
         {
             this.OKBtn.Hide();
+            this.CancelBtn.Enabled = true;
             this.CancelBtn.Text = "Close";
         }
         #endregion public functions
