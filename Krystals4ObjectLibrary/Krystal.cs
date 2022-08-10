@@ -130,6 +130,86 @@ namespace Krystals4ObjectLibrary
                 }
             }
         }
+
+        /// <summary>
+        /// Uses the strand related properties and the names of existing krystals to create a new unique name.
+        /// This default function is overridden by ExpansionKrystalBase.
+        /// </summary>
+        protected virtual string GetUniqueName(K.KrystalType type)
+        {
+            string root = GetNameRoot(); // domain.shape.
+            string suffix = string.Format($".{type}{K.KrystalFilenameSuffix}");
+            string uniqueNameIndex = GetUniqueNameIndex(root, suffix);
+
+            string uniqueName = String.Format($"{root}{uniqueNameIndex}{suffix}");
+
+            return uniqueName;
+        }
+
+        /// <summary>
+        /// A Krystal's name root consists of its domain (=MaxValue) followed by a '.' character,
+        ///   followed by a shapeNameString followed by a '.' character.
+        /// The shapeNameString contains one or more integers separated by '_' characters.
+        /// The first int in the shapeNameString is the number of level 1 and level 2 strands, so:
+        ///  "0" is a constant krystal -- containing one strand having level 0 and one value (=domain) (no level 1 or level 2 strands).
+        ///  "1_[nValues]" is a line krystal -- containing one strand having level 1 and [nValues] values (no level 2 strands).
+        ///  "7_[nValues)" is a level 2 krystal -- containing 7 strands (1 level 1 and 6 level 2 strands) and [nValues] values.
+        ///  "7_28_[nValues]" is a level 3 krystal - containing 28 strands having level 1, 2, or 3, and [nValues] values.
+        ///  "7_28_206_[nValues]" is a level 4 krystal - containing 206 strands having level 1, 2, 3 or 4, and [nValues] values. 
+        /// </summary>
+        /// <returns></returns>
+        protected string GetNameRoot()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(MaxValue.ToString() + ".");
+
+            if(Level == 0)
+            {
+                sb.Append("0");
+            }
+            else if(Level == 1)
+            {
+                sb.Append("1");
+                sb.Append("_");
+                sb.Append(Strands[0].Values.Count().ToString());
+            }
+            else
+            {
+                for(int i = 1; i < ShapeArray.Length; i++)
+                {
+                    sb.Append(ShapeArray[i].ToString() + '_');
+                }
+                sb.Remove(sb.Length - 1, 1);
+            }
+
+            sb.Append('.');
+
+            return sb.ToString();
+        }
+
+        protected string GetUniqueNameIndex(string prefix, string suffix)
+        {
+            string searchString = String.Format($"{prefix}*{suffix}");
+            string[] similarFilenames = Directory.GetFiles(K.KrystalsFolder, searchString);
+            #region check name contiguity
+            var namesList = similarFilenames.ToList();
+            namesList.Sort();
+            var indStr = namesList[0].Remove(0, prefix.Length);
+            indStr = indStr.Remove(indStr.Length - suffix.Length);
+            int.TryParse(indStr, out int prevIndex);
+            for(int i = 1; i < namesList.Count; i++)
+            {
+                indStr = namesList[i].Remove(0, prefix.Length);
+                indStr = indStr.Remove(indStr.Length - suffix.Length);
+                int.TryParse(indStr, out int index);
+                Debug.Assert(index == prevIndex + 1);
+                prevIndex = index;
+            }
+            #endregion check name contiguity
+
+            return (similarFilenames.Length + 1).ToString();
+        }
+
         /// <summary>
         /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
         /// If a krystal having identical content exists in the krystals directory,

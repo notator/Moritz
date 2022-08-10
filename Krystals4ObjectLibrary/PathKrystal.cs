@@ -93,6 +93,8 @@ namespace Krystals4ObjectLibrary
             _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
 
             _level = (uint) _trajectory.Level;
+
+            _name = GetUniqueName(K.KrystalType.path);
         }
 
         /// <summary>

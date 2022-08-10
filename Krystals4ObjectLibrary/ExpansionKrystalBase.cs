@@ -84,6 +84,10 @@ namespace Krystals4ObjectLibrary
             }
             Expand();
         }
+         protected static void SetStrandsAndName(ExpansionKrystal ek)
+        {
+            SetStrandsAndName(ek);
+        }
         #endregion
         #region public
         /// <summary>
@@ -98,6 +102,28 @@ namespace Krystals4ObjectLibrary
         }
 
         #region virtual
+        /// <summary>
+        /// Uses the strand related properties and the names of existing krystals to create a new unique name.
+        /// Overrides the default function to include the expander index in the name.
+        /// </summary>
+        protected override string GetUniqueName(K.KrystalType kType)
+        {
+            string root = GetNameRoot(); // domain.shape.
+            string expanderIndex = GetExpanderIndex(ExpanderFilename);
+            root += expanderIndex;
+            string suffix = string.Format($".{kType}{K.KrystalFilenameSuffix}");
+            string uniqueNameIndex = GetUniqueNameIndex(root, suffix);
+
+            string uniqueName = String.Format($"{root}{uniqueNameIndex}{suffix}");
+
+            return uniqueName;
+        }
+        protected string GetExpanderIndex(string expanderFilename)
+        {
+            char[] dot = new char[] { '.' };
+            var components = expanderFilename.Split(dot);
+            return components[2];
+        }
         public abstract void Expand();
         public abstract List<StrandNode> StrandNodeList();
         #endregion

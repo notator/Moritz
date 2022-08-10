@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using System.IO;
 using System.Windows.Forms;
-using Moritz.Globals;
-using System.Linq;
+using System.Diagnostics;
 
 namespace Krystals4ObjectLibrary
 {
@@ -91,6 +90,25 @@ namespace Krystals4ObjectLibrary
                 ContourInputFilename = Path.GetFileName(contourInputFilepath);
                 _contourInputKrystal = new ContourInputKrystal(contourInputFilepath);
             }
+
+            var ek = new ShapedExpansionKrystal(_densityInputKrystal, _pointsInputKrystal, _axisInputKrystal, _contourInputKrystal, _expander);
+            _strands = ek.Strands;
+            _name = ek.Name;
+
+            _name = GetUniqueName(K.KrystalType.shaped);
+        }
+
+        public ShapedExpansionKrystal(DensityInputKrystal densityInputKrystal,
+                        PointsInputKrystal pointsInputKrystal,
+                        AxisInputKrystal axisInputKrystal,
+                        ContourInputKrystal contourInputKrystal,
+                        Expander expander)
+            : base(densityInputKrystal, pointsInputKrystal, expander)
+        {
+            // strands are set in the base class, now do the contouring...
+            Debug.Assert(false, "TODO");
+
+            _name = GetUniqueName(K.KrystalType.shaped);
         }
 
         #endregion

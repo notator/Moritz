@@ -85,6 +85,10 @@ namespace Krystals4ObjectLibrary
             _sortFirst = sortFirst;
 
             _permutationNodeList = GetPermutationNodeList();
+
+            Permute();
+
+            _name = GetUniqueName(K.KrystalType.perm);
         }
 
         #endregion

@@ -89,6 +89,10 @@ namespace Krystals4ObjectLibrary
                     throw new ApplicationException("Error: One or more input values exceed the bounds of the modulator.");
             }
             SetRedundantQualifierCoordinates();
+
+            Modulate();
+
+            _name = GetUniqueName(K.KrystalType.mod);
         }
 
         #endregion

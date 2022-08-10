@@ -46,9 +46,12 @@ namespace Krystals4ObjectLibrary
             }
             Strand strand = new Strand(1, valueList);
             _strands.Add(strand);
+
+            _name = GetUniqueName(K.KrystalType.line);
         }
 
         #region overridden functions
+
         /// <summary>
         /// If a krystal having identical content exists in the krystals directory,
         /// the user is given the option to

@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.IO;
 using System.Windows.Forms;
-using Moritz.Globals;
-using System.Linq;
+using System.Xml;
 
 namespace Krystals4ObjectLibrary
 {
@@ -53,7 +51,7 @@ namespace Krystals4ObjectLibrary
         }
         /// <summary>
         /// Constructor used when beginning to edit a new krystal (which has no strands yet).
-        /// This constructor generates a unique name for the krystal.
+        /// This constructor generates the strands and a unique name for the krystal.
         /// </summary>
         /// <param name="densityInputFilepath">The file path to the density input</param>
         /// <param name="inputValuesFilepath">The file path to the input values</param>
@@ -63,13 +61,13 @@ namespace Krystals4ObjectLibrary
                                 string expanderFilepath)
             : base(densityInputFilepath, pointsInputFilepath, expanderFilepath)
         {
+            var ek = new ExpansionKrystal(_densityInputKrystal, _pointsInputKrystal, _expander);
+            _strands = ek.Strands;
+            _name = ek.Name; 
         }
-
-
-
         /// <summary>
         /// Constructor used when the density and points input krystals, and the Expander are already available.
-        /// Expand() is called in this constructor to create the strands.
+        /// Expand() is called in this constructor to create the strands and strand related properties.
         /// </summary>
         /// <param name="densityInputFilepath">The file path to the density input</param>
         /// <param name="inputValuesFilepath">The file path to the input values</param>
@@ -79,7 +77,9 @@ namespace Krystals4ObjectLibrary
                                 Expander expander)
             : base(densityInputKrystal, pointsInputKrystal, expander)
         {
+            _name = GetUniqueName(K.KrystalType.exp);
         }
+
         #endregion
 
         #region public virtual

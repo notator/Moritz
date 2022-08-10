@@ -216,9 +216,14 @@ namespace Krystals4ObjectLibrary
         {
             return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]path\.krys$");
         }
+        /// <summary>
+        /// This is the same definition as in the krystals.xsd schema
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static bool IsKrystalFilename(string name)
         {
-            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.](constant|line|exp|path|shaped|mod|perm)(\.krys)$");
+            return Regex.IsMatch(name, @"^(([0-9]+[.][0-9_]+[.][0-9]+[.](constant|line|path|mod|perm))|([0-9]+[.][0-9_]+[.][0-9]+[.][0-9]+[.](exp|shaped)))(\.krys)$");
         }
         public static bool IsModulationOperatorFilename(string name)
         {
@@ -620,6 +625,8 @@ namespace Krystals4ObjectLibrary
                 case DialogFilterIndex.expansion:
                 case DialogFilterIndex.shapedExpansion:
                 case DialogFilterIndex.modulation:
+                case DialogFilterIndex.permutation:
+                case DialogFilterIndex.path:
                     openFileDialog.InitialDirectory = K.KrystalsFolder;
                     break;
                 case DialogFilterIndex.expander:
@@ -797,13 +804,15 @@ namespace Krystals4ObjectLibrary
         //public static readonly string UntitledModulatorName = "Untitled.kmod";
         public static readonly string DialogFilter =
             "all krystals (*.krys)|*.krys|"
-            + "constants (ck*.krys)|ck*.krys|"
-            + "lines (lk*.krys)|lk*.krys|"
-            + "expansions (xk*.krys)|xk*.krys|"
-            + "shaped expansions (sk*.krys)|sk*.krys|"
-            + "modulations (mk*.krys)|mk*.krys|"
-            + "expanders (e*.kexp) |e*.kexp|"
-            + "modulators (m*.kmod) |m*.kmod|"
+            + "constants (*.constant.krys)|*.constant.krys|"
+            + "lines (*.line.krys)|*.line.krys|"
+            + "expansions (*.exp.krys)|*.exp.krys|"
+            + "shaped expansions (*.shaped.krys)|*.shaped.krys|"
+            + "modulations (*.mod.krys)|*.mod.krys|"
+            + "permutations (*.perm.krys)|*.perm.krys|"
+            + "paths (*.path.krys)|*.path.krys|"
+            + "expanders (*.kexp) |*.kexp|"
+            + "modulators (*.kmod) |*.kmod|"
             + "SVG files (*.svg) |*.svg";
         public static readonly string KrystalFilenameSuffix = ".krys";
         public static readonly string ExpanderFilenameSuffix = ".kexp";
@@ -823,7 +832,7 @@ namespace Krystals4ObjectLibrary
         };
  
         // used to index the Krystal dialog filter (see above)
-        public enum DialogFilterIndex { allKrystals, constant, line, expansion, shapedExpansion, modulation, expander, modulator, svg };
+        public enum DialogFilterIndex { allKrystals, constant, line, expansion, shapedExpansion, modulation, permutation, path, expander, modulator, svg };
         public enum PointGroupShape { circle, spiral, straightLine };
         public enum DisplayColor { black, red, green, blue, orange, purple, magenta };
         #endregion public variables

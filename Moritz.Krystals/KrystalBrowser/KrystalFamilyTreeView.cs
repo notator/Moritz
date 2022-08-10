@@ -66,9 +66,6 @@ namespace Moritz.Krystals
         /// <summary>
         /// Returns the index of the first node in nodes whose Text ends with a krystal name greater than
         /// the first argument. "Greater than" is defined by K.CompareKrystalNames().
-        /// In childNodes, each childNode.Text contains a three character intro, denoting the function of the
-        /// parent for the child, followed by a krystal name. This function therefore compares the krystalName
-        /// substring of each childNode.Text.
         /// If the TreeNodeCollection is empty, this function returns 0.
         /// If none of the nodes' Text fields contains a krystal name greater than krystalName, this function
         /// returns childNodes.Count.
@@ -82,7 +79,14 @@ namespace Moritz.Krystals
                 int returnValue = childNodes.Count;
                 for(int index = 0; index < childNodes.Count; index++)
                 {
-                    if(K.CompareKrystalNames(krystalName, childNodes[index].Text.Substring(3)) < 0)
+                    string krystalName2 = childNodes[index].Text;
+
+                    if(krystalName2.IndexOf(":") == 1)
+                    {
+                        krystalName2 = krystalName2.Substring(3);
+                    }
+
+                    if(K.CompareKrystalNames(krystalName, krystalName2) < 0)
                     {
                         returnValue = index;
                         break;
