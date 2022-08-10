@@ -452,7 +452,7 @@ namespace Krystals4Application
                     return kName;
                 }
 
-                int GetExpanderID(ExpansionKrystalBase k)
+                int GetExpanderID(ExpansionKrystal k)
                 {
                     string newEName = expanderNamesDict[k.ExpanderFilename];
                     char[] dot = new char[] { '.' };

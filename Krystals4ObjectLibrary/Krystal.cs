@@ -132,8 +132,9 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Uses the strand related properties and the names of existing krystals to create a new unique name.
-        /// This default function is overridden by ExpansionKrystalBase.
+        /// Uses the strand related properties and the names of krystals already 
+        /// in the krystals folder to create a new unique name.
+        /// ExpansionKrystal overrides this function to include the ExpanderID.
         /// </summary>
         protected virtual string GetUniqueName(K.KrystalType type)
         {
