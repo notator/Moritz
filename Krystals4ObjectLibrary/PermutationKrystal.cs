@@ -58,8 +58,8 @@ namespace Krystals4ObjectLibrary
             _permutationNodeList = GetPermutationNodeList();
         }
         /// <summary>
-        /// Constructor used when creating a new permuted krystal (which has no strands yet).
-        /// This constructor generates a unique name for the krystal.
+        /// Constructor used when creating a new permuted krystal.
+        /// This constructor generates the starnds and a unique name for the krystal.
         /// </summary>
         /// <param name="sourcePath">The file path to the source krystal</param>
         /// <param name="axisPath">The file path to the axis input</param>

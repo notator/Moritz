@@ -26,24 +26,6 @@ namespace Moritz.Krystals
                         fieldNode.Text = fieldNode.Text.Insert(0, "e: ");
                         this.Nodes.Add((TreeNode) fieldNode);
                     }
-                    if(K.IsShapedExpansionKrystalFilename(Text))
-                    {
-                        AncestorsNode densityNode = new AncestorsNode(dependencyList[i].Input1, dependencyList);
-                        densityNode.Text = densityNode.Text.Insert(0, "d: ");
-                        this.Nodes.Add((TreeNode) densityNode);
-                        AncestorsNode pointsNode = new AncestorsNode(dependencyList[i].Input2, dependencyList);
-                        pointsNode.Text = pointsNode.Text.Insert(0, "p: ");
-                        this.Nodes.Add((TreeNode) pointsNode);
-                        AncestorsNode axisNode = new AncestorsNode(dependencyList[i].Input3, dependencyList);
-                        axisNode.Text = axisNode.Text.Insert(0, "a: ");
-                        this.Nodes.Add((TreeNode) axisNode);
-                        AncestorsNode contourNode = new AncestorsNode(dependencyList[i].Input4, dependencyList);
-                        contourNode.Text = contourNode.Text.Insert(0, "c: ");
-                        this.Nodes.Add((TreeNode) contourNode);
-                        AncestorsNode fieldNode = new AncestorsNode(dependencyList[i].Field, dependencyList);
-                        fieldNode.Text = fieldNode.Text.Insert(0, "e: ");
-                        this.Nodes.Add((TreeNode) fieldNode);
-                    }
                     else if(K.IsModulationKrystalFilename(Text))
                     {
                         AncestorsNode xNode = new AncestorsNode(dependencyList[i].Input1, dependencyList);

@@ -17,8 +17,7 @@ namespace Moritz.Krystals
                 {
                     KrystalChildrenNode input1Node = new KrystalChildrenNode(i, dependencyList);
                     listIndex = FindChildFollower(input1Node.Text, this.Nodes);
-                    if(K.IsExpansionKrystalFilename(dependencyList[i].Name)
-                    || K.IsShapedExpansionKrystalFilename(dependencyList[i].Name))
+                    if(K.IsExpansionKrystalFilename(dependencyList[i].Name))
                         input1Node.Text = input1Node.Text.Insert(0, "d: ");
                     else if(K.IsModulationKrystalFilename(dependencyList[i].Name))
                         input1Node.Text = input1Node.Text.Insert(0, "x: ");
@@ -31,8 +30,7 @@ namespace Moritz.Krystals
                 {
                     KrystalChildrenNode input2Node = new KrystalChildrenNode(i, dependencyList);
                     listIndex = FindChildFollower(input2Node.Text, this.Nodes);
-                    if(K.IsExpansionKrystalFilename(dependencyList[i].Name)
-                    || K.IsShapedExpansionKrystalFilename(dependencyList[i].Name))
+                    if(K.IsExpansionKrystalFilename(dependencyList[i].Name))
                         input2Node.Text = input2Node.Text.Insert(0, "p: ");
                     else if(K.IsModulationKrystalFilename(dependencyList[i].Name))
                         input2Node.Text = input2Node.Text.Insert(0, "y: ");
@@ -45,9 +43,7 @@ namespace Moritz.Krystals
                 {
                     KrystalChildrenNode input3Node = new KrystalChildrenNode(i, dependencyList);
                     listIndex = FindChildFollower(input3Node.Text, this.Nodes);
-                    if(K.IsShapedExpansionKrystalFilename(dependencyList[i].Name))
-                        input3Node.Text = input3Node.Text.Insert(0, "a: ");
-                    else if(K.IsPermutationKrystalFilename(dependencyList[i].Name))
+                    if(K.IsPermutationKrystalFilename(dependencyList[i].Name))
                         input3Node.Text = input3Node.Text.Insert(0, "c: ");
 
                     this.Nodes.Insert(listIndex, (TreeNode)input3Node);
@@ -56,8 +52,6 @@ namespace Moritz.Krystals
                 {
                     KrystalChildrenNode input4Node = new KrystalChildrenNode(i, dependencyList);
                     listIndex = FindChildFollower(input4Node.Text, this.Nodes);
-                    if(K.IsShapedExpansionKrystalFilename(dependencyList[i].Name))
-                        input4Node.Text = input4Node.Text.Insert(0, "c: ");
 
                     this.Nodes.Insert(listIndex, (TreeNode)input4Node);
                 }
@@ -139,11 +133,6 @@ namespace Moritz.Krystals
                 {
                     index = FindFollower(rootNode.Text, expansionRoot.Nodes);
                     expansionRoot.Nodes.Insert(index, rootNode);
-                }
-                else if(K.IsShapedExpansionKrystalFilename(rootNode.Text))
-                {
-                    index = FindFollower(rootNode.Text, shapedExpansionRoot.Nodes);
-                    shapedExpansionRoot.Nodes.Insert(index, rootNode);
                 }
                 else if(K.IsModulationKrystalFilename(rootNode.Text))
                 {

@@ -1,21 +1,21 @@
+using Moritz.Globals;
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.IO;
 using System.Xml;
-using System.Diagnostics;
-
-using Moritz.Globals;
 
 namespace Krystals4ObjectLibrary
 {
-	/// <summary>
-	/// The static class K contains application-wide constants and enum definitions,
-	/// together with generally useful functions.
-	/// </summary>
+    /// <summary>
+    /// The static class K contains application-wide constants and enum definitions,
+    /// together with generally useful functions.
+    /// </summary>
     public static class K
     {
 		static K() // cribbed from CapXML.Utilities
@@ -42,8 +42,6 @@ namespace Krystals4ObjectLibrary
 				krystal = new LineKrystal(pathname);
             else if(IsExpansionKrystalFilename(filename))
                 krystal = new ExpansionKrystal(pathname);
-            else if(IsShapedExpansionKrystalFilename(filename))
-                krystal = new ShapedExpansionKrystal(pathname);
             else if(IsModulationKrystalFilename(filename))
 				krystal = new ModulationKrystal(pathname);
             else if(IsPermutationKrystalFilename(filename))
@@ -208,10 +206,6 @@ namespace Krystals4ObjectLibrary
         {
             return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]exp\.krys$");
         }
-        public static bool IsShapedExpansionKrystalFilename(string name)
-        {
-            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]shaped\.krys$");
-        }
         public static bool IsPathKrystalFilename(string name)
         {
             return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]path\.krys$");
@@ -223,7 +217,7 @@ namespace Krystals4ObjectLibrary
         /// <returns></returns>
         public static bool IsKrystalFilename(string name)
         {
-            return Regex.IsMatch(name, @"^(([0-9]+[.][0-9_]+[.][0-9]+[.](constant|line|path|mod|perm))|([0-9]+[.][0-9_]+[.][0-9]+[.][0-9]+[.](exp|shaped)))(\.krys)$");
+            return Regex.IsMatch(name, @"^(([0-9]+[.][0-9_]+[.][0-9]+[.](constant|line|path|mod|perm))|([0-9]+[.][0-9_]+[.][0-9]+[.][0-9]+[.](exp)))(\.krys)$");
         }
         public static bool IsModulationOperatorFilename(string name)
         {
@@ -528,8 +522,7 @@ namespace Krystals4ObjectLibrary
             if(K.IsConstantKrystalFilename(moritzName))
                 result = 0;
             else if(K.IsLineKrystalFilename(moritzName) || K.IsModulationKrystalFilename(moritzName)
-            || K.IsExpansionKrystalFilename(moritzName) || K.IsShapedExpansionKrystalFilename(moritzName)
-            || K.IsModulationOperatorFilename(moritzName))
+            || K.IsExpansionKrystalFilename(moritzName) || K.IsModulationOperatorFilename(moritzName))
             {
                 int startindex = moritzName.IndexOf('-') + 1;
                 int endindex = moritzName.Length - 5;
@@ -623,7 +616,6 @@ namespace Krystals4ObjectLibrary
                 case DialogFilterIndex.constant:
                 case DialogFilterIndex.line:
                 case DialogFilterIndex.expansion:
-                case DialogFilterIndex.shapedExpansion:
                 case DialogFilterIndex.modulation:
                 case DialogFilterIndex.permutation:
                 case DialogFilterIndex.path:
@@ -807,7 +799,6 @@ namespace Krystals4ObjectLibrary
             + "constants (*.constant.krys)|*.constant.krys|"
             + "lines (*.line.krys)|*.line.krys|"
             + "expansions (*.exp.krys)|*.exp.krys|"
-            + "shaped expansions (*.shaped.krys)|*.shaped.krys|"
             + "modulations (*.mod.krys)|*.mod.krys|"
             + "permutations (*.perm.krys)|*.perm.krys|"
             + "paths (*.path.krys)|*.path.krys|"
@@ -826,13 +817,12 @@ namespace Krystals4ObjectLibrary
             line,
             exp,
             path,
-            shaped,
             mod,
             perm
         };
  
         // used to index the Krystal dialog filter (see above)
-        public enum DialogFilterIndex { allKrystals, constant, line, expansion, shapedExpansion, modulation, permutation, path, expander, modulator, svg };
+        public enum DialogFilterIndex { allKrystals, constant, line, expansion, modulation, permutation, path, expander, modulator, svg };
         public enum PointGroupShape { circle, spiral, straightLine };
         public enum DisplayColor { black, red, green, blue, orange, purple, magenta };
         #endregion public variables

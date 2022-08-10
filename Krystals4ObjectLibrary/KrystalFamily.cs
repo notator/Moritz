@@ -92,29 +92,6 @@ namespace Krystals4ObjectLibrary
             }
             #endregion add expansions to the _unknownParentsList
 
-            #region add shaped expansions to the _unknownParentsList
-            string shapedExpansions = "*.shaped.krys";
-            ShapedExpansionKrystal sk = null;
-            foreach(FileInfo f in dir.GetFiles(shapedExpansions))
-            {
-                string path = K.KrystalsFolder + @"\" +  f.Name;
-                sk = new ShapedExpansionKrystal(path);
-				Dependency d = new Dependency
-				{
-					Name = f.Name
-				};
-				if(sk != null)
-                {
-                    d.Input1 = sk.DensityInputFilename;
-                    d.Input2 = sk.PointsInputFilename;
-                    d.Input3 = sk.AxisInputFilename;
-                    d.Input4 = sk.ContourInputFilename;
-                    d.Field = sk.Expander.Name;
-                }
-                _unknownParentsList.Add(d);
-            }
-            #endregion add shaped expansions to the _unknownParentsList
-
             #region add modulations to the _unknownParentsList
             string allModulations = "*.mod.krys";
             ModulationKrystal mk = null;
@@ -273,11 +250,6 @@ namespace Krystals4ObjectLibrary
                 {
                     ExpansionKrystal xk = new ExpansionKrystal(path);
                     xk.Rebuild();
-                }
-                if(K.IsShapedExpansionKrystalFilename(d.Name))
-                {
-                    ShapedExpansionKrystal sk = new ShapedExpansionKrystal(path);
-                    sk.Rebuild();
                 }
                 if(K.IsModulationKrystalFilename(d.Name))
                 {

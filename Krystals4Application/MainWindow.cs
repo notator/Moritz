@@ -507,11 +507,11 @@ namespace Krystals4Application
                             expanderID = GetExpanderID(xk);
                             newName = NewExpandedKrystalName(xk, expanderID, K.KrystalType.exp);
                             break;
-                        case "sk":
-                            var sk = new ShapedExpansionKrystal(K.KrystalsFolder + "//" + oldName);
-                            expanderID = GetExpanderID(sk);
-                            newName = NewExpandedKrystalName(sk, expanderID, K.KrystalType.shaped);
-                            break;
+                        //case "sk":
+                        //    var sk = new ShapedExpansionKrystal(K.KrystalsFolder + "//" + oldName);
+                        //    expanderID = GetExpanderID(sk);
+                        //    newName = NewExpandedKrystalName(sk, expanderID, K.KrystalType.shaped);
+                        //    break;
                         case "mk":
                             var mk = new ModulationKrystal(K.KrystalsFolder + "//" + oldName);
                             newName = NewKrystalName(mk, K.KrystalType.mod);
@@ -614,38 +614,38 @@ namespace Krystals4Application
 
                     k.Save();
                 }
-                if(originalKrysFilename.StartsWith("sk"))
-                {
-                    ShapedExpansionKrystal k = new ShapedExpansionKrystal(krysFilePath);
+                //if(originalKrysFilename.StartsWith("sk"))
+                //{
+                //    ShapedExpansionKrystal k = new ShapedExpansionKrystal(krysFilePath);
 
-                    string oldName = k.Name;
-                    string newName = NewKrystalFilename(k.Name);
-                    k.Name = newName;
-                    SetRvalDict(oldName, newName);
-                    string oldPInput = k.PointsInputFilename;
-                    string newPInput = NewKrystalFilename(k.PointsInputFilename);
-                    k.PointsInputFilename = newPInput;
-                    SetRvalDict(oldPInput, newPInput);
-                    string oldDInput = k.DensityInputFilename;
-                    string newDInput = NewKrystalFilename(k.DensityInputFilename);
-                    k.DensityInputFilename = newDInput;
-                    SetRvalDict(oldDInput, newDInput);
-                    string oldAInput = k.AxisInputFilename;
-                    string newAInput = NewKrystalFilename(k.AxisInputFilename);
-                    k.AxisInputFilename = newAInput;
-                    SetRvalDict(oldAInput, newAInput);
-                    string oldCName = k.ContourInputFilename;
-                    string newCName = NewKrystalFilename(k.ContourInputFilename);
-                    k.ContourInputFilename = newCName;
-                    SetRvalDict(oldCName, newCName);
-                    string oldEName = k.ExpanderFilename;
-                    string newEName = expanderNamesDict[oldEName];
-                    k.ExpanderFilename = newEName;
+                //    string oldName = k.Name;
+                //    string newName = NewKrystalFilename(k.Name);
+                //    k.Name = newName;
+                //    SetRvalDict(oldName, newName);
+                //    string oldPInput = k.PointsInputFilename;
+                //    string newPInput = NewKrystalFilename(k.PointsInputFilename);
+                //    k.PointsInputFilename = newPInput;
+                //    SetRvalDict(oldPInput, newPInput);
+                //    string oldDInput = k.DensityInputFilename;
+                //    string newDInput = NewKrystalFilename(k.DensityInputFilename);
+                //    k.DensityInputFilename = newDInput;
+                //    SetRvalDict(oldDInput, newDInput);
+                //    string oldAInput = k.AxisInputFilename;
+                //    string newAInput = NewKrystalFilename(k.AxisInputFilename);
+                //    k.AxisInputFilename = newAInput;
+                //    SetRvalDict(oldAInput, newAInput);
+                //    string oldCName = k.ContourInputFilename;
+                //    string newCName = NewKrystalFilename(k.ContourInputFilename);
+                //    k.ContourInputFilename = newCName;
+                //    SetRvalDict(oldCName, newCName);
+                //    string oldEName = k.ExpanderFilename;
+                //    string newEName = expanderNamesDict[oldEName];
+                //    k.ExpanderFilename = newEName;
 
-                    File.Delete(K.KrystalsFolder + "//" + newName);
+                //    File.Delete(K.KrystalsFolder + "//" + newName);
 
-                    k.Save();
-                }
+                //    k.Save();
+                //}
             }
 
             return rval;

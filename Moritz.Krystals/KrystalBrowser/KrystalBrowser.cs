@@ -110,7 +110,6 @@ namespace Moritz.Krystals
 
 			LineKrystal lk = _krystal as LineKrystal;
 			ExpansionKrystal xk = _krystal as ExpansionKrystal;
-            ShapedExpansionKrystal sk = _krystal as ShapedExpansionKrystal;
             ModulationKrystal mk = _krystal as ModulationKrystal;
             PermutationKrystal pk = _krystal as PermutationKrystal;
 
@@ -131,12 +130,6 @@ namespace Moritz.Krystals
 				this.BasicData.Text = string.Format("Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
 					_krystal.Name, xk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
 				SetForExpansionKrystal(xk);
-			}
-			else if(sk != null)
-			{
-				this.BasicData.Text = string.Format("Shaped Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
-					_krystal.Name, sk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-				SetForShapedExpansionKrystal(sk);
 			}
 			else if(mk != null)
 			{
@@ -219,19 +212,6 @@ namespace Moritz.Krystals
                 xk.DensityInputKrystal.Level,
                 xk.PointsInputKrystal.MissingAbsoluteValues);
             expansionTreeView.DisplayStrands(xk.Strands);
-            StrandsTreeView.ExpandAll();
-        }
-
-        private void SetForShapedExpansionKrystal(ShapedExpansionKrystal sk)
-        {
-            MissingValues.Text = "Missing Values:  " + _krystal.MissingValues;
-            Shape.Text = "Shape:  " + _krystal.Shape;
-
-            StrandsTreeView.Nodes.Clear();
-            ExpansionTreeView expansionTreeView = new ExpansionTreeView(StrandsTreeView, sk.StrandNodeList(),
-                sk.DensityInputKrystal.Level,
-                sk.PointsInputKrystal.MissingAbsoluteValues);
-            expansionTreeView.DisplayStrands(sk.Strands);
             StrandsTreeView.ExpandAll();
         }
 
@@ -349,15 +329,6 @@ namespace Moritz.Krystals
             {
                 foreach(TreeNode tn in _krystalFamilyTreeView.Nodes)
                     if(tn.Text.Equals("Expansions"))
-                    {
-                        rootNode = tn;
-                        break;
-                    }
-            }
-            else if(K.IsShapedExpansionKrystalFilename(filename))
-            {
-                foreach(TreeNode tn in _krystalFamilyTreeView.Nodes)
-                    if(tn.Text.Equals("Shaped Expansions"))
                     {
                         rootNode = tn;
                         break;

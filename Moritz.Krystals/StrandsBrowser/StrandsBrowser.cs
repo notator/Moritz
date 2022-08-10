@@ -22,8 +22,8 @@ namespace Moritz.Krystals
                 SetForModulationKrystal((ModulationKrystal)krystal);
             else if(krystal is PermutationKrystal)
                 SetForPermutationKrystal((PermutationKrystal)krystal);
-            else if(krystal is ExpansionKrystal || krystal is ShapedExpansionKrystal)
-                SetForExpansionKrystal((ExpansionKrystalBase) krystal);
+            else if(krystal is ExpansionKrystal)
+                SetForExpansionKrystal((ExpansionKrystal) krystal);
 
             this.Location = location;
   		}
@@ -51,7 +51,7 @@ namespace Moritz.Krystals
             this.Height = 48;
         }
 
-        private void SetForExpansionKrystal(ExpansionKrystalBase xk)
+        private void SetForExpansionKrystal(ExpansionKrystal xk)
         {
             this.Controls.Remove(LineStrandLabel);
             ExpansionTreeView expansionTreeView = new ExpansionTreeView(StrandsTreeView, xk.StrandNodeList(),

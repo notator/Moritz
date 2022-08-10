@@ -42,27 +42,6 @@ namespace Krystals4ObjectLibrary
                 throw ex;
             }
         }
-        /// <summary>
-        /// This constructor creates strands from the complete, checked inputs of its ExpansionKrystal argument.
-        /// (No further checking is done.)
-        /// After expanding the strands normally, they are contoured.
-        /// </summary>
-        /// <param name="ek">An expansion krystal with complete, checked inputs</param>
-        public Expansion(ShapedExpansionKrystal ek)
-        {
-            try
-            {
-                Expander expander = ek.Expander;
-                expander.CalculateAbstractPointPositions(ek.DensityInputKrystal);
-                List<StrandNode> strandNodeList = ek.StrandNodeList();
-                Expand(strandNodeList, expander);
-                ContourStrands(strandNodeList, _strands);
-            }
-            catch(ApplicationException ex)
-            {
-                throw ex;
-            }
-        }
 
         private void Expand(List<StrandNode> strandNodeList, Expander expander)
         {
