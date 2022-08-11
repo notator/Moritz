@@ -159,8 +159,10 @@ namespace Krystals4ObjectLibrary
 
             #region insert Dependencies from the _unknownParentsList in the sorted _dependencyList
 
+            // The _dependency list is going to be in order of dependence. In other words:
+            // Each dependency object's _inputs_ (if it has any) will have an index
+            // less than the index of the dependency object itself.
             int[] inputIndex = new int[4];
-
             foreach(Dependency d in _unknownParentsList)
             {
                 inputIndex[0] = inputIndex[1] = inputIndex[2] = inputIndex[3] = -1;
