@@ -198,7 +198,8 @@ namespace Krystals4ObjectLibrary
 
                 if(maxIndex == -1)
                 {
-                    // none of the inputs were found in the _dependency list
+                    // None of this dependency's inputs were found in the _dependencyList
+                    // but it may be the input of a dependency that has not yet been added.
                     _dependencyList.Add(d);
                 }
                 else
