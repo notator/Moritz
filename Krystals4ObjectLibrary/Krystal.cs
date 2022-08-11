@@ -1,8 +1,6 @@
-using Moritz.Globals;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -74,13 +72,14 @@ namespace Krystals4ObjectLibrary
         public Krystal(string filepath)
         {
             string filename = Path.GetFileName(filepath);
+            Strands = new List<Strand>();
             try
             {
                 using(XmlReader r = XmlReader.Create(filepath))
                 {
-                    _name = Path.GetFileName(filepath);
-                    _minValue = uint.MaxValue;
-                    _maxValue = uint.MinValue;
+                    Name = Path.GetFileName(filepath);
+                    MinValue = uint.MaxValue;
+                    MaxValue = uint.MinValue;
                     K.ReadToXmlElementTag(r, "krystal"); // check that this is a krystal
                     // ignore the heredity info in the next element (<expansion> etc.)
                     K.ReadToXmlElementTag(r, "strands"); // check that there is a "strands" element
@@ -89,14 +88,14 @@ namespace Krystals4ObjectLibrary
                     while(r.Name == "s")
                     {
                         Strand strand = new Strand(r);
-                        _level = (_level < strand.Level) ? strand.Level : _level;
+                        Level = (Level < strand.Level) ? strand.Level : Level;
                         foreach(uint value in strand.Values)
                         {
-                            _minValue = (_minValue < value) ? _minValue : value;
-                            _maxValue = (_maxValue < value) ? value : _maxValue;
+                            MinValue = (MinValue < value) ? MinValue : value;
+                            MaxValue = (MaxValue < value) ? value : MaxValue;
                         }
-                        _numValues += (uint)strand.Values.Count;
-                        _strands.Add(strand);
+                        NumValues += (uint)strand.Values.Count;
+                        Strands.Add(strand);
                     }
                     // r.Name is the end tag "strands" here
                 }
@@ -114,19 +113,19 @@ namespace Krystals4ObjectLibrary
         /// <param name="strands"></param>
         public void Update(List<Strand> strands)
         {
-            _strands = strands;
-            _level = 0;
-            _minValue = uint.MaxValue;
-            _maxValue = uint.MinValue;
-            _numValues = 0;
+            Strands = strands;
+            Level = 0;
+            MinValue = uint.MaxValue;
+            MaxValue = uint.MinValue;
+            NumValues = 0;
             foreach(Strand strand in strands)
             {
-                _numValues += (uint)strand.Values.Count;
-                _level = (_level < strand.Level) ? strand.Level : _level;
+                NumValues += (uint)strand.Values.Count;
+                Level = (Level < strand.Level) ? strand.Level : Level;
                 foreach(uint value in strand.Values)
                 {
-                    _minValue = (_minValue < value) ? _minValue : value;
-                    _maxValue = (_maxValue < value) ? value : _maxValue;
+                    MinValue = (MinValue < value) ? MinValue : value;
+                    MaxValue = (MaxValue < value) ? value : MaxValue;
                 }
             }
         }
@@ -140,11 +139,60 @@ namespace Krystals4ObjectLibrary
         {
             string root = GetNameRoot(); // domain.shape.
             string suffix = string.Format($".{type}{K.KrystalFilenameSuffix}");
-            string uniqueNameIndex = GetUniqueNameIndex(root, suffix);
-
-            string uniqueName = String.Format($"{root}{uniqueNameIndex}{suffix}");
+            string uniqueName = GetUniqueName(root, suffix);
 
             return uniqueName;
+        }
+
+        /// <summary>
+        /// Returns a krystal name beginning with prefix, and ending with suffix.
+        /// If there is such a krystal in the krystals folder containing identical strands,
+        /// then that krystal's name is returned. Otherwise a new name (with an unused index) is returned.
+        /// ExpansionKrystal overrides this function, including  to include the ExpanderID.
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
+        protected string GetUniqueName(string prefix, string suffix)
+        {
+            int GetIndex(string name)
+            {
+                char[] dot = new char[] { '.' };
+                var components = name.Split(dot);
+                string iString = components[components.Length - 3];
+                int.TryParse(iString, out int iVal);
+                return iVal;
+            }
+
+            string searchString = String.Format($"{prefix}*{suffix}");
+            string[] similarPathnames = Directory.GetFiles(K.KrystalsFolder, searchString);
+            string rval = String.Format($"{prefix}{similarPathnames.Length + 1}{suffix}"); // default value
+
+            var pathList = similarPathnames.ToList();
+            pathList.Sort();
+            int runningIndex = 1;
+            foreach(var path in pathList)
+            {
+                var name = Path.GetFileName(path);
+                int index = GetIndex(name);
+                if(index > runningIndex)
+                {
+                    // The krystal whose name has runningIndex has been deleted
+                    // from the folder, so return the name having runningIndex.
+                    rval = String.Format($"{prefix}{runningIndex}{suffix}");
+                    break;
+                }
+
+                var existingKrystal = new DensityInputKrystal(path);
+                if(this.Equals(existingKrystal))
+                {
+                    rval = existingKrystal.Name;
+                    break;
+                }
+                runningIndex++;
+            }
+
+            return rval;
         }
 
         /// <summary>
@@ -188,27 +236,29 @@ namespace Krystals4ObjectLibrary
             return sb.ToString();
         }
 
-        protected string GetUniqueNameIndex(string prefix, string suffix)
+        /// <summary>
+        /// Compares only the strands in the two krystals
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(Object obj)
         {
-            string searchString = String.Format($"{prefix}*{suffix}");
-            string[] similarFilenames = Directory.GetFiles(K.KrystalsFolder, searchString);
-            #region check name contiguity
-            var namesList = similarFilenames.ToList();
-            namesList.Sort();
-            var indStr = namesList[0].Remove(0, prefix.Length);
-            indStr = indStr.Remove(indStr.Length - suffix.Length);
-            int.TryParse(indStr, out int prevIndex);
-            for(int i = 1; i < namesList.Count; i++)
+            var otherK = obj as Krystal;
+            if(otherK == null || this.Strands.Count != otherK.Strands.Count)
             {
-                indStr = namesList[i].Remove(0, prefix.Length);
-                indStr = indStr.Remove(indStr.Length - suffix.Length);
-                int.TryParse(indStr, out int index);
-                Debug.Assert(index == prevIndex + 1);
-                prevIndex = index;
+                return false;
             }
-            #endregion check name contiguity
 
-            return (similarFilenames.Length + 1).ToString();
+            for(int i = 0; i < Strands.Count; i++)
+            {
+                var strand = Strands[i];
+                var otherStrand = otherK.Strands[i];
+                if(strand.Level != otherStrand.Level || strand.Values.SequenceEqual(otherStrand.Values) == false)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -275,7 +325,7 @@ namespace Krystals4ObjectLibrary
         public abstract void Rebuild();
         public override string ToString()
         {
-            return this._name;
+            return this.Name;
         }
         /// <summary>
         /// This krystal can be permuted at the given level if it has less then 7 elements at that level.
@@ -360,7 +410,7 @@ namespace Krystals4ObjectLibrary
 				IndentChars = ("\t"),
 				CloseOutput = true
 			};
-			string namePath = K.KrystalsFolder + @"\" + _name;
+			string namePath = K.KrystalsFolder + @"\" + Name;
             XmlWriter w = XmlWriter.Create(namePath, settings);
             w.WriteStartDocument();
             w.WriteComment("created: " + K.Now);
@@ -374,7 +424,7 @@ namespace Krystals4ObjectLibrary
         protected void EndSaveKrystal(XmlWriter w)
         {
             w.WriteStartElement("strands");
-            foreach(Strand strand in _strands)
+            foreach(Strand strand in Strands)
             {
                 w.WriteStartElement("s");
                 w.WriteAttributeString("l", strand.Level.ToString());
@@ -387,12 +437,12 @@ namespace Krystals4ObjectLibrary
         }
         #endregion protected functions
         #region public properties
-        public string Name { get { return _name; } set { _name = value; } }
-        public uint Level { get { return _level; } set { _level = value; } }
-        public uint MinValue { get { return _minValue; } }
-        public uint MaxValue { get { return _maxValue; } }
-        public uint NumValues { get { return _numValues; } }
-        public List<Strand> Strands { get { return _strands; } }
+        public string Name { get; set; }
+        public uint Level { get; set; }
+        public uint MinValue { get; set; }
+        public uint MaxValue { get; set; }
+        public uint NumValues { get; set; }
+        public List<Strand> Strands { get; set; }
         /// <summary>
         /// A string of comma-separated values not contained in the krystal
         /// </summary>
@@ -400,13 +450,13 @@ namespace Krystals4ObjectLibrary
         {
             get
             {
-                int[] nValues = new int[this._maxValue + 1];
-                foreach(Strand strand in this._strands)
+                int[] nValues = new int[this.MaxValue + 1];
+                foreach(Strand strand in this.Strands)
                     foreach(uint value in strand.Values)
                         nValues[value]++;
 
                 StringBuilder sb = new StringBuilder();
-                for(uint i = _minValue; i <= this._maxValue; i++)
+                for(uint i = MinValue; i <= this.MaxValue; i++)
                     if(nValues[i] == 0)
                     {
                         sb.Append(", ");
@@ -430,7 +480,7 @@ namespace Krystals4ObjectLibrary
         /// <returns>The values in the krystal as a list of int lists.</returns>
         public List<List<int>> GetValues(uint level)
         {
-            if(level < 1 || level > _level + 1)
+            if(level < 1 || level > Level + 1)
                 throw new ArgumentOutOfRangeException("Error in Krystal.GetValues().");
 
             List<List<int>> returnList = new List<List<int>>();
@@ -443,9 +493,9 @@ namespace Krystals4ObjectLibrary
             }
 
             int returnListIndex = -1;
-            foreach(Strand strand in this._strands)
+            foreach(Strand strand in this.Strands)
             {
-                if(level == _level + 1)
+                if(level == Level + 1)
                 {
                     foreach(uint value in strand.Values)
                     {
@@ -470,12 +520,12 @@ namespace Krystals4ObjectLibrary
         {
             get
             {
-                int[] shapeArray = new int[this._level + 1];
-                foreach(Strand strand in this._strands)
+                int[] shapeArray = new int[this.Level + 1];
+                foreach(Strand strand in this.Strands)
                 {
-                    for(uint i = strand.Level; i <= this._level; i++)
+                    for(uint i = strand.Level; i <= this.Level; i++)
                         shapeArray[i - 1] += 1;
-                    shapeArray[this._level] += strand.Values.Count;
+                    shapeArray[this.Level] += strand.Values.Count;
                 }
                 return shapeArray;
             }
@@ -488,11 +538,11 @@ namespace Krystals4ObjectLibrary
             get
             {
                 string shapeString = "";
-                if(this._level > 0)
+                if(this.Level > 0)
                 {
                     int[] shapeArray = ShapeArray;
                     StringBuilder shapeStrB = new StringBuilder();
-                    for(int i = 0; i <= this._level; i++)
+                    for(int i = 0; i <= this.Level; i++)
                     {
                         shapeStrB.Append(" : ");
                         shapeStrB.Append(shapeArray[i].ToString());
@@ -505,14 +555,14 @@ namespace Krystals4ObjectLibrary
         }
         #endregion public properties
 
-        #region protected variables
-        protected string _name = ""; // Used by status line: set ONLY by Save() -- i.e. when writing the newly created krystal's XML
-        protected uint _level; // the maximum level of any strand in the krystal
-        protected uint _minValue; // the minimum value in the krystal
-        protected uint _maxValue; // the maximum value in the krystal
-        protected uint _numValues; // the number of values in the krystal
-        protected List<Strand> _strands = new List<Strand>();
-        #endregion protected variables
+        //#region protected variables
+        //protected string Name = ""; // Used by status line: set ONLY by Save() -- i.e. when writing the newly created krystal's XML
+        //protected uint Level; // the maximum level of any strand in the krystal
+        //protected uint MinValue; // the minimum value in the krystal
+        //protected uint MaxValue; // the maximum value in the krystal
+        //protected uint NumValues; // the number of values in the krystal
+        //protected List<Strand> Strands = new List<Strand>();
+        //#endregion protected variables
     }
 }
 

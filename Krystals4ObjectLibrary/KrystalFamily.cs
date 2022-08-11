@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Text;
 using System.IO;
+using System.Reflection;
 
 namespace Krystals4ObjectLibrary
 {
@@ -53,7 +54,8 @@ namespace Krystals4ObjectLibrary
         {
             DirectoryInfo dir = new DirectoryInfo(krystalsFolder);
             string allConstants = "*.constant.krys";
-            foreach(FileInfo f in dir.GetFiles(allConstants))
+            var fileInfos = dir.GetFiles(allConstants);
+            foreach(FileInfo f in fileInfos)
             {
 				Dependency d = new Dependency
 				{
@@ -62,7 +64,8 @@ namespace Krystals4ObjectLibrary
 				_dependencyList.Add(d);
             }
             string allLines = "*.line.krys";
-            foreach(FileInfo f in dir.GetFiles(allLines))
+            fileInfos = dir.GetFiles(allLines);
+            foreach(FileInfo f in fileInfos)
             {
 				Dependency d = new Dependency
 				{
@@ -73,11 +76,11 @@ namespace Krystals4ObjectLibrary
 
             #region add expansions to the _unknownParentsList
             string expansions = "*.exp.krys";
-            ExpansionKrystal xk = null;
-            foreach(FileInfo f in dir.GetFiles(expansions))
+            fileInfos = dir.GetFiles(expansions);
+            foreach(FileInfo f in fileInfos)
             {
                 string path = K.KrystalsFolder + @"\" +  f.Name;
-                xk = new ExpansionKrystal(path);
+                var xk = new ExpansionKrystal(path, true);
 				Dependency d = new Dependency
 				{
 					Name = f.Name
@@ -86,7 +89,7 @@ namespace Krystals4ObjectLibrary
                 {
                     d.Input1 = xk.DensityInputFilename;
                     d.Input2 = xk.PointsInputFilename;
-                    d.Field = xk.Expander.Name;
+                    d.Field = xk.ExpanderFilename;
                 }
                 _unknownParentsList.Add(d);
             }
@@ -94,11 +97,11 @@ namespace Krystals4ObjectLibrary
 
             #region add modulations to the _unknownParentsList
             string allModulations = "*.mod.krys";
-            ModulationKrystal mk = null;
-            foreach(FileInfo f in dir.GetFiles(allModulations))
+            fileInfos = dir.GetFiles(allModulations);
+            foreach(FileInfo f in fileInfos)
             {
                 string path = K.KrystalsFolder + @"\" + f.Name;
-                mk = new ModulationKrystal(path);
+                var mk = new ModulationKrystal(path, true);
 				Dependency d = new Dependency
 				{
 					Name = f.Name
@@ -107,23 +110,24 @@ namespace Krystals4ObjectLibrary
                 {
                     d.Input1 = mk.XInputFilename;
                     d.Input2 = mk.YInputFilename;
-                    d.Field = mk.Modulator.Name;
+                    d.Field = mk.ModulatorFilename;
                 }
                 _unknownParentsList.Add(d);
             }
             #endregion add modulations to the _unknownParentsList
+
             #region add permutation krystals to the _unknownParentsList
             string allPermutations = "*.perm.krys";
-            PermutationKrystal pk = null;
-            foreach(FileInfo f in dir.GetFiles(allPermutations))
+            fileInfos = dir.GetFiles(allPermutations);
+            foreach(FileInfo f in fileInfos)
             {
                 string path = K.KrystalsFolder + @"\" + f.Name;
-                pk = new PermutationKrystal(path);
-				Dependency d = new Dependency
-				{
-					Name = f.Name
-				};
-				if(pk != null)
+                var pk = new PermutationKrystal(path, true);
+                Dependency d = new Dependency
+                {
+                    Name = f.Name
+                };
+                if(pk != null)
                 {
                     d.Input1 = pk.SourceInputFilename;
                     d.Input2 = pk.AxisInputFilename;
@@ -131,95 +135,74 @@ namespace Krystals4ObjectLibrary
                 }
                 _unknownParentsList.Add(d);
             }
-            #endregion add permutation krystals to the _unknownParentsList
+            #endregion add path krystals to the _unknownParentsList
+
+            #region add path krystals to the _unknownParentsList
+            string allPaths = "*.path.krys";
+            fileInfos = dir.GetFiles(allPaths);
+            foreach(FileInfo f in fileInfos)
+            {
+                string path = K.KrystalsFolder + @"\" + f.Name;
+                var pk = new PathKrystal(path, true);
+                Dependency d = new Dependency
+                {
+                    Name = f.Name
+                };
+                if(pk != null)
+                {
+                    d.Input1 = pk.DensityInputKrystalName;
+                    d.Input2 = pk.SVGInputFilename;
+                }
+                _unknownParentsList.Add(d);
+            }
+            #endregion add path krystals to the _unknownParentsList
+
             #region insert Dependencies from the _unknownParentsList in the sorted _dependencyList
-            bool found = true;
+
             int[] inputIndex = new int[4];
-            int minIndex = -1;
-            int maxIndex = -1;
-            while(_unknownParentsList.Count > 0 && found)
+
+            foreach(Dependency d in _unknownParentsList)
             {
                 inputIndex[0] = inputIndex[1] = inputIndex[2] = inputIndex[3] = -1;
-                found = false;
-                foreach(Dependency d in _unknownParentsList)
+                if(string.IsNullOrEmpty(d.Input1) == false)
                 {
-                    if(string.IsNullOrEmpty(d.Input1) == false)
+                    inputIndex[0] = _dependencyList.FindIndex(x => d.Input1.Equals(x.Name));
+                }
+
+                if(string.IsNullOrEmpty(d.Input2) == false)
+                {
+                    inputIndex[1] = _dependencyList.FindIndex(x => d.Input2.Equals(x.Name));
+                }
+
+                if(string.IsNullOrEmpty(d.Input3) == false)
+                {
+                    inputIndex[2] = _dependencyList.FindIndex(x => d.Input3.Equals(x.Name));
+                }
+
+                if(string.IsNullOrEmpty(d.Input4) == false)
+                {
+                    inputIndex[3] = _dependencyList.FindIndex(x => d.Input4.Equals(x.Name));
+                }
+
+                var maxIndex = -1;
+                for(int j = 0; j < inputIndex.Length; j++)
+                {
+                    var index = inputIndex[j];
+                    if(index != -1)
                     {
-                        for(int index = 0 ; index < _dependencyList.Count ; index++)
-                        {
-                            if(d.Input1.Equals(_dependencyList[index].Name)) // InputIndex[inputNameIndex] is currently -1
-                            {
-                                inputIndex[0] = index; // save the index of the input file in the dependency list
-                                break;
-                            }
-                        }
-
-                        if(string.IsNullOrEmpty(d.Input2) == false)
-                        {
-                            for(int index = 0 ; index < _dependencyList.Count ; index++)
-                            {
-                                if(d.Input2.Equals(_dependencyList[index].Name)) // InputIndex[inputNameIndex] is currently -1
-                                {
-                                    inputIndex[1] = index; // save the index of the input file in the dependency list
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(string.IsNullOrEmpty(d.Input3) == false)
-                        {
-                            for(int index = 0 ; index < _dependencyList.Count ; index++)
-                            {
-                                if(d.Input3.Equals(_dependencyList[index].Name)) // InputIndex[inputNameIndex] is currently -1
-                                {
-                                    inputIndex[2] = index; // save the index of the input file in the dependency list
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(string.IsNullOrEmpty(d.Input4) == false)
-                        {
-                            for(int index = 0 ; index < _dependencyList.Count ; index++)
-                            {
-                                if(d.Input4.Equals(_dependencyList[index].Name)) // InputIndex[inputNameIndex] is currently -1
-                                {
-                                    inputIndex[3] = index; // save the index of the input file in the dependency list
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(inputIndex[0] < inputIndex[1])
-                        {
-                            minIndex = inputIndex[0];
-                            maxIndex = inputIndex[1];
-                        }
-                        else
-                        {
-                            minIndex = inputIndex[1];
-                            maxIndex = inputIndex[0];
-                        }
-                        if(string.IsNullOrEmpty(d.Input3) == false || string.IsNullOrEmpty(d.Input4) == false)
-                        {
-                            minIndex = minIndex < inputIndex[2] ? minIndex : inputIndex[2];
-                            minIndex = minIndex < inputIndex[3] ? minIndex : inputIndex[3];
-                            maxIndex = maxIndex > inputIndex[2] ? maxIndex : inputIndex[2];
-                            maxIndex = maxIndex > inputIndex[3] ? maxIndex : inputIndex[3];
-                        }
-
-                        if(minIndex >= 0) // all the inputs are currently in the _dependencyList
-                        {
-                            _dependencyList.Insert(maxIndex + 1, d);
-                        }
+                        maxIndex = (maxIndex > index) ? maxIndex : index;
                     }
                 }
-                int removed = 0;
-                foreach(Dependency d in _dependencyList)
-                    if(_unknownParentsList.Remove(d))
-                        removed++;
-                if(removed > 0)
-                    found = true;
+
+                if(maxIndex == -1)
+                {
+                    // none of the inputs were found in the _dependency list
+                    _dependencyList.Add(d);
+                }
+                else
+                {
+                    _dependencyList.Insert(maxIndex + 1, d);
+                }
             }
             #endregion move Dependencies from the _unknownParentsList to the sorted _dependencyList
         }
@@ -248,23 +231,19 @@ namespace Krystals4ObjectLibrary
                 string path = K.KrystalsFolder + @"\" +  d.Name;
                 if(K.IsExpansionKrystalFilename(d.Name))
                 {
-                    ExpansionKrystal xk = new ExpansionKrystal(path);
-                    xk.Rebuild();
+                    ExpansionKrystal xk = new ExpansionKrystal(path, true);
                 }
                 if(K.IsModulationKrystalFilename(d.Name))
                 {
-                    ModulationKrystal mk = new ModulationKrystal(path);
-                    mk.Rebuild();
+                    ModulationKrystal mk = new ModulationKrystal(path, true);
                 }
                 if(K.IsPermutationKrystalFilename(d.Name))
                 {
-                    PermutationKrystal pk = new PermutationKrystal(path);
-                    pk.Rebuild();
+                    PermutationKrystal pk = new PermutationKrystal(path, true);
                 }
                 if(K.IsPathKrystalFilename(d.Name))
                 {
-                    PathKrystal pk = new PathKrystal(path);
-                    pk.Rebuild();
+                    PathKrystal pk = new PathKrystal(path, true);
                 }
             }
         }

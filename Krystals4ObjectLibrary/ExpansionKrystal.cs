@@ -13,12 +13,13 @@ namespace Krystals4ObjectLibrary
     {
         #region constructors
         /// <summary>
-        /// Constructor for loading a complete expansion krystal from a file.
+        /// Constructor for loading an expansion krystal from a file.
+        /// By default, this constructor creates the KyIf onlyLoadHeredityInfo is set to true, 
         /// This constructor reads the heredity info, and constructs the corresponding objects.
         /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
-        public ExpansionKrystal(string filepath)
+        public ExpansionKrystal(string filepath, bool onlyLoadHeredityInfo = false)
             : base(filepath)
         {
             using(XmlReader r = XmlReader.Create(filepath))
@@ -41,13 +42,17 @@ namespace Krystals4ObjectLibrary
                     }
                 }
             }
-            string densityInputFilepath = K.KrystalsFolder + @"\" + DensityInputFilename;
-            string pointsInputFilepath = K.KrystalsFolder + @"\" + PointsInputFilename;
-            string expanderFilepath = K.ExpansionOperatorsFolder + @"\" + ExpanderFilename;
 
-            DensityInputKrystal = new DensityInputKrystal(densityInputFilepath);
-            PointsInputKrystal = new PointsInputKrystal(pointsInputFilepath);
-            Expander = new Expander(expanderFilepath, DensityInputKrystal);
+            if(onlyLoadHeredityInfo == false)
+            {
+                string densityInputFilepath = K.KrystalsFolder + @"\" + DensityInputFilename;
+                string pointsInputFilepath = K.KrystalsFolder + @"\" + PointsInputFilename;
+                string expanderFilepath = K.ExpansionOperatorsFolder + @"\" + ExpanderFilename;
+
+                DensityInputKrystal = new DensityInputKrystal(densityInputFilepath);
+                PointsInputKrystal = new PointsInputKrystal(pointsInputFilepath);
+                Expander = new Expander(expanderFilepath, DensityInputKrystal);
+            }
         }
         /// <summary>
         /// This constructor generates the strands and a unique name for the krystal.
@@ -83,19 +88,19 @@ namespace Krystals4ObjectLibrary
 
             if(DensityInputKrystal != null && PointsInputKrystal != null)
             {
-                this._level = DensityInputKrystal.Level > PointsInputKrystal.Level ? DensityInputKrystal.Level : PointsInputKrystal.Level;
-                this._level++;
+                this.Level = DensityInputKrystal.Level > PointsInputKrystal.Level ? DensityInputKrystal.Level : PointsInputKrystal.Level;
+                this.Level++;
             }
 
             if(DensityInputKrystal != null && PointsInputKrystal != null)
             {
-                this._level = (DensityInputKrystal.Level > PointsInputKrystal.Level) ?
+                this.Level = (DensityInputKrystal.Level > PointsInputKrystal.Level) ?
                     DensityInputKrystal.Level : PointsInputKrystal.Level;
-                this._level++;
+                this.Level++;
             }
             Expand();
 
-            _name = GetUniqueName(K.KrystalType.exp); 
+            Name = GetUniqueName(K.KrystalType.exp); 
         }
 
         #endregion
@@ -109,11 +114,9 @@ namespace Krystals4ObjectLibrary
             var components = ExpanderFilename.Split(dot);
             string expanderIndex = components[2];
 
-            root += expanderIndex;
+            root += expanderIndex;  // domain.shape.expanderIndex
             string suffix = string.Format($".{kType}{K.KrystalFilenameSuffix}");
-            string uniqueNameIndex = GetUniqueNameIndex(root, suffix);
-
-            string uniqueName = String.Format($"{root}{uniqueNameIndex}{suffix}");
+            string uniqueName = GetUniqueName(root, suffix);
 
             return uniqueName;
         }
@@ -137,11 +140,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            var pathname = K.KrystalsFolder + @"\" + _name;
+            var pathname = K.KrystalsFolder + @"\" + Name;
             DialogResult answer = DialogResult.Yes;
             if(File.Exists(pathname))
             {
-                string msg = $"Expansion krystal {_name} already exists. Save it again with a new date?";
+                string msg = $"Expansion krystal {Name} already exists.\nSave it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 
@@ -156,6 +159,12 @@ namespace Krystals4ObjectLibrary
                 w.WriteEndElement(); // expansion
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+
+                MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         public void Expand()
@@ -219,11 +228,7 @@ namespace Krystals4ObjectLibrary
 
         public string DensityInputFilename { get; set; }
         public string PointsInputFilename { get; set; }
-        public string ExpanderFilename
-        {
-            get { return Expander.Name; }
-            set { Expander.Name = value; }
-        }
+        public string ExpanderFilename { get; set; }
     }
  }
 

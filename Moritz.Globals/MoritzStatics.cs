@@ -372,48 +372,71 @@ namespace Moritz.Globals
 			}
 			return OK;
 		}
-		/// <summary>
-		/// Converts a string containing integers separated by whitespace and the character in arg2
-		/// to the corresponding list of integers.
-		/// Throws an exception if the string contains anything other than 
-		/// positive or negative integers, the separator or white space. 
-		/// </summary>
-		public static List<int> StringToIntList(string s, char separator)
-		{
-			List<int> rval = new List<int>();
-			char[] delimiter = { separator };
-			string[] integers = s.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
-			try
-			{
-				foreach(string integer in integers)
-				{
-					string i = integer.Trim();
-					if(!string.IsNullOrEmpty(i))
-					{
-						rval.Add(int.Parse(i));
-					}
-				}
-			}
-			catch
-			{
-				throw new ApplicationException("Error in Moritz.Globals.StringToIntList()");
-			}
-			return rval;
-		}
+        /// <summary>
+        /// Converts a string containing integers separated by whitespace and the character in arg2
+        /// to the corresponding list of integers.
+        /// Throws an exception if the string contains anything other than 
+        /// positive or negative integers, the separator or white space. 
+        /// </summary>
+        public static List<int> StringToIntList(string s, char separator)
+        {
+            List<int> rval = new List<int>();
+            char[] delimiter = { separator };
+            string[] integers = s.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+            try
+            {
+                foreach(string integer in integers)
+                {
+                    string i = integer.Trim();
+                    if(!string.IsNullOrEmpty(i))
+                    {
+                        rval.Add(int.Parse(i));
+                    }
+                }
+            }
+            catch
+            {
+                throw new ApplicationException("Error in Moritz.Globals.StringToIntList()");
+            }
+            return rval;
+        }
 
-		#endregion
+        public static List<uint> StringToUIntList(string s, char separator)
+        {
+            List<uint> rval = new List<uint>();
+            char[] delimiter = { separator };
+            string[] integers = s.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+            try
+            {
+                foreach(string integer in integers)
+                {
+                    string i = integer.Trim();
+                    if(!string.IsNullOrEmpty(i))
+                    {
+                        rval.Add(uint.Parse(i));
+                    }
+                }
+            }
+            catch
+            {
+                throw new ApplicationException("Error in Moritz.Globals.StringToUIntList()");
+            }
+            return rval;
+        }
 
-		#region float lists
-		/// <summary>
-		/// If the textBox is disabled, this function does nothing.
-		/// SetDialogState sets the text box to an error state (usually by setting its background colour to pink) if:
-		///     textBox.Text is empty, or
-		///     textBox.Text contains anything other than numbers, commas and whitespace or
-		///     count != uint.MaxValue && there are not count values or
-		///     the values are outside the given range.
-		/// Float values use the '.' character as decimal separator, and are separated by ','s.
-		/// </summary>
-		public static void LeaveFloatRangeTextBox(TextBox textBox, bool canBeEmpty, uint count, float minVal, float maxVal,
+        #endregion
+
+        #region float lists
+        /// <summary>
+        /// If the textBox is disabled, this function does nothing.
+        /// SetDialogState sets the text box to an error state (usually by setting its background colour to pink) if:
+        ///     textBox.Text is empty, or
+        ///     textBox.Text contains anything other than numbers, commas and whitespace or
+        ///     count != uint.MaxValue && there are not count values or
+        ///     the values are outside the given range.
+        /// Float values use the '.' character as decimal separator, and are separated by ','s.
+        /// </summary>
+        public static void LeaveFloatRangeTextBox(TextBox textBox, bool canBeEmpty, uint count, float minVal, float maxVal,
 															SetDialogStateDelegate SetDialogState)
 				{
 					if(textBox.Enabled)

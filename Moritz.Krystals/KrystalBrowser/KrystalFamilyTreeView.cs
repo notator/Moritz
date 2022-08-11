@@ -104,15 +104,15 @@ namespace Moritz.Krystals
 			TreeNode constantRoot = new TreeNode("Constants");
 			TreeNode lineRoot = new TreeNode("Lines");
             TreeNode expansionRoot = new TreeNode("Expansions");
-            TreeNode shapedExpansionRoot = new TreeNode("Shaped Expansions");
             TreeNode modulationRoot = new TreeNode("Modulations");
             TreeNode permutationRoot = new TreeNode("Permutations");
+            TreeNode pathRoot = new TreeNode("Path");
             this.Nodes.Add(constantRoot);
 			this.Nodes.Add(lineRoot);
             this.Nodes.Add(expansionRoot);
-            this.Nodes.Add(shapedExpansionRoot);
             this.Nodes.Add(modulationRoot);
             this.Nodes.Add(permutationRoot);
+            this.Nodes.Add(pathRoot);
 
             int index = 0;
 			for(int i = 0 ; i < dependencyList.Count ; i++)
@@ -143,6 +143,11 @@ namespace Moritz.Krystals
                 {
                     index = FindFollower(rootNode.Text, permutationRoot.Nodes);
                     permutationRoot.Nodes.Insert(index, rootNode);
+                }
+                else if(K.IsPathKrystalFilename(rootNode.Text))
+                {
+                    index = FindFollower(rootNode.Text, pathRoot.Nodes);
+                    pathRoot.Nodes.Insert(index, rootNode);
                 }
             }
 			this.EndUpdate();

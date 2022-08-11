@@ -18,7 +18,7 @@ namespace Krystals4ObjectLibrary
         /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
-        public PermutationKrystal(string filepath)
+        public PermutationKrystal(string filepath, bool onlyLoadHeredityInfo = false)
             : base(filepath)
         {
             using(XmlReader r = XmlReader.Create(filepath))
@@ -47,15 +47,19 @@ namespace Krystals4ObjectLibrary
                     }
                 }
             }
-            string sourceInputFilepath = K.KrystalsFolder + @"\" + SourceInputFilename;
-            string axisInputFilepath = K.KrystalsFolder + @"\" + AxisInputFilename;
-            string contourInputFilepath = K.KrystalsFolder + @"\" + ContourInputFilename;
 
-            _sourceInputKrystal = new PermutationSourceInputKrystal(sourceInputFilepath);
-            _axisInputKrystal = new AxisInputKrystal(axisInputFilepath);
-            _contourInputKrystal = new ContourInputKrystal(contourInputFilepath);
+            if(onlyLoadHeredityInfo == false)
+            {
+                string sourceInputFilepath = K.KrystalsFolder + @"\" + SourceInputFilename;
+                string axisInputFilepath = K.KrystalsFolder + @"\" + AxisInputFilename;
+                string contourInputFilepath = K.KrystalsFolder + @"\" + ContourInputFilename;
 
-            _permutationNodeList = GetPermutationNodeList();
+                _sourceInputKrystal = new PermutationSourceInputKrystal(sourceInputFilepath);
+                _axisInputKrystal = new AxisInputKrystal(axisInputFilepath);
+                _contourInputKrystal = new ContourInputKrystal(contourInputFilepath);
+
+                _permutationNodeList = GetPermutationNodeList();
+            }
         }
         /// <summary>
         /// Constructor used when creating a new permuted krystal.
@@ -88,7 +92,7 @@ namespace Krystals4ObjectLibrary
 
             Permute();
 
-            _name = GetUniqueName(K.KrystalType.perm);
+            Name = GetUniqueName(K.KrystalType.perm);
         }
 
         #endregion
@@ -340,11 +344,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            var pathname = K.KrystalsFolder + @"\" + _name;
+            var pathname = K.KrystalsFolder + @"\" + Name;
             DialogResult answer = DialogResult.Yes;
             if(File.Exists(pathname))
             {
-                string msg = $"PermutationKrystal {_name} already exists. Save it again with a new date?";
+                string msg = $"PermutationKrystal {Name} already exists.\nSave it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 
@@ -364,6 +368,11 @@ namespace Krystals4ObjectLibrary
                 w.WriteEndElement(); // permutation
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+                MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

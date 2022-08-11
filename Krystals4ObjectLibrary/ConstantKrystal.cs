@@ -26,7 +26,7 @@ namespace Krystals4ObjectLibrary
                 K.ReadToXmlElementTag(r, "constant"); // check that this is a constant krystal (the other checks have been done in base())
             }
 
-            _name = String.Format($"{this.MaxValue}.0.1.{K.KrystalType.constant}{K.KrystalFilenameSuffix}");
+            Name = String.Format($"{this.MaxValue}.0.1.{K.KrystalType.constant}{K.KrystalFilenameSuffix}");
         }
         /// <summary>
         /// Constructor used when creating new constants.
@@ -37,16 +37,16 @@ namespace Krystals4ObjectLibrary
         public ConstantKrystal(uint value)
             : base()
         {
-            _name = String.Format($"{value}.0.1.{K.KrystalType.constant}{K.KrystalFilenameSuffix}");
-            _level = 0;
-            _minValue = _maxValue = value;
-            _numValues = 1;
+            Name = String.Format($"{value}.0.1.{K.KrystalType.constant}{K.KrystalFilenameSuffix}");
+            Level = 0;
+            MinValue = MaxValue = value;
+            NumValues = 1;
 			List<uint> valueList = new List<uint>
 			{
 				value
 			};
 			Strand strand = new Strand(0, valueList);
-            _strands.Add(strand);
+            Strands = new List<Strand>() { strand };
         }
         #region overridden functions
         /// <summary>
@@ -57,12 +57,12 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            var pathname = K.KrystalsFolder + @"\" + _name;
+            var pathname = K.KrystalsFolder + @"\" + Name;
 
             DialogResult answer = DialogResult.Yes;
             if(File.Exists(pathname))
             {
-                string msg = $"Constant krystal {_name} already exists. Save it again with a new date?";
+                string msg = $"Constant krystal {Name} already exists.\nSave it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 
@@ -74,6 +74,12 @@ namespace Krystals4ObjectLibrary
                 w.WriteEndElement(); // constant
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+
+                MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         public override void Rebuild()

@@ -35,8 +35,8 @@ namespace Krystals4ObjectLibrary
             get
             {
                 LeveledValue leveledValue;
-                int valueLevel = (int)this._level + 1;
-                foreach(Strand strand in _strands)
+                int valueLevel = (int)this.Level + 1;
+                foreach(Strand strand in Strands)
                 {
                     leveledValue.level = (int)((strand.Level == 0) ? 1 : strand.Level);
                     leveledValue.value = (int)strand.Values[0];
@@ -83,16 +83,16 @@ namespace Krystals4ObjectLibrary
             uint masterLevel = 1;
             int strandIndex = 0;
             int valueIndex = 0;
-            while(strandIndex < _strands.Count)
+            while(strandIndex < Strands.Count)
             {
-                uint valueLevel = _strands[strandIndex].Level;
+                uint valueLevel = Strands[strandIndex].Level;
                 valueIndex = 0;
 
-                while(valueIndex < _strands[strandIndex].Values.Count
+                while(valueIndex < Strands[strandIndex].Values.Count
                     && mStrandIndex < masterKrystal.Strands.Count
                     && mValueIndex < masterKrystal.Strands[mStrandIndex].Values.Count)
                 {
-                    alignedValues.Add((int)_strands[strandIndex].Values[valueIndex]);
+                    alignedValues.Add((int)Strands[strandIndex].Values[valueIndex]);
 
                     mValueIndex++;
                     if(mValueIndex == masterKrystal.Strands[mStrandIndex].Values.Count)
@@ -104,7 +104,7 @@ namespace Krystals4ObjectLibrary
                     }
                     else masterLevel = masterKrystal.Level + 1;
 
-                    valueLevel = this._level + 1;
+                    valueLevel = this.Level + 1;
 
                     if(valueLevel == masterLevel || (mValueIndex == 0 && valueLevel > masterLevel))
                         valueIndex++;
@@ -126,14 +126,14 @@ namespace Krystals4ObjectLibrary
         private void GetAbsoluteValues()
         {
             _absoluteValues = new List<int>();
-            if(_maxValue == _minValue)
-                _absoluteValues.Add((int)_minValue);
+            if(MaxValue == MinValue)
+                _absoluteValues.Add((int)MinValue);
             else
             {
-                for(int i = (int)_minValue; i <= (int)_maxValue; i++)
+                for(int i = (int)MinValue; i <= (int)MaxValue; i++)
                 {
                     bool found = false;
-                    foreach(Strand s in _strands)
+                    foreach(Strand s in Strands)
                     {
                         foreach(uint value in s.Values)
                         {
@@ -183,6 +183,7 @@ namespace Krystals4ObjectLibrary
         }
         #region properties
         public float[] RelativePlanetPointPositions { get { return _relativePlanetPointPositions; } }
+
         #endregion properties
         #region private functions
         /// <summary>
@@ -194,7 +195,7 @@ namespace Krystals4ObjectLibrary
         private void CalculateRelativePlanetPointPositions()
         {
             int nValues = 0;
-            foreach(Strand strand in this._strands)
+            foreach(Strand strand in this.Strands)
                 nValues += strand.Values.Count;
             _relativePlanetPointPositions = new float[nValues];
             float[] pos = _relativePlanetPointPositions; // just an alias
@@ -216,9 +217,9 @@ namespace Krystals4ObjectLibrary
                 pos[nValues - 1] = width; // does not change
                 uint[] levels = new uint[nValues];
                 #region set levels array
-                uint maxValueLevel = this._level + 1;
+                uint maxValueLevel = this.Level + 1;
                 int index = 0;
-                foreach(Strand strand in this._strands)
+                foreach(Strand strand in this.Strands)
                 {
                     levels[index] = strand.Level;
                     index++;

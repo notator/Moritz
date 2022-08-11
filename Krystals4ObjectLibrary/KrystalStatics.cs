@@ -194,6 +194,10 @@ namespace Krystals4ObjectLibrary
         {
             return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]line\.krys$");
         }
+        public static bool IsExpansionKrystalFilename(string name)
+        {
+            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.][0-9]+[.]exp\.krys$");
+        }
         public static bool IsModulationKrystalFilename(string name)
         {
             return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]mod\.krys$");
@@ -201,10 +205,6 @@ namespace Krystals4ObjectLibrary
         public static bool IsPermutationKrystalFilename(string name)
         {
             return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]perm\.krys$");
-        }
-        public static bool IsExpansionKrystalFilename(string name)
-        {
-            return Regex.IsMatch(name, @"^[0-9]+[.][0-9_]+[.][0-9]+[.]exp\.krys$");
         }
         public static bool IsPathKrystalFilename(string name)
         {

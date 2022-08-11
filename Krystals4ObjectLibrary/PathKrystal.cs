@@ -27,7 +27,7 @@ namespace Krystals4ObjectLibrary
         /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
-        public PathKrystal(string filepath)
+        public PathKrystal(string filepath, bool onlyLoadHeredityInfo = false)
             : base(filepath)
         {
             using(XmlReader r = XmlReader.Create(filepath))
@@ -48,13 +48,16 @@ namespace Krystals4ObjectLibrary
                 }
             }
 
-            string svgInputFilepath = K.KrystalsSVGFolder + @"\" + SVGInputFilename;
-            string densityInputFilepath = K.KrystalsFolder + @"\" + DensityInputKrystalName;
+            if(onlyLoadHeredityInfo == false)
+            {
+                string svgInputFilepath = K.KrystalsSVGFolder + @"\" + SVGInputFilename;
+                string densityInputFilepath = K.KrystalsFolder + @"\" + DensityInputKrystalName;
 
-            DensityInputKrystal = new DensityInputKrystal(densityInputFilepath);
-            SvgDoc = new XmlDocument();
-            SvgDoc.PreserveWhitespace = true;
-            SvgDoc.Load(svgInputFilepath);
+                DensityInputKrystal = new DensityInputKrystal(densityInputFilepath);
+                SvgDoc = new XmlDocument();
+                SvgDoc.PreserveWhitespace = true;
+                SvgDoc.Load(svgInputFilepath);
+            }
         }
         /// <summary>
         /// constructor for creating a path krystal from an (SVG) XmlDocument and a krystal
@@ -90,11 +93,11 @@ namespace Krystals4ObjectLibrary
 
             List<List<uint>> expansionDistances = GetExpansionDistances(_field.Foci, _trajectory.StrandsInput);
 
-            _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
+            Strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
 
-            _level = (uint) _trajectory.Level;
+            Level = (uint) _trajectory.Level;
 
-            _name = GetUniqueName(K.KrystalType.path);
+            Name = GetUniqueName(K.KrystalType.path);
         }
 
         /// <summary>
@@ -127,9 +130,9 @@ namespace Krystals4ObjectLibrary
         {
             Debug.Assert(strandsInput.Count == expansionDistances.Count);
 
-            _numValues = 0;
-            _maxValue = uint.MinValue;
-            _minValue = uint.MaxValue;
+            NumValues = 0;
+            MaxValue = uint.MinValue;
+            MinValue = uint.MaxValue;
 
             List<TrammelMark> trammel = new List<TrammelMark>();
 
@@ -156,12 +159,12 @@ namespace Krystals4ObjectLibrary
 
                 Strand strand = Expansion.ExpandStrand(level, density, trammel);
 
-                _numValues += (uint) density;
+                NumValues += (uint) density;
 
                 foreach(uint value in strand.Values)
                 {
-                    _maxValue = (_maxValue > value) ? _maxValue : value;
-                    _minValue = (_minValue < value) ? _minValue : value;
+                    MaxValue = (MaxValue > value) ? MaxValue : value;
+                    MinValue = (MinValue < value) ? MinValue : value;
                 } 
 
                 rval.Add(strand);
@@ -179,11 +182,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            var pathname = K.KrystalsFolder + @"\" + _name;
+            var pathname = K.KrystalsFolder + @"\" + Name;
             DialogResult answer = DialogResult.Yes;
             if(File.Exists(pathname))
             {
-                string msg = $"PathKrystal {_name} already exists. Save it again with a new date?";
+                string msg = $"PathKrystal {Name} already exists.\nSave it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 
@@ -197,6 +200,11 @@ namespace Krystals4ObjectLibrary
                 w.WriteEndElement(); // path
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+                MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         /// <summary>
@@ -208,7 +216,7 @@ namespace Krystals4ObjectLibrary
         {
             List<List<uint>> expansionDistances = GetExpansionDistances(_field.Foci, _trajectory.StrandsInput);
 
-            _strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
+            Strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
 
             this.Save();
         }

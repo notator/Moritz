@@ -67,8 +67,8 @@ namespace Krystals4Application
                 DialogResult result = dlg.ShowDialog();
                 if(result == DialogResult.OK)
                 {
-                    string lineValue = dlg.LineKrystalValue;
-                    if(lineValue.Length > 0)
+                    List<uint> lineValue = M.StringToUIntList(dlg.LineKrystalValue, ' ');
+                    if(lineValue.Count > 0)
                     {
                         LineKrystal lk = new LineKrystal(lineValue);
                         lk.Save();
@@ -96,31 +96,6 @@ namespace Krystals4Application
             catch (ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-
-        private void NewPathKrystalMenuItem_Click(object sender, EventArgs e)
-        {
-            string svgFilepath = "";
-            string densityInputKrystalFilePath = "";
-
-            using(NewPathExpansionDialog dlg = new NewPathExpansionDialog())
-            {
-                DialogResult result = dlg.ShowDialog();
-                if(result == DialogResult.OK)
-                {
-                    svgFilepath = dlg.TrajectorySVGFilepath;
-                    densityInputKrystalFilePath = dlg.DensityInputKrystalFilepath;
-                }
-            }
-
-            if(!String.IsNullOrEmpty(svgFilepath) && !String.IsNullOrEmpty(densityInputKrystalFilePath))
-            {
-                var pathKrystal = new PathKrystal(svgFilepath, densityInputKrystalFilePath);
-                pathKrystal.Save();
-
-                string msg = "Saved Path Krystal:\n\n" + pathKrystal.Name; 
-                MessageBox.Show(msg, "Saved Path Krystal", MessageBoxButtons.OK);
             }
         }
 
@@ -265,6 +240,32 @@ namespace Krystals4Application
             catch (ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
+
+        private void NewPathKrystalMenuItem_Click(object sender, EventArgs e)
+        {
+            string svgFilepath = "";
+            string densityInputKrystalFilePath = "";
+
+            using(NewPathExpansionDialog dlg = new NewPathExpansionDialog())
+            {
+                DialogResult result = dlg.ShowDialog();
+                if(result == DialogResult.OK)
+                {
+                    svgFilepath = dlg.TrajectorySVGFilepath;
+                    densityInputKrystalFilePath = dlg.DensityInputKrystalFilepath;
+                }
+            }
+
+            if(!String.IsNullOrEmpty(svgFilepath) && !String.IsNullOrEmpty(densityInputKrystalFilePath))
+            {
+                var pathKrystal = new PathKrystal(svgFilepath, densityInputKrystalFilePath);
+                pathKrystal.Save();
+
+                string msg = "Saved Path Krystal:\n\n" + pathKrystal.Name;
+                MessageBox.Show(msg, "Saved Path Krystal", MessageBoxButtons.OK);
             }
         }
 

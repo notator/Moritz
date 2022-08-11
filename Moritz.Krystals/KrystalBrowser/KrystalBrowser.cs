@@ -40,10 +40,10 @@ namespace Moritz.Krystals
 
         private void InitializeKrystalBrowser()
         {
-            this.Width = 650;
+            this.Width = 975;
             this.Height = Screen.PrimaryScreen.WorkingArea.Height;
             this.Location = new Point(0, 0);
-            this.splitContainer1.SplitterDistance = 190;
+            this.splitContainer1.SplitterDistance = 320;
             this.splitContainer2.SplitterDistance = this.splitContainer1.SplitterDistance;
 
             if(_sendKrystal != null)

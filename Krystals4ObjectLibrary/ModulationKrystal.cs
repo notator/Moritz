@@ -17,7 +17,7 @@ namespace Krystals4ObjectLibrary
         /// The Krystal base class reads the strands.
         /// </summary>
         /// <param name="filepath"></param>
-        public ModulationKrystal(string filepath)
+        public ModulationKrystal(string filepath, bool onlyLoadHeredityInfo = false)
             : base(filepath)
         {
             using(XmlReader r = XmlReader.Create(filepath))
@@ -40,17 +40,21 @@ namespace Krystals4ObjectLibrary
                     }
                 }
             }
-            string xInputFilepath = K.KrystalsFolder + @"\" + XInputFilename;
-            string yInputFilepath = K.KrystalsFolder + @"\" + YInputFilename;
-            string modulatorFilepath = K.ModulationOperatorsFolder + @"\" + ModulatorFilename;
 
-            _xInputKrystal = new ModulationInputKrystal(xInputFilepath);
-            _yInputKrystal = new ModulationInputKrystal(yInputFilepath);
-            _modulator = new Modulator(modulatorFilepath);
+            if(onlyLoadHeredityInfo == false)
+            {
+                string xInputFilepath = K.KrystalsFolder + @"\" + XInputFilename;
+                string yInputFilepath = K.KrystalsFolder + @"\" + YInputFilename;
+                string modulatorFilepath = K.ModulationOperatorsFolder + @"\" + ModulatorFilename;
 
-            _modulationNodeList = GetModulationNodeList();
+                _xInputKrystal = new ModulationInputKrystal(xInputFilepath);
+                _yInputKrystal = new ModulationInputKrystal(yInputFilepath);
+                _modulator = new Modulator(modulatorFilepath);
 
-            SetRedundantQualifierCoordinates();
+                _modulationNodeList = GetModulationNodeList();
+
+                SetRedundantQualifierCoordinates();
+            }
         }
         /// <summary>
         /// Constructor used when beginning to edit a new modulated krystal (which has no modulator or strands yet).
@@ -70,7 +74,7 @@ namespace Krystals4ObjectLibrary
 
             _modulationNodeList = GetModulationNodeList();
 
-            this._level = _yInputKrystal.Level > _xInputKrystal.Level ? _yInputKrystal.Level : _xInputKrystal.Level;
+            this.Level = _yInputKrystal.Level > _xInputKrystal.Level ? _yInputKrystal.Level : _xInputKrystal.Level;
 
             if(_yInputKrystal.Level == _xInputKrystal.Level && _yInputKrystal.NumValues != _xInputKrystal.NumValues)
                 throw new ApplicationException("Error: the two input krystals are not of compatible size.");
@@ -92,7 +96,7 @@ namespace Krystals4ObjectLibrary
 
             Modulate();
 
-            _name = GetUniqueName(K.KrystalType.mod);
+            Name = GetUniqueName(K.KrystalType.mod);
         }
 
         #endregion
@@ -146,11 +150,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            var pathname = K.KrystalsFolder + @"\" + _name;
+            var pathname = K.KrystalsFolder + @"\" + Name;
             DialogResult answer = DialogResult.Yes;
             if(File.Exists(pathname))
             {
-                string msg = $"ModulationKrystal {_name} already exists. Save it again with a new date?";
+                string msg = $"ModulationKrystal {Name} already exists.\nSave it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 
@@ -165,12 +169,17 @@ namespace Krystals4ObjectLibrary
                 w.WriteEndElement(); // expansion
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+                MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private bool MaxValueHasChanged()
         {
-            string[] segs = _name.Split('.');
+            string[] segs = Name.Split('.');
             uint max = uint.Parse(segs[0]);
             if(max == MaxValue)
                 return false;

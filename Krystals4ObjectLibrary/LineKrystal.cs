@@ -26,7 +26,7 @@ namespace Krystals4ObjectLibrary
                 K.ReadToXmlElementTag(r, "line"); // check that this is a line krystal (the other checks have been done in base()
             }
 
-            //_name = UniqueLineKrystalName();
+            //Name = UniqueLineKrystalName();
         }
         /// <summary>
         /// Constructor used when creating new line krystals.
@@ -35,19 +35,19 @@ namespace Krystals4ObjectLibrary
         public LineKrystal(List<uint> valueList)
             : base()
         {
-            _level = 1;
-            _numValues = (uint)valueList.Count;
-            _minValue = uint.MaxValue;
-            _maxValue = uint.MinValue;
+            Level = 1;
+            NumValues = (uint)valueList.Count;
+            MinValue = uint.MaxValue;
+            MaxValue = uint.MinValue;
             foreach(uint value in valueList)
             {
-                _minValue = _minValue < value ? _minValue : value;
-                _maxValue = _maxValue > value ? _maxValue : value;
+                MinValue = MinValue < value ? MinValue : value;
+                MaxValue = MaxValue > value ? MaxValue : value;
             }
             Strand strand = new Strand(1, valueList);
-            _strands.Add(strand);
+            Strands = new List<Strand>() { strand };
 
-            _name = GetUniqueName(K.KrystalType.line);
+            Name = GetUniqueName(K.KrystalType.line);
         }
 
         #region overridden functions
@@ -61,11 +61,11 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         public override void Save()
         {
-            var pathname = K.KrystalsFolder + @"\" + _name;
+            var pathname = K.KrystalsFolder + @"\" + Name;
             DialogResult answer = DialogResult.Yes;
             if(File.Exists(pathname))
             {
-                string msg = $"Line krystal {_name} already exists. Save it again with a new date?";
+                string msg = $"Line krystal {Name} already exists.\nSave it again with a new date?";
                 answer = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             }
 
@@ -77,6 +77,11 @@ namespace Krystals4ObjectLibrary
                 w.WriteEndElement(); // line
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
+                MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
