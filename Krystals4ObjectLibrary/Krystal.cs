@@ -237,11 +237,20 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Compares only the strands in the two krystals
+        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
+        /// If a krystal having identical content exists in the krystals directory,
+        /// the user is given the option to
+        ///    either overwrite the existing krystal (using that krystal's index),
+        ///    or abort the save.
+        /// This means that a given set of ancestors should always have the same index.
+        /// </summary>
+        public abstract void Save();
+
+        /// <summary>
+        /// Returns true if the krystals contain identical strands, otherwise false.
         /// </summary>
         /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(Object obj)
+        public new bool Equals(Object obj)
         {
             var otherK = obj as Krystal;
             if(otherK == null || this.Strands.Count != otherK.Strands.Count)
@@ -262,18 +271,8 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Sets the krystal's Name, and saves it (but not any of its ancestor files).
-        /// If a krystal having identical content exists in the krystals directory,
-        /// the user is given the option to
-        ///    either overwrite the existing krystal (using that krystal's index),
-        ///    or abort the save.
-        /// This means that a given set of ancestors should always have the same index.
-        /// </summary>
-        public abstract void Save();
-
-        /// <summary>
-        /// This function returns 0 if the shape and numeric content are the same,
-        /// Otherwise it compares the two names.
+        /// Returns 0 if the content of the two krystals is identical,
+        /// otherwise it returns the result of comparing the two names.
         /// </summary>
         /// <param name="otherKrystal"></param>
         /// <returns></returns>
@@ -282,37 +281,20 @@ namespace Krystals4ObjectLibrary
 			if(!(other is Krystal otherKrystal))
 				throw new ArgumentException();
 
-			bool isEquivalent = false;
+			bool contentIsIdentical = false;
             if(this.Shape == otherKrystal.Shape
             && this.Strands.Count == otherKrystal.Strands.Count
             && this.Level == otherKrystal.Level
             && this.MaxValue == otherKrystal.MaxValue
             && this.MinValue == otherKrystal.MinValue
             && this.NumValues == otherKrystal.NumValues
-            && this.MissingValues == otherKrystal.MissingValues)
+            && this.MissingValues == otherKrystal.MissingValues
+            && this.Equals(otherKrystal))
             {
-                isEquivalent = true;
-                for(int i = 0; i < this.Strands.Count; i++)
-                {
-                    Strand thisStrand = this.Strands[i];
-                    Strand otherStrand = otherKrystal.Strands[i];
-                    if(thisStrand.Values.Count != otherStrand.Values.Count
-                    || thisStrand.Level != otherStrand.Level)
-                    {
-                        isEquivalent = false;
-                        break;
-                    }
-                    for(int j = 0; j < thisStrand.Values.Count; j++)
-                    {
-                        if(thisStrand.Values[j] != otherStrand.Values[j])
-                        {
-                            isEquivalent = false;
-                            break;
-                        }
-                    }
-                }
+                contentIsIdentical = true;
             }
-            if(isEquivalent == true)
+
+            if(contentIsIdentical == true)
                 return 0;
             else
                 return this.Name.CompareTo(otherKrystal.Name);

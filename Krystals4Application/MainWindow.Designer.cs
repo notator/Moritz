@@ -32,9 +32,12 @@ namespace Krystals4Application
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.constantkrystalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.expansionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modulatedkrystalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.expansionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.NewModulatedKrystalMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.shapedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.permutationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openKrystalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenConstantToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenExpansionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,22 +57,19 @@ namespace Krystals4Application
             this.NewModKrysButton = new System.Windows.Forms.Button();
             this.RebuildKrystalFamilyButton = new System.Windows.Forms.Button();
             this.NewPathKrysButton = new System.Windows.Forms.Button();
-            this.OpenKrystalsBrowserButton = new System.Windows.Forms.Button();
+            this.ShowKrystalsBrowserButton = new System.Windows.Forms.Button();
             this.SaveKrystalsWithNewNamesButton = new System.Windows.Forms.Button();
             this.archivePanel = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.archivelabel = new System.Windows.Forms.Label();
             this.GlobalPanel = new System.Windows.Forms.Panel();
+            this.globalTextlabel = new System.Windows.Forms.Label();
             this.globalLabel = new System.Windows.Forms.Label();
             this.editorsPanel = new System.Windows.Forms.Panel();
             this.editorsLabel = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.newLabel = new System.Windows.Forms.Label();
-            this.globalTextlabel = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.NewExpansionKrysButton = new System.Windows.Forms.Button();
-            this.shapedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.permutationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newLabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.archivePanel.SuspendLayout();
             this.GlobalPanel.SuspendLayout();
@@ -117,30 +117,48 @@ namespace Krystals4Application
             // constantkrystalToolStripMenuItem
             // 
             this.constantkrystalToolStripMenuItem.Name = "constantkrystalToolStripMenuItem";
-            this.constantkrystalToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.constantkrystalToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.constantkrystalToolStripMenuItem.Text = "constant...";
             this.constantkrystalToolStripMenuItem.Click += new System.EventHandler(this.NewConstantKrystalMenuItem_Click);
-            // 
-            // expansionToolStripMenuItem
-            // 
-            this.expansionToolStripMenuItem.Name = "expansionToolStripMenuItem";
-            this.expansionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.expansionToolStripMenuItem.Text = "expansion...";
-            this.expansionToolStripMenuItem.Click += new System.EventHandler(this.NewExpansionKrystalMenuItem_Click);
             // 
             // modulatedkrystalToolStripMenuItem
             // 
             this.modulatedkrystalToolStripMenuItem.Name = "modulatedkrystalToolStripMenuItem";
-            this.modulatedkrystalToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.modulatedkrystalToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.modulatedkrystalToolStripMenuItem.Text = "line...";
             this.modulatedkrystalToolStripMenuItem.Click += new System.EventHandler(this.NewLineKrystalMenuItem_Click);
+            // 
+            // expansionToolStripMenuItem
+            // 
+            this.expansionToolStripMenuItem.Name = "expansionToolStripMenuItem";
+            this.expansionToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.expansionToolStripMenuItem.Text = "expansion...";
+            this.expansionToolStripMenuItem.Click += new System.EventHandler(this.NewExpansionKrystalMenuItem_Click);
             // 
             // NewModulatedKrystalMenuItem
             // 
             this.NewModulatedKrystalMenuItem.Name = "NewModulatedKrystalMenuItem";
-            this.NewModulatedKrystalMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.NewModulatedKrystalMenuItem.Size = new System.Drawing.Size(145, 22);
             this.NewModulatedKrystalMenuItem.Text = "modulation...";
             this.NewModulatedKrystalMenuItem.Click += new System.EventHandler(this.NewModulatedKrystalMenuItem_Click);
+            // 
+            // shapedToolStripMenuItem
+            // 
+            this.shapedToolStripMenuItem.Name = "shapedToolStripMenuItem";
+            this.shapedToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.shapedToolStripMenuItem.Text = "shaped";
+            // 
+            // permutationToolStripMenuItem
+            // 
+            this.permutationToolStripMenuItem.Name = "permutationToolStripMenuItem";
+            this.permutationToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.permutationToolStripMenuItem.Text = "permutation";
+            // 
+            // pathToolStripMenuItem
+            // 
+            this.pathToolStripMenuItem.Name = "pathToolStripMenuItem";
+            this.pathToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.pathToolStripMenuItem.Text = "path";
             // 
             // openKrystalToolStripMenuItem
             // 
@@ -237,7 +255,7 @@ namespace Krystals4Application
             // aboutKrystals40ToolStripMenuItem
             // 
             this.aboutKrystals40ToolStripMenuItem.Name = "aboutKrystals40ToolStripMenuItem";
-            this.aboutKrystals40ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutKrystals40ToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
             this.aboutKrystals40ToolStripMenuItem.Text = "About Krystals 4.0...";
             this.aboutKrystals40ToolStripMenuItem.Click += new System.EventHandler(this.About_Click);
             // 
@@ -301,15 +319,15 @@ namespace Krystals4Application
             this.NewPathKrysButton.Text = "new path krystal";
             this.NewPathKrysButton.Click += new System.EventHandler(this.NewPathKrystalMenuItem_Click);
             // 
-            // OpenKrystalsBrowserButton
+            // ShowKrystalsBrowserButton
             // 
-            this.OpenKrystalsBrowserButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.OpenKrystalsBrowserButton.Location = new System.Drawing.Point(15, 51);
-            this.OpenKrystalsBrowserButton.Name = "OpenKrystalsBrowserButton";
-            this.OpenKrystalsBrowserButton.Size = new System.Drawing.Size(160, 42);
-            this.OpenKrystalsBrowserButton.TabIndex = 6;
-            this.OpenKrystalsBrowserButton.Text = "open krystals browser";
-            this.OpenKrystalsBrowserButton.Click += new System.EventHandler(this.OpenKrystalsBrowserButton_Click);
+            this.ShowKrystalsBrowserButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.ShowKrystalsBrowserButton.Location = new System.Drawing.Point(15, 51);
+            this.ShowKrystalsBrowserButton.Name = "ShowKrystalsBrowserButton";
+            this.ShowKrystalsBrowserButton.Size = new System.Drawing.Size(160, 42);
+            this.ShowKrystalsBrowserButton.TabIndex = 6;
+            this.ShowKrystalsBrowserButton.Text = "show krystals browser";
+            this.ShowKrystalsBrowserButton.Click += new System.EventHandler(this.ShowKrystalsBrowserButton_Click);
             // 
             // SaveKrystalsWithNewNamesButton
             // 
@@ -333,6 +351,16 @@ namespace Krystals4Application
             this.archivePanel.Size = new System.Drawing.Size(400, 106);
             this.archivePanel.TabIndex = 8;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(12, 25);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(373, 15);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "These functions exist in the code-base, but should not be run again.";
+            // 
             // archivelabel
             // 
             this.archivelabel.AutoSize = true;
@@ -349,12 +377,22 @@ namespace Krystals4Application
             this.GlobalPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.GlobalPanel.Controls.Add(this.globalTextlabel);
             this.GlobalPanel.Controls.Add(this.globalLabel);
-            this.GlobalPanel.Controls.Add(this.OpenKrystalsBrowserButton);
+            this.GlobalPanel.Controls.Add(this.ShowKrystalsBrowserButton);
             this.GlobalPanel.Controls.Add(this.RebuildKrystalFamilyButton);
             this.GlobalPanel.Location = new System.Drawing.Point(12, 406);
             this.GlobalPanel.Name = "GlobalPanel";
             this.GlobalPanel.Size = new System.Drawing.Size(400, 106);
             this.GlobalPanel.TabIndex = 9;
+            // 
+            // globalTextlabel
+            // 
+            this.globalTextlabel.AutoSize = true;
+            this.globalTextlabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.globalTextlabel.Location = new System.Drawing.Point(13, 27);
+            this.globalTextlabel.Name = "globalTextlabel";
+            this.globalTextlabel.Size = new System.Drawing.Size(179, 15);
+            this.globalTextlabel.TabIndex = 10;
+            this.globalTextlabel.Text = "Functions relating to all krystals.";
             // 
             // globalLabel
             // 
@@ -402,37 +440,6 @@ namespace Krystals4Application
             this.panel1.Size = new System.Drawing.Size(400, 237);
             this.panel1.TabIndex = 11;
             // 
-            // newLabel
-            // 
-            this.newLabel.AutoSize = true;
-            this.newLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.newLabel.ForeColor = System.Drawing.Color.IndianRed;
-            this.newLabel.Location = new System.Drawing.Point(12, 12);
-            this.newLabel.Name = "newLabel";
-            this.newLabel.Size = new System.Drawing.Size(34, 16);
-            this.newLabel.TabIndex = 9;
-            this.newLabel.Text = "New";
-            // 
-            // globalTextlabel
-            // 
-            this.globalTextlabel.AutoSize = true;
-            this.globalTextlabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.globalTextlabel.Location = new System.Drawing.Point(13, 27);
-            this.globalTextlabel.Name = "globalTextlabel";
-            this.globalTextlabel.Size = new System.Drawing.Size(179, 15);
-            this.globalTextlabel.TabIndex = 10;
-            this.globalTextlabel.Text = "Functions relating to all krystals.";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 25);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(373, 15);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "These functions exist in the code-base, but should not be run again.";
-            // 
             // NewExpansionKrysButton
             // 
             this.NewExpansionKrysButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -443,23 +450,16 @@ namespace Krystals4Application
             this.NewExpansionKrysButton.Text = "new expansion krystal";
             this.NewExpansionKrysButton.Click += new System.EventHandler(this.NewExpansionKrystalMenuItem_Click);
             // 
-            // shapedToolStripMenuItem
+            // newLabel
             // 
-            this.shapedToolStripMenuItem.Name = "shapedToolStripMenuItem";
-            this.shapedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.shapedToolStripMenuItem.Text = "shaped";
-            // 
-            // permutationToolStripMenuItem
-            // 
-            this.permutationToolStripMenuItem.Name = "permutationToolStripMenuItem";
-            this.permutationToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.permutationToolStripMenuItem.Text = "permutation";
-            // 
-            // pathToolStripMenuItem
-            // 
-            this.pathToolStripMenuItem.Name = "pathToolStripMenuItem";
-            this.pathToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.pathToolStripMenuItem.Text = "path";
+            this.newLabel.AutoSize = true;
+            this.newLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.newLabel.ForeColor = System.Drawing.Color.IndianRed;
+            this.newLabel.Location = new System.Drawing.Point(12, 12);
+            this.newLabel.Name = "newLabel";
+            this.newLabel.Size = new System.Drawing.Size(34, 16);
+            this.newLabel.TabIndex = 9;
+            this.newLabel.Text = "New";
             // 
             // MainWindow
             // 
@@ -519,7 +519,7 @@ namespace Krystals4Application
         private System.Windows.Forms.ToolStripMenuItem MenuItemRebuildKrystalFamily;
         private System.Windows.Forms.Button RebuildKrystalFamilyButton;
         private System.Windows.Forms.Button NewPathKrysButton;
-        private System.Windows.Forms.Button OpenKrystalsBrowserButton;
+        private System.Windows.Forms.Button ShowKrystalsBrowserButton;
         private System.Windows.Forms.Button SaveKrystalsWithNewNamesButton;
         private System.Windows.Forms.Panel archivePanel;
         private System.Windows.Forms.Label label1;

@@ -5,36 +5,25 @@ using System.Windows.Forms;
 
 using Krystals4ObjectLibrary;
 
+using Moritz.Globals;
+
 namespace Moritz.Krystals
 {
     public delegate void KrystalDelegate(Krystal krystal);
 
     public partial class KrystalBrowser : Form
     {
-
         /// <summary>
-        /// The krystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
-        /// The krystalBrowser opens with no krystal selected .
+        /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
+        /// If krystal != null, the krystalBrowser opens with the given krystal selected.
         /// </summary>
-        public KrystalBrowser(string krystalsFolder, KrystalDelegate krystalNameDelegate)
+        public KrystalBrowser(KrystalDelegate returnKrystalNameDelegate = null, Krystal krystal = null)
         {
             InitializeComponent();
-            _krystal = null;
-            _krystalsFolder = krystalsFolder;
-            _sendKrystal = krystalNameDelegate;
-            InitializeKrystalBrowser();
-        }
-
-        /// <summary>
-        /// The krystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
-        /// The krystalBrowser opens with the given krystal selected.
-        /// </summary>
-        public KrystalBrowser(Krystal krystal, string krystalsFolder, KrystalDelegate krystalNameDelegate)
-        {
-            InitializeComponent();
+            ControlBox = false;
+            _krystalsFolder = M.LocalMoritzKrystalsFolder;
+            _returnKrystalNameDelegate = returnKrystalNameDelegate;
             _krystal = krystal;
-            _krystalsFolder = krystalsFolder;
-            _sendKrystal = krystalNameDelegate;
             InitializeKrystalBrowser();
         }
 
@@ -46,7 +35,7 @@ namespace Moritz.Krystals
             this.splitContainer1.SplitterDistance = 320;
             this.splitContainer2.SplitterDistance = this.splitContainer1.SplitterDistance;
 
-            if(_sendKrystal != null)
+            if(_returnKrystalNameDelegate != null)
             {
                 this.ReturnKrystalButton.Show();
                 this.CloseButton.Hide();
@@ -76,16 +65,16 @@ namespace Moritz.Krystals
         /// <param name="e"></param>
         private void ReturnKrystalButton_Click(object sender, EventArgs e)
         {
-            if(this._sendKrystal != null)
-                _sendKrystal(_krystal);
-            StrandsTreeView.Nodes.Clear();
-            Close();
+            if(this._returnKrystalNameDelegate != null)
+                _returnKrystalNameDelegate(_krystal);
+            //StrandsTreeView.Nodes.Clear();
+            Hide();
         }
 
         private void OKButton_Click(object sender, EventArgs e)
         {
-            StrandsTreeView.Nodes.Clear();
-            Close();
+            //StrandsTreeView.Nodes.Clear();
+            Hide();
         }
 
         public void SetForKrystal(string filename)
@@ -396,7 +385,7 @@ namespace Moritz.Krystals
         private KrystalChildrenNode _previouslySelectedChildrenNode = null;
         private TreeView _selectedTreeView = null;
 
-        private KrystalDelegate _sendKrystal = null;
+        private KrystalDelegate _returnKrystalNameDelegate = null;
 
     }
 }

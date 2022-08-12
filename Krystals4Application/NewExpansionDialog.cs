@@ -18,7 +18,7 @@ namespace Krystals4Application
         #region Events
         private void SetDensityInputButton_Click(object sender, EventArgs e)
         { 
-            KrystalBrowser krystalBrowser = new KrystalBrowser(null, _krystalsFolder, SetDensityInputKrystal);
+            KrystalBrowser krystalBrowser = new KrystalBrowser(SetDensityInputKrystal);
             krystalBrowser.Show();
         }
         private void SetDensityInputKrystal(Krystal krystal)
@@ -29,7 +29,7 @@ namespace Krystals4Application
 
         private void SetPointsInputButton_Click(object sender, EventArgs e)
         {
-            KrystalBrowser krystalBrowser = new KrystalBrowser(null, _krystalsFolder, SetPointsInputKrystal);
+            KrystalBrowser krystalBrowser = new KrystalBrowser(SetPointsInputKrystal);
             krystalBrowser.Show();
         }
         private void SetPointsInputKrystal(Krystal krystal)

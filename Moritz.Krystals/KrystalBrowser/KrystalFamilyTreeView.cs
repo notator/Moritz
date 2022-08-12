@@ -106,7 +106,7 @@ namespace Moritz.Krystals
             TreeNode expansionRoot = new TreeNode("Expansions");
             TreeNode modulationRoot = new TreeNode("Modulations");
             TreeNode permutationRoot = new TreeNode("Permutations");
-            TreeNode pathRoot = new TreeNode("Path");
+            TreeNode pathRoot = new TreeNode("Paths");
             this.Nodes.Add(constantRoot);
 			this.Nodes.Add(lineRoot);
             this.Nodes.Add(expansionRoot);

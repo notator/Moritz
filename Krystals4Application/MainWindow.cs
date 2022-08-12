@@ -18,6 +18,8 @@ namespace Krystals4Application
         public MainWindow()
         {
             InitializeComponent();
+            KrystalBrowser.Show();
+            this.BringToFront();
         }
 
         private void NewConstantKrystalMenuItem_Click(object sender, EventArgs e)
@@ -269,10 +271,9 @@ namespace Krystals4Application
             }
         }
 
-        private void OpenKrystalsBrowserButton_Click(object sender, EventArgs e)
+        private void ShowKrystalsBrowserButton_Click(object sender, EventArgs e)
         {
-            KrystalBrowser krystalBrowser = new KrystalBrowser(null, M.LocalMoritzKrystalsFolder, null);
-            krystalBrowser.Show();
+            KrystalBrowser.Show();
         }
 
         private void MenuItemRebuildKrystalFamily_Click(object sender, EventArgs e)
@@ -663,5 +664,7 @@ namespace Krystals4Application
             Form about = new AboutKrystals4();
             about.ShowDialog();
         }
+
+        private readonly KrystalBrowser KrystalBrowser = new KrystalBrowser();
     }
 }
