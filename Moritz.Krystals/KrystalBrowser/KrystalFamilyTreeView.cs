@@ -18,11 +18,13 @@ namespace Moritz.Krystals
                     KrystalChildrenNode input1Node = new KrystalChildrenNode(i, dependencyList);
                     listIndex = FindChildFollower(input1Node.Text, this.Nodes);
                     if(K.IsExpansionKrystalFilename(dependencyList[i].Name))
-                        input1Node.Text = input1Node.Text.Insert(0, "d: ");
+                        input1Node.Text = input1Node.Text.Insert(0, "d: "); // density
                     else if(K.IsModulationKrystalFilename(dependencyList[i].Name))
-                        input1Node.Text = input1Node.Text.Insert(0, "x: ");
+                        input1Node.Text = input1Node.Text.Insert(0, "x: "); // xInput
                     else if(K.IsPermutationKrystalFilename(dependencyList[i].Name))
-                        input1Node.Text = input1Node.Text.Insert(0, "s: ");
+                        input1Node.Text = input1Node.Text.Insert(0, "o: "); // original
+                    else if(K.IsPathKrystalFilename(dependencyList[i].Name))
+                        input1Node.Text = input1Node.Text.Insert(0, "s: "); /// svg
 
                     this.Nodes.Insert(listIndex, (TreeNode)input1Node);
                 }
@@ -31,11 +33,13 @@ namespace Moritz.Krystals
                     KrystalChildrenNode input2Node = new KrystalChildrenNode(i, dependencyList);
                     listIndex = FindChildFollower(input2Node.Text, this.Nodes);
                     if(K.IsExpansionKrystalFilename(dependencyList[i].Name))
-                        input2Node.Text = input2Node.Text.Insert(0, "p: ");
+                        input2Node.Text = input2Node.Text.Insert(0, "p: "); // points input
                     else if(K.IsModulationKrystalFilename(dependencyList[i].Name))
-                        input2Node.Text = input2Node.Text.Insert(0, "y: ");
+                        input2Node.Text = input2Node.Text.Insert(0, "y: "); // yInput
                     else if(K.IsPermutationKrystalFilename(dependencyList[i].Name))
-                        input2Node.Text = input2Node.Text.Insert(0, "a: ");
+                        input2Node.Text = input2Node.Text.Insert(0, "a: "); // axis
+                    else if(K.IsPathKrystalFilename(dependencyList[i].Name))
+                        input2Node.Text = input2Node.Text.Insert(0, "d: "); // density
 
                     this.Nodes.Insert(listIndex, (TreeNode)input2Node);
                 }
@@ -44,7 +48,7 @@ namespace Moritz.Krystals
                     KrystalChildrenNode input3Node = new KrystalChildrenNode(i, dependencyList);
                     listIndex = FindChildFollower(input3Node.Text, this.Nodes);
                     if(K.IsPermutationKrystalFilename(dependencyList[i].Name))
-                        input3Node.Text = input3Node.Text.Insert(0, "c: ");
+                        input3Node.Text = input3Node.Text.Insert(0, "c: "); // contour
 
                     this.Nodes.Insert(listIndex, (TreeNode)input3Node);
                 }
