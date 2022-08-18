@@ -98,65 +98,108 @@ namespace Moritz.Krystals
 
 	public class KrystalFamilyTreeView : TreeView
 	{
-		public KrystalFamilyTreeView(List<Dependency> dependencyList)
-		{
-			this.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.Location = new System.Drawing.Point(0, 0);
+        public KrystalFamilyTreeView(List<Dependency> dependencyList, int? domainFilter, List<int> shapeListFilter)
+        {
+            bool DisplayCompatibleShape(KrystalChildrenNode node, List<int> filter)
+            {
+                if(filter == null || filter[0] == 0)
+                {
+                    return true;
+                }
+                List<int> nodeShape = K.GetShapeFromKrystalName(node.Text);
+                if(nodeShape.Count < filter.Count)
+                {
+                    return false;
+                }
+                for(int i = 0; i < filter.Count; i++)
+                {
+                    if(nodeShape[i] != filter[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
 
-			this.BeginUpdate();
-			this.Nodes.Clear();
-			TreeNode constantRoot = new TreeNode("Constants");
-			TreeNode lineRoot = new TreeNode("Lines");
-            TreeNode expansionRoot = new TreeNode("Expansions");
-            TreeNode modulationRoot = new TreeNode("Modulations");
-            TreeNode permutationRoot = new TreeNode("Permutations");
-            TreeNode pathRoot = new TreeNode("Paths");
+            bool DisplayCompatibleDomain(KrystalChildrenNode node, int? filter)
+            {
+                if(filter == null)
+                {
+                    return true; // display everything
+                }
+
+                int domain = K.GetDomainFromFirstComponent(node.Text);
+
+                return (domain <= (int) filter);
+            }
+
+            TreeNode constantRoot, lineRoot, expansionRoot, modulationRoot, permutationRoot, pathRoot;
+            InitializeKrystalFamilyTreeView(out constantRoot, out lineRoot, out expansionRoot, out modulationRoot, out permutationRoot, out pathRoot);
+
+            int index;
+            for(int i = 0; i < dependencyList.Count; i++)
+            {
+                KrystalChildrenNode rootNode = new KrystalChildrenNode(i, dependencyList);
+                if(DisplayCompatibleShape(rootNode, shapeListFilter) && DisplayCompatibleDomain(rootNode, domainFilter))
+                {
+                    // rootNode contains a tree of KrystalChildrenNodes
+                    if(K.IsConstantKrystalFilename(rootNode.Text))
+                    {
+                        index = FindFollower(rootNode.Text, constantRoot.Nodes);
+                        constantRoot.Nodes.Insert(index, rootNode);
+                    }
+                    else if(K.IsLineKrystalFilename(rootNode.Text))
+                    {
+                        index = FindFollower(rootNode.Text, lineRoot.Nodes);
+                        lineRoot.Nodes.Insert(index, rootNode);
+                    }
+                    else if(K.IsExpansionKrystalFilename(rootNode.Text))
+                    {
+                        index = FindFollower(rootNode.Text, expansionRoot.Nodes);
+                        expansionRoot.Nodes.Insert(index, rootNode);
+                    }
+                    else if(K.IsModulationKrystalFilename(rootNode.Text))
+                    {
+                        index = FindFollower(rootNode.Text, modulationRoot.Nodes);
+                        modulationRoot.Nodes.Insert(index, rootNode);
+                    }
+                    else if(K.IsPermutationKrystalFilename(rootNode.Text))
+                    {
+                        index = FindFollower(rootNode.Text, permutationRoot.Nodes);
+                        permutationRoot.Nodes.Insert(index, rootNode);
+                    }
+                    else if(K.IsPathKrystalFilename(rootNode.Text))
+                    {
+                        index = FindFollower(rootNode.Text, pathRoot.Nodes);
+                        pathRoot.Nodes.Insert(index, rootNode);
+                    }
+                }
+            }
+            this.EndUpdate();
+            this.CollapseAll();
+        }
+
+        private void InitializeKrystalFamilyTreeView(out TreeNode constantRoot, out TreeNode lineRoot, out TreeNode expansionRoot, out TreeNode modulationRoot, out TreeNode permutationRoot, out TreeNode pathRoot)
+        {
+            this.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Location = new System.Drawing.Point(0, 0);
+
+            this.BeginUpdate();
+            this.Nodes.Clear();
+            constantRoot = new TreeNode("Constants");
+            lineRoot = new TreeNode("Lines");
+            expansionRoot = new TreeNode("Expansions");
+            modulationRoot = new TreeNode("Modulations");
+            permutationRoot = new TreeNode("Permutations");
+            pathRoot = new TreeNode("Paths");
             this.Nodes.Add(constantRoot);
-			this.Nodes.Add(lineRoot);
+            this.Nodes.Add(lineRoot);
             this.Nodes.Add(expansionRoot);
             this.Nodes.Add(modulationRoot);
             this.Nodes.Add(permutationRoot);
             this.Nodes.Add(pathRoot);
+        }
 
-            int index = 0;
-			for(int i = 0 ; i < dependencyList.Count ; i++)
-			{
-                KrystalChildrenNode rootNode = new KrystalChildrenNode(i, dependencyList);
-                // rootNode contains a tree of KrystalChildrenNodes
-                if(K.IsConstantKrystalFilename(rootNode.Text))
-                {
-                    index = FindFollower(rootNode.Text, constantRoot.Nodes);
-                    constantRoot.Nodes.Insert(index, rootNode);
-                }
-                else if(K.IsLineKrystalFilename(rootNode.Text))
-                {
-                    index = FindFollower(rootNode.Text, lineRoot.Nodes);
-                    lineRoot.Nodes.Insert(index, rootNode);
-                }
-                else if(K.IsExpansionKrystalFilename(rootNode.Text))
-                {
-                    index = FindFollower(rootNode.Text, expansionRoot.Nodes);
-                    expansionRoot.Nodes.Insert(index, rootNode);
-                }
-                else if(K.IsModulationKrystalFilename(rootNode.Text))
-                {
-                    index = FindFollower(rootNode.Text, modulationRoot.Nodes);
-                    modulationRoot.Nodes.Insert(index, rootNode);
-                }
-                else if(K.IsPermutationKrystalFilename(rootNode.Text))
-                {
-                    index = FindFollower(rootNode.Text, permutationRoot.Nodes);
-                    permutationRoot.Nodes.Insert(index, rootNode);
-                }
-                else if(K.IsPathKrystalFilename(rootNode.Text))
-                {
-                    index = FindFollower(rootNode.Text, pathRoot.Nodes);
-                    pathRoot.Nodes.Insert(index, rootNode);
-                }
-            }
-			this.EndUpdate();
-			this.CollapseAll();
-		}
         /// <summary>
         /// Returns the index of the first node in nodes whose Text (a krystal name) is greater than
         /// the first argument (krystalName). "Greater than" is defined by K.CompareKrystalNames().

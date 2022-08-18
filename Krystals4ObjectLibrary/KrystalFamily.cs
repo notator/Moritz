@@ -50,7 +50,7 @@ namespace Krystals4ObjectLibrary
         /// Loads all the krystals in K.KrystalsFolder into a list of dependencies,
         /// in which later entries in the list are dependent on earlier entries. 
         /// </summary>
-        public KrystalFamily(string krystalsFolder)
+        public KrystalFamily(string krystalsFolder )
         {
             DirectoryInfo dir = new DirectoryInfo(krystalsFolder);
             string allConstants = "*.constant.krys";

@@ -780,6 +780,74 @@ namespace Krystals4ObjectLibrary
             else
                 return (float)Convert.ToDouble(value, _numberFormat);
         }
+
+        /// <summary>
+        /// Returns the krystalName's domainString component.
+        /// </summary>
+        public static string GetDomainStringFromKrystalName(string krystalName)
+        {
+            char[] dot = new char[] { '.' };
+            var components = krystalName.Split(dot);
+            return components[0];
+        }
+
+        /// <summary>
+        /// Returns the krystalName's domain as an int.
+        /// </summary>
+        public static int GetDomainFromFirstComponent(string krystalName)
+        {
+            char[] dot = new char[] { '.' };
+            var components = krystalName.Split(dot);
+            int.TryParse(components[0], out int domain);
+            return domain;
+        }
+
+        /// <summary>
+        /// Returns the krystalName's shapeString component.
+        /// </summary>
+        public static string GetShapeStringFromKrystalName(string krystalName)
+        {
+            char[] dot = new char[] { '.' };
+            var components = krystalName.Split(dot);
+            return components[1];
+        }
+
+        /// <summary>
+        /// Returns a normalised list in which the first element is always 0 or 1.
+        /// </summary>
+        public static List<int> GetShapeFromKrystalName(string krystalName)
+        {
+            char[] dot = new char[] { '.' };
+            var components = krystalName.Split(dot);
+            var rval = GetShapeFromShapeString(components[1]);
+            return rval;
+        }
+
+        /// <summary>
+        /// Returns a normalised list in which the first element is always 0 or 1.
+        /// </summary>
+        public static List<int> GetShapeFromShapeString(string shapeString)
+        {
+            char[] underline = new char[] { '_' };
+            var shapeComponents = shapeString.Split(underline);
+            var rval = new List<int>();
+            foreach(var subString in shapeComponents)
+            {
+                int subInt;
+                int.TryParse(subString, out subInt);
+                rval.Add(subInt);
+            }
+            if(rval[0] != 0 && rval[0] != 1)
+            {
+                rval.Insert(0, 1);
+            }
+            if(rval[0] == 0 && rval.Count > 1)
+            {
+                throw new ApplicationException("Error in ConstantKrystal shape.");
+            }
+            return rval;
+        }
+
         public static string Now
         {
             get { return DateTime.Today.ToString("dddd dd.MM.yyyy", _dateTimeFormat) + ", " + DateTime.Now.ToLongTimeString();}

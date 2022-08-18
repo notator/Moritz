@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -17,17 +18,58 @@ namespace Moritz.Krystals
         /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// If krystal != null, the krystalBrowser opens with the given krystal selected.
         /// </summary>
-        public KrystalBrowser(KrystalDelegate returnKrystalNameDelegate = null, Krystal krystal = null)
+        public KrystalBrowser(string title)
         {
             InitializeComponent();
+            this.Text = title;
+            _krystalsFolder = M.LocalMoritzKrystalsFolder;
+            _returnKrystalNameDelegate = null;
+            InitializeKrystalBrowser(null, null);
+        }
+
+        /// <summary>
+        /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
+        /// </summary>
+        public KrystalBrowser(string title, KrystalDelegate returnKrystalNameDelegate)
+        {
+            InitializeComponent();
+            this.Text = title;
             ControlBox = false;
             _krystalsFolder = M.LocalMoritzKrystalsFolder;
             _returnKrystalNameDelegate = returnKrystalNameDelegate;
-            _krystal = krystal;
-            InitializeKrystalBrowser();
+            InitializeKrystalBrowser(null, null); // display all krystals
         }
 
-        private void InitializeKrystalBrowser()
+        /// <summary>
+        /// Only Krystals whose name contains the string in filter are included in the displayed KrystaFamilyTree. 
+        /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
+        /// </summary>
+        public KrystalBrowser(string title, int? domainFilter, List<int> shapeListFilter, KrystalDelegate returnKrystalNameDelegate)
+        {
+            InitializeComponent();
+            this.Text = title;
+            ControlBox = false;
+            _krystalsFolder = M.LocalMoritzKrystalsFolder;
+            _returnKrystalNameDelegate = returnKrystalNameDelegate;
+            InitializeKrystalBrowser(domainFilter, shapeListFilter);
+        }
+
+        /// <summary>
+        /// The KrystalBrowser opens with the selectKrystal selected. 
+        /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
+        /// </summary>
+        public KrystalBrowser(string title, Krystal selectKrystal, KrystalDelegate returnKrystalNameDelegate)
+        {
+            InitializeComponent();
+            this.Text = title;
+            ControlBox = false;
+            _krystalsFolder = M.LocalMoritzKrystalsFolder;
+            _returnKrystalNameDelegate = returnKrystalNameDelegate;
+            _krystal = selectKrystal;
+            InitializeKrystalBrowser(null, null);
+        }
+
+        private void InitializeKrystalBrowser(int? domainFilter, List<int> shapeListFilter)
         {
             this.Width = 975;
             this.Height = Screen.PrimaryScreen.WorkingArea.Height;
@@ -47,13 +89,14 @@ namespace Moritz.Krystals
             }
 
             _krystalFamily = new KrystalFamily(this._krystalsFolder);
-            SetKrystalFamilyTree();
+
+            SetKrystalFamilyTree(domainFilter, shapeListFilter);
             SetForKrystal(null);
         }  
 
-        private void SetKrystalFamilyTree()
+        private void SetKrystalFamilyTree(int? domainFilter, List<int> shapeListFilter)
         {
-            _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily.DependencyList);
+            _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily.DependencyList, domainFilter, shapeListFilter);
             _krystalFamilyTreeView.AfterSelect += new TreeViewEventHandler(this.KrystalFamilyTreeView_AfterSelect);
             this.splitContainer1.Panel1.Controls.Add(_krystalFamilyTreeView);
         }
@@ -67,8 +110,6 @@ namespace Moritz.Krystals
         {
             if(this._returnKrystalNameDelegate != null)
                 _returnKrystalNameDelegate(_krystal);
-            //StrandsTreeView.Nodes.Clear();
-            Hide();
         }
 
         private void OKButton_Click(object sender, EventArgs e)

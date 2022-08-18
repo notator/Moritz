@@ -6,14 +6,17 @@ using System.IO;
 using System.Windows.Forms;
 using Krystals4ControlLibrary;
 using Krystals4ObjectLibrary;
+using Moritz.Krystals;
 
 namespace Krystals4Application
 {
     internal partial class ExpansionEditor : Form
     {
-        public ExpansionEditor()
+        public ExpansionEditor(KrystalBrowser krystalBrowser)
         {
             InitializeComponent();
+
+            _krystalBrowser = krystalBrowser;
 
             _newEditorState = _oldEditorState = EditorState.FixedOutput;
             _fixedInputPointsIndex = -1;
@@ -2965,6 +2968,8 @@ namespace Krystals4Application
         private enum EditorState { FixedOutput, FixedInput, OutputPlanet, InputPlanet };
         private EditorState _newEditorState;
         private EditorState _oldEditorState;
+
+        private readonly KrystalBrowser _krystalBrowser;
 
         // double buffering
         BufferedGraphicsContext _bufferedGraphicsContext = new BufferedGraphicsContext();

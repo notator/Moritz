@@ -1466,7 +1466,7 @@ namespace Moritz.Composer
             Krystal selectedKrystal = null;
             if(KrystalsListBox.SelectedIndex >= 0)
                 selectedKrystal = KrystalsListBox.SelectedItem as Krystal;
-            Moritz.Krystals.KrystalBrowser krystalBrowser = new Moritz.Krystals.KrystalBrowser(SetKrystal, selectedKrystal);
+            Moritz.Krystals.KrystalBrowser krystalBrowser = new Moritz.Krystals.KrystalBrowser("All krystals", selectedKrystal, SetKrystal);
             krystalBrowser.Show();
             // the krystalBrowser calls SetKrystal() as a delegate just before it closes.
         }
@@ -1509,7 +1509,7 @@ namespace Moritz.Composer
 			if(this.KrystalsListBox.SelectedItem is Krystal krystal)
 			{
 				_krystalBrowser =
-					new Moritz.Krystals.KrystalBrowser(null);
+					new Moritz.Krystals.KrystalBrowser("All krystals");
 				_krystalBrowser.Show();
 			}
 		}

@@ -18,7 +18,6 @@ namespace Krystals4Application
         public MainWindow()
         {
             InitializeComponent();
-            KrystalBrowser.Show();
             this.BringToFront();
         }
 
@@ -145,7 +144,7 @@ namespace Krystals4Application
         {
             try
             {
-                ExpansionEditor editor = new ExpansionEditor();
+                ExpansionEditor editor = new ExpansionEditor(KrystalBrowser);
                 editor.EventHandler += new ExpansionEditor.ExpansionEditorEventhandler(HandleExpansionEditorEvents);
                 editor.Show();
             }
@@ -273,6 +272,7 @@ namespace Krystals4Application
 
         private void ShowKrystalsBrowserButton_Click(object sender, EventArgs e)
         {
+            KrystalBrowser KrystalBrowser = new KrystalBrowser("All krystals");
             KrystalBrowser.Show();
         }
 
@@ -665,6 +665,6 @@ namespace Krystals4Application
             about.ShowDialog();
         }
 
-        private readonly KrystalBrowser KrystalBrowser = new KrystalBrowser();
+        private KrystalBrowser KrystalBrowser = null;
     }
 }

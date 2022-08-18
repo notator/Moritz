@@ -5,6 +5,7 @@ using System.IO;
 using Krystals4ObjectLibrary;
 using Moritz.Globals; // Preferences
 using Moritz.Krystals; //KrystalBrowser
+using System.Collections.Generic;
 
 namespace Krystals4Application
 {
@@ -13,36 +14,80 @@ namespace Krystals4Application
         public NewExpansionDialog()
         {
             InitializeComponent();
+            _krystalBrowser = null;
             _krystalsFolder = M.LocalMoritzKrystalsFolder;
+
+            SetDensityInputButton.Enabled = true;
+            SetPointsInputValuesButton.Enabled = false;
+            SetExpanderButton.Enabled = false;
+            OKBtn.Enabled = false;
+            CancelBtn.Enabled = true;
         }
         #region Events
         private void SetDensityInputButton_Click(object sender, EventArgs e)
-        { 
-            KrystalBrowser krystalBrowser = new KrystalBrowser(SetDensityInputKrystal);
-            krystalBrowser.Show();
+        {
+            if(_krystalBrowser != null)
+            {
+                _krystalBrowser.Close();
+            }
+            _krystalBrowser = new KrystalBrowser("All krystals: (Get Density Input)", SetDensityInputKrystal); // TODO: set filter to show all files
+            _krystalBrowser.Show();
         }
         private void SetDensityInputKrystal(Krystal krystal)
         {
             DensityInputFilenameLabel.Text = krystal.Name;
             _densityInputFilepath = _krystalsFolder + @"\" + krystal.Name;
-        }
+            if(_krystalBrowser != null)
+            {
+                _krystalBrowser.Close();
+            }
 
-        private void SetPointsInputButton_Click(object sender, EventArgs e)
-        {
-            KrystalBrowser krystalBrowser = new KrystalBrowser(SetPointsInputKrystal);
-            krystalBrowser.Show();
-        }
-        private void SetPointsInputKrystal(Krystal krystal)
-        {
-            PointsInputFilenameLabel.Text = krystal.Name;
-            _pointsInputFilepath = _krystalsFolder + @"\" + krystal.Name;
+            SetDensityInputButton.Enabled = false;
+            SetExpanderButton.Enabled = true;
+            
         }
 
         private void SetExpanderButton_Click(object sender, EventArgs e)
         {
             _expanderFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.expander);
-            ExpanderFilenameLabel.Text = Path.GetFileName(_expanderFilepath);
-        } 
+            if(_expanderFilepath != "")
+            {
+                ExpanderFilenameLabel.Text = Path.GetFileName(_expanderFilepath);
+
+                SetExpanderButton.Enabled = false;
+                SetPointsInputValuesButton.Enabled = true;
+            }
+        }
+
+        private void SetPointsInputButton_Click(object sender, EventArgs e)
+        {
+            char[] dot = new char[] { '.' };
+            var densityFilename = Path.GetFileName(_densityInputFilepath);
+            var expanderFilename = Path.GetFileName(_expanderFilepath);
+            
+            int inputDomain = K.GetDomainFromFirstComponent(expanderFilename);
+            List<int> shapeListFilter = K.GetShapeFromKrystalName(densityFilename);
+
+            string title = $"Possible points input krystals -- DensityInput: {densityFilename}, Expander: {expanderFilename}";
+
+            _krystalBrowser = new KrystalBrowser(title, inputDomain, shapeListFilter, SetPointsInputKrystal);
+
+            _krystalBrowser.Show();
+        }
+        private void SetPointsInputKrystal(Krystal krystal)
+        {
+            PointsInputFilenameLabel.Text = krystal.Name;
+            _pointsInputFilepath = _krystalsFolder + @"\" + krystal.Name;
+            if(_krystalBrowser != null)
+            {
+                _krystalBrowser.Close();
+            }
+
+            SetPointsInputValuesButton.Enabled = false;
+            OKBtn.Enabled = true;
+        }
+
+
         private void CancelBtn_Click(object sender, EventArgs e)
         {
             _densityInputFilepath = "";
@@ -52,6 +97,8 @@ namespace Krystals4Application
         }
         private void OKBtn_Click(object sender, EventArgs e)
         {
+
+            // TODO: Expand and save the new Krystal...
             Close();
         }
         #endregion Events
@@ -64,7 +111,8 @@ namespace Krystals4Application
         private string _densityInputFilepath;
         private string _pointsInputFilepath;
         private string _expanderFilepath;
-        private string _krystalsFolder;
+        private KrystalBrowser _krystalBrowser;
+        private readonly string _krystalsFolder;
         #endregion private variables
 
     }
