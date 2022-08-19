@@ -18,6 +18,7 @@ namespace Krystals4Application
             _krystalsFolder = M.LocalMoritzKrystalsFolder;
 
             SetDensityInputButton.Enabled = true;
+            SetDensityInputButton.Focus();
             SetPointsInputValuesButton.Enabled = false;
             SetExpanderButton.Enabled = false;
             OKBtn.Enabled = false;
@@ -44,7 +45,7 @@ namespace Krystals4Application
 
             SetDensityInputButton.Enabled = false;
             SetExpanderButton.Enabled = true;
-            
+            SetExpanderButton.Focus();
         }
 
         private void SetExpanderButton_Click(object sender, EventArgs e)
@@ -56,6 +57,7 @@ namespace Krystals4Application
 
                 SetExpanderButton.Enabled = false;
                 SetPointsInputValuesButton.Enabled = true;
+                SetPointsInputValuesButton.Focus();
             }
         }
 
@@ -85,8 +87,8 @@ namespace Krystals4Application
 
             SetPointsInputValuesButton.Enabled = false;
             OKBtn.Enabled = true;
+            OKBtn.Focus();
         }
-
 
         private void CancelBtn_Click(object sender, EventArgs e)
         {
