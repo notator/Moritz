@@ -118,11 +118,8 @@ namespace Krystals4Application
                 {
                     MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
-                //catch (SystemException ae)
-                //{
-                //    MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                //}
             }
+            kd.Close();
         }
         private void OpenExpansionKrystalMenuItem_Click(object sender, EventArgs e)
         {

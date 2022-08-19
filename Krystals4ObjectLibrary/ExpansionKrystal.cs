@@ -82,9 +82,15 @@ namespace Krystals4ObjectLibrary
             }
 
             if(String.IsNullOrEmpty(expanderFilepath))
+            {
                 Expander = new Expander();
+            }
             else
+            {
                 Expander = new Expander(expanderFilepath, DensityInputKrystal);
+            }
+
+            ExpanderFilename = Expander.Name;
 
             if(DensityInputKrystal != null && PointsInputKrystal != null)
             {
@@ -115,6 +121,7 @@ namespace Krystals4ObjectLibrary
             string expanderIndex = components[2];
 
             root += expanderIndex;  // domain.shape.expanderIndex
+            root += ".";  // domain.shape.expanderIndex.
             string suffix = string.Format($".{kType}{K.KrystalFilenameSuffix}");
             string uniqueName = GetUniqueName(root, suffix);
 

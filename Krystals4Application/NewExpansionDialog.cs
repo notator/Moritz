@@ -93,13 +93,12 @@ namespace Krystals4Application
             _densityInputFilepath = "";
             _pointsInputFilepath = "";
             _expanderFilepath = "";
-            Close();
+
+            DialogResult = DialogResult.Cancel;
         }
         private void OKBtn_Click(object sender, EventArgs e)
         {
-
-            // TODO: Expand and save the new Krystal...
-            Close();
+            DialogResult = DialogResult.OK;
         }
         #endregion Events
         #region Properties

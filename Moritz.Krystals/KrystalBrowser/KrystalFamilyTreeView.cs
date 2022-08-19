@@ -107,11 +107,11 @@ namespace Moritz.Krystals
                     return true;
                 }
                 List<int> nodeShape = K.GetShapeFromKrystalName(node.Text);
-                if(nodeShape.Count < filter.Count)
+                if(nodeShape.Count > filter.Count)
                 {
                     return false;
                 }
-                for(int i = 0; i < filter.Count; i++)
+                for(int i = 0; i < nodeShape.Count; i++)
                 {
                     if(nodeShape[i] != filter[i])
                     {

@@ -335,7 +335,7 @@ namespace Krystals4ObjectLibrary
         /// </returns>
         public static int CompareKrystalNames(string krystalName1, string krystalName2)
 		{
-            if(!IsKrystalFilename(krystalName1) || !IsKrystalFilename(krystalName1))
+            if(!IsKrystalFilename(krystalName1) || !IsKrystalFilename(krystalName2))
             {
                 throw new ApplicationException("Argument to K:CompareKrystalNames() was not a krystal file name");
             }

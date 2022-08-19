@@ -41,7 +41,7 @@ namespace Moritz.Krystals
         }
 
         /// <summary>
-        /// Only Krystals whose name contains the string in filter are included in the displayed KrystaFamilyTree. 
+        /// Only Krystals whose shape is contained in the shapeListFilter are included in the displayed KrystaFamilyTree. 
         /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// </summary>
         public KrystalBrowser(string title, int? domainFilter, List<int> shapeListFilter, KrystalDelegate returnKrystalNameDelegate)
