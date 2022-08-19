@@ -343,26 +343,63 @@ namespace Krystals4ObjectLibrary
             int rval = String.Compare(krystalName1, krystalName2);
 
             // The sort criteria are: domain->level->shape->type->index
+            // or domain->level->shape->expanderIndex->type->index
             if(rval != 0)
             {
                 rval = 1; // assume krystalName1 > krystalName2
-                GetNameInfo(krystalName1, out int domain1, out string[] shapeComponents1, out int index1, out string type1);
-                GetNameInfo(krystalName2, out int domain2, out string[] shapeComponents2, out int index2, out string type2);
+                GetNameInfo(krystalName1, out int domain1, out string[] shapeComponents1, out int? expanderIndex1, out int index1, out string type1);
+                GetNameInfo(krystalName2, out int domain2, out string[] shapeComponents2, out int? expanderIndex2, out int index2, out string type2);
 
                 var shapeComparison = CompareKrystalShapes(shapeComponents1, shapeComponents2);
+                int? expanderIndexComparison = CompareExpanderIndices(expanderIndex1, expanderIndex2);
                 var typeComparison = CompareKrystalTypes(type1, type2);
 
-                if((domain1 < domain2)
-                || (domain1 == domain2 && shapeComparison < 0)
-                || (domain1 == domain2 && shapeComparison == 0 && typeComparison < 0)
-                || (domain1 == domain2 && shapeComparison == 0 && typeComparison == 0 && index1 < index2))
+                if(expanderIndexComparison == null)
                 {
-                    rval = -1;
+                    if((domain1 < domain2)
+                    || (domain1 == domain2 && shapeComparison < 0)
+                    || (domain1 == domain2 && shapeComparison == 0 && typeComparison < 0)
+                    || (domain1 == domain2 && shapeComparison == 0 && typeComparison == 0 && index1 < index2))
+                    {
+                        rval = -1;
+                    }
+                }
+                else
+                {
+                    if((domain1 < domain2)
+                    || (domain1 == domain2 && shapeComparison < 0)
+                    || (domain1 == domain2 && shapeComparison == 0 && ((int)expanderIndexComparison) < 0)
+                    || (domain1 == domain2 && shapeComparison == 0 && ((int)expanderIndexComparison) == 0 && typeComparison < 0)
+                    || (domain1 == domain2 && shapeComparison == 0 && ((int)expanderIndexComparison) == 0 && typeComparison == 0 && index1 < index2))
+                    {
+                        rval = -1;
+                    }
                 }
             }
 
 			return rval;
 		}
+
+        private static int? CompareExpanderIndices(int? expanderIndex1, int? expanderIndex2)
+        {
+            int? rval = null;
+            if(expanderIndex1 != null && expanderIndex2 != null)
+            {
+                if( expanderIndex1 == expanderIndex2)
+                {
+                    rval = 0;
+                }
+                else if(expanderIndex1 < expanderIndex2)
+                {
+                    rval = -1;
+                }
+                else if(expanderIndex1 > expanderIndex2)
+                {
+                    rval = 1;
+                }
+            }
+            return rval;
+        }
 
         /// <summary>
         /// returns 0 if the shape components are equal
@@ -426,16 +463,26 @@ namespace Krystals4ObjectLibrary
             return rval;
         }        
 
-        private static void GetNameInfo(string krystalName1, out int domain, out string[] shapeComponents, out int index, out string type )
+        private static void GetNameInfo(string krystalName, out int domain, out string[] shapeComponents, out int? expanderIndex, out int index, out string type )
         {
             var dot = new char[] { '.' };
             var underscore = new char[] { '_' };
 
-            var components1 = krystalName1.Split(dot);
-            domain = int.Parse(components1[0]);
-            shapeComponents = components1[1].Split(underscore);
-            index = int.Parse(components1[2]);
-            type = components1[3];
+            var components = krystalName.Split(dot);
+            domain = int.Parse(components[0]);
+            shapeComponents = components[1].Split(underscore);
+            if(krystalName.Contains("exp"))
+            {
+                expanderIndex = int.Parse(components[2]);
+                index = int.Parse(components[3]);
+                type = components[4];
+            }
+            else
+            {
+                expanderIndex = null;
+                index = int.Parse(components[2]);
+                type = components[3];
+            }
         }
 
         private static int CompareDomains(string domStr1, string domStr2)
