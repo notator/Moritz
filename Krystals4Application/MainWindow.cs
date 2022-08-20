@@ -21,7 +21,8 @@ namespace Krystals4Application
             this.BringToFront();
         }
 
-        private void NewConstantKrystalMenuItem_Click(object sender, EventArgs e)
+        #region New Krystals
+        private void NewConstantKrystalButton_Click(object sender, EventArgs e)
         {
             using(NewConstantKrystalDialog dlg = new NewConstantKrystalDialog())
             {
@@ -38,30 +39,7 @@ namespace Krystals4Application
                 }
             }
         }
-        private void OpenConstantKrystalMenuItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string constantKrystalFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.constant);
-                if (constantKrystalFilepath.Length > 0)
-                {
-                    ConstantKrystal constantKrystal = new ConstantKrystal(constantKrystalFilepath);
-					NewConstantKrystalDialog dlg = new NewConstantKrystalDialog
-					{
-						Text = constantKrystal.Name
-					};
-					dlg.SetButtons();
-                    dlg.ConstantKrystalValue = constantKrystal.MaxValue.ToString();
-                    dlg.Show();
-                }
-            }
-            catch (ApplicationException ae)
-            {
-                MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-
-        private void NewLineKrystalMenuItem_Click(object sender, EventArgs e)
+        private void NewLineKrystalButton_Click(object sender, EventArgs e)
         {
             using(NewLineKrystalDialog dlg = new NewLineKrystalDialog())
             {
@@ -77,30 +55,7 @@ namespace Krystals4Application
                 }
             }
         }
-        private void OpenLineKrystalMenuItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string lineKrystalFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.line);
-                if (lineKrystalFilepath.Length > 0)
-                {
-                    LineKrystal lineKrystal = new LineKrystal(lineKrystalFilepath);
-					NewLineKrystalDialog dlg = new NewLineKrystalDialog
-					{
-						Text = lineKrystal.Name
-					};
-					dlg.SetButtons();
-                    dlg.LineKrystalValue = K.GetStringOfUnsignedInts(lineKrystal.Strands[0].Values);
-                    dlg.Show();
-                }
-            }
-            catch (ApplicationException ae)
-            {
-                MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-
-        private void NewExpansionKrystalMenuItem_Click(object sender, EventArgs e)
+        private void NewExpansionKrystalButton_Click(object sender, EventArgs e)
         {
             //  NewExpansionKrystal();
 
@@ -120,10 +75,6 @@ namespace Krystals4Application
                 }
             }
             kd.Close();
-        }
-        private void OpenExpansionKrystalMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenExpansionKrystal();
         }
         private void HandleExpansionEditorEvents(object sender, ExpansionEditorEventArgs e)
         {
@@ -170,14 +121,11 @@ namespace Krystals4Application
             }
         }
 
-        private void NewModulatedKrystalMenuItem_Click(object sender, EventArgs e)
+        private void NewModulatedKrystalButton_Click(object sender, EventArgs e)
         {
             NewModulatedKrystal();
         }
-        private void OpenModulatedKrystalMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenModulatedKrystal();
-        }
+
         private void HandleModulationEditorEvents(object sender, ModulationEditorEventArgs e)
         {
             switch (e.Message)
@@ -241,8 +189,12 @@ namespace Krystals4Application
             }
         }
 
+        private void NewPermutedKrystalButton_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
-        private void NewPathKrystalMenuItem_Click(object sender, EventArgs e)
+        private void NewPathKrystalButton_Click(object sender, EventArgs e)
         {
             string svgFilepath = "";
             string densityInputKrystalFilePath = "";
@@ -267,13 +219,17 @@ namespace Krystals4Application
             }
         }
 
-        private void ShowKrystalsBrowserButton_Click(object sender, EventArgs e)
+        #endregion New Krystals
+
+        #region For all krystals
+
+        private void OpenKrystalsBrowserButton_Click(object sender, EventArgs e)
         {
             KrystalBrowser KrystalBrowser = new KrystalBrowser("All krystals");
             KrystalBrowser.Show();
         }
 
-        private void MenuItemRebuildKrystalFamily_Click(object sender, EventArgs e)
+        private void RebuildKrystalFamilyButton_Click(object sender, EventArgs e)
         {
 			DialogResult result = MessageBox.Show(
 				"Re-expand and re-modulate all expansion and modulation krystals\n" +
@@ -287,7 +243,9 @@ namespace Krystals4Application
             }
         }
 
-        #region SaveKrystalsWithNewNames
+        #endregion For all krystals
+
+        #region Old SaveKrystalsWithNewNames
         /// <summary>
         /// 09.08.2022
         /// ACHTUNG: The following procedure was used to change the naming of existing krystals and expanders:
@@ -663,5 +621,7 @@ namespace Krystals4Application
         }
 
         private KrystalBrowser KrystalBrowser = null;
+
+
     }
 }
