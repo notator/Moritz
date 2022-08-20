@@ -30,7 +30,7 @@ namespace Krystals4Application
         }
         private void SetDensityInputButton_Click(object sender, EventArgs e)
         {
-            KrystalBrowser krystalBrowser = new KrystalBrowser("All krystals", SetDensityInputKrystal);
+            KrystalsBrowser krystalBrowser = new KrystalsBrowser("All krystals", SetDensityInputKrystal);
             krystalBrowser.Show(); // calls SetDensityInputKrystal(krystal) as a delegate
         }
 
@@ -49,7 +49,7 @@ namespace Krystals4Application
             else
             {
                 MessageBox.Show($"The density input krystal's shape must include the number of (effective) trajectory nodes ({nEffectiveTrajectoryNodes}).", "Warning", MessageBoxButtons.OK);
-                KrystalBrowser krystalBrowser = new KrystalBrowser("All krystals", SetDensityInputKrystal);
+                KrystalsBrowser krystalBrowser = new KrystalsBrowser("All krystals", SetDensityInputKrystal);
                 krystalBrowser.Show(); // calls SetDensityInputKrystal(krystal) as a delegate
             }
         }

@@ -12,7 +12,7 @@ namespace Krystals4Application
 {
     internal partial class ExpansionEditor : Form
     {
-        public ExpansionEditor(KrystalBrowser krystalBrowser)
+        public ExpansionEditor(KrystalsBrowser krystalBrowser)
         {
             InitializeComponent();
 
@@ -2969,7 +2969,7 @@ namespace Krystals4Application
         private EditorState _newEditorState;
         private EditorState _oldEditorState;
 
-        private readonly KrystalBrowser _krystalBrowser;
+        private readonly KrystalsBrowser _krystalBrowser;
 
         // double buffering
         BufferedGraphicsContext _bufferedGraphicsContext = new BufferedGraphicsContext();

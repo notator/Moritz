@@ -1466,7 +1466,7 @@ namespace Moritz.Composer
             Krystal selectedKrystal = null;
             if(KrystalsListBox.SelectedIndex >= 0)
                 selectedKrystal = KrystalsListBox.SelectedItem as Krystal;
-            Moritz.Krystals.KrystalBrowser krystalBrowser = new Moritz.Krystals.KrystalBrowser("All krystals", selectedKrystal, SetKrystal);
+            Moritz.Krystals.KrystalsBrowser krystalBrowser = new Moritz.Krystals.KrystalsBrowser("All krystals", selectedKrystal, SetKrystal);
             krystalBrowser.Show();
             // the krystalBrowser calls SetKrystal() as a delegate just before it closes.
         }
@@ -1508,8 +1508,7 @@ namespace Moritz.Composer
         {
 			if(this.KrystalsListBox.SelectedItem is Krystal krystal)
 			{
-				_krystalBrowser =
-					new Moritz.Krystals.KrystalBrowser("All krystals");
+				_krystalBrowser = new KrystalsBrowser();
 				_krystalBrowser.Show();
 			}
 		}
@@ -2213,7 +2212,7 @@ namespace Moritz.Composer
         #endregion names and paths
         #region editing
         private IMoritzForm1 _moritzForm1;
-        private KrystalBrowser _krystalBrowser = null;
+        private KrystalsBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
         private FormStateFunctions _fsf;
         private List<TextBox> _allTextBoxes = null;

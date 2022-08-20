@@ -31,7 +31,7 @@ namespace Krystals4Application
             {
                 _krystalBrowser.Close();
             }
-            _krystalBrowser = new KrystalBrowser("All krystals: (Get Density Input)", SetDensityInputKrystal); // TODO: set filter to show all files
+            _krystalBrowser = new KrystalsBrowser("All krystals: (Get Density Input)", SetDensityInputKrystal); // TODO: set filter to show all files
             _krystalBrowser.Show();
         }
         private void SetDensityInputKrystal(Krystal krystal)
@@ -72,7 +72,7 @@ namespace Krystals4Application
 
             string title = $"Possible points input krystals -- DensityInput: {densityFilename}, Expander: {expanderFilename}";
 
-            _krystalBrowser = new KrystalBrowser(title, inputDomain, shapeListFilter, SetPointsInputKrystal);
+            _krystalBrowser = new KrystalsBrowser(title, inputDomain, shapeListFilter, SetPointsInputKrystal);
 
             _krystalBrowser.Show();
         }
@@ -112,7 +112,7 @@ namespace Krystals4Application
         private string _densityInputFilepath;
         private string _pointsInputFilepath;
         private string _expanderFilepath;
-        private KrystalBrowser _krystalBrowser;
+        private KrystalsBrowser _krystalBrowser;
         private readonly string _krystalsFolder;
         #endregion private variables
 

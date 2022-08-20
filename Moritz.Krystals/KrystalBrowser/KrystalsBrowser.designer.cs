@@ -1,6 +1,6 @@
 namespace Moritz.Krystals
 {
-	partial class KrystalBrowser
+	partial class KrystalsBrowser
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -36,6 +36,8 @@ namespace Moritz.Krystals
             this.CloseButton = new System.Windows.Forms.Button();
             this.MissingValues = new System.Windows.Forms.Label();
             this.ReturnKrystalButton = new System.Windows.Forms.Button();
+            this.RenameKrystalButton = new System.Windows.Forms.Button();
+            this.DisplayKrystal2DButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -137,12 +139,38 @@ namespace Moritz.Krystals
             this.ReturnKrystalButton.UseVisualStyleBackColor = true;
             this.ReturnKrystalButton.Click += new System.EventHandler(this.ReturnKrystalButton_Click);
             // 
-            // KrystalBrowser
+            // RenameKrystalButton
+            // 
+            this.RenameKrystalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.RenameKrystalButton.Location = new System.Drawing.Point(398, 436);
+            this.RenameKrystalButton.Name = "RenameKrystalButton";
+            this.RenameKrystalButton.Size = new System.Drawing.Size(125, 23);
+            this.RenameKrystalButton.TabIndex = 36;
+            this.RenameKrystalButton.Text = "Rename Krystal...";
+            this.RenameKrystalButton.UseVisualStyleBackColor = true;
+            this.RenameKrystalButton.Visible = false;
+            this.RenameKrystalButton.Click += new System.EventHandler(this.RenameKrystalButton_Click);
+            // 
+            // DisplayKrystal2DButton
+            // 
+            this.DisplayKrystal2DButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.DisplayKrystal2DButton.Location = new System.Drawing.Point(270, 436);
+            this.DisplayKrystal2DButton.Name = "DisplayKrystal2DButton";
+            this.DisplayKrystal2DButton.Size = new System.Drawing.Size(118, 23);
+            this.DisplayKrystal2DButton.TabIndex = 37;
+            this.DisplayKrystal2DButton.Text = "Display Krystal 2D";
+            this.DisplayKrystal2DButton.UseVisualStyleBackColor = true;
+            this.DisplayKrystal2DButton.Visible = false;
+            this.DisplayKrystal2DButton.Click += new System.EventHandler(this.DisplayKrystal2DButton_Click);
+            // 
+            // KrystalsBrowser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
             this.ClientSize = new System.Drawing.Size(638, 470);
+            this.Controls.Add(this.DisplayKrystal2DButton);
+            this.Controls.Add(this.RenameKrystalButton);
             this.Controls.Add(this.MissingValues);
             this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.splitContainer1);
@@ -150,7 +178,7 @@ namespace Moritz.Krystals
             this.Controls.Add(this.Shape);
             this.Controls.Add(this.ReturnKrystalButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.Name = "KrystalBrowser";
+            this.Name = "KrystalsBrowser";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Krystals";
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -174,7 +202,7 @@ namespace Moritz.Krystals
 		private System.Windows.Forms.TreeView StrandsTreeView;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Button ReturnKrystalButton;
-
-
-	}
+        private System.Windows.Forms.Button RenameKrystalButton;
+        private System.Windows.Forms.Button DisplayKrystal2DButton;
+    }
 }

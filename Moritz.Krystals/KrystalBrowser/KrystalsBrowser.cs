@@ -12,16 +12,16 @@ namespace Moritz.Krystals
 {
     public delegate void KrystalDelegate(Krystal krystal);
 
-    public partial class KrystalBrowser : Form
+    public partial class KrystalsBrowser : Form
     {
         /// <summary>
         /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// If krystal != null, the krystalBrowser opens with the given krystal selected.
         /// </summary>
-        public KrystalBrowser(string title)
+        public KrystalsBrowser()
         {
             InitializeComponent();
-            this.Text = title;
+            this.Text = "All Krystals";
             _krystalsFolder = M.LocalMoritzKrystalsFolder;
             _returnKrystalNameDelegate = null;
             InitializeKrystalBrowser(null, null);
@@ -30,7 +30,7 @@ namespace Moritz.Krystals
         /// <summary>
         /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// </summary>
-        public KrystalBrowser(string title, KrystalDelegate returnKrystalNameDelegate)
+        public KrystalsBrowser(string title, KrystalDelegate returnKrystalNameDelegate)
         {
             InitializeComponent();
             this.Text = title;
@@ -44,7 +44,7 @@ namespace Moritz.Krystals
         /// Only Krystals whose shape is contained in the shapeListFilter are included in the displayed KrystaFamilyTree. 
         /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// </summary>
-        public KrystalBrowser(string title, int? domainFilter, List<int> shapeListFilter, KrystalDelegate returnKrystalNameDelegate)
+        public KrystalsBrowser(string title, int? domainFilter, List<int> shapeListFilter, KrystalDelegate returnKrystalNameDelegate)
         {
             InitializeComponent();
             this.Text = title;
@@ -58,7 +58,7 @@ namespace Moritz.Krystals
         /// The KrystalBrowser opens with the selectKrystal selected. 
         /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// </summary>
-        public KrystalBrowser(string title, Krystal selectKrystal, KrystalDelegate returnKrystalNameDelegate)
+        public KrystalsBrowser(string title, Krystal selectKrystal, KrystalDelegate returnKrystalNameDelegate)
         {
             InitializeComponent();
             this.Text = title;
@@ -66,6 +66,8 @@ namespace Moritz.Krystals
             _krystalsFolder = M.LocalMoritzKrystalsFolder;
             _returnKrystalNameDelegate = returnKrystalNameDelegate;
             _krystal = selectKrystal;
+            RenameKrystalButton.Visible = true;
+            DisplayKrystal2DButton.Visible = true;
             InitializeKrystalBrowser(null, null);
         }
 
@@ -99,6 +101,16 @@ namespace Moritz.Krystals
             _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily.DependencyList, domainFilter, shapeListFilter);
             _krystalFamilyTreeView.AfterSelect += new TreeViewEventHandler(this.KrystalFamilyTreeView_AfterSelect);
             this.splitContainer1.Panel1.Controls.Add(_krystalFamilyTreeView);
+        }
+
+        private void RenameKrystalButton_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DisplayKrystal2DButton_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -190,6 +202,8 @@ namespace Moritz.Krystals
                 if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalFamilyTreeView) == false)
                     SelectNodeInFamilyTree(_krystal.Name);
                 SetFirstAncestorAppearance();
+                RenameKrystalButton.Visible = true;
+                DisplayKrystal2DButton.Visible = true;
             }
             this.ResumeLayout();
         }
@@ -427,6 +441,5 @@ namespace Moritz.Krystals
         private TreeView _selectedTreeView = null;
 
         private KrystalDelegate _returnKrystalNameDelegate = null;
-
     }
 }

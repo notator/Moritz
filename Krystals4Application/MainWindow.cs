@@ -225,7 +225,7 @@ namespace Krystals4Application
 
         private void OpenKrystalsBrowserButton_Click(object sender, EventArgs e)
         {
-            KrystalBrowser KrystalBrowser = new KrystalBrowser("All krystals");
+            KrystalsBrowser KrystalBrowser = new KrystalsBrowser();
             KrystalBrowser.Show();
         }
 
@@ -620,7 +620,7 @@ namespace Krystals4Application
             about.ShowDialog();
         }
 
-        private KrystalBrowser KrystalBrowser = null;
+        private KrystalsBrowser KrystalBrowser = null;
 
 
     }
