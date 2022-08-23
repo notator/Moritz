@@ -30,6 +30,7 @@ namespace Moritz.Krystals
 		{
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.StrandsTreeView = new System.Windows.Forms.TreeView();
             this.BasicData = new System.Windows.Forms.Label();
             this.Shape = new System.Windows.Forms.Label();
@@ -37,13 +38,17 @@ namespace Moritz.Krystals
             this.MissingValues = new System.Windows.Forms.Label();
             this.ReturnKrystalButton = new System.Windows.Forms.Button();
             this.RenameKrystalButton = new System.Windows.Forms.Button();
-            this.DisplayKrystal2DButton = new System.Windows.Forms.Button();
+            this.Krystal2DTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
+            this.splitContainer3.Panel1.SuspendLayout();
+            this.splitContainer3.Panel2.SuspendLayout();
+            this.splitContainer3.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -58,8 +63,8 @@ namespace Moritz.Krystals
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(638, 388);
-            this.splitContainer1.SplitterDistance = 226;
+            this.splitContainer1.Size = new System.Drawing.Size(1368, 388);
+            this.splitContainer1.SplitterDistance = 184;
             this.splitContainer1.TabIndex = 0;
             // 
             // splitContainer2
@@ -70,10 +75,27 @@ namespace Moritz.Krystals
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.StrandsTreeView);
-            this.splitContainer2.Size = new System.Drawing.Size(408, 388);
-            this.splitContainer2.SplitterDistance = 136;
+            this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
+            this.splitContainer2.Size = new System.Drawing.Size(1180, 388);
+            this.splitContainer2.SplitterDistance = 202;
             this.splitContainer2.TabIndex = 0;
+            // 
+            // splitContainer3
+            // 
+            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer3.Name = "splitContainer3";
+            // 
+            // splitContainer3.Panel1
+            // 
+            this.splitContainer3.Panel1.Controls.Add(this.StrandsTreeView);
+            // 
+            // splitContainer3.Panel2
+            // 
+            this.splitContainer3.Panel2.Controls.Add(this.Krystal2DTextBox);
+            this.splitContainer3.Size = new System.Drawing.Size(974, 388);
+            this.splitContainer3.SplitterDistance = 254;
+            this.splitContainer3.TabIndex = 1;
             // 
             // StrandsTreeView
             // 
@@ -81,7 +103,7 @@ namespace Moritz.Krystals
             this.StrandsTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.StrandsTreeView.Location = new System.Drawing.Point(0, 0);
             this.StrandsTreeView.Name = "StrandsTreeView";
-            this.StrandsTreeView.Size = new System.Drawing.Size(268, 388);
+            this.StrandsTreeView.Size = new System.Drawing.Size(254, 388);
             this.StrandsTreeView.TabIndex = 0;
             // 
             // BasicData
@@ -109,7 +131,7 @@ namespace Moritz.Krystals
             // CloseButton
             // 
             this.CloseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.CloseButton.Location = new System.Drawing.Point(533, 436);
+            this.CloseButton.Location = new System.Drawing.Point(1261, 436);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new System.Drawing.Size(94, 23);
             this.CloseButton.TabIndex = 23;
@@ -131,7 +153,7 @@ namespace Moritz.Krystals
             // ReturnKrystalButton
             // 
             this.ReturnKrystalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ReturnKrystalButton.Location = new System.Drawing.Point(533, 436);
+            this.ReturnKrystalButton.Location = new System.Drawing.Point(1261, 436);
             this.ReturnKrystalButton.Name = "ReturnKrystalButton";
             this.ReturnKrystalButton.Size = new System.Drawing.Size(94, 23);
             this.ReturnKrystalButton.TabIndex = 35;
@@ -142,7 +164,7 @@ namespace Moritz.Krystals
             // RenameKrystalButton
             // 
             this.RenameKrystalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.RenameKrystalButton.Location = new System.Drawing.Point(398, 436);
+            this.RenameKrystalButton.Location = new System.Drawing.Point(1126, 436);
             this.RenameKrystalButton.Name = "RenameKrystalButton";
             this.RenameKrystalButton.Size = new System.Drawing.Size(125, 23);
             this.RenameKrystalButton.TabIndex = 36;
@@ -151,25 +173,26 @@ namespace Moritz.Krystals
             this.RenameKrystalButton.Visible = false;
             this.RenameKrystalButton.Click += new System.EventHandler(this.RenameKrystalButton_Click);
             // 
-            // DisplayKrystal2DButton
+            // Krystal2DTextBox
             // 
-            this.DisplayKrystal2DButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.DisplayKrystal2DButton.Location = new System.Drawing.Point(270, 436);
-            this.DisplayKrystal2DButton.Name = "DisplayKrystal2DButton";
-            this.DisplayKrystal2DButton.Size = new System.Drawing.Size(118, 23);
-            this.DisplayKrystal2DButton.TabIndex = 37;
-            this.DisplayKrystal2DButton.Text = "Display Krystal 2D";
-            this.DisplayKrystal2DButton.UseVisualStyleBackColor = true;
-            this.DisplayKrystal2DButton.Visible = false;
-            this.DisplayKrystal2DButton.Click += new System.EventHandler(this.DisplayKrystal2DButton_Click);
+            this.Krystal2DTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Krystal2DTextBox.Location = new System.Drawing.Point(0, 0);
+            this.Krystal2DTextBox.Multiline = true;
+            this.Krystal2DTextBox.Name = "Krystal2DTextBox";
+            this.Krystal2DTextBox.Size = new System.Drawing.Size(714, 388);
+            this.Krystal2DTextBox.TabIndex = 0;
+            this.Krystal2DTextBox.Text = "demo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndem" +
+    "o text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo " +
+    "text\r\n\r\ndemo text\r\n\r\n";
             // 
             // KrystalsBrowser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
-            this.ClientSize = new System.Drawing.Size(638, 470);
-            this.Controls.Add(this.DisplayKrystal2DButton);
+            this.ClientSize = new System.Drawing.Size(1366, 470);
             this.Controls.Add(this.RenameKrystalButton);
             this.Controls.Add(this.MissingValues);
             this.Controls.Add(this.CloseButton);
@@ -187,6 +210,11 @@ namespace Moritz.Krystals
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.splitContainer3.Panel1.ResumeLayout(false);
+            this.splitContainer3.Panel2.ResumeLayout(false);
+            this.splitContainer3.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
+            this.splitContainer3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -203,6 +231,7 @@ namespace Moritz.Krystals
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Button ReturnKrystalButton;
         private System.Windows.Forms.Button RenameKrystalButton;
-        private System.Windows.Forms.Button DisplayKrystal2DButton;
+        private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.TextBox Krystal2DTextBox;
     }
 }

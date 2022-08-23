@@ -67,17 +67,18 @@ namespace Moritz.Krystals
             _returnKrystalNameDelegate = returnKrystalNameDelegate;
             _krystal = selectKrystal;
             RenameKrystalButton.Visible = true;
-            DisplayKrystal2DButton.Visible = true;
             InitializeKrystalBrowser(null, null);
         }
 
         private void InitializeKrystalBrowser(int? domainFilter, List<int> shapeListFilter)
         {
-            this.Width = 975;
+            this.Width = Screen.PrimaryScreen.WorkingArea.Width - 100;
             this.Height = Screen.PrimaryScreen.WorkingArea.Height;
             this.Location = new Point(0, 0);
-            this.splitContainer1.SplitterDistance = 320;
-            this.splitContainer2.SplitterDistance = this.splitContainer1.SplitterDistance;
+            this.splitContainer1.SplitterDistance = Width / 6;
+            this.splitContainer2.SplitterDistance = Width / 6;
+            this.splitContainer3.SplitterDistance = Width / 6;
+            this.Krystal2DTextBox.Text = "";
 
             if(_returnKrystalNameDelegate != null)
             {
@@ -104,11 +105,6 @@ namespace Moritz.Krystals
         }
 
         private void RenameKrystalButton_Click(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void DisplayKrystal2DButton_Click(object sender, EventArgs e)
         {
             throw new NotImplementedException();
         }
@@ -150,15 +146,17 @@ namespace Moritz.Krystals
             _ancestorsTreeView.AfterSelect += new TreeViewEventHandler(this.AncestorsTreeView_AfterSelect);
             this.splitContainer2.Panel1.Controls.Add(_ancestorsTreeView);
 
-			LineKrystal lk = _krystal as LineKrystal;
+            ConstantKrystal ck = _krystal as ConstantKrystal;
+            LineKrystal lk = _krystal as LineKrystal;
 			ExpansionKrystal xk = _krystal as ExpansionKrystal;
             ModulationKrystal mk = _krystal as ModulationKrystal;
             PermutationKrystal pk = _krystal as PermutationKrystal;
+            PathKrystal pathK = _krystal as PathKrystal;
 
-			if(_krystal is ConstantKrystal ck)
+			if(ck != null)
 			{
 				this.BasicData.Text = string.Format("Constant Krystal: {0}   Level: {1}   Value: {2}",
-					_krystal.Name, _krystal.Level.ToString(), _krystal.MaxValue.ToString());
+					ck.Name, ck.Level.ToString(), ck.MaxValue.ToString());
 				SetForConstantKrystal();
 			}
 			else if(lk != null)
@@ -191,6 +189,10 @@ namespace Moritz.Krystals
 					_krystal.Name, _krystal.Level.ToString(), pk.PermutationLevel.ToString(), sortFirstString, _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
 				SetForPermutationKrystal(pk);
 			}
+            else if(pathK != null)
+            {
+                throw new NotImplementedException();
+            }
 			else // _krystal == null
 			{
 				this.BasicData.Text = "";
@@ -202,10 +204,31 @@ namespace Moritz.Krystals
                 if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalFamilyTreeView) == false)
                     SelectNodeInFamilyTree(_krystal.Name);
                 SetFirstAncestorAppearance();
+                Krystal2DTextBox.Text = Get2DText(_krystal);
                 RenameKrystalButton.Visible = true;
-                DisplayKrystal2DButton.Visible = true;
             }
             this.ResumeLayout();
+        }
+
+        private string Get2DText(Krystal krystal)
+        {
+            var sb = new StringBuilder();
+
+            int kLevel = (int)krystal.Level;
+            List<List<string>> allBlocks = new List<List<string>>();
+            List<string> block = new List<string>(); // a block consists of a single list of consecutive strands (usually 7 or less)
+            allBlocks.Add(block);
+            foreach(var strand in krystal.Strands)
+            {
+                if(strand.Level > 1 && strand.Level < kLevel)
+                {
+                    allBlocks.Add(block);
+                    block = new List<string>();
+                }
+                block.Add(K.GetStringOfUnsignedInts(strand.Values));
+            }
+
+            return sb.ToString();
         }
 
         private void SetForNoKrystal()
@@ -215,6 +238,7 @@ namespace Moritz.Krystals
             StrandsTreeView.Nodes.Clear();
             TreeNode tn = new TreeNode("  ");
             StrandsTreeView.Nodes.Add(tn);
+            Krystal2DTextBox.Text = "";
         }
 
         private void SetForConstantKrystal()
