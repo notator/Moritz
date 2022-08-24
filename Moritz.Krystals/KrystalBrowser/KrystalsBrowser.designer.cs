@@ -32,13 +32,13 @@ namespace Moritz.Krystals
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.StrandsTreeView = new System.Windows.Forms.TreeView();
+            this.Krystal2DTextBox = new System.Windows.Forms.TextBox();
             this.BasicData = new System.Windows.Forms.Label();
             this.Shape = new System.Windows.Forms.Label();
             this.CloseButton = new System.Windows.Forms.Button();
             this.MissingValues = new System.Windows.Forms.Label();
             this.ReturnKrystalButton = new System.Windows.Forms.Button();
             this.RenameKrystalButton = new System.Windows.Forms.Button();
-            this.Krystal2DTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -106,6 +106,22 @@ namespace Moritz.Krystals
             this.StrandsTreeView.Size = new System.Drawing.Size(254, 388);
             this.StrandsTreeView.TabIndex = 0;
             // 
+            // Krystal2DTextBox
+            // 
+            this.Krystal2DTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Krystal2DTextBox.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Krystal2DTextBox.Location = new System.Drawing.Point(0, 0);
+            this.Krystal2DTextBox.Multiline = true;
+            this.Krystal2DTextBox.Name = "Krystal2DTextBox";
+            this.Krystal2DTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.Krystal2DTextBox.Size = new System.Drawing.Size(714, 388);
+            this.Krystal2DTextBox.TabIndex = 0;
+            this.Krystal2DTextBox.Text = "demo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndem" +
+    "o text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo " +
+    "text\r\n\r\ndemo text\r\n\r\n";
+            // 
             // BasicData
             // 
             this.BasicData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -172,20 +188,6 @@ namespace Moritz.Krystals
             this.RenameKrystalButton.UseVisualStyleBackColor = true;
             this.RenameKrystalButton.Visible = false;
             this.RenameKrystalButton.Click += new System.EventHandler(this.RenameKrystalButton_Click);
-            // 
-            // Krystal2DTextBox
-            // 
-            this.Krystal2DTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Krystal2DTextBox.Location = new System.Drawing.Point(0, 0);
-            this.Krystal2DTextBox.Multiline = true;
-            this.Krystal2DTextBox.Name = "Krystal2DTextBox";
-            this.Krystal2DTextBox.Size = new System.Drawing.Size(714, 388);
-            this.Krystal2DTextBox.TabIndex = 0;
-            this.Krystal2DTextBox.Text = "demo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndem" +
-    "o text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo " +
-    "text\r\n\r\ndemo text\r\n\r\n";
             // 
             // KrystalsBrowser
             // 

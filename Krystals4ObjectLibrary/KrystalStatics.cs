@@ -707,21 +707,31 @@ namespace Krystals4ObjectLibrary
             string expanderSignature = FieldSignature(expansionKrystalFilename);
             return String.Format("e{0}{1}", expanderSignature, K.ExpanderFilenameSuffix);
         }
+
+        /// <summary>
+        /// Converts a List of uints to a StringBuilder containing the uints separated by the separator character
+        /// </summary>
+        public static StringBuilder GetStringBuilderOfUnsignedInts(List<uint> values, char separator)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach(uint ui in values)
+            {
+                sb.Append(ui);
+                sb.Append(separator);
+            }
+            if(values.Count > 0)
+                sb.Remove(sb.Length - 1, 1); // remove the final space
+            return sb;
+        }
+
         /// <summary>
         /// Converts a List of uints to a string containing the uints separated by spaces
         /// </summary>
         /// <param name="uintList"></param>
         /// <returns>the string</returns>
-        public static string GetStringOfUnsignedInts(List<uint> uintList)
+        public static string GetStringOfUnsignedInts(List<uint> uintList, char separator = ' ')
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (uint ui in uintList)
-            {
-                sb.Append(ui);
-                sb.Append(" ");
-            }
-            if (uintList.Count > 0)
-                sb.Remove(sb.Length - 1, 1); // remove the final space
+            StringBuilder sb = GetStringBuilderOfUnsignedInts(uintList, separator);
             return sb.ToString();
         }
         /// <summary>
@@ -895,6 +905,41 @@ namespace Krystals4ObjectLibrary
             return rval;
         }
 
+        /// <summary>
+        /// Returns the values in the clock separated by " : " (not including clock[0]).
+        /// </summary>
+        /// <param name="clock"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static string ClockToString(int[] clock)
+        {
+            StringBuilder sb = new StringBuilder();
+            string separator = " : ";
+            for(int i = 1; i < clock.Length; i++)
+            {
+                sb.Append(clock[i]);
+                sb.Append(separator);
+            }
+            sb.Remove(sb.Length - separator.Length, separator.Length);
+
+            return sb.ToString();
+        }
+        /// <summary>
+        /// Returns the values as a string of hexadecimal characters.
+        /// </summary>
+        /// <param name="values"></param>
+        public static string GetHexString(List<uint> values)
+        {
+            IReadOnlyList<char> chars = new List<char>() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+            StringBuilder sb = new StringBuilder();
+            foreach(var val in values)
+            {
+                Debug.Assert(val <= 16);
+                sb.Append(chars[(int)val]);
+            }
+            return sb.ToString();
+        }
+
         public static string Now
         {
             get { return DateTime.Today.ToString("dddd dd.MM.yyyy", _dateTimeFormat) + ", " + DateTime.Now.ToLongTimeString();}
@@ -931,9 +976,9 @@ namespace Krystals4ObjectLibrary
             constant,
             line,
             exp,
-            path,
             mod,
-            perm
+            perm,
+            path
         };
  
         // used to index the Krystal dialog filter (see above)

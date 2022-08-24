@@ -204,31 +204,150 @@ namespace Moritz.Krystals
                 if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalFamilyTreeView) == false)
                     SelectNodeInFamilyTree(_krystal.Name);
                 SetFirstAncestorAppearance();
-                Krystal2DTextBox.Text = Get2DText(_krystal);
+                Krystal2DTextBox.Lines = Get2DText(_krystal);
                 RenameKrystalButton.Visible = true;
             }
             this.ResumeLayout();
         }
 
-        private string Get2DText(Krystal krystal)
+        private string[] Get2DText(Krystal krystal)
         {
             var sb = new StringBuilder();
 
             int kLevel = (int)krystal.Level;
-            List<List<string>> allBlocks = new List<List<string>>();
-            List<string> block = new List<string>(); // a block consists of a single list of consecutive strands (usually 7 or less)
-            allBlocks.Add(block);
-            foreach(var strand in krystal.Strands)
+            int[] clock = new int[kLevel + 1];
+            int[] nextClock = new int[kLevel + 1];
+            for(int i = 0; i < clock.Length; i++)
             {
-                if(strand.Level > 1 && strand.Level < kLevel)
-                {
-                    allBlocks.Add(block);
-                    block = new List<string>();
-                }
-                block.Add(K.GetStringOfUnsignedInts(strand.Values));
+                clock[i] = nextClock[i] = 1;
             }
 
-            return sb.ToString();
+            List<string> paragraph = new List<string>(); // a paragraph is a a clock line, followed by a horizontal group of blocks, followed by an empty line.
+            List<List<string>> paragraphs = new List<List<string>>();
+            List<string> block = new List<string>();  // a block consists of a single list of consecutive strands (usually 7 or less)
+            List<List<string>> blocksList = new List<List<string>>();
+            for(int k = 0; k < krystal.Strands.Count; k++)
+            {
+                var strand = krystal.Strands[k];
+
+                if(strand.Level <= kLevel - 1 && block.Count > 0)
+                {
+                    blocksList.Add(block);
+                    block = new List<string>();
+                }
+
+                if((strand.Level == 1 || strand.Level < kLevel - 1) && blocksList.Count > 0)
+                {
+                    paragraph = GetParagraph(krystal.Name, clock, blocksList);
+                    paragraphs.Add(paragraph);
+                    for(int i = 0; i < clock.Length; i++)
+                    {
+                        clock[i] = nextClock[i];
+                    }
+                    blocksList = new List<List<string>>();
+                    block = new List<string>();
+                }
+
+                block.Add(K.GetHexString(strand.Values));
+
+                nextClock[nextClock.Length - 1] += strand.Values.Count;
+                for(int i = nextClock.Length - 1; i >= strand.Level ; i--)
+                {
+                    nextClock[i-1] += 1;
+                }
+            }
+
+            blocksList.Add(block);
+            paragraph = GetParagraph(krystal.Name, clock, blocksList);
+            paragraphs.Add(paragraph);
+
+            return ParagraphsToText(paragraphs, nextClock);
+        }
+
+        private string[] ParagraphsToText(List<List<string>> paragraphs, int[] nextClock)
+        {
+            List<string> rval = new List<string>();
+            foreach(List<string> lines in paragraphs)
+            {
+                foreach(var line in lines)
+                {
+                    rval.Add(line);
+                }
+            }
+
+            rval.Add("");
+
+            List<int> finalClock = new List<int>();
+            foreach(var val in nextClock)
+            {
+                finalClock.Add(val - 1);
+            }
+            rval.Add(K.ClockToString(finalClock.ToArray()));
+
+            return rval.ToArray();
+        }
+
+        /// <summary>
+        /// Each string in the returned List is a line of text.
+        /// The first line is a representation of the current state of the clock (=shape)
+        /// Subsequent lines contain strand values in various blocks.
+        /// The final line is empty (i.e. is a carriage return).
+        /// </summary>
+        /// <param name="shape"></param>
+        /// <param name="paragraphBlocks"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private List<string> GetParagraph(string krystalName, int[] clock, List<List<string>> blocksList)
+        {
+            var sbLines = new List<StringBuilder>();
+
+            int nParagraphBlockLines = 0;
+            foreach(List<string> block in blocksList)
+            {
+                nParagraphBlockLines = (block.Count > nParagraphBlockLines) ? block.Count : nParagraphBlockLines;
+            }
+            for(int i = 0; i < nParagraphBlockLines; i++)
+            {
+                sbLines.Add(new StringBuilder());
+            }
+
+            int nBlocks = blocksList.Count;
+            const int tab = 15;
+
+            if(!krystalName.Contains(K.KrystalType.perm.ToString())) // TODO permutation display with axes.
+            {
+                for(int j = 0; j < nBlocks; j++)
+                {
+                    List<string> blockLines = blocksList[j];
+                    int nBlockLines = blockLines.Count;
+                    for(int k = 0; k < nBlockLines; k++)
+                    {
+                        sbLines[k].Append(blockLines[k]);
+                    }
+                    if(j < nBlocks - 1)
+                    {
+                        int tabstop = tab * (j + 1);
+                        for(int k = 0; k < nParagraphBlockLines; k++)
+                        {
+                            while(sbLines[k].Length < tabstop)
+                            {
+                                sbLines[k].Append(' ');
+                            }
+                        }
+                    }
+                }
+            }
+
+            var rval = new List<string> {K.ClockToString(clock)};
+
+            foreach(var sbLine in sbLines)
+            {
+                rval.Add(sbLine.ToString());
+            }
+
+            rval.Add("");
+
+            return rval;
         }
 
         private void SetForNoKrystal()
