@@ -212,7 +212,10 @@ namespace Moritz.Krystals
 
         private string[] Get2DText(Krystal krystal)
         {
-            var sb = new StringBuilder();
+            if(_krystal.Level == 0)
+            {
+                return new string[] { _krystal.MaxValue.ToString() };
+            }
 
             int kLevel = (int)krystal.Level;
             int[] clock = new int[kLevel + 1];
@@ -274,8 +277,6 @@ namespace Moritz.Krystals
                     rval.Add(line);
                 }
             }
-
-            rval.Add("");
 
             List<int> finalClock = new List<int>();
             foreach(var val in nextClock)
