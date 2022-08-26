@@ -218,11 +218,24 @@ namespace Moritz.Krystals
             }
 
             int kLevel = (int)krystal.Level;
+
             int[] clock = new int[kLevel + 1];
             int[] nextClock = new int[kLevel + 1];
             for(int i = 0; i < clock.Length; i++)
             {
                 clock[i] = nextClock[i] = 1;
+            }
+            List<uint> section = null;
+            List<uint> nextSection = null;
+            if(kLevel > 4)
+            {
+                section = new List<uint>();
+                nextSection = new List<uint>();
+                for(int i = 0; i < kLevel - 3; i++)
+                {
+                    section.Add(1);
+                    nextSection.Add(1);
+                }
             }
 
             List<string> paragraph = new List<string>(); // a paragraph is a a clock line, followed by a horizontal group of blocks, followed by an empty line.
@@ -231,7 +244,7 @@ namespace Moritz.Krystals
             List<List<string>> blocksList = new List<List<string>>();
             for(int k = 0; k < krystal.Strands.Count; k++)
             {
-                var strand = krystal.Strands[k];
+                Strand strand = krystal.Strands[k];
 
                 if(strand.Level <= kLevel - 1 && block.Count > 0)
                 {
@@ -241,11 +254,18 @@ namespace Moritz.Krystals
 
                 if((strand.Level == 1 || strand.Level < kLevel - 1) && blocksList.Count > 0)
                 {
-                    paragraph = GetParagraph(krystal.Name, clock, blocksList);
+                    paragraph = GetParagraph(krystal.Name, section, clock, blocksList);
                     paragraphs.Add(paragraph);
                     for(int i = 0; i < clock.Length; i++)
                     {
                         clock[i] = nextClock[i];
+                    }
+                    if(kLevel > 4)
+                    {
+                        for(int i = 0; i < section.Count; i++)
+                        {
+                            section[i] = nextSection[i];
+                        }
                     }
                     blocksList = new List<List<string>>();
                     block = new List<string>();
@@ -258,10 +278,29 @@ namespace Moritz.Krystals
                 {
                     nextClock[i-1] += 1;
                 }
+                if(kLevel > 4)
+                {
+                    Console.WriteLine("Strand=" + strand.ToString());
+                    if(strand.Level < 3)
+                    {
+                        nextSection[0]++;
+                        for(int j = 1; j < nextSection.Count; j++)
+                        {
+                            nextSection[j] = 1;
+                        }
+                    }
+                    else if(strand.Level <= kLevel - 2)
+                    {
+                        for(int j = (int)strand.Level - 2; j < nextSection.Count; j++)
+                        {
+                            nextSection[j]++;
+                        }
+                    }
+                }
             }
 
             blocksList.Add(block);
-            paragraph = GetParagraph(krystal.Name, clock, blocksList);
+            paragraph = GetParagraph(krystal.Name, section, clock, blocksList);
             paragraphs.Add(paragraph);
 
             return ParagraphsToText(paragraphs, nextClock);
@@ -298,7 +337,7 @@ namespace Moritz.Krystals
         /// <param name="paragraphBlocks"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private List<string> GetParagraph(string krystalName, int[] clock, List<List<string>> blocksList)
+        private List<string> GetParagraph(string krystalName, List<uint> section, int[] clock, List<List<string>> blocksList)
         {
             var sbLines = new List<StringBuilder>();
 
@@ -339,7 +378,15 @@ namespace Moritz.Krystals
                 }
             }
 
-            var rval = new List<string> {K.ClockToString(clock)};
+            string sectionString = "";
+            string clockString = K.ClockToString(clock);
+            if(section != null)
+            {
+                int colonIndex = clockString.IndexOf(':');
+                clockString = clockString.Remove(0, colonIndex);
+                sectionString = K.GetStringOfUnsignedInts(section, '.') + ' ';
+            }
+            var rval = new List<string> {sectionString + clockString};
 
             foreach(var sbLine in sbLines)
             {

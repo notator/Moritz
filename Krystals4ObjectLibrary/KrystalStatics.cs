@@ -725,7 +725,7 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
-        /// Converts a List of uints to a string containing the uints separated by spaces
+        /// Converts a List of uints to a string containing the uints separated by the separator char (default ' ')
         /// </summary>
         /// <param name="uintList"></param>
         /// <returns>the string</returns>
