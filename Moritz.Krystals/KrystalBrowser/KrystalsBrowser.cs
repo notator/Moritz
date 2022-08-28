@@ -212,9 +212,15 @@ namespace Moritz.Krystals
 
         private string[] Get2DText(Krystal krystal)
         {
+            const int MaxHexValue = 16;
+
             if(_krystal.Level == 0)
             {
                 return new string[] { _krystal.MaxValue.ToString() };
+            }
+            if(_krystal.MaxValue > MaxHexValue)
+            {
+                return new string[] { $"Cannot display krystals with a maximum value greater than {MaxHexValue} here." };
             }
             if(_krystal.Name.Contains(K.KrystalType.perm.ToString())) // TODO permutation display with axes.
             {

@@ -709,6 +709,22 @@ namespace Krystals4ObjectLibrary
         }
 
         /// <summary>
+        /// Returns the values as a string of unseparated hexadecimal characters.
+        /// </summary>
+        /// <param name="values"></param>
+        public static string GetHexString(List<uint> values)
+        {
+            IReadOnlyList<char> chars = new List<char>() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+            StringBuilder sb = new StringBuilder();
+            foreach(var val in values)
+            {
+                Debug.Assert(val <= chars.Count);
+                sb.Append(chars[(int)val]);
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Converts a List of uints to a StringBuilder containing the uints separated by the separator character
         /// </summary>
         public static StringBuilder GetStringBuilderOfUnsignedInts(List<uint> values, char separator)
@@ -922,21 +938,6 @@ namespace Krystals4ObjectLibrary
             }
             sb.Remove(sb.Length - separator.Length, separator.Length);
 
-            return sb.ToString();
-        }
-        /// <summary>
-        /// Returns the values as a string of hexadecimal characters.
-        /// </summary>
-        /// <param name="values"></param>
-        public static string GetHexString(List<uint> values)
-        {
-            IReadOnlyList<char> chars = new List<char>() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-            StringBuilder sb = new StringBuilder();
-            foreach(var val in values)
-            {
-                Debug.Assert(val <= 16);
-                sb.Append(chars[(int)val]);
-            }
             return sb.ToString();
         }
 
