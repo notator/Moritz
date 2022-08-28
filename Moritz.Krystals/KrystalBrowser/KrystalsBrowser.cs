@@ -225,15 +225,12 @@ namespace Moritz.Krystals
             {
                 clock[i] = nextClock[i] = 1;
             }
-            List<uint> section = null;
             List<uint> nextSection = null;
             if(kLevel > 4)
             {
-                section = new List<uint>();
                 nextSection = new List<uint>();
                 for(int i = 0; i < kLevel - 3; i++)
                 {
-                    section.Add(1);
                     nextSection.Add(1);
                 }
             }
@@ -254,19 +251,13 @@ namespace Moritz.Krystals
 
                 if((strand.Level == 1 || strand.Level < kLevel - 1) && blocksList.Count > 0)
                 {
-                    paragraph = GetParagraph(krystal.Name, section, clock, blocksList);
+                    paragraph = GetParagraph(krystal.Name, nextSection, clock, blocksList);
                     paragraphs.Add(paragraph);
                     for(int i = 0; i < clock.Length; i++)
                     {
                         clock[i] = nextClock[i];
                     }
-                    if(kLevel > 4)
-                    {
-                        for(int i = 0; i < section.Count; i++)
-                        {
-                            section[i] = nextSection[i];
-                        }
-                    }
+
                     blocksList = new List<List<string>>();
                     block = new List<string>();
                 }
@@ -278,10 +269,9 @@ namespace Moritz.Krystals
                 {
                     nextClock[i-1] += 1;
                 }
-                if(kLevel > 4)
+                if(kLevel > 4 && strand.Level > 1 && strand.Level <= kLevel - 2)
                 {
-                    Console.WriteLine("Strand=" + strand.ToString());
-                    if(strand.Level < 3)
+                    if(strand.Level == 2)
                     {
                         nextSection[0]++;
                         for(int j = 1; j < nextSection.Count; j++)
@@ -289,7 +279,7 @@ namespace Moritz.Krystals
                             nextSection[j] = 1;
                         }
                     }
-                    else if(strand.Level <= kLevel - 2)
+                    else
                     {
                         for(int j = (int)strand.Level - 2; j < nextSection.Count; j++)
                         {
@@ -300,7 +290,7 @@ namespace Moritz.Krystals
             }
 
             blocksList.Add(block);
-            paragraph = GetParagraph(krystal.Name, section, clock, blocksList);
+            paragraph = GetParagraph(krystal.Name, nextSection, clock, blocksList);
             paragraphs.Add(paragraph);
 
             return ParagraphsToText(paragraphs, nextClock);
