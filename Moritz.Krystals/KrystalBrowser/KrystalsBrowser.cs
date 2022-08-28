@@ -216,6 +216,10 @@ namespace Moritz.Krystals
             {
                 return new string[] { _krystal.MaxValue.ToString() };
             }
+            if(_krystal.Name.Contains(K.KrystalType.perm.ToString())) // TODO permutation display with axes.
+            {
+                MessageBox.Show("TODO: permutation display with axis and contour values.", "Permutation krystal", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
 
             int kLevel = (int)krystal.Level;
 
@@ -344,25 +348,22 @@ namespace Moritz.Krystals
             int nBlocks = blocksList.Count;
             const int tab = 15;
 
-            if(!krystalName.Contains(K.KrystalType.perm.ToString())) // TODO permutation display with axes.
+            for(int j = 0; j < nBlocks; j++)
             {
-                for(int j = 0; j < nBlocks; j++)
+                List<string> blockLines = blocksList[j];
+                int nBlockLines = blockLines.Count;
+                for(int k = 0; k < nBlockLines; k++)
                 {
-                    List<string> blockLines = blocksList[j];
-                    int nBlockLines = blockLines.Count;
-                    for(int k = 0; k < nBlockLines; k++)
+                    sbLines[k].Append(blockLines[k]);
+                }
+                if(j < nBlocks - 1)
+                {
+                    int tabstop = tab * (j + 1);
+                    for(int k = 0; k < nParagraphBlockLines; k++)
                     {
-                        sbLines[k].Append(blockLines[k]);
-                    }
-                    if(j < nBlocks - 1)
-                    {
-                        int tabstop = tab * (j + 1);
-                        for(int k = 0; k < nParagraphBlockLines; k++)
+                        while(sbLines[k].Length < tabstop)
                         {
-                            while(sbLines[k].Length < tabstop)
-                            {
-                                sbLines[k].Append(' ');
-                            }
+                            sbLines[k].Append(' ');
                         }
                     }
                 }
