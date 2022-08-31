@@ -281,10 +281,11 @@ namespace Moritz.Krystals
                 }
                 if(kLevel > 4 && strand.Level > 1 && strand.Level <= kLevel - 2)
                 {
-                    if(strand.Level == 2)
+                    if(strand.Level < kLevel - 2)
                     {
-                        nextSection[0]++;
-                        for(int j = 1; j < nextSection.Count; j++)
+                        int resetlevel = (int)strand.Level - 2;
+                        nextSection[resetlevel]++;
+                        for(int j = resetlevel + 1; j < nextSection.Count; j++)
                         {
                             nextSection[j] = 1;
                         }
