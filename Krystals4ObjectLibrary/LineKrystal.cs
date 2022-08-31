@@ -59,8 +59,10 @@ namespace Krystals4ObjectLibrary
         ///    or abort the save.
         /// This means that a given set of ancestors should always have the same index.
         /// </summary>
-        public override void Save()
+        public override bool Save()
         {
+            bool hasBeenSaved = false;
+
             var pathname = K.KrystalsFolder + @"\" + Name;
             DialogResult answer = DialogResult.Yes;
             if(File.Exists(pathname))
@@ -78,11 +80,14 @@ namespace Krystals4ObjectLibrary
                 #endregion
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
                 MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+                hasBeenSaved = true;
             }
             else
             {
                 MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
+            return hasBeenSaved;
         }
 
 

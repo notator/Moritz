@@ -32,15 +32,15 @@ namespace Krystals4ObjectLibrary
     {
         public StrandNode(int moment, int level, int density, int point)
         {
-            strandMoment = moment;
-            strandLevel = level;
-            strandDensity = density;
-            strandPoint = point;
+            StrandMoment = moment;
+            StrandLevel = level;
+            StrandDensity = density;
+            StrandPoint = point;
         }
-        public int strandMoment;
-        public int strandLevel;
-        public int strandDensity;
-        public int strandPoint;
+        public int StrandMoment;
+        public int StrandLevel;
+        public int StrandDensity;
+        public int StrandPoint;
     }
     public class ContouredStrandNode : StrandNode
     {
@@ -243,8 +243,9 @@ namespace Krystals4ObjectLibrary
         ///    either overwrite the existing krystal (using that krystal's index),
         ///    or abort the save.
         /// This means that a given set of ancestors should always have the same index.
+        /// Returns true if the file has been saved, false if the save has been aborted.
         /// </summary>
-        public abstract void Save();
+        public abstract bool Save();
 
         /// <summary>
         /// Returns true if the krystals contain identical strands, otherwise false.

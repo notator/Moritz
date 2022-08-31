@@ -27,7 +27,8 @@ namespace Krystals4ObjectLibrary
         }
         public Strand(uint level)
         {
-            this.Level = level;
+            Level = level;
+            Values = new List<uint>();
         }
         public Strand(uint level, List<uint> values)
         {

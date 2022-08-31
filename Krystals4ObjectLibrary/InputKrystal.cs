@@ -56,7 +56,7 @@ namespace Krystals4ObjectLibrary
         /// <summary>
         /// Dummy function. This should never be called.
         /// </summary>
-        public override void Save()
+        public override bool Save()
         {
             throw new ApplicationException("Input krystals cannot be saved (they have already been saved!)");
         }

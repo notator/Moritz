@@ -377,7 +377,7 @@ namespace Krystals4Application
                         {
                             // adds the new point marker to the painter's list
                             //if (planet.Value == _outputKrystal.PointsInputKrystal.AlignedValues[momentNumber - 1])
-                            if (planet.Value == _strandNodeList[(int)momentNumber - 1].strandPoint)
+                            if (planet.Value == _strandNodeList[(int)momentNumber - 1].StrandPoint)
                                 _painter.CreatePointMarker(pg.WindowsPixelCoordinates[pointIndex], planet.Value.ToString(),
                                     true, true); // highlight
                             else
@@ -406,7 +406,7 @@ namespace Krystals4Application
             {
                 if (pg.Value.Count > 0) // can fail if the pointgroup settings are not complete when the tree is selected
                     for (int i = 0; i < pg.Count; i++)
-                        if (pg.Value[i] == _strandNodeList[(int)momentNumber - 1].strandPoint)//_outputKrystal.PointsInputKrystal.AlignedValues[momentNumber - 1])
+                        if (pg.Value[i] == _strandNodeList[(int)momentNumber - 1].StrandPoint)//_outputKrystal.PointsInputKrystal.AlignedValues[momentNumber - 1])
                             _painter.CreatePointMarker(pg.WindowsPixelCoordinates[i], pg.Value[i].ToString(), true, true); // highlight
                         else
                             _painter.CreatePointMarker(pg.WindowsPixelCoordinates[i], pg.Value[i].ToString(), true, false); // empty
@@ -517,7 +517,7 @@ namespace Krystals4Application
 								location = testPoint,
 								isPlanet = true
 							};
-							if (!inputPlanets || pointGroup.Value[0] == _strandNodeList[(int)(pointIndex + pointGroup.StartMoment - 1)].strandPoint)
+							if (!inputPlanets || pointGroup.Value[0] == _strandNodeList[(int)(pointIndex + pointGroup.StartMoment - 1)].StrandPoint)
                                 ppi.isUsed = true;
                             else ppi.isUsed = false;
                             if (inputPlanets)
@@ -2777,7 +2777,7 @@ namespace Krystals4Application
                             {
                                 if (pointGroupIndex == 0 && i == 0)
                                     DrawLabel(points[i], p.Value[i].ToString());
-                                if (p.Value[0] == _strandNodeList[i + ((int)p.StartMoment) - 1].strandPoint)
+                                if (p.Value[0] == _strandNodeList[i + ((int)p.StartMoment) - 1].StrandPoint)
                                 {
                                     DrawDot(_theDotPen, _theDotPen.Brush, points[i].X - _dotOffset, points[i].Y - _dotOffset, _dotSize);
                                 }
@@ -2805,7 +2805,7 @@ namespace Krystals4Application
                                 }
                             if (!pointDrawn) // unmarked input planet points in time-slice mode
                             {
-                                if (p.Value[0] == _strandNodeList[i + ((int)p.StartMoment) - 1].strandPoint)
+                                if (p.Value[0] == _strandNodeList[i + ((int)p.StartMoment) - 1].StrandPoint)
                                 {
                                     DrawDot(_theDotPen, _theDotPen.Brush, points[i].X - _dotOffset, points[i].Y - _dotOffset, _dotSize);
                                 }

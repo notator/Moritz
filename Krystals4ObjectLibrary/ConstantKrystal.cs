@@ -55,8 +55,9 @@ namespace Krystals4ObjectLibrary
         ///    either overwrite the existing krystal (with a new date),
         ///    or abort the save.
         /// </summary>
-        public override void Save()
+        public override bool Save()
         {
+            var hasBeenSaved = false;
             var pathname = K.KrystalsFolder + @"\" + Name;
 
             DialogResult answer = DialogResult.Yes;
@@ -76,11 +77,14 @@ namespace Krystals4ObjectLibrary
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
 
                 MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+                hasBeenSaved = true;
             }
             else
             {
                 MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
+            return hasBeenSaved;
         }
         public override void Rebuild()
         {

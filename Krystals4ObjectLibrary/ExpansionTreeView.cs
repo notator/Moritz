@@ -17,8 +17,8 @@ namespace Krystals4ObjectLibrary
 			#region constant krystal inputs
 			if(dKrystalLevel == 0) // constant krystal inputs
 			{
-				int p = strandNodeList[0].strandPoint;
-				int d = strandNodeList[0].strandDensity;
+				int p = strandNodeList[0].StrandPoint;
+				int d = strandNodeList[0].StrandDensity;
 				strandNodeList[0].Text = "1: m1"
 					+ ", p" + p.ToString()
 					+ ", d" + d.ToString();
@@ -34,9 +34,9 @@ namespace Krystals4ObjectLibrary
 						_treeView.Nodes.Add("Missing p value(s): " + missingPointValuesStr);
 					foreach(StrandNode strandNode in strandNodeList)
 					{
-						int m = strandNode.strandMoment;
-						int p = strandNode.strandPoint;
-						int d = strandNode.strandDensity;
+						int m = strandNode.StrandMoment;
+						int p = strandNode.StrandPoint;
+						int d = strandNode.StrandDensity;
 						strandNode.Text = m.ToString()
 							+ ": m" + m.ToString()
 							+ ", p" + p.ToString()
@@ -56,10 +56,10 @@ namespace Krystals4ObjectLibrary
 					int localStrandSectionNumber = 0;
 					foreach(StrandNode strandNode in strandNodeList)
 					{
-						if(strandNode.strandLevel <= dKrystalLevel)
+						if(strandNode.StrandLevel <= dKrystalLevel)
 						{
 							localStrandSectionNumber = 0;
-							int levelIndex = strandNode.strandLevel - 1;
+							int levelIndex = strandNode.StrandLevel - 1;
 							while(levelIndex < dKrystalLevel)
 							{
 								TreeNode tn = new TreeNode();
@@ -81,9 +81,9 @@ namespace Krystals4ObjectLibrary
 						localStrandSectionNumber++;
 						currentNode[dKrystalLevel - 1].Nodes.Add(strandNode);
 						localSectionNumber[dKrystalLevel - 1]++;
-						int m = strandNode.strandMoment;
-						int p = strandNode.strandPoint;
-						int d = strandNode.strandDensity;
+						int m = strandNode.StrandMoment;
+						int p = strandNode.StrandPoint;
+						int d = strandNode.StrandDensity;
 						strandNode.Text = strandNode.Parent.Text
 							+ "." + localStrandSectionNumber.ToString()
 							+ ": m" + m.ToString()
@@ -93,7 +93,7 @@ namespace Krystals4ObjectLibrary
 					// Now add the moment numbers to the pure TreeNode.Texts
 					foreach(StrandNode strandNode in strandNodeList)
 					{
-						if(strandNode.strandLevel <= dKrystalLevel)
+						if(strandNode.StrandLevel <= dKrystalLevel)
 						{
 							TreeNode tn = strandNode.Parent;
 							bool continueUp = true;
@@ -102,7 +102,7 @@ namespace Krystals4ObjectLibrary
 								if(tn.Text.EndsWith(".1") && tn.Level > 0)
 									continueUp = true;
 								else continueUp = false;
-								int m = strandNode.strandMoment;
+								int m = strandNode.StrandMoment;
 								tn.Text = tn.Text + ": m" + m.ToString();
 								if(continueUp)
 									tn = tn.Parent;

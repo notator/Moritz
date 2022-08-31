@@ -67,9 +67,9 @@ namespace Krystals4ObjectLibrary
             int momentIndex = 0;
             foreach(StrandNode strandNode in strandNodeList)
             {
-                int level = strandNode.strandLevel;
-                int density = strandNode.strandDensity;
-                int iPointValue = strandNode.strandPoint;
+                int level = strandNode.StrandLevel;
+                int density = strandNode.StrandDensity;
+                int iPointValue = strandNode.StrandPoint;
                 int iPointIndex = iPointValue - 1; // the input point's index in the distances array
 
                 #region calculate distances for planets where necessary.
@@ -113,10 +113,10 @@ namespace Krystals4ObjectLibrary
             for(int strandIndex = 0 ; strandIndex < _strands.Count ; strandIndex++)
             {
 				if(contouredStrandNodeList[strandIndex] is ContouredStrandNode contouredStrandNode
-					&& contouredStrandNode.strandDensity > 1
-					&& contouredStrandNode.strandDensity <= 7)
+					&& contouredStrandNode.StrandDensity > 1
+					&& contouredStrandNode.StrandDensity <= 7)
 				{
-					int density = contouredStrandNode.strandDensity;
+					int density = contouredStrandNode.StrandDensity;
 					contour = K.Contour(density, contouredStrandNode.strandContour, contouredStrandNode.strandAxis);
 					_strands[strandIndex].Values.Sort();
 					tempList.Clear();

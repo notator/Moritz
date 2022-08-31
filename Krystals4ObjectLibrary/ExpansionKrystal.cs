@@ -144,9 +144,12 @@ namespace Krystals4ObjectLibrary
         ///    either overwrite the existing krystal (using that krystal's index),
         ///    or abort the save.
         /// This means that a given set of ancestors should always have the same index.
+        /// Returns true if the file has been saved, otherwise false.
         /// </summary>
-        public override void Save()
+        public override bool Save()
         {
+            bool hasBeenSaved = false;
+
             var pathname = K.KrystalsFolder + @"\" + Name;
             DialogResult answer = DialogResult.Yes;
             if(File.Exists(pathname))
@@ -168,11 +171,14 @@ namespace Krystals4ObjectLibrary
                 base.EndSaveKrystal(w); // saves the strands, closes the document, disposes of w
 
                 MessageBox.Show($"{Name} saved.", "Saved", MessageBoxButtons.OK);
+                hasBeenSaved = true;
             }
             else
             {
                 MessageBox.Show($"{Name} not saved.", "Save Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
             }
+            return hasBeenSaved;
         }
         public void Expand()
         {
