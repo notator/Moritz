@@ -172,7 +172,7 @@ namespace Moritz.Krystals
 
         private void SetKrystalFamilyTree(int? domainFilter, List<int> shapeListFilter, List<string> krystalsUsedInScores)
         {
-            _krystalFamilyTreeView = new KrystalFamilyTreeView(krystalsUsedInScores, _krystalFamily.DependencyList, domainFilter, shapeListFilter);
+            _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily.DependencyList, domainFilter, shapeListFilter);
             _krystalFamilyTreeView.AfterSelect += new TreeViewEventHandler(this.KrystalFamilyTreeView_AfterSelect);
             this.splitContainer1.Panel1.Controls.Add(_krystalFamilyTreeView);
         }
