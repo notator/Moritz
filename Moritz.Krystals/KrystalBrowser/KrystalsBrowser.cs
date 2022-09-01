@@ -1,12 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-
 using Krystals4ObjectLibrary;
 
 using Moritz.Globals;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace Moritz.Krystals
 {
@@ -91,15 +94,85 @@ namespace Moritz.Krystals
                 this.CloseButton.Show();
             }
 
+            List<string> krystalsUsedInScores = GetKrystalsUsedInScores();
+
             _krystalFamily = new KrystalFamily(this._krystalsFolder);
 
-            SetKrystalFamilyTree(domainFilter, shapeListFilter);
-            SetForKrystal(null);
-        }  
+            SetKrystalFamilyTree(domainFilter, shapeListFilter, krystalsUsedInScores);
 
-        private void SetKrystalFamilyTree(int? domainFilter, List<int> shapeListFilter)
+            SetForKrystal(null);
+        }
+
+        #region GetKrystalsUsedInScores
+        private List<string> GetKrystalsUsedInScores()
         {
-            _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily.DependencyList, domainFilter, shapeListFilter);
+            var rval = new List<string>();
+            string scoresPath = M.LocalMoritzScoresFolder;
+            var allScoreSettings = Directory.EnumerateFiles(scoresPath, "*.mkss", SearchOption.AllDirectories);
+            foreach(var scoreSettings in allScoreSettings)
+            {
+                var scoreKrystals = GetScoreKrystals(scoreSettings);
+                foreach(var krystalName in scoreKrystals)
+                {
+                    if(!rval.Contains(krystalName))
+                    {
+                        rval.Add(krystalName);
+                    }
+                }
+            }
+            return rval;
+        }
+        private List<string> GetScoreKrystals(string scoreSettings)
+        {
+            List<string> scoreKrystals = null;
+            try
+            {
+                using(XmlReader r = XmlReader.Create(scoreSettings))
+                {
+                    M.ReadToXmlElementTag(r, "moritzKrystalScore"); // check that this is a krystal score settings file
+
+                    M.ReadToXmlElementTag(r, "krystals", "moritzKrystalScore");
+
+                    if(r.Name == "moritzKrystalScore")
+                    {
+                        scoreKrystals = new List<string>();
+                    }
+                    else
+                    {
+                        Debug.Assert(r.Name == "krystals");
+                        scoreKrystals = GetKrystals(r);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return scoreKrystals;
+        }
+        private List<string> GetKrystals(XmlReader r)
+        {
+            List<string> scoreKrystals = new List<string>();
+            Debug.Assert(r.Name == "krystals");
+
+            M.ReadToXmlElementTag(r, "krystal");
+            while(r.Name == "krystal")
+            {
+                if(r.NodeType != XmlNodeType.EndElement)
+                {
+                    r.MoveToAttribute(0);
+                    scoreKrystals.Add(r.Value);
+                }
+                M.ReadToXmlElementTag(r, "krystal", "krystals");
+            }
+            return scoreKrystals;
+        }
+        #endregion
+
+        private void SetKrystalFamilyTree(int? domainFilter, List<int> shapeListFilter, List<string> krystalsUsedInScores)
+        {
+            _krystalFamilyTreeView = new KrystalFamilyTreeView(krystalsUsedInScores, _krystalFamily.DependencyList, domainFilter, shapeListFilter);
             _krystalFamilyTreeView.AfterSelect += new TreeViewEventHandler(this.KrystalFamilyTreeView_AfterSelect);
             this.splitContainer1.Panel1.Controls.Add(_krystalFamilyTreeView);
         }
