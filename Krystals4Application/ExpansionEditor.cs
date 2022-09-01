@@ -948,62 +948,62 @@ namespace Krystals4Application
         /// <param name="e"></param>
         private void MenuItemReplace_Click(object sender, EventArgs e)
         {
-            try
-            {
-                string expansionKrystalFilepath = GetExpansionKrystalFilepathFromReplaceFileDialog();
-                if (expansionKrystalFilepath.Length > 0)
-                {
-                    bool abort = true;                                                                                  
-                    string krystalName = Path.GetFileName(expansionKrystalFilepath);
-                    // *******************
-                    // 02.08.2022 CheckExpansionKrystalName is out of date (TODO)
-                    CheckExpansionKrystalName(krystalName); // throws exception if name is invalid
-                    // *******************
-                    string expanderName = K.ExpansionOperatorFilename(krystalName);
-                    string expanderPath = K.KrystalsFolder + @"\" +  expanderName;
-                    if (File.Exists(expanderPath))
-                    {
-                        string msg = "The following krystal and expander are about to be replaced:\n\n"
-                            + "              krystal:\t" + krystalName + "\n"
-                            + "         expander:\t" + expanderName
-                            + "\n\nNote: the krystal and expander can only be replaced together.     \n\n"
-                            + "When a krystal and expander are replaced, all the krystals in the\n"
-                            + "krystals directory have to be rebuilt to maintain the consistency\n"
-                            + "of the relationships between them. This may result in the current\n"
-                            + "krystal changing as the result of its input krystals changing.\n"
-                            + "Krystals contain references to expanders and other krystals.\n\n"
-                            + "Replace this krystal and expander, rebuild all the other krystals\n"
-                            + "and then reload the currently loaded krystal?\n\n";
-                        if (MessageBox.Show(msg, "Replace and rebuild", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
-                            MessageBoxDefaultButton.Button2) == DialogResult.Yes)
-                            abort = false;
-                        else
-                            abort = true;
-                    }
-                    else abort = false;
+            //try
+            //{
+            //    string expansionKrystalFilepath = GetExpansionKrystalFilepathFromReplaceFileDialog();
+            //    if (expansionKrystalFilepath.Length > 0)
+            //    {
+            //        bool abort = true;                                                                                  
+            //        string krystalName = Path.GetFileName(expansionKrystalFilepath);
+            //        // *******************
+            //        // 02.08.2022 CheckExpansionKrystalName is out of date (TODO)
+            //        CheckExpansionKrystalName(krystalName); // throws exception if name is invalid
+            //        // *******************
+            //        string expanderName = K.ExpansionOperatorFilename(krystalName);
+            //        string expanderPath = K.KrystalsFolder + @"\" +  expanderName;
+            //        if (File.Exists(expanderPath))
+            //        {
+            //            string msg = "The following krystal and expander are about to be replaced:\n\n"
+            //                + "              krystal:\t" + krystalName + "\n"
+            //                + "         expander:\t" + expanderName
+            //                + "\n\nNote: the krystal and expander can only be replaced together.     \n\n"
+            //                + "When a krystal and expander are replaced, all the krystals in the\n"
+            //                + "krystals directory have to be rebuilt to maintain the consistency\n"
+            //                + "of the relationships between them. This may result in the current\n"
+            //                + "krystal changing as the result of its input krystals changing.\n"
+            //                + "Krystals contain references to expanders and other krystals.\n\n"
+            //                + "Replace this krystal and expander, rebuild all the other krystals\n"
+            //                + "and then reload the currently loaded krystal?\n\n";
+            //            if (MessageBox.Show(msg, "Replace and rebuild", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+            //                MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            //                abort = false;
+            //            else
+            //                abort = true;
+            //        }
+            //        else abort = false;
 
-                    if (!abort)
-                    {
-                        _expander.Name = expanderName;
-                        _outputKrystal.Name = krystalName;
-                        _outputKrystal.Expander.Save(); // save expander, but not krystal
+            //        if (!abort)
+            //        {
+            //            _expander.Name = expanderName;
+            //            _outputKrystal.Name = krystalName;
+            //            _outputKrystal.Expander.Save(); // save expander, but not krystal
 
-                        KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
-                        kFamily.Rebuild();
+            //            KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
+            //            kFamily.Rebuild();
 
-                        _outputKrystal = new ExpansionKrystal(expansionKrystalFilepath);
-                        this.ExpandButton.Enabled = false;
-                        this.ZoomLabel.Enabled = true;
-                        this.ZoomComboBox.Enabled = true;
-                        this.PercentLabel.Enabled = true;
-                        LoadNewOutputKrystalIntoEditor();
-                    }
-                }
-            }
-            catch (ApplicationException ae)
-            {
-                MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
+            //            _outputKrystal = new ExpansionKrystal(expansionKrystalFilepath);
+            //            this.ExpandButton.Enabled = false;
+            //            this.ZoomLabel.Enabled = true;
+            //            this.ZoomComboBox.Enabled = true;
+            //            this.PercentLabel.Enabled = true;
+            //            LoadNewOutputKrystalIntoEditor();
+            //        }
+            //    }
+            //}
+            //catch (ApplicationException ae)
+            //{
+            //    MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            //}
             //catch (SystemException ae)
             //{
             //    MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Text;
+using System.Drawing;
 using System.IO;
-using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
 
 namespace Krystals4ObjectLibrary
 {
@@ -50,7 +50,7 @@ namespace Krystals4ObjectLibrary
         /// Loads all the krystals in K.KrystalsFolder into a list of dependencies,
         /// in which later entries in the list are dependent on earlier entries. 
         /// </summary>
-        public KrystalFamily(string krystalsFolder )
+        public KrystalFamily(string krystalsFolder, List<string> krystalsUsedInScores)
         {
             DirectoryInfo dir = new DirectoryInfo(krystalsFolder);
             string allConstants = "*.constant.krys";
@@ -81,15 +81,22 @@ namespace Krystals4ObjectLibrary
             {
                 string path = K.KrystalsFolder + @"\" +  f.Name;
                 var xk = new ExpansionKrystal(path, true);
-				Dependency d = new Dependency
-				{
-					Name = f.Name
+                Dependency d = new Dependency
+                {
+                    Name = f.Name
 				};
-				if(xk != null)
+                if(xk != null)
                 {
                     d.Input1 = xk.DensityInputFilename;
                     d.Input2 = xk.PointsInputFilename;
                     d.Field = xk.ExpanderFilename;
+                }
+                if(krystalsUsedInScores.Contains(d.Name))
+                {
+                    SetUsedInScoreColor(d.Name);
+                    SetAncestorColor(d.Input1);
+                    SetAncestorColor(d.Input2);
+                    SetAncestorColor(d.Field);
                 }
                 _unknownParentsList.Add(d);
             }
@@ -106,11 +113,18 @@ namespace Krystals4ObjectLibrary
 				{
 					Name = f.Name
 				};
-				if(mk != null)
+                if(mk != null)
                 {
                     d.Input1 = mk.XInputFilename;
                     d.Input2 = mk.YInputFilename;
                     d.Field = mk.ModulatorFilename;
+                }
+                if(krystalsUsedInScores.Contains(d.Name))
+                {
+                    SetUsedInScoreColor(d.Name);
+                    SetAncestorColor(d.Input1);
+                    SetAncestorColor(d.Input2);
+                    SetAncestorColor(d.Field);
                 }
                 _unknownParentsList.Add(d);
             }
@@ -133,6 +147,13 @@ namespace Krystals4ObjectLibrary
                     d.Input2 = pk.AxisInputFilename;
                     d.Input3 = pk.ContourInputFilename;
                 }
+                if(krystalsUsedInScores.Contains(d.Name))
+                {
+                    SetUsedInScoreColor(d.Name);
+                    SetAncestorColor(d.Input1);
+                    SetAncestorColor(d.Input2);
+                    SetAncestorColor(d.Input3);
+                }
                 _unknownParentsList.Add(d);
             }
             #endregion add path krystals to the _unknownParentsList
@@ -147,11 +168,17 @@ namespace Krystals4ObjectLibrary
                 Dependency d = new Dependency
                 {
                     Name = f.Name
-                };
+                };                
                 if(pk != null)
                 {
                     d.Input1 = pk.DensityInputKrystalName;
                     d.Input2 = pk.SVGInputFilename;
+                }
+                if(krystalsUsedInScores.Contains(d.Name))
+                {
+                    SetUsedInScoreColor(d.Name);
+                    SetAncestorColor(d.Input1);
+                    SetAncestorColor(d.Input2);
                 }
                 _unknownParentsList.Add(d);
             }
@@ -209,6 +236,35 @@ namespace Krystals4ObjectLibrary
             }
             #endregion move Dependencies from the _unknownParentsList to the sorted _dependencyList
         }
+
+        private void SetAncestorColor(string name)
+        {
+            if(_nameColors.ContainsKey(name) && _nameColors[name] == UsedInScoreColor)
+            {
+                return;
+            }
+            if(!_nameColors.ContainsKey(name))
+            {
+                this._nameColors.Add(name, AncestorColor);
+            }
+            else
+            {
+                _nameColors[name] = AncestorColor;
+            }
+        }
+
+        private void SetUsedInScoreColor(string name)
+        {
+            if(!_nameColors.ContainsKey(name))
+            {
+                this._nameColors.Add(name, Color.Red);
+            }
+            else
+            {
+                _nameColors[name] = Color.Red;
+            }
+        }
+
         public void Rebuild()
         {
             if(_unknownParentsList.Count > 0)
@@ -253,5 +309,9 @@ namespace Krystals4ObjectLibrary
         public List<Dependency> DependencyList { get { return _dependencyList; } }
         private List<Dependency> _dependencyList = new List<Dependency>();
         private List<Dependency> _unknownParentsList = new List<Dependency>();
+
+        private Color UsedInScoreColor = Color.Red;
+        private Color AncestorColor = Color.Purple;
+        private Dictionary<string, Color> _nameColors = new Dictionary<string, Color>();
     }
 }

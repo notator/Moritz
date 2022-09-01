@@ -96,9 +96,9 @@ namespace Moritz.Krystals
 
             List<string> krystalsUsedInScores = GetKrystalsUsedInScores();
 
-            _krystalFamily = new KrystalFamily(this._krystalsFolder);
+            _krystalFamily = new KrystalFamily(this._krystalsFolder, krystalsUsedInScores);
 
-            SetKrystalFamilyTree(domainFilter, shapeListFilter, krystalsUsedInScores);
+            SetKrystalFamilyTree(domainFilter, shapeListFilter);
 
             SetForKrystal(null);
         }
@@ -170,7 +170,7 @@ namespace Moritz.Krystals
         }
         #endregion
 
-        private void SetKrystalFamilyTree(int? domainFilter, List<int> shapeListFilter, List<string> krystalsUsedInScores)
+        private void SetKrystalFamilyTree(int? domainFilter, List<int> shapeListFilter)
         {
             _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily.DependencyList, domainFilter, shapeListFilter);
             _krystalFamilyTreeView.AfterSelect += new TreeViewEventHandler(this.KrystalFamilyTreeView_AfterSelect);

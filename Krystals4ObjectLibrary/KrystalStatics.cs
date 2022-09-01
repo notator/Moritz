@@ -317,10 +317,10 @@ namespace Krystals4ObjectLibrary
 
         public static void RebuildKrystalFamily()
         {
-            KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
-            kFamily.Rebuild();
-            MessageBox.Show("All krystals have been successfully recreated",
-                "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //    KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
+        //    kFamily.Rebuild();
+        //    MessageBox.Show("All krystals have been successfully recreated",
+        //        "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
