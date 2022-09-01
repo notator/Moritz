@@ -118,9 +118,6 @@ namespace Moritz.Krystals
             this.Krystal2DTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.Krystal2DTextBox.Size = new System.Drawing.Size(714, 388);
             this.Krystal2DTextBox.TabIndex = 0;
-            this.Krystal2DTextBox.Text = "demo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndem" +
-    "o text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo text\r\n\r\ndemo " +
-    "text\r\n\r\ndemo text\r\n\r\n";
             // 
             // BasicData
             // 
