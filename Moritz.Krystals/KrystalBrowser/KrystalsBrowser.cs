@@ -172,7 +172,7 @@ namespace Moritz.Krystals
 
         private void SetKrystalFamilyTree(int? domainFilter, List<int> shapeListFilter)
         {
-            _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily.DependencyList, domainFilter, shapeListFilter);
+            _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily, domainFilter, shapeListFilter);
             _krystalFamilyTreeView.AfterSelect += new TreeViewEventHandler(this.KrystalFamilyTreeView_AfterSelect);
             this.splitContainer1.Panel1.Controls.Add(_krystalFamilyTreeView);
         }
@@ -215,7 +215,7 @@ namespace Moritz.Krystals
                 tv.Dispose();
             }
             // if filename is null, _krystal is null here
-            _ancestorsTreeView = new KrystalAncestorsTreeView(_krystal, _krystalFamily.DependencyList);
+            _ancestorsTreeView = new KrystalAncestorsTreeView(_krystal, _krystalFamily);
             _ancestorsTreeView.AfterSelect += new TreeViewEventHandler(this.AncestorsTreeView_AfterSelect);
             this.splitContainer2.Panel1.Controls.Add(_ancestorsTreeView);
 
@@ -276,7 +276,7 @@ namespace Moritz.Krystals
             {
                 if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalFamilyTreeView) == false)
                     SelectNodeInFamilyTree(_krystal.Name);
-                SetFirstAncestorAppearance();
+                //SetFirstAncestorAppearance();
                 Krystal2DTextBox.Lines = Get2DText(_krystal);
                 RenameKrystalButton.Visible = true;
             }
@@ -551,13 +551,13 @@ namespace Moritz.Krystals
             if(_previouslySelectedAncestorsNode != null)
             {
                 _previouslySelectedAncestorsNode.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Window);
-                _previouslySelectedAncestorsNode.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Black);
             }
-
-            AncestorsNode n = e.Node as AncestorsNode;
-            _previouslySelectedAncestorsNode = n;
-            n.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Highlight);
-            n.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Window);
+            var n = e.Node as AncestorsNode;
+            if(n != null)
+            {
+                _previouslySelectedAncestorsNode = n;
+                n.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Highlight);
+            }
 
             if(_ancestorsTreeView.Focused)
             {
@@ -579,16 +579,12 @@ namespace Moritz.Krystals
             if(_previouslySelectedChildrenNode != null)
             {
                 _previouslySelectedChildrenNode.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Window);
-                _previouslySelectedChildrenNode.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Black);
             }
-
-            KrystalChildrenNode n = e.Node as KrystalChildrenNode;
-            _previouslySelectedChildrenNode = n;
-
+            var n = e.Node as KrystalChildrenNode;
             if(n != null)
             {
+                _previouslySelectedChildrenNode = n;
                 n.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Highlight);
-                n.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Window);
             }
 
             if(_krystalFamilyTreeView.Focused)
@@ -674,22 +670,6 @@ namespace Moritz.Krystals
                 }
             }
         }
-
-        private void SetFirstAncestorAppearance()
-        {
-            if(_previouslySelectedAncestorsNode != null)
-            {
-                _previouslySelectedAncestorsNode.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Window);
-                _previouslySelectedAncestorsNode.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Black);
-            }
-
-			if(this._ancestorsTreeView.Nodes[0] is AncestorsNode n)
-			{
-				_previouslySelectedAncestorsNode = n;
-				n.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Highlight);
-				n.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Window);
-			}
-		}
 
         private KrystalFamily _krystalFamily = null;
         private Krystal _krystal = null;

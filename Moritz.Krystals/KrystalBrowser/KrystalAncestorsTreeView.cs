@@ -7,59 +7,69 @@ namespace Moritz.Krystals
 {
 	internal class AncestorsNode : TreeNode
 	{
-		public AncestorsNode(string name, List<Dependency> dependencyList)
+		public AncestorsNode(string name, KrystalFamily krystalFamily)
 		{
-			Text = name;
-			for(int i = dependencyList.Count - 1 ; i >= 0 ; i--)
-			{
-				if(dependencyList[i].Name.Equals(Text))
-				{
-                    if(K.IsExpansionKrystalFilename(Text))
-                    {
-                        AncestorsNode densityNode = new AncestorsNode(dependencyList[i].Input1, dependencyList);
-                        densityNode.Text = densityNode.Text.Insert(0, "d: ");
-                        this.Nodes.Add((TreeNode) densityNode);
-                        AncestorsNode pointsNode = new AncestorsNode(dependencyList[i].Input2, dependencyList);
-                        pointsNode.Text = pointsNode.Text.Insert(0, "p: ");
-                        this.Nodes.Add((TreeNode) pointsNode);
-                        AncestorsNode fieldNode = new AncestorsNode(dependencyList[i].Field, dependencyList);
-                        fieldNode.Text = fieldNode.Text.Insert(0, "e: ");
-                        this.Nodes.Add((TreeNode) fieldNode);
-                    }
-                    else if(K.IsModulationKrystalFilename(Text))
-                    {
-                        AncestorsNode xNode = new AncestorsNode(dependencyList[i].Input1, dependencyList);
-                        xNode.Text = xNode.Text.Insert(0, "x: ");
-                        this.Nodes.Add((TreeNode)xNode);
-                        AncestorsNode yNode = new AncestorsNode(dependencyList[i].Input2, dependencyList);
-                        yNode.Text = yNode.Text.Insert(0, "y: ");
-                        this.Nodes.Add((TreeNode)yNode);
-                        AncestorsNode fieldNode = new AncestorsNode(dependencyList[i].Field, dependencyList);
-                        fieldNode.Text = fieldNode.Text.Insert(0, "m: ");
-                        this.Nodes.Add((TreeNode)fieldNode);
-                    }
-                    else if(K.IsPermutationKrystalFilename(Text))
-                    {
-                        AncestorsNode sourceNode = new AncestorsNode(dependencyList[i].Input1, dependencyList);
-                        sourceNode.Text = sourceNode.Text.Insert(0, "s: ");
-                        this.Nodes.Add((TreeNode)sourceNode);
-                        AncestorsNode axisNode = new AncestorsNode(dependencyList[i].Input2, dependencyList);
-                        axisNode.Text = axisNode.Text.Insert(0, "a: ");
-                        this.Nodes.Add((TreeNode)axisNode);
-                        AncestorsNode contourNode = new AncestorsNode(dependencyList[i].Input3, dependencyList);
-                        contourNode.Text = contourNode.Text.Insert(0, "c: ");
-                        this.Nodes.Add((TreeNode)contourNode);
-                    }
-                    break;
-				}
-			}
+            List<Dependency> dependencyList = krystalFamily.DependencyList;
+            var nameColors = krystalFamily.NameColors;
+
+            Text = name;
+            ForeColor = krystalFamily.GetNameColor(Text);
+
+            Dependency dependency = dependencyList.Find(d => d.Name == Text);
+
+            if(K.IsExpansionKrystalFilename(Text))
+            {
+                AncestorsNode densityNode = new AncestorsNode(dependency.Input1, krystalFamily);
+                densityNode.Text = densityNode.Text.Insert(0, "d: ");
+                densityNode.ForeColor = krystalFamily.GetNameColor(dependency.Input1);
+                this.Nodes.Add((TreeNode) densityNode);
+                AncestorsNode pointsNode = new AncestorsNode(dependency.Input2, krystalFamily);
+                pointsNode.Text = pointsNode.Text.Insert(0, "p: ");
+                pointsNode.ForeColor = krystalFamily.GetNameColor(dependency.Input2);
+                this.Nodes.Add((TreeNode) pointsNode);
+                AncestorsNode fieldNode = new AncestorsNode(dependency.Field, krystalFamily);
+                fieldNode.Text = fieldNode.Text.Insert(0, "e: ");
+                fieldNode.ForeColor = krystalFamily.GetNameColor(dependency.Field);
+                this.Nodes.Add((TreeNode) fieldNode);
+            }
+            else if(K.IsModulationKrystalFilename(Text))
+            {
+                AncestorsNode xNode = new AncestorsNode(dependency.Input1, krystalFamily);
+                xNode.Text = xNode.Text.Insert(0, "x: ");
+                xNode.ForeColor = krystalFamily.GetNameColor(dependency.Input1);
+                this.Nodes.Add((TreeNode)xNode);
+                AncestorsNode yNode = new AncestorsNode(dependency.Input2, krystalFamily);
+                yNode.Text = yNode.Text.Insert(0, "y: ");
+                yNode.ForeColor = krystalFamily.GetNameColor(dependency.Input2);
+                this.Nodes.Add((TreeNode)yNode);
+                AncestorsNode fieldNode = new AncestorsNode(dependency.Field, krystalFamily);
+                fieldNode.Text = fieldNode.Text.Insert(0, "m: ");
+                fieldNode.ForeColor = krystalFamily.GetNameColor(dependency.Field);
+                this.Nodes.Add((TreeNode)fieldNode);
+            }
+            else if(K.IsPermutationKrystalFilename(Text))
+            {
+                AncestorsNode sourceNode = new AncestorsNode(dependency.Input1, krystalFamily);
+                sourceNode.Text = sourceNode.Text.Insert(0, "s: ");
+                sourceNode.ForeColor = krystalFamily.GetNameColor(dependency.Input1);
+                this.Nodes.Add((TreeNode)sourceNode);
+                AncestorsNode axisNode = new AncestorsNode(dependency.Input2, krystalFamily);
+                axisNode.Text = axisNode.Text.Insert(0, "a: ");
+                axisNode.ForeColor = krystalFamily.GetNameColor(dependency.Input2);
+                this.Nodes.Add((TreeNode)axisNode);
+                AncestorsNode contourNode = new AncestorsNode(dependency.Input3, krystalFamily);
+                contourNode.Text = contourNode.Text.Insert(0, "c: ");
+                contourNode.ForeColor = krystalFamily.GetNameColor(dependency.Input3);
+                this.Nodes.Add((TreeNode)contourNode);
+            }
+
 		}
     }
 
 
 	public class KrystalAncestorsTreeView : TreeView
 	{
-		public KrystalAncestorsTreeView(Krystal krystal, List<Dependency> dependencyList)
+		public KrystalAncestorsTreeView(Krystal krystal, KrystalFamily krystalFamily)
 		{
 			this.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.Location = new System.Drawing.Point(0, 0);
@@ -68,9 +78,9 @@ namespace Moritz.Krystals
 			this.Nodes.Clear();
 			AncestorsNode rootNode = null;
 			if(krystal == null )
-				rootNode = new AncestorsNode("", dependencyList);
+				rootNode = new AncestorsNode("", krystalFamily);
 			else
-				rootNode = new AncestorsNode(krystal.Name, dependencyList); // recursively creates a tree of LineageNodes
+				rootNode = new AncestorsNode(krystal.Name, krystalFamily); // recursively creates a tree of AncestorNodes
 			this.Nodes.Add(rootNode);
 			this.EndUpdate();
 			this.ExpandAll();

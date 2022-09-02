@@ -239,29 +239,41 @@ namespace Krystals4ObjectLibrary
 
         private void SetAncestorColor(string name)
         {
-            if(_nameColors.ContainsKey(name) && _nameColors[name] == UsedInScoreColor)
+            if(NameColors.ContainsKey(name) && NameColors[name] == UsedInScoreColor)
             {
                 return;
             }
-            if(!_nameColors.ContainsKey(name))
+            if(!NameColors.ContainsKey(name))
             {
-                this._nameColors.Add(name, AncestorColor);
+                this.NameColors.Add(name, AncestorColor);
             }
             else
             {
-                _nameColors[name] = AncestorColor;
+                NameColors[name] = AncestorColor;
             }
         }
 
         private void SetUsedInScoreColor(string name)
         {
-            if(!_nameColors.ContainsKey(name))
+            if(!NameColors.ContainsKey(name))
             {
-                this._nameColors.Add(name, Color.Red);
+                this.NameColors.Add(name, Color.Red);
             }
             else
             {
-                _nameColors[name] = Color.Red;
+                NameColors[name] = Color.Red;
+            }
+        }
+
+        public Color GetNameColor(string name)
+        {
+            if(NameColors.ContainsKey(name))
+            {
+                return NameColors[name];
+            }
+            else
+            {
+                return Color.Black;
             }
         }
 
@@ -311,7 +323,7 @@ namespace Krystals4ObjectLibrary
         private List<Dependency> _unknownParentsList = new List<Dependency>();
 
         private Color UsedInScoreColor = Color.Red;
-        private Color AncestorColor = Color.Purple;
-        private Dictionary<string, Color> _nameColors = new Dictionary<string, Color>();
+        private Color AncestorColor = Color.FromArgb(255, 0, 170, 0); 
+        public Dictionary<string, Color> NameColors = new Dictionary<string, Color>();
     }
 }
