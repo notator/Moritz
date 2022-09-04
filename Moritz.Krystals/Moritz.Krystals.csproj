@@ -55,7 +55,7 @@
     <Compile Include="KrystalBrowser\KrystalsBrowser.designer.cs">
       <DependentUpon>KrystalsBrowser.cs</DependentUpon>
     </Compile>
-    <Compile Include="KrystalBrowser\KrystalFamilyTreeView.cs" />
+    <Compile Include="KrystalBrowser\KrystalChildrenTreeView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

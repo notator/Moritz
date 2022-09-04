@@ -110,9 +110,9 @@ namespace Moritz.Krystals
 
     }
 
-	public class KrystalFamilyTreeView : TreeView
+	public class KrystalChildrenTreeView : TreeView
 	{
-        public KrystalFamilyTreeView(KrystalFamily krystalFamily, int? domainFilter, List<int> shapeListFilter)
+        public KrystalChildrenTreeView(KrystalFamily krystalFamily, int? domainFilter, List<int> shapeListFilter)
         {
             bool DisplayCompatibleShape(KrystalChildrenNode node, List<int> filter)
             {
@@ -151,10 +151,9 @@ namespace Moritz.Krystals
             InitializeKrystalFamilyTreeView(out constantRoot, out lineRoot, out expansionRoot, out modulationRoot, out permutationRoot, out pathRoot);
 
             int index;
-            for(int i = 0; i < krystalFamily.DependencyList.Count; i++)
+            foreach(Dependency dependency in krystalFamily.DependencyList)
             {
-                string name = krystalFamily.DependencyList[i].Name;
-                KrystalChildrenNode rootNode = new KrystalChildrenNode(name, krystalFamily);
+                KrystalChildrenNode rootNode = new KrystalChildrenNode(dependency.Name, krystalFamily);
                 if(DisplayCompatibleShape(rootNode, shapeListFilter) && DisplayCompatibleDomain(rootNode, domainFilter))
                 {
                     // rootNode contains a tree of KrystalChildrenNodes
@@ -187,6 +186,14 @@ namespace Moritz.Krystals
                     {
                         index = FindFollower(rootNode.Text, pathRoot.Nodes);
                         pathRoot.Nodes.Insert(index, rootNode);
+                    }
+                }
+                if(dependency.ScoreNames != null)
+                {
+                    Debug.Assert(rootNode.ForeColor == Color.Red);
+                    foreach(string scoreName in dependency.ScoreNames)
+                    {
+                        rootNode.Nodes.Insert(0, scoreName);
                     }
                 }
             }

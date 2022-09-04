@@ -94,29 +94,45 @@ namespace Moritz.Krystals
                 this.CloseButton.Show();
             }
 
-            List<string> krystalsUsedInScores = GetKrystalsUsedInScores();
+            Dictionary<string, List<string>> krystalScoresDict = GetKrystalScoresDict();
 
-            _krystalFamily = new KrystalFamily(this._krystalsFolder, krystalsUsedInScores);
+            _krystalFamily = new KrystalFamily(this._krystalsFolder, krystalScoresDict);
 
-            SetKrystalFamilyTree(domainFilter, shapeListFilter);
+            _krystalChildrenTreeView = new KrystalChildrenTreeView(_krystalFamily, domainFilter, shapeListFilter);
+
+            _krystalChildrenTreeView.AfterSelect += new TreeViewEventHandler(this.KrystalChildrenTreeView_AfterSelect);
+
+            this.splitContainer1.Panel1.Controls.Add(_krystalChildrenTreeView);
 
             SetForKrystal(null);
         }
 
-        #region GetKrystalsUsedInScores
-        private List<string> GetKrystalsUsedInScores()
+        #region GetKrystalScoresDict
+
+        /// <summary>
+        /// The returned dictionary contains krystal/listOfScoresContainingIt
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<string, List<string>> GetKrystalScoresDict()
         {
-            var rval = new List<string>();
+            var rval = new Dictionary<string, List<string>>();
             string scoresPath = M.LocalMoritzScoresFolder;
             var allScoreSettings = Directory.EnumerateFiles(scoresPath, "*.mkss", SearchOption.AllDirectories);
             foreach(var scoreSettings in allScoreSettings)
             {
+                string scoreName = Path.GetFileName(scoreSettings);
+                scoreName = scoreName.Remove(scoreName.IndexOf(".mkss"));
+
                 var scoreKrystals = GetScoreKrystals(scoreSettings);
                 foreach(var krystalName in scoreKrystals)
                 {
-                    if(!rval.Contains(krystalName))
+                    if(!rval.ContainsKey(krystalName))
                     {
-                        rval.Add(krystalName);
+                        rval.Add(krystalName, new List<string>() {scoreName});
+                    }
+                    else if(!rval[krystalName].Contains(scoreName))
+                    {
+                        rval[krystalName].Add(scoreName);
                     }
                 }
             }
@@ -169,13 +185,6 @@ namespace Moritz.Krystals
             return scoreKrystals;
         }
         #endregion
-
-        private void SetKrystalFamilyTree(int? domainFilter, List<int> shapeListFilter)
-        {
-            _krystalFamilyTreeView = new KrystalFamilyTreeView(_krystalFamily, domainFilter, shapeListFilter);
-            _krystalFamilyTreeView.AfterSelect += new TreeViewEventHandler(this.KrystalFamilyTreeView_AfterSelect);
-            this.splitContainer1.Panel1.Controls.Add(_krystalFamilyTreeView);
-        }
 
         private void RenameKrystalButton_Click(object sender, EventArgs e)
         {
@@ -274,7 +283,7 @@ namespace Moritz.Krystals
 
 			if(_krystal != null)
             {
-                if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalFamilyTreeView) == false)
+                if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalChildrenTreeView) == false)
                     SelectNodeInFamilyTree(_krystal.Name);
                 //SetFirstAncestorAppearance();
                 Krystal2DTextBox.Lines = Get2DText(_krystal);
@@ -574,7 +583,7 @@ namespace Moritz.Krystals
             }
         }
 
-        private void KrystalFamilyTreeView_AfterSelect(object sender, TreeViewEventArgs e)
+        private void KrystalChildrenTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if(_previouslySelectedChildrenNode != null)
             {
@@ -587,9 +596,9 @@ namespace Moritz.Krystals
                 n.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Highlight);
             }
 
-            if(_krystalFamilyTreeView.Focused)
+            if(_krystalChildrenTreeView.Focused)
             {
-                _selectedTreeView = _krystalFamilyTreeView;
+                _selectedTreeView = _krystalChildrenTreeView;
                 if(n != null)
                 {
                     string filename;
@@ -611,7 +620,7 @@ namespace Moritz.Krystals
             #region find root node
             if(K.IsConstantKrystalFilename(filename))
             {
-                foreach(TreeNode tn in _krystalFamilyTreeView.Nodes)
+                foreach(TreeNode tn in _krystalChildrenTreeView.Nodes)
                     if(tn.Text.Equals("Constants"))
                     {
                         rootNode = tn;
@@ -620,7 +629,7 @@ namespace Moritz.Krystals
             }
             else if(K.IsLineKrystalFilename(filename))
             {
-                foreach(TreeNode tn in _krystalFamilyTreeView.Nodes)
+                foreach(TreeNode tn in _krystalChildrenTreeView.Nodes)
                     if(tn.Text.Equals("Lines"))
                     {
                         rootNode = tn;
@@ -629,7 +638,7 @@ namespace Moritz.Krystals
             }
             else if(K.IsExpansionKrystalFilename(filename))
             {
-                foreach(TreeNode tn in _krystalFamilyTreeView.Nodes)
+                foreach(TreeNode tn in _krystalChildrenTreeView.Nodes)
                     if(tn.Text.Equals("Expansions"))
                     {
                         rootNode = tn;
@@ -638,7 +647,7 @@ namespace Moritz.Krystals
             }
             else if(K.IsModulationKrystalFilename(filename))
             {
-                foreach(TreeNode tn in _krystalFamilyTreeView.Nodes)
+                foreach(TreeNode tn in _krystalChildrenTreeView.Nodes)
                     if(tn.Text.Equals("Modulations"))
                     {
                         rootNode = tn;
@@ -647,7 +656,7 @@ namespace Moritz.Krystals
             }
             else if(K.IsPermutationKrystalFilename(filename))
             {
-                foreach(TreeNode tn in _krystalFamilyTreeView.Nodes)
+                foreach(TreeNode tn in _krystalChildrenTreeView.Nodes)
                     if(tn.Text.Equals("Permutations"))
                     {
                         rootNode = tn;
@@ -661,8 +670,8 @@ namespace Moritz.Krystals
                 {
                     if(t.Text.Contains(filename))
                     {
-                        _krystalFamilyTreeView.CollapseAll();
-                        _krystalFamilyTreeView.SelectedNode = t;
+                        _krystalChildrenTreeView.CollapseAll();
+                        _krystalChildrenTreeView.SelectedNode = t;
                         t.Expand();
                         t.EnsureVisible();
                         break;
@@ -676,7 +685,7 @@ namespace Moritz.Krystals
         private string _krystalsFolder = null;
 
         private KrystalAncestorsTreeView _ancestorsTreeView = null;
-        private KrystalFamilyTreeView _krystalFamilyTreeView = null;
+        private KrystalChildrenTreeView _krystalChildrenTreeView = null;
 
         private AncestorsNode _previouslySelectedAncestorsNode = null;
         private KrystalChildrenNode _previouslySelectedChildrenNode = null;
