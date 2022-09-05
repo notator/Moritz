@@ -244,6 +244,8 @@ namespace Krystals4ObjectLibrary
         {
             if(krystalScoresDict.ContainsKey(d.Name))
             {
+                d.ScoreNames = krystalScoresDict[d.Name];
+
                 SetUsedInScoreColor(d.Name);
                 SetAncestorColors(d, krystalScoresDict);
             }
