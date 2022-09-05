@@ -56,43 +56,21 @@ namespace Krystals4ObjectLibrary
         public KrystalFamily(string krystalsFolder, Dictionary<string, List<string>> krystalScoresDict)
         {
             DirectoryInfo dir = new DirectoryInfo(krystalsFolder);
-            string allConstants = "*.constant.krys";
-            var fileInfos = dir.GetFiles(allConstants);
-            foreach(FileInfo f in fileInfos)
-            {
-				Dependency d = new Dependency
-				{
-					Name = f.Name
-				};
-				_dependencyList.Add(d);
-            }
-            string allLines = "*.line.krys";
-            fileInfos = dir.GetFiles(allLines);
-            foreach(FileInfo f in fileInfos)
-            {
-				Dependency d = new Dependency
-				{
-					Name = f.Name
-				};
-				_dependencyList.Add(d);
-            }
-
-            List<Dependency> unknownParentsList = new List<Dependency>();
+            List<Dependency> unsortedDependencies = new List<Dependency>();
             string krystalNames = "*.krys";
-            fileInfos = dir.GetFiles(krystalNames);
-            foreach(FileInfo fileInfo in fileInfos)
+            var allKrystalFileInfos = dir.GetFiles(krystalNames);
+            foreach(FileInfo fileInfo in allKrystalFileInfos)
             {
-                AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo);              
+                GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, allKrystalFileInfos, fileInfo);
             }
 
-            #region insert Dependencies from the _unknownParentsList in the sorted _dependencyList
+            #region set the sorted _dependencyList
 
-            // The _dependency list is going to be in order of dependence. In other words:
+            // The _dependency list will be in order of dependence:
             // Each dependency object's _inputs_ (if it has any) will have an index
             // less than the index of the dependency object itself.
-
             int[] inputIndex = new int[4];
-            foreach(Dependency d in unknownParentsList)
+            foreach(Dependency d in unsortedDependencies)
             {
                 inputIndex[0] = inputIndex[1] = inputIndex[2] = inputIndex[3] = -1;
                 if(string.IsNullOrEmpty(d.Input1) == false)
@@ -136,145 +114,157 @@ namespace Krystals4ObjectLibrary
                     _dependencyList.Insert(maxIndex + 1, d);
                 }
             }
-            #endregion move Dependencies from the _unknownParentsList to the sorted _dependencyList
+
+            #endregion set the sorted _dependencyList
         }
 
-        private void AddAllDependenciesToUnknownParentsList(List<Dependency> unknownParentsList, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
+        private void GetUnsortedDependencies(List<Dependency> unsortedDependencies, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            if(unknownParentsList.Find(x => x.Name == fileInfo.Name) == null)
+            Dependency d = unsortedDependencies.Find(x => x.Name == fileInfo.Name);
+            if(d == null)
             {
-                Dependency d = null;
-                if(krystalScoresDict.ContainsKey(fileInfo.Name))
+                d = new Dependency
                 {
-                    d = new Dependency
-                    {
-                        Name = fileInfo.Name
-                    };
-                    d.ScoreNames = krystalScoresDict[d.Name];
-                    SetUsedInScoreColor(d.Name);
-                }
+                    Name = fileInfo.Name
+                };
+            }
+            if(krystalScoresDict.ContainsKey(fileInfo.Name))
+            {
+                d.ScoreNames = krystalScoresDict[d.Name];
+                SetUsedInScoreColor(d.Name);
+            }
 
-                if(fileInfo.Name.Contains(".exp."))
+            if(fileInfo.Name.Contains(".constant.") || fileInfo.Name.Contains(".line."))
+            {
+                if(unsortedDependencies.Find(x => x.Name == d.Name) == null)
                 {
-                    AddExpansionDependency(d, unknownParentsList, krystalScoresDict, fileInfos, fileInfo);
+                    unsortedDependencies.Insert(0, d);
                 }
-                else if(fileInfo.Name.Contains(".mod."))
-                {
-                    AddModulationDependency(d, unknownParentsList, krystalScoresDict, fileInfos, fileInfo);
-                }
-                else if(fileInfo.Name.Contains(".perm."))
-                {
-                    AddPermutationDependency(d, unknownParentsList, krystalScoresDict, fileInfos, fileInfo);
-                }
-                else if(fileInfo.Name.Contains(".perm."))
-                {
-                    AddPathDependency(d, unknownParentsList, krystalScoresDict, fileInfos, fileInfo);
-                }
+            }
+            else if(fileInfo.Name.Contains(".exp."))
+            {
+                AddExpansionDependency(d, unsortedDependencies, krystalScoresDict, fileInfos, fileInfo);
+            }
+            else if(fileInfo.Name.Contains(".mod."))
+            {
+                AddModulationDependency(d, unsortedDependencies, krystalScoresDict, fileInfos, fileInfo);
+            }
+            else if(fileInfo.Name.Contains(".perm."))
+            {
+                AddPermutationDependency(d, unsortedDependencies, krystalScoresDict, fileInfos, fileInfo);
+            }
+            else if(fileInfo.Name.Contains(".perm."))
+            {
+                AddPathDependency(d, unsortedDependencies, krystalScoresDict, fileInfos, fileInfo);
             }
         }
 
-        private void AddExpansionDependency(Dependency d, List<Dependency> unknownParentsList, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
+        private void AddExpansionDependency(Dependency d, List<Dependency> unsortedDependencies, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            Debug.Assert(unknownParentsList.Find(x => x.Name == fileInfo.Name) == null);
+            Debug.Assert(d != null);
 
             string path = K.KrystalsFolder + @"\" + fileInfo.Name;
             var xk = new ExpansionKrystal(path, true);
-            if(d == null)
-            {
-                d = new Dependency() { Name = fileInfo.Name };
-            }
             d.Input1 = xk.DensityInputFilename;
             d.Input2 = xk.PointsInputFilename;
             d.Field = xk.ExpanderFilename;
 
             var fileInfo1 = Array.Find(fileInfos, x => x.Name == d.Input1);
-            AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo1);
+            GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, fileInfos, fileInfo1);
             var fileInfo2 = Array.Find(fileInfos, x => x.Name == d.Input2);
-            AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo2);
+            GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, fileInfos, fileInfo2);
 
-            SetAncestorColor(d.Name);
-            SetAncestorColor(d.Input1);
-            SetAncestorColor(d.Input2);
-            SetAncestorColor(d.Field);
-            
-            unknownParentsList.Add(d);
+            if(krystalScoresDict.ContainsKey(fileInfo.Name))
+            {
+                SetAncestorColor(d.Input1);
+                SetAncestorColor(d.Input2);
+                SetAncestorColor(d.Field);
+            }
+
+            if(unsortedDependencies.Find(x => x.Name == fileInfo.Name) == null)
+            {
+                unsortedDependencies.Add(d);
+            }
         }
 
-        private void AddModulationDependency(Dependency d, List<Dependency> unknownParentsList, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
+        private void AddModulationDependency(Dependency d, List<Dependency> unsortedDependencies, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            Debug.Assert(unknownParentsList.Find(x => x.Name == fileInfo.Name) == null);
+            Debug.Assert(d != null);
 
             string path = K.KrystalsFolder + @"\" + fileInfo.Name;
             var mk = new ModulationKrystal(path, true);
-            if(d == null)
-            {
-                d = new Dependency() { Name = fileInfo.Name };
-            }
             d.Input1 = mk.XInputFilename;
             d.Input2 = mk.YInputFilename;
             d.Field = mk.ModulatorFilename;
 
             var fileInfo1 = Array.Find(fileInfos, x => x.Name == d.Input1);
-            AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo1);
+            GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, fileInfos, fileInfo1);
             var fileInfo2 = Array.Find(fileInfos, x => x.Name == d.Input2);
-            AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo2);
+            GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, fileInfos, fileInfo2);
 
-            SetAncestorColor(d.Name);
-            SetAncestorColor(d.Input1);
-            SetAncestorColor(d.Input2);
-            SetAncestorColor(d.Field);
-            
-            unknownParentsList.Add(d);
+            if(krystalScoresDict.ContainsKey(fileInfo.Name))
+            {
+                SetAncestorColor(d.Input1);
+                SetAncestorColor(d.Input2);
+                SetAncestorColor(d.Field);
+            }
+
+            if(unsortedDependencies.Find(x => x.Name == fileInfo.Name) == null)
+            {
+                unsortedDependencies.Add(d);
+            }
         }
 
-        private void AddPermutationDependency(Dependency d, List<Dependency> unknownParentsList, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
+        private void AddPermutationDependency(Dependency d, List<Dependency> unsortedDependencies, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            Debug.Assert(unknownParentsList.Find(x => x.Name == fileInfo.Name) == null);
+            Debug.Assert(d != null);
 
             string path = K.KrystalsFolder + @"\" + fileInfo.Name;
             var pk = new PermutationKrystal(path, true);
-            if(d == null)
-            {
-                d = new Dependency() { Name = fileInfo.Name };
-            }
             d.Input1 = pk.SourceInputFilename;
             d.Input2 = pk.AxisInputFilename;
             d.Input3 = pk.ContourInputFilename;
 
             var fileInfo1 = Array.Find(fileInfos, x => x.Name == d.Input1);
-            AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo1);
+            GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, fileInfos, fileInfo1);
             var fileInfo2 = Array.Find(fileInfos, x => x.Name == d.Input2);
-            AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo2);
+            GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, fileInfos, fileInfo2);
             var fileInfo3 = Array.Find(fileInfos, x => x.Name == d.Input3);
-            AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo3);
+            GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, fileInfos, fileInfo3);
 
-            SetAncestorColor(d.Name);
-            SetAncestorColor(d.Input1);
-            SetAncestorColor(d.Input2);
-            SetAncestorColor(d.Input3);
+            if(krystalScoresDict.ContainsKey(fileInfo.Name))
+            {
+                SetAncestorColor(d.Input1);
+                SetAncestorColor(d.Input2);
+                SetAncestorColor(d.Input3);
+            }
 
-            unknownParentsList.Add(d);
+            if(unsortedDependencies.Find(x => x.Name == fileInfo.Name) == null)
+            {
+                unsortedDependencies.Add(d);
+            }
         }
-        private void AddPathDependency(Dependency d, List<Dependency> unknownParentsList, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
+        private void AddPathDependency(Dependency d, List<Dependency> unsortedDependencies, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            Debug.Assert(unknownParentsList.Find(x => x.Name == fileInfo.Name) == null);
+            Debug.Assert(d != null);
 
             string path = K.KrystalsFolder + @"\" + fileInfo.Name;
             var pk = new PathKrystal(path, true);
-            if(d == null)
-            {
-                d = new Dependency() { Name = fileInfo.Name };
-            }
             d.Input1 = pk.DensityInputKrystalName;
             d.Input2 = pk.SVGInputFilename;
 
             var fileInfo1 = Array.Find(fileInfos, x => x.Name == d.Input1);
-            AddAllDependenciesToUnknownParentsList(unknownParentsList, krystalScoresDict, fileInfos, fileInfo1);
+            GetUnsortedDependencies(unsortedDependencies, krystalScoresDict, fileInfos, fileInfo1);
 
-            SetAncestorColor(d.Name);
-            SetAncestorColor(d.Input1);
+            if(krystalScoresDict.ContainsKey(fileInfo.Name))
+            {
+                SetAncestorColor(d.Input1);
+            }
 
-            unknownParentsList.Add(d);
+            if(unsortedDependencies.Find(x => x.Name == fileInfo.Name) == null)
+            {
+                unsortedDependencies.Add(d);
+            }
         }
 
         private void SetAncestorColor(string name)
@@ -360,8 +350,8 @@ namespace Krystals4ObjectLibrary
         public List<Dependency> DependencyList { get { return _dependencyList; } }
         private List<Dependency> _dependencyList = new List<Dependency>();
 
-        private Color UsedInScoreColor = Color.Red;
-        private Color AncestorColor = Color.FromArgb(255, 0, 170, 0);
+        private readonly Color UsedInScoreColor = Color.Red;
+        private readonly Color AncestorColor = Color.FromArgb(255, 0, 170, 0);
         /// <summary>
         /// Contains only name/color pairs for names of krystals used in scores and their ancestors (krystals and fields).
         /// The default Color for other node names will be Color.Black.
