@@ -81,7 +81,7 @@ namespace Moritz.Krystals
             if(krystal != null)
             {
                 Dependency dependency = krystalFamily.DependencyList.Find(d => d.Name == krystal.Name);
-                if(dependency.ScoreNames.Count > 0)
+                if(dependency.ScoreNames != null && dependency.ScoreNames.Count > 0)
                 {
                     List<TreeNode> childNodes = new List<TreeNode>();
                     foreach(var scoreName in dependency.ScoreNames)
