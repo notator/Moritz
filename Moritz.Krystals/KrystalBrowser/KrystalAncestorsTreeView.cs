@@ -69,18 +69,34 @@ namespace Moritz.Krystals
 
 	public class KrystalAncestorsTreeView : TreeView
 	{
-		public KrystalAncestorsTreeView(Krystal krystal, KrystalFamily krystalFamily)
-		{
-			this.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.Location = new System.Drawing.Point(0, 0);
+        public KrystalAncestorsTreeView(Krystal krystal, KrystalFamily krystalFamily)
+        {
+            this.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Location = new System.Drawing.Point(0, 0);
 
-			this.BeginUpdate();
-			this.Nodes.Clear();
-			AncestorsNode rootNode = null;
-			if(krystal == null )
-				rootNode = new AncestorsNode("", krystalFamily);
-			else
-				rootNode = new AncestorsNode(krystal.Name, krystalFamily); // recursively creates a tree of AncestorNodes
+            this.BeginUpdate();
+            this.Nodes.Clear();
+
+            AncestorsNode rootNode = null;
+            if(krystal != null)
+            {
+                Dependency dependency = krystalFamily.DependencyList.Find(d => d.Name == krystal.Name);
+                if(dependency.ScoreNames.Count > 0)
+                {
+                    List<TreeNode> childNodes = new List<TreeNode>();
+                    foreach(var scoreName in dependency.ScoreNames)
+                    {
+                        childNodes.Add(new TreeNode(scoreName));
+                    }
+                    this.Nodes.Add(new TreeNode("Scores", childNodes.ToArray()));
+                }
+                rootNode = new AncestorsNode(krystal.Name, krystalFamily); // recursively creates a tree of AncestorNodes
+            }
+            else
+            {
+                rootNode = new AncestorsNode("", krystalFamily);
+            }
+
 			this.Nodes.Add(rootNode);
 			this.EndUpdate();
 			this.ExpandAll();
