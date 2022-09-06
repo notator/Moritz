@@ -69,7 +69,7 @@ namespace Moritz.Krystals
             _krystalsFolder = M.LocalMoritzKrystalsFolder;
             _returnKrystalNameDelegate = returnKrystalNameDelegate;
             _krystal = selectKrystal;
-            DeleteKrystalButton.Visible = true;
+            SetDeleteKrystalButtonVisible = true;
             InitializeKrystalBrowser(null, null);
         }
 
@@ -200,16 +200,25 @@ namespace Moritz.Krystals
             var dialogResult = MessageBox.Show(msg, "Delete Krystal", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if(dialogResult == DialogResult.Yes)
             {
+                string krystalPath = M.LocalMoritzKrystalsFolder + "//" + krystalToDelete;
+                File.Delete(krystalPath);
+
                 _krystalChildrenTreeView.BeginUpdate();
-
                 _krystalChildrenTreeView.SelectedNode = null;
-
                 _krystalChildrenTreeView.Nodes.Remove(selectedNode);
-
                 _krystalChildrenTreeView.EndUpdate();
-
                 this.SetForKrystal(null);
-                this.DeleteKrystalButton.Visible = false;
+                SetDeleteKrystalButtonVisible = false;
+                
+            }
+        }
+
+        private bool SetDeleteKrystalButtonVisible
+        {
+            set
+            {
+                this.DeleteKrystalButton.Visible = value;
+                this.DeleteKrystalLabel.Visible = !value;
             }
         }
 
@@ -313,11 +322,11 @@ namespace Moritz.Krystals
                 Krystal2DTextBox.Lines = Get2DText(_krystal);
                 if(_krystalChildrenTreeView.SelectedNode.Nodes.Count > 0) // krystals can only be deleted if they are not used to construct other krystals or scores
                 {
-                    DeleteKrystalButton.Visible = false;
+                    SetDeleteKrystalButtonVisible = false;
                 }
                 else
                 {
-                    DeleteKrystalButton.Visible = true;
+                    SetDeleteKrystalButtonVisible = true;
                 }
             }
             this.ResumeLayout();

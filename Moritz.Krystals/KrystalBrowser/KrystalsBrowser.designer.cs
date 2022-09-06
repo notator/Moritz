@@ -39,6 +39,7 @@ namespace Moritz.Krystals
             this.MissingValues = new System.Windows.Forms.Label();
             this.ReturnKrystalButton = new System.Windows.Forms.Button();
             this.DeleteKrystalButton = new System.Windows.Forms.Button();
+            this.DeleteKrystalLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -147,7 +148,7 @@ namespace Moritz.Krystals
             this.CloseButton.Location = new System.Drawing.Point(1261, 436);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new System.Drawing.Size(94, 23);
-            this.CloseButton.TabIndex = 23;
+            this.CloseButton.TabIndex = 40;
             this.CloseButton.Text = "Close";
             this.CloseButton.UseVisualStyleBackColor = true;
             this.CloseButton.Click += new System.EventHandler(this.OKButton_Click);
@@ -186,12 +187,23 @@ namespace Moritz.Krystals
             this.DeleteKrystalButton.Visible = false;
             this.DeleteKrystalButton.Click += new System.EventHandler(this.DeleteKrystalButton_Click);
             // 
+            // DeleteKrystalLabel
+            // 
+            this.DeleteKrystalLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.DeleteKrystalLabel.AutoSize = true;
+            this.DeleteKrystalLabel.Location = new System.Drawing.Point(1107, 434);
+            this.DeleteKrystalLabel.Name = "DeleteKrystalLabel";
+            this.DeleteKrystalLabel.Size = new System.Drawing.Size(144, 26);
+            this.DeleteKrystalLabel.TabIndex = 37;
+            this.DeleteKrystalLabel.Text = "Krystals can only be deleted\r\nif they have no descendents.";
+            // 
             // KrystalsBrowser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
             this.ClientSize = new System.Drawing.Size(1366, 470);
+            this.Controls.Add(this.DeleteKrystalLabel);
             this.Controls.Add(this.DeleteKrystalButton);
             this.Controls.Add(this.MissingValues);
             this.Controls.Add(this.CloseButton);
@@ -232,5 +244,6 @@ namespace Moritz.Krystals
         private System.Windows.Forms.Button DeleteKrystalButton;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.TextBox Krystal2DTextBox;
+        private System.Windows.Forms.Label DeleteKrystalLabel;
     }
 }
