@@ -38,7 +38,7 @@ namespace Moritz.Krystals
             this.CloseButton = new System.Windows.Forms.Button();
             this.MissingValues = new System.Windows.Forms.Label();
             this.ReturnKrystalButton = new System.Windows.Forms.Button();
-            this.RenameKrystalButton = new System.Windows.Forms.Button();
+            this.DeleteKrystalButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -174,17 +174,17 @@ namespace Moritz.Krystals
             this.ReturnKrystalButton.UseVisualStyleBackColor = true;
             this.ReturnKrystalButton.Click += new System.EventHandler(this.ReturnKrystalButton_Click);
             // 
-            // RenameKrystalButton
+            // DeleteKrystalButton
             // 
-            this.RenameKrystalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.RenameKrystalButton.Location = new System.Drawing.Point(1126, 436);
-            this.RenameKrystalButton.Name = "RenameKrystalButton";
-            this.RenameKrystalButton.Size = new System.Drawing.Size(125, 23);
-            this.RenameKrystalButton.TabIndex = 36;
-            this.RenameKrystalButton.Text = "Rename Krystal...";
-            this.RenameKrystalButton.UseVisualStyleBackColor = true;
-            this.RenameKrystalButton.Visible = false;
-            this.RenameKrystalButton.Click += new System.EventHandler(this.RenameKrystalButton_Click);
+            this.DeleteKrystalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.DeleteKrystalButton.Location = new System.Drawing.Point(1126, 436);
+            this.DeleteKrystalButton.Name = "DeleteKrystalButton";
+            this.DeleteKrystalButton.Size = new System.Drawing.Size(125, 23);
+            this.DeleteKrystalButton.TabIndex = 36;
+            this.DeleteKrystalButton.Text = "Delete Krystal";
+            this.DeleteKrystalButton.UseVisualStyleBackColor = true;
+            this.DeleteKrystalButton.Visible = false;
+            this.DeleteKrystalButton.Click += new System.EventHandler(this.DeleteKrystalButton_Click);
             // 
             // KrystalsBrowser
             // 
@@ -192,7 +192,7 @@ namespace Moritz.Krystals
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
             this.ClientSize = new System.Drawing.Size(1366, 470);
-            this.Controls.Add(this.RenameKrystalButton);
+            this.Controls.Add(this.DeleteKrystalButton);
             this.Controls.Add(this.MissingValues);
             this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.splitContainer1);
@@ -229,7 +229,7 @@ namespace Moritz.Krystals
 		private System.Windows.Forms.TreeView StrandsTreeView;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Button ReturnKrystalButton;
-        private System.Windows.Forms.Button RenameKrystalButton;
+        private System.Windows.Forms.Button DeleteKrystalButton;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.TextBox Krystal2DTextBox;
     }

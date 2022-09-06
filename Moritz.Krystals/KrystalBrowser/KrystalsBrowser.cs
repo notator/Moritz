@@ -69,7 +69,7 @@ namespace Moritz.Krystals
             _krystalsFolder = M.LocalMoritzKrystalsFolder;
             _returnKrystalNameDelegate = returnKrystalNameDelegate;
             _krystal = selectKrystal;
-            RenameKrystalButton.Visible = true;
+            DeleteKrystalButton.Visible = true;
             InitializeKrystalBrowser(null, null);
         }
 
@@ -186,9 +186,31 @@ namespace Moritz.Krystals
         }
         #endregion
 
-        private void RenameKrystalButton_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Krystals can only be deleted if they have no children (i.e. they are not used to create scores or other krystals)
+        /// </summary>
+        private void DeleteKrystalButton_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Debug.Assert(_krystalChildrenTreeView.SelectedNode.Nodes.Count == 0);
+            
+            var selectedNode = _krystalChildrenTreeView.SelectedNode;
+            string krystalToDelete = selectedNode.Text;
+
+            string msg = $"Delete {krystalToDelete}?\n\nCaution: This action cannot be undone. Are you sure?";
+            var dialogResult = MessageBox.Show(msg, "Delete Krystal", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if(dialogResult == DialogResult.Yes)
+            {
+                _krystalChildrenTreeView.BeginUpdate();
+
+                _krystalChildrenTreeView.SelectedNode = null;
+
+                _krystalChildrenTreeView.Nodes.Remove(selectedNode);
+
+                _krystalChildrenTreeView.EndUpdate();
+
+                this.SetForKrystal(null);
+                this.DeleteKrystalButton.Visible = false;
+            }
         }
 
         /// <summary>
@@ -210,6 +232,8 @@ namespace Moritz.Krystals
 
         public void SetForKrystal(string filename)
         {
+            _krystal = null;
+
             this.SuspendLayout();
             if(filename != null && K.IsKrystalFilename(filename))
             {
@@ -287,7 +311,14 @@ namespace Moritz.Krystals
                     SelectNodeInFamilyTree(_krystal.Name);
                 //SetFirstAncestorAppearance();
                 Krystal2DTextBox.Lines = Get2DText(_krystal);
-                RenameKrystalButton.Visible = true;
+                if(_krystalChildrenTreeView.SelectedNode.Nodes.Count > 0) // krystals can only be deleted if they are not used to construct other krystals or scores
+                {
+                    DeleteKrystalButton.Visible = false;
+                }
+                else
+                {
+                    DeleteKrystalButton.Visible = true;
+                }
             }
             this.ResumeLayout();
         }
