@@ -698,27 +698,33 @@ namespace Krystals4Application
             {
                 try
                 {
-                    _outputKrystal = new ExpansionKrystal(kd.DensityInputFilepath,
-                                                          kd.PointsInputFilepath,
-                                                          kd.ExpanderFilepath);
+                    // commented out 07.09.2022 so that
+                    //    kd.DensityInputFilepath,
+                    //    kd.PointsInputFilepath,
+                    //    kd.ExpanderFilepath
+                    // can be deleted from NewExpansionDialog
 
-                    //_expanderIsSaved = false;
-                    //_krystalIsSaved = false;
-                    this.SaveButton.Enabled = false;
-                    if (String.IsNullOrEmpty(kd.ExpanderFilepath))
-                    {
-                        this.ZoomLabel.Enabled = false;
-                        this.ZoomComboBox.Enabled = false;
-                        this.PercentLabel.Enabled = false;
-                        this.ExpandButton.Enabled = false;
-                    }
-                    else
-                    {
-                        this.ZoomLabel.Enabled = true;
-                        this.ZoomComboBox.Enabled = true;
-                        this.PercentLabel.Enabled = true;
-                        this.ExpandButton.Enabled = true;
-                    }
+                    //_outputKrystal = new ExpansionKrystal(kd.DensityInputFilepath,
+                    //                                      kd.PointsInputFilepath,
+                    //                                      kd.ExpanderFilepath);
+
+                    ////_expanderIsSaved = false;
+                    ////_krystalIsSaved = false;
+                    //this.SaveButton.Enabled = false;
+                    //if (String.IsNullOrEmpty(kd.ExpanderFilepath))
+                    //{
+                    //    this.ZoomLabel.Enabled = false;
+                    //    this.ZoomComboBox.Enabled = false;
+                    //    this.PercentLabel.Enabled = false;
+                    //    this.ExpandButton.Enabled = false;
+                    //}
+                    //else
+                    //{
+                    //    this.ZoomLabel.Enabled = true;
+                    //    this.ZoomComboBox.Enabled = true;
+                    //    this.PercentLabel.Enabled = true;
+                    //    this.ExpandButton.Enabled = true;
+                    //}
 
                     LoadNewOutputKrystalIntoEditor();
                 }
