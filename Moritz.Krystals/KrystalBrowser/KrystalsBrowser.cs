@@ -13,67 +13,62 @@ using System.Xml;
 
 namespace Moritz.Krystals
 {
-    public delegate void KrystalDelegate(Krystal krystal);
+    public delegate void ReturnKrystalDelegate(Krystal krystal);
 
     public partial class KrystalsBrowser : Form
     {
         /// <summary>
-        /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
+        /// The returnKrystalDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// If krystal != null, the krystalBrowser opens with the given krystal selected.
         /// </summary>
         public KrystalsBrowser()
         {
             InitializeComponent();
             this.Text = "All Krystals";
-            _krystalsFolder = M.LocalMoritzKrystalsFolder;
-            _returnKrystalNameDelegate = null;
-            InitializeKrystalBrowser(null, null);
+            _returnKrystalDelegate = null;
+            InitializeKrystalBrowser(null, null, null);
         }
 
         /// <summary>
-        /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
+        /// The returnKrystalDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// </summary>
-        public KrystalsBrowser(string title, KrystalDelegate returnKrystalNameDelegate)
+        public KrystalsBrowser(string title, ReturnKrystalDelegate returnKrystalDelegate)
         {
             InitializeComponent();
             this.Text = title;
             ControlBox = false;
-            _krystalsFolder = M.LocalMoritzKrystalsFolder;
-            _returnKrystalNameDelegate = returnKrystalNameDelegate;
-            InitializeKrystalBrowser(null, null); // display all krystals
+            _returnKrystalDelegate = returnKrystalDelegate;
+            InitializeKrystalBrowser(null, null, null); // display all krystals
         }
 
         /// <summary>
         /// Only Krystals whose shape is contained in the shapeListFilter are included in the displayed KrystaFamilyTree. 
-        /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
+        /// The returnKrystalDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// </summary>
-        public KrystalsBrowser(string title, int? domainFilter, List<int> shapeListFilter, KrystalDelegate returnKrystalNameDelegate)
+        public KrystalsBrowser(string title, int? domainFilter, List<int> shapeListFilter, ReturnKrystalDelegate returnKrystalDelegate)
         {
             InitializeComponent();
             this.Text = title;
             ControlBox = false;
-            _krystalsFolder = M.LocalMoritzKrystalsFolder;
-            _returnKrystalNameDelegate = returnKrystalNameDelegate;
-            InitializeKrystalBrowser(domainFilter, shapeListFilter);
+            _returnKrystalDelegate = returnKrystalDelegate;
+            InitializeKrystalBrowser(null, domainFilter, shapeListFilter);
         }
 
         /// <summary>
         /// The KrystalBrowser opens with the selectKrystal selected. 
-        /// The returnKrystalNameDelegate is called with the current krystal name when this krystalBrowser is closed.
+        /// The returnKrystalDelegate is called with the current krystal name when this krystalBrowser is closed.
         /// </summary>
-        public KrystalsBrowser(string title, Krystal selectKrystal, KrystalDelegate returnKrystalNameDelegate)
+        public KrystalsBrowser(string title, Krystal selectKrystal, ReturnKrystalDelegate returnKrystalDelegate)
         {
             InitializeComponent();
             this.Text = title;
             ControlBox = false;
-            _krystalsFolder = M.LocalMoritzKrystalsFolder;
-            _returnKrystalNameDelegate = returnKrystalNameDelegate;
-            _krystal = selectKrystal;
+            _returnKrystalDelegate = returnKrystalDelegate;
             SetDeleteKrystalButtonVisible = true;
-            InitializeKrystalBrowser(null, null);
+            InitializeKrystalBrowser(selectKrystal.Name, null, null);
         }
 
-        private void InitializeKrystalBrowser(int? domainFilter, List<int> shapeListFilter)
+        private void InitializeKrystalBrowser(string selectKrystalName, int? domainFilter, List<int> shapeListFilter)
         {
             this.Width = Screen.PrimaryScreen.WorkingArea.Width - 100;
             this.Height = Screen.PrimaryScreen.WorkingArea.Height;
@@ -83,7 +78,7 @@ namespace Moritz.Krystals
             this.splitContainer3.SplitterDistance = Width / 6;
             this.Krystal2DTextBox.Text = "";
 
-            if(_returnKrystalNameDelegate != null)
+            if(_returnKrystalDelegate != null)
             {
                 this.ReturnKrystalButton.Show();
                 this.CloseButton.Hide();
@@ -104,7 +99,7 @@ namespace Moritz.Krystals
 
             this.splitContainer1.Panel1.Controls.Add(_krystalChildrenTreeView);
 
-            SetForKrystal(null);
+            SetForKrystal(selectKrystalName);
         }
 
         #region GetKrystalScoresDict
@@ -229,14 +224,16 @@ namespace Moritz.Krystals
         /// <param name="e"></param>
         private void ReturnKrystalButton_Click(object sender, EventArgs e)
         {
-            if(this._returnKrystalNameDelegate != null)
-                _returnKrystalNameDelegate(_krystal);
+            if(this._returnKrystalDelegate != null)
+            {
+                _returnKrystalDelegate(_krystal);
+                Close();
+            }
         }
 
-        private void OKButton_Click(object sender, EventArgs e)
+        private void CloseButton_Click(object sender, EventArgs e)
         {
-            //StrandsTreeView.Nodes.Clear();
-            Hide();
+            Close();
         }
 
         public void SetForKrystal(string filename)
@@ -263,58 +260,58 @@ namespace Moritz.Krystals
 
             ConstantKrystal ck = _krystal as ConstantKrystal;
             LineKrystal lk = _krystal as LineKrystal;
-			ExpansionKrystal xk = _krystal as ExpansionKrystal;
+            ExpansionKrystal xk = _krystal as ExpansionKrystal;
             ModulationKrystal mk = _krystal as ModulationKrystal;
             PermutationKrystal pk = _krystal as PermutationKrystal;
             PathKrystal pathK = _krystal as PathKrystal;
 
-			if(ck != null)
-			{
-				this.BasicData.Text = string.Format("Constant Krystal: {0}   Level: {1}   Value: {2}",
-					ck.Name, ck.Level.ToString(), ck.MaxValue.ToString());
-				SetForConstantKrystal();
-			}
-			else if(lk != null)
-			{
-				this.BasicData.Text = string.Format("Line Krystal: {0}    Level: {1}    Range of Values: {2}..{3}",
-					_krystal.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-				SetForLineKrystal();
-			}
-			else if(xk != null)
-			{
-				this.BasicData.Text = string.Format("Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
-					_krystal.Name, xk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-				SetForExpansionKrystal(xk);
-			}
-			else if(mk != null)
-			{
-				this.BasicData.Text = string.Format("Modulation Krystal: {0}   Modulator: {1}   Level: {2}   Range of Values: {3}..{4}",
-					_krystal.Name, mk.Modulator.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-				SetForModulationKrystal(mk);
-			}
-			else if(pk != null)
-			{
-				string sortFirstString;
-				if(pk.SortFirst)
-					sortFirstString = "true";
-				else
-					sortFirstString = "false";
+            if(ck != null)
+            {
+                this.BasicData.Text = string.Format("Constant Krystal: {0}   Level: {1}   Value: {2}",
+                    ck.Name, ck.Level.ToString(), ck.MaxValue.ToString());
+                SetForConstantKrystal();
+            }
+            else if(lk != null)
+            {
+                this.BasicData.Text = string.Format("Line Krystal: {0}    Level: {1}    Range of Values: {2}..{3}",
+                    _krystal.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+                SetForLineKrystal();
+            }
+            else if(xk != null)
+            {
+                this.BasicData.Text = string.Format("Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
+                    _krystal.Name, xk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+                SetForExpansionKrystal(xk);
+            }
+            else if(mk != null)
+            {
+                this.BasicData.Text = string.Format("Modulation Krystal: {0}   Modulator: {1}   Level: {2}   Range of Values: {3}..{4}",
+                    _krystal.Name, mk.Modulator.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+                SetForModulationKrystal(mk);
+            }
+            else if(pk != null)
+            {
+                string sortFirstString;
+                if(pk.SortFirst)
+                    sortFirstString = "true";
+                else
+                    sortFirstString = "false";
 
-				this.BasicData.Text = string.Format("Permutation Krystal: {0}   Level: {1}   pLevel: {2}   sortFirst: {3}   Range of Values: {4}..{5}",
-					_krystal.Name, _krystal.Level.ToString(), pk.PermutationLevel.ToString(), sortFirstString, _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-				SetForPermutationKrystal(pk);
-			}
+                this.BasicData.Text = string.Format("Permutation Krystal: {0}   Level: {1}   pLevel: {2}   sortFirst: {3}   Range of Values: {4}..{5}",
+                    _krystal.Name, _krystal.Level.ToString(), pk.PermutationLevel.ToString(), sortFirstString, _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+                SetForPermutationKrystal(pk);
+            }
             else if(pathK != null)
             {
                 throw new NotImplementedException();
             }
-			else // _krystal == null
-			{
-				this.BasicData.Text = "";
-				SetForNoKrystal();
-			}
+            else // _krystal == null
+            {
+                this.BasicData.Text = "";
+                SetForNoKrystal();
+            }
 
-			if(_krystal != null)
+            if(_krystal != null)
             {
                 if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalChildrenTreeView) == false)
                     SelectNodeInFamilyTree(_krystal.Name);
@@ -720,9 +717,10 @@ namespace Moritz.Krystals
             }
         }
 
+        private readonly string _krystalsFolder = M.LocalMoritzKrystalsFolder;
+
         private KrystalFamily _krystalFamily = null;
         private Krystal _krystal = null;
-        private string _krystalsFolder = null;
 
         private KrystalAncestorsTreeView _ancestorsTreeView = null;
         private KrystalChildrenTreeView _krystalChildrenTreeView = null;
@@ -731,6 +729,6 @@ namespace Moritz.Krystals
         private KrystalChildrenNode _previouslySelectedChildrenNode = null;
         private TreeView _selectedTreeView = null;
 
-        private KrystalDelegate _returnKrystalNameDelegate = null;
+        private ReturnKrystalDelegate _returnKrystalDelegate = null;
     }
 }

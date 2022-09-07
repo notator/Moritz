@@ -67,29 +67,11 @@ namespace Krystals4Application
         }
         private void NewExpansionKrystalButton_Click(object sender, EventArgs e)
         {
-            //  NewExpansionKrystal();
-
             NewExpansionDialog kd = new NewExpansionDialog();
             if(kd.ShowDialog() == DialogResult.OK)
             {
-                try
-                {
-                    var expansionKrystal = new ExpansionKrystal(kd.DensityInputFilepath,
-                                                            kd.PointsInputFilepath,
-                                                            kd.ExpanderFilepath);
-                    var hasBeenSaved = expansionKrystal.Save();
-                    if(hasBeenSaved)
-                    {
-                        KrystalsBrowser kb = new KrystalsBrowser("New Krystal", expansionKrystal, null);
-                        kb.Show();
-                    }
-                }
-                catch(ApplicationException ae)
-                {
-                    MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
+                kd.Close();
             }
-            kd.Close();
         }
         private void HandleExpansionEditorEvents(object sender, ExpansionEditorEventArgs e)
         {

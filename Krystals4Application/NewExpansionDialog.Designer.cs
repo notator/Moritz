@@ -29,8 +29,8 @@ namespace Krystals4Application
         private void InitializeComponent()
         {
             this.SetExpanderButton = new System.Windows.Forms.Button();
-            this.OKBtn = new System.Windows.Forms.Button();
-            this.CancelBtn = new System.Windows.Forms.Button();
+            this.ExpandBtn = new System.Windows.Forms.Button();
+            this.CloseBtn = new System.Windows.Forms.Button();
             this.SetDensityInputButton = new System.Windows.Forms.Button();
             this.SetPointsInputValuesButton = new System.Windows.Forms.Button();
             this.ExpanderLabel = new System.Windows.Forms.Label();
@@ -43,7 +43,6 @@ namespace Krystals4Application
             // 
             // SetExpanderButton
             // 
-            this.SetExpanderButton.Enabled = false;
             this.SetExpanderButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.SetExpanderButton.Location = new System.Drawing.Point(231, 62);
             this.SetExpanderButton.Name = "SetExpanderButton";
@@ -53,30 +52,29 @@ namespace Krystals4Application
             this.SetExpanderButton.UseVisualStyleBackColor = true;
             this.SetExpanderButton.Click += new System.EventHandler(this.SetExpanderButton_Click);
             // 
-            // OKBtn
+            // ExpandBtn
             // 
-            this.OKBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.OKBtn.Enabled = false;
-            this.OKBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.OKBtn.Location = new System.Drawing.Point(116, 149);
-            this.OKBtn.Name = "OKBtn";
-            this.OKBtn.Size = new System.Drawing.Size(75, 23);
-            this.OKBtn.TabIndex = 5;
-            this.OKBtn.Text = "OK";
-            this.OKBtn.UseVisualStyleBackColor = true;
-            this.OKBtn.Click += new System.EventHandler(this.OKBtn_Click);
+            this.ExpandBtn.Enabled = false;
+            this.ExpandBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.ExpandBtn.Location = new System.Drawing.Point(116, 149);
+            this.ExpandBtn.Name = "ExpandBtn";
+            this.ExpandBtn.Size = new System.Drawing.Size(75, 23);
+            this.ExpandBtn.TabIndex = 5;
+            this.ExpandBtn.Text = "Expand";
+            this.ExpandBtn.UseVisualStyleBackColor = true;
+            this.ExpandBtn.Click += new System.EventHandler(this.ExpandBtn_Click);
             // 
-            // CancelBtn
+            // CloseBtn
             // 
-            this.CancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.CancelBtn.Location = new System.Drawing.Point(216, 149);
-            this.CancelBtn.Name = "CancelBtn";
-            this.CancelBtn.Size = new System.Drawing.Size(75, 23);
-            this.CancelBtn.TabIndex = 6;
-            this.CancelBtn.Text = "Cancel";
-            this.CancelBtn.UseVisualStyleBackColor = true;
-            this.CancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
+            this.CloseBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.CloseBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.CloseBtn.Location = new System.Drawing.Point(216, 149);
+            this.CloseBtn.Name = "CloseBtn";
+            this.CloseBtn.Size = new System.Drawing.Size(75, 23);
+            this.CloseBtn.TabIndex = 6;
+            this.CloseBtn.Text = "Close";
+            this.CloseBtn.UseVisualStyleBackColor = true;
+            this.CloseBtn.Click += new System.EventHandler(this.CloseBtn_Click);
             // 
             // SetDensityInputButton
             // 
@@ -110,6 +108,7 @@ namespace Krystals4Application
             this.ExpanderLabel.Size = new System.Drawing.Size(55, 13);
             this.ExpanderLabel.TabIndex = 9;
             this.ExpanderLabel.Text = "Expander:";
+            this.ExpanderLabel.Click += new System.EventHandler(this.SetExpanderButton_Click);
             // 
             // DensityInputLabel
             // 
@@ -120,6 +119,7 @@ namespace Krystals4Application
             this.DensityInputLabel.Size = new System.Drawing.Size(71, 13);
             this.DensityInputLabel.TabIndex = 11;
             this.DensityInputLabel.Text = "Density input:";
+            this.DensityInputLabel.Click += new System.EventHandler(this.SetDensityInputButton_Click);
             // 
             // InputValuesLabel
             // 
@@ -130,6 +130,7 @@ namespace Krystals4Application
             this.InputValuesLabel.Size = new System.Drawing.Size(65, 13);
             this.InputValuesLabel.TabIndex = 12;
             this.InputValuesLabel.Text = "Points input:";
+            this.InputValuesLabel.Click += new System.EventHandler(this.SetPointsInputButton_Click);
             // 
             // ExpanderFilenameLabel
             // 
@@ -140,6 +141,7 @@ namespace Krystals4Application
             this.ExpanderFilenameLabel.Size = new System.Drawing.Size(68, 13);
             this.ExpanderFilenameLabel.TabIndex = 13;
             this.ExpanderFilenameLabel.Text = "<unasigned>";
+            this.ExpanderFilenameLabel.Click += new System.EventHandler(this.SetExpanderButton_Click);
             // 
             // DensityInputFilenameLabel
             // 
@@ -150,6 +152,7 @@ namespace Krystals4Application
             this.DensityInputFilenameLabel.Size = new System.Drawing.Size(73, 13);
             this.DensityInputFilenameLabel.TabIndex = 15;
             this.DensityInputFilenameLabel.Text = "<unassigned>";
+            this.DensityInputFilenameLabel.Click += new System.EventHandler(this.SetDensityInputButton_Click);
             // 
             // PointsInputFilenameLabel
             // 
@@ -160,6 +163,7 @@ namespace Krystals4Application
             this.PointsInputFilenameLabel.Size = new System.Drawing.Size(73, 13);
             this.PointsInputFilenameLabel.TabIndex = 16;
             this.PointsInputFilenameLabel.Text = "<unassigned>";
+            this.PointsInputFilenameLabel.Click += new System.EventHandler(this.SetPointsInputButton_Click);
             // 
             // NewExpansionDialog
             // 
@@ -175,8 +179,8 @@ namespace Krystals4Application
             this.Controls.Add(this.ExpanderLabel);
             this.Controls.Add(this.SetPointsInputValuesButton);
             this.Controls.Add(this.SetDensityInputButton);
-            this.Controls.Add(this.CancelBtn);
-            this.Controls.Add(this.OKBtn);
+            this.Controls.Add(this.CloseBtn);
+            this.Controls.Add(this.ExpandBtn);
             this.Controls.Add(this.SetExpanderButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "NewExpansionDialog";
@@ -188,7 +192,7 @@ namespace Krystals4Application
         }
 
         #endregion
-        private System.Windows.Forms.Button CancelBtn;
+        private System.Windows.Forms.Button CloseBtn;
         private System.Windows.Forms.Button SetDensityInputButton;
         private System.Windows.Forms.Label ExpanderLabel;
         private System.Windows.Forms.Label DensityInputLabel;
@@ -197,7 +201,7 @@ namespace Krystals4Application
         private System.Windows.Forms.Label DensityInputFilenameLabel;
         private System.Windows.Forms.Label PointsInputFilenameLabel;
         internal System.Windows.Forms.Button SetExpanderButton;
-        internal System.Windows.Forms.Button OKBtn;
+        internal System.Windows.Forms.Button ExpandBtn;
         internal System.Windows.Forms.Button SetPointsInputValuesButton;
     }
 }

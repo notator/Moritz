@@ -1,11 +1,12 @@
-using System;
-using System.Windows.Forms;
-using System.IO;
-
 using Krystals4ObjectLibrary;
+
 using Moritz.Globals; // Preferences
 using Moritz.Krystals; //KrystalBrowser
+
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
 
 namespace Krystals4Application
 {
@@ -14,38 +15,33 @@ namespace Krystals4Application
         public NewExpansionDialog()
         {
             InitializeComponent();
-            _krystalBrowser = null;
-            _krystalsFolder = M.LocalMoritzKrystalsFolder;
+            _krystalsBrowser = null;
 
-            SetDensityInputButton.Enabled = true;
             SetDensityInputButton.Focus();
-            SetPointsInputValuesButton.Enabled = false;
-            SetExpanderButton.Enabled = false;
-            OKBtn.Enabled = false;
-            CancelBtn.Enabled = true;
+
+            ExpandBtn.Enabled = false;
+            CloseBtn.Enabled = true;
         }
         #region Events
         private void SetDensityInputButton_Click(object sender, EventArgs e)
         {
-            if(_krystalBrowser != null)
+            if(_krystalsBrowser != null)
             {
-                _krystalBrowser.Close();
+                _krystalsBrowser.Close();
             }
-            _krystalBrowser = new KrystalsBrowser("All krystals: (Get Density Input)", SetDensityInputKrystal); // TODO: set filter to show all files
-            _krystalBrowser.Show();
+            _krystalsBrowser = new KrystalsBrowser("All krystals: (Get Density Input)", SetDensityInputKrystal); // TODO: set filter to show all files
+            _krystalsBrowser.Show();
         }
         private void SetDensityInputKrystal(Krystal krystal)
         {
             DensityInputFilenameLabel.Text = krystal.Name;
             _densityInputFilepath = _krystalsFolder + @"\" + krystal.Name;
-            if(_krystalBrowser != null)
+            if(_krystalsBrowser != null)
             {
-                _krystalBrowser.Close();
+                _krystalsBrowser.Close();
             }
 
-            SetDensityInputButton.Enabled = false;
-            SetExpanderButton.Enabled = true;
-            SetExpanderButton.Focus();
+            SetButtonsEnabledState();
         }
 
         private void SetExpanderButton_Click(object sender, EventArgs e)
@@ -54,11 +50,8 @@ namespace Krystals4Application
             if(_expanderFilepath != "")
             {
                 ExpanderFilenameLabel.Text = Path.GetFileName(_expanderFilepath);
-
-                SetExpanderButton.Enabled = false;
-                SetPointsInputValuesButton.Enabled = true;
-                SetPointsInputValuesButton.Focus();
             }
+            SetButtonsEnabledState();
         }
 
         private void SetPointsInputButton_Click(object sender, EventArgs e)
@@ -72,49 +65,62 @@ namespace Krystals4Application
 
             string title = $"Possible points input krystals -- DensityInput: {densityFilename}, Expander: {expanderFilename}";
 
-            _krystalBrowser = new KrystalsBrowser(title, inputDomain, shapeListFilter, SetPointsInputKrystal);
+            _krystalsBrowser = new KrystalsBrowser(title, inputDomain, shapeListFilter, SetPointsInputKrystal);
 
-            _krystalBrowser.Show();
+            _krystalsBrowser.Show();
         }
         private void SetPointsInputKrystal(Krystal krystal)
         {
             PointsInputFilenameLabel.Text = krystal.Name;
             _pointsInputFilepath = _krystalsFolder + @"\" + krystal.Name;
-            if(_krystalBrowser != null)
+            if(_krystalsBrowser != null)
             {
-                _krystalBrowser.Close();
+                _krystalsBrowser.Close();
             }
 
-            SetPointsInputValuesButton.Enabled = false;
-            OKBtn.Enabled = true;
-            OKBtn.Focus();
+            SetButtonsEnabledState();
         }
 
-        private void CancelBtn_Click(object sender, EventArgs e)
+        private void SetButtonsEnabledState()
         {
+            SetPointsInputValuesButton.Enabled = !(String.IsNullOrEmpty(_densityInputFilepath) || String.IsNullOrEmpty(_expanderFilepath));
+            ExpandBtn.Enabled = !(String.IsNullOrEmpty(_densityInputFilepath) || String.IsNullOrEmpty(_pointsInputFilepath) || String.IsNullOrEmpty(_expanderFilepath));
+        }
+
+        private void CloseBtn_Click(object sender, EventArgs e)
+        {
+            // DialogResult = DialogResult.OK is set in the designer
             _densityInputFilepath = "";
             _pointsInputFilepath = "";
-            _expanderFilepath = "";
-
-            DialogResult = DialogResult.Cancel;
+            _expanderFilepath = "";            
         }
-        private void OKBtn_Click(object sender, EventArgs e)
+        private void ExpandBtn_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.OK;
+            try
+            {
+                var expansionKrystal = new ExpansionKrystal(_densityInputFilepath, _pointsInputFilepath, _expanderFilepath);
+                var hasBeenSaved = expansionKrystal.Save();
+                if(hasBeenSaved)
+                {
+                    _krystalsBrowser = new KrystalsBrowser("New Krystal", expansionKrystal, null);
+                    _krystalsBrowser.Show();
+                    _krystalsBrowser.BringToFront();
+                }
+            }
+            catch(ApplicationException ae)
+            {
+                MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
+
         #endregion Events
-        #region Properties
-        public string DensityInputFilepath { get { return _densityInputFilepath; } }
-        public string PointsInputFilepath { get { return _pointsInputFilepath; } }
-        public string ExpanderFilepath { get { return _expanderFilepath; } }
-        #endregion Properties
+
         #region private variables
+        private readonly string _krystalsFolder = M.LocalMoritzKrystalsFolder;
         private string _densityInputFilepath;
         private string _pointsInputFilepath;
         private string _expanderFilepath;
-        private KrystalsBrowser _krystalBrowser;
-        private readonly string _krystalsFolder;
+        private KrystalsBrowser _krystalsBrowser;
         #endregion private variables
-
     }
 }
