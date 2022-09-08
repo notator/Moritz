@@ -228,18 +228,82 @@ namespace Krystals5Application
             KrystalBrowser.Show();
         }
 
-        private void DeleteUnusedDuplicatesButton_Click(object sender, EventArgs e)
+        private void DeleteUnusedDuplicateKrystalsButton_Click(object sender, EventArgs e)
         {
-			DialogResult result = MessageBox.Show(
-				"Re-expand and re-modulate all expansion and modulation krystals\n" +
-				"in the krystals directory?\n\n" +
-				"This will ensure that all krystal dependencies are up to date.",
-				"Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+            //RemoveDuplicates(Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.constant.krys"));
+            //RemoveDuplicates(Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.line.krys"));
+            RemoveDuplicates(Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.exp.krys"));
+            //RemoveDuplicates(Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.mod.krys"));
+            //RemoveDuplicates(Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.perm.krys"));
+            //RemoveDuplicates(Directory.EnumerateFiles(M.LocalMoritzKrystalsFolder, "*.path.krys"));
 
-			if(result == DialogResult.OK)
+            //MessageBox.Show( "All unused, duplicate krystals have been deleted.", "Deleted", MessageBoxButtons.OK);
+        }
+
+        private void RemoveDuplicates(IEnumerable<string> iEnumKrystalPaths)
+        {
+            List<string> allKrystalPaths = iEnumKrystalPaths.ToList<string>();
+
+            List<List<string>> listsOfDuplicates = GetListsOfDuplicates(allKrystalPaths);
+
+            // Now remove all krystalNames, from the listsOfDuplicates, that have children in the KrystalChildrenTreeView
+            //Dictionary<string, List<string>> krystalScoresDict = GetKrystalScoresDict();
+
+            //_krystalFamily = new KrystalFamily(this._krystalsFolder, krystalScoresDict);
+
+            //_krystalChildrenTreeView = new KrystalChildrenTreeView(_krystalFamily, domainFilter, shapeListFilter);
+        }
+
+        private List<List<string>> GetListsOfDuplicates(List<string> allKrystalPaths)
+        {
+            List<List<string>> allDuplicatesLists = new List<List<string>>();
+            int allKrystalsCount = allKrystalPaths.Count();
+            List<string> currentDuplicates = new List<string>();
+            List<int> touchedKrystalIndices = new List<int>();
+
+            for(int i = 0; i < allKrystalsCount; i++)
             {
-                K.RebuildKrystalFamily();
+                if(touchedKrystalIndices.Contains(i))
+                {
+                    continue;
+                }
+                else
+                {
+                    touchedKrystalIndices.Add(i);
+                    var testKrystal = new DensityInputKrystal(allKrystalPaths[i]);
+                    for(int j = i + 1; j < allKrystalsCount; j++)
+                    {
+                        if(touchedKrystalIndices.Contains(j))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            var otherKrystal = new DensityInputKrystal(allKrystalPaths[j]);
+                            if(testKrystal.Equals(otherKrystal)) // Equals only compares the strands in both krystals
+                            {
+                                if(currentDuplicates.Contains(testKrystal.Name) == false)
+                                {
+                                    if(currentDuplicates.Count > 0)
+                                    {
+                                        allDuplicatesLists.Add(currentDuplicates);
+                                    }
+                                    currentDuplicates = new List<string>() { testKrystal.Name };
+                                }
+                                currentDuplicates.Add(otherKrystal.Name);
+                                touchedKrystalIndices.Add(j);
+                            }
+                        }
+
+                    }
+                }
             }
+            if(currentDuplicates.Count > 0)
+            {
+                allDuplicatesLists.Add(currentDuplicates);
+            }
+
+            return allDuplicatesLists;
         }
 
         #endregion For all krystals

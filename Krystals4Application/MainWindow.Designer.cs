@@ -105,7 +105,7 @@ namespace Krystals5Application
             this.DeleteUnusedDuplicatesButton.Size = new System.Drawing.Size(160, 42);
             this.DeleteUnusedDuplicatesButton.TabIndex = 5;
             this.DeleteUnusedDuplicatesButton.Text = "delete unused duplicates";
-            this.DeleteUnusedDuplicatesButton.Click += new System.EventHandler(this.DeleteUnusedDuplicatesButton_Click);
+            this.DeleteUnusedDuplicatesButton.Click += new System.EventHandler(this.DeleteUnusedDuplicateKrystalsButton_Click);
             // 
             // NewPathKrysButton
             // 
