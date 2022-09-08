@@ -4,6 +4,8 @@ using System.Windows.Forms;
 using Moritz.Globals;
 using Moritz.Composer;
 
+using Krystals5Application;
+
 namespace Moritz
 {
     public partial class MoritzForm1 : Form, IMoritzForm1
@@ -16,9 +18,9 @@ namespace Moritz
         #region Krystals Editor
         private void KrystalsEditorButton_Click(object sender, EventArgs e)
         {
-            using(Form krystals4Application = new Krystals5Application.MainWindow())
+            using(Form krystals5Application = new Krystals5Application.MainWindow())
             {
-                krystals4Application.ShowDialog();
+                krystals5Application.ShowDialog();
             }
         }
         #endregion

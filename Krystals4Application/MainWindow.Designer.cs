@@ -315,7 +315,7 @@ namespace Krystals5Application
             this.Controls.Add(this.archivePanel);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Krystals 4.0";
+            this.Text = "Krystals 5.0";
             this.archivePanel.ResumeLayout(false);
             this.archivePanel.PerformLayout();
             this.GlobalPanel.ResumeLayout(false);
