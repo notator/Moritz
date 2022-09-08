@@ -228,7 +228,7 @@ namespace Krystals4Application
             KrystalBrowser.Show();
         }
 
-        private void RebuildKrystalFamilyButton_Click(object sender, EventArgs e)
+        private void DeleteUnusedDuplicatesButton_Click(object sender, EventArgs e)
         {
 			DialogResult result = MessageBox.Show(
 				"Re-expand and re-modulate all expansion and modulation krystals\n" +
@@ -574,11 +574,6 @@ namespace Krystals4Application
             return rval;
         }
         #endregion SaveKrystalsWithNewNames
-        private void MenuItemQuit_Click(object sender, EventArgs e)
-        {
-            M.Preferences.Dispose();
-            Close();
-        }
 
         private void About_Click(object sender, EventArgs e)
         {
@@ -586,8 +581,12 @@ namespace Krystals4Application
             about.ShowDialog();
         }
 
+        private void QuitButton_Click(object sender, EventArgs e)
+        {
+            M.Preferences.Dispose();
+            Close();
+        }
+
         private KrystalsBrowser KrystalBrowser = null;
-
-
     }
 }
