@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Xml;
 
-using Krystals4ObjectLibrary;
+using Krystals5ObjectLibrary;
 using Moritz.Globals;
 
 namespace Moritz.Palettes

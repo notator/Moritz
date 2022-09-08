@@ -6,7 +6,7 @@ using System.IO;
 using Moritz.Globals;
 using System.Linq;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     public sealed class ModulationKrystal : Krystal
     {

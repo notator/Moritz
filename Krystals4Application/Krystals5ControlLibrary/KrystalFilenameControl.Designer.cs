@@ -1,6 +1,6 @@
-namespace Krystals4ControlLibrary
+namespace Krystals5ControlLibrary
 {
-    partial class FloatControl
+    partial class KrystalFilenameControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -13,7 +13,7 @@ namespace Krystals4ControlLibrary
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if( disposing && ( components != null ) )
+            if (disposing && (components != null))
             {
                 components.Dispose();
             }
@@ -28,25 +28,27 @@ namespace Krystals4ControlLibrary
         /// </summary>
         private void InitializeComponent()
         {
-            this.FloatTextBox = new System.Windows.Forms.TextBox();
+            this.KrystalFilenameTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
-            // FloatTextBox
+            // KrystalFilenameTextBox
             // 
-            this.FloatTextBox.Location = new System.Drawing.Point(0, 0);
-            this.FloatTextBox.Name = "FloatTextBox";
-            this.FloatTextBox.Size = new System.Drawing.Size(44, 20);
-            this.FloatTextBox.TabIndex = 1;
-            this.FloatTextBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.FloatTextBox_PreviewKeyDown);
-            this.FloatTextBox.Leave += new System.EventHandler(this.FloatTextBox_Leave);
+            this.KrystalFilenameTextBox.Location = new System.Drawing.Point(0, 0);
+            this.KrystalFilenameTextBox.Name = "KrystalFilenameTextBox";
+            this.KrystalFilenameTextBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.KrystalFilenameTextBox.Size = new System.Drawing.Size(182, 20);
+            this.KrystalFilenameTextBox.TabIndex = 1;
+            this.KrystalFilenameTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.KrystalFilenameTextBox.Leave += new System.EventHandler(this.TextBox_Leave);
             // 
-            // FloatControl
+            // KrystalFilenameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.FloatTextBox);
-            this.Name = "FloatControl";
-            this.Size = new System.Drawing.Size(44, 20);
+            this.BackColor = System.Drawing.SystemColors.Window;
+            this.Controls.Add(this.KrystalFilenameTextBox);
+            this.Name = "KrystalFilenameControl";
+            this.Size = new System.Drawing.Size(182, 20);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -54,6 +56,6 @@ namespace Krystals4ControlLibrary
 
         #endregion
 
-        private System.Windows.Forms.TextBox FloatTextBox;
+        private System.Windows.Forms.TextBox KrystalFilenameTextBox;
     }
 }

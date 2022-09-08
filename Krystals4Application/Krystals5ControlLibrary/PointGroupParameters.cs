@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Krystals4ObjectLibrary;
+using Krystals5ObjectLibrary;
 
-namespace Krystals4ControlLibrary
+namespace Krystals5ControlLibrary
 {
     internal partial class PointGroupParameters : UserControl
     {

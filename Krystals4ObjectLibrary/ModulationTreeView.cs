@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Text;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
 	public class ModulationTreeView
 	{

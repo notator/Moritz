@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     /// <summary>
     /// A simple, non-contoured expansion

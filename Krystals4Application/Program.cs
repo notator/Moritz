@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
     static class Program
     {

@@ -1,6 +1,6 @@
-namespace Krystals4ControlLibrary
+namespace Krystals5ControlLibrary
 {
-    partial class UnsignedIntSeqControl
+    partial class UnsignedIntControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,28 +28,25 @@ namespace Krystals4ControlLibrary
         /// </summary>
         private void InitializeComponent()
         {
-            this.UIntSeqTextBox = new System.Windows.Forms.TextBox();
+            this.UIntTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
-            // UIntSeqTextBox
+            // UIntTextBox
             // 
-            this.UIntSeqTextBox.Location = new System.Drawing.Point(0, 0);
-            this.UIntSeqTextBox.Name = "UIntSeqTextBox";
-            this.UIntSeqTextBox.Size = new System.Drawing.Size(82, 20);
-            this.UIntSeqTextBox.TabIndex = 0;
-            this.UIntSeqTextBox.WordWrap = false;
-            this.UIntSeqTextBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.UIntSeqTextBox_PreviewKeyDown);
-            this.UIntSeqTextBox.Leave += new System.EventHandler(this.UIntSeqTextBox_Leave);
+            this.UIntTextBox.Location = new System.Drawing.Point(0, 0);
+            this.UIntTextBox.Name = "UIntTextBox";
+            this.UIntTextBox.Size = new System.Drawing.Size(44, 20);
+            this.UIntTextBox.TabIndex = 0;
+            this.UIntTextBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.UIntTextBox_PreviewKeyDown);
+            this.UIntTextBox.Leave += new System.EventHandler(this.UIntTextBox_Leave);
             // 
-            // UnsignedIntSeqControl
+            // UnsignedIntControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BackColor = System.Drawing.SystemColors.Window;
-            this.Controls.Add(this.UIntSeqTextBox);
-            this.Name = "UnsignedIntSeqControl";
-            this.Size = new System.Drawing.Size(82, 20);
+            this.Controls.Add(this.UIntTextBox);
+            this.Name = "UnsignedIntControl";
+            this.Size = new System.Drawing.Size(44, 20);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -57,11 +54,6 @@ namespace Krystals4ControlLibrary
 
         #endregion
 
-        private System.Windows.Forms.TextBox UIntSeqTextBox;
-
-
-
-
-
+        private System.Windows.Forms.TextBox UIntTextBox;
     }
 }

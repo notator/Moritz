@@ -1,4 +1,4 @@
-using Krystals4ObjectLibrary;
+using Krystals5ObjectLibrary;
 
 using Moritz.Globals; // Preferences
 using Moritz.Krystals; //KrystalBrowser
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
     internal partial class NewExpansionDialog : Form
     {

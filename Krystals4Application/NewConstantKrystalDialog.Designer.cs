@@ -1,4 +1,4 @@
-namespace Krystals4Application
+namespace Krystals5Application
 {
     partial class NewConstantKrystalDialog
     {
@@ -33,7 +33,7 @@ namespace Krystals4Application
             this.CancelBtn = new System.Windows.Forms.Button();
             this.ConstantValueLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.UnsignedIntControl1 = new Krystals4ControlLibrary.UnsignedIntControl();
+            this.UnsignedIntControl1 = new Krystals5ControlLibrary.UnsignedIntControl();
             this.SuspendLayout();
             // 
             // OKBtn
@@ -116,6 +116,6 @@ namespace Krystals4Application
         private System.Windows.Forms.Button CancelBtn;
         private System.Windows.Forms.Label ConstantValueLabel;
         private System.Windows.Forms.Label label1;
-        private Krystals4ControlLibrary.UnsignedIntControl UnsignedIntControl1;
+        private Krystals5ControlLibrary.UnsignedIntControl UnsignedIntControl1;
     }
 }

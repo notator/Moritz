@@ -1,4 +1,4 @@
-using Krystals4ObjectLibrary;
+using Krystals5ObjectLibrary;
 
 using Moritz.Globals;
 using Moritz.Krystals;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
     public partial class MainWindow : Form
     {
@@ -577,7 +577,7 @@ namespace Krystals4Application
 
         private void About_Click(object sender, EventArgs e)
         {
-            Form about = new AboutKrystals4();
+            Form about = new AboutKrystals5();
             about.ShowDialog();
         }
 

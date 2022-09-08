@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     public class PointR
     {

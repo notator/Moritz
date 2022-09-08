@@ -1,4 +1,4 @@
-namespace Krystals4Application
+namespace Krystals5Application
 {
     partial class MainWindow
     {

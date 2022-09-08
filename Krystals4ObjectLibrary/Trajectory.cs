@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Xml;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     public class StrandArgs
     {

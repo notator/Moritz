@@ -87,13 +87,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Krystals4Application\Krystals4Application.csproj">
+    <ProjectReference Include="..\Krystals4Application\Krystals5Application.csproj">
       <Project>{93791484-2ca8-427a-9d19-3232d3753983}</Project>
-      <Name>Krystals4Application</Name>
+      <Name>Krystals5Application</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
+    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals5ObjectLibrary.csproj">
       <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
-      <Name>Krystals4ObjectLibrary</Name>
+      <Name>Krystals5ObjectLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Algorithm\Moritz.Algorithm.csproj">
       <Project>{539a2302-1db3-4eda-879c-81a1624a24a0}</Project>

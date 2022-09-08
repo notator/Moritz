@@ -1,10 +1,10 @@
 using System;
 using System.Windows.Forms;
 using System.IO;
-using Krystals4ObjectLibrary;
+using Krystals5ObjectLibrary;
 
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
     internal partial class NewModulationDialog : Form
     {

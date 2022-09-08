@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
     internal partial class NewConstantKrystalDialog : Form
     {

@@ -1,13 +1,8 @@
 using System;
 using System.Windows.Forms;
-using System.Xml;
-using System.Diagnostics;
-using System.IO;
 
 using Moritz.Globals;
 using Moritz.Composer;
-
-using Krystals4Application;
 
 namespace Moritz
 {
@@ -21,7 +16,7 @@ namespace Moritz
         #region Krystals Editor
         private void KrystalsEditorButton_Click(object sender, EventArgs e)
         {
-            using(Form krystals4Application = new Krystals4Application.MainWindow())
+            using(Form krystals4Application = new Krystals5Application.MainWindow())
             {
                 krystals4Application.ShowDialog();
             }

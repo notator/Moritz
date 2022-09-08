@@ -1,4 +1,4 @@
-﻿using Krystals4ObjectLibrary;
+﻿using Krystals5ObjectLibrary;
 
 using Moritz.Globals; // Preferences
 using Moritz.Krystals; //KrystalBrowser
@@ -8,7 +8,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
     public partial class NewPathExpansionDialog : Form
     {

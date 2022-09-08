@@ -1,4 +1,4 @@
-namespace Krystals4ControlLibrary
+namespace Krystals5ControlLibrary
 {
     partial class UIntTable
     {

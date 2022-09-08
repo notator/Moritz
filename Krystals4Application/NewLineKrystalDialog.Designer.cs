@@ -1,4 +1,4 @@
-namespace Krystals4Application
+namespace Krystals5Application
 {
     partial class NewLineKrystalDialog
     {
@@ -33,7 +33,7 @@ namespace Krystals4Application
             this.CancelBtn = new System.Windows.Forms.Button();
             this.UintSeqLabel = new System.Windows.Forms.Label();
             this.LineLabel = new System.Windows.Forms.Label();
-            this.UnsignedIntSequenceControl1 = new Krystals4ControlLibrary.UnsignedIntSeqControl();
+            this.UnsignedIntSequenceControl1 = new Krystals5ControlLibrary.UnsignedIntSeqControl();
             this.SuspendLayout();
             // 
             // OKBtn
@@ -120,6 +120,6 @@ namespace Krystals4Application
         private System.Windows.Forms.Button CancelBtn;
         private System.Windows.Forms.Label UintSeqLabel;
         private System.Windows.Forms.Label LineLabel;
-        private Krystals4ControlLibrary.UnsignedIntSeqControl UnsignedIntSequenceControl1;
+        private Krystals5ControlLibrary.UnsignedIntSeqControl UnsignedIntSequenceControl1;
     }
 }

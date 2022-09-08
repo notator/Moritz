@@ -1,4 +1,4 @@
-namespace Krystals4ControlLibrary
+namespace Krystals5ControlLibrary
 {
     partial class PointGroupParameters
     {
@@ -54,16 +54,16 @@ namespace Krystals4ControlLibrary
             this.CountValueLabel = new System.Windows.Forms.Label();
             this.FixedPointsValuesLabel = new System.Windows.Forms.Label();
             this.ShapeLabel = new System.Windows.Forms.Label();
-            this.PlanetValueUIntControl = new Krystals4ControlLibrary.UnsignedIntControl();
-            this.FixedPointsValuesUIntSeqControl = new Krystals4ControlLibrary.UnsignedIntSeqControl();
-            this.ShiftAngleFloatControl = new Krystals4ControlLibrary.FloatControl();
-            this.ShiftRadiusFloatControl = new Krystals4ControlLibrary.FloatControl();
-            this.RotationFloatControl = new Krystals4ControlLibrary.FloatControl();
-            this.ToAngleFloatControl = new Krystals4ControlLibrary.FloatControl();
-            this.ToRadiusFloatControl = new Krystals4ControlLibrary.FloatControl();
-            this.FromRadiusFloatControl = new Krystals4ControlLibrary.FloatControl();
-            this.FromAngleFloatControl = new Krystals4ControlLibrary.FloatControl();
-            this.StartMomentUIntControl = new Krystals4ControlLibrary.UnsignedIntControl();
+            this.PlanetValueUIntControl = new Krystals5ControlLibrary.UnsignedIntControl();
+            this.FixedPointsValuesUIntSeqControl = new Krystals5ControlLibrary.UnsignedIntSeqControl();
+            this.ShiftAngleFloatControl = new Krystals5ControlLibrary.FloatControl();
+            this.ShiftRadiusFloatControl = new Krystals5ControlLibrary.FloatControl();
+            this.RotationFloatControl = new Krystals5ControlLibrary.FloatControl();
+            this.ToAngleFloatControl = new Krystals5ControlLibrary.FloatControl();
+            this.ToRadiusFloatControl = new Krystals5ControlLibrary.FloatControl();
+            this.FromRadiusFloatControl = new Krystals5ControlLibrary.FloatControl();
+            this.FromAngleFloatControl = new Krystals5ControlLibrary.FloatControl();
+            this.StartMomentUIntControl = new Krystals5ControlLibrary.UnsignedIntControl();
             this.PointGroupGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 

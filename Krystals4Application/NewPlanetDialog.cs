@@ -1,7 +1,7 @@
 using System.Windows.Forms;
-using Krystals4ControlLibrary;
+using Krystals5ControlLibrary;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
 	internal partial class NewPlanetDialog : Form
 	{

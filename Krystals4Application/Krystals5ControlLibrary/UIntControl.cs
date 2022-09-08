@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Krystals4ControlLibrary
+namespace Krystals5ControlLibrary
 {
     internal partial class UnsignedIntControl : UserControl
     {

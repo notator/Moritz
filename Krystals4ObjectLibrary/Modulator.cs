@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     /// <summary>
     /// A two dimensional array of unsigned integers used for modulating krystals.

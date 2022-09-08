@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     /// <summary>
     /// The static class K contains application-wide constants and enum definitions,

@@ -2,21 +2,21 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
-    internal partial class AboutKrystals4 : Form
+    internal partial class AboutKrystals5 : Form
     {
-        public AboutKrystals4()
+        public AboutKrystals5()
         {
             InitializeComponent();
         }
 
-        private void AboutKrystals4_Paint(object sender, PaintEventArgs e)
+        private void AboutKrystals5_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.DrawRectangle(new Pen(Brushes.Black),1,1,this.Width-2,this.Height-2);
+            e.Graphics.DrawRectangle(new Pen(Brushes.Blue),1,1,this.Width-2,this.Height-2);
         }
 
-        private void AboutKrystals4_Click(object sender, EventArgs e)
+        private void AboutKrystals5_Click(object sender, EventArgs e)
         {
             Close();
         }

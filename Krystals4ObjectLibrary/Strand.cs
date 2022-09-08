@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Xml;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     /// <summary>
     /// A strand is a krystal component, and is a list of unsigned integers with a level attribute.

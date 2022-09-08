@@ -1,4 +1,4 @@
-namespace Krystals4Application
+namespace Krystals5Application
 {
 	partial class NewPlanetDialog
 	{
@@ -34,8 +34,8 @@ namespace Krystals4Application
             this.NumberOfSubpathsLabel = new System.Windows.Forms.Label();
             this.ValueLabel = new System.Windows.Forms.Label();
             this.commentText = new System.Windows.Forms.Label();
-            this.StartMomentIntSeqControl = new Krystals4ControlLibrary.UnsignedIntSeqControl();
-            this.ValueUIntControl = new Krystals4ControlLibrary.UnsignedIntControl();
+            this.StartMomentIntSeqControl = new Krystals5ControlLibrary.UnsignedIntSeqControl();
+            this.ValueUIntControl = new Krystals5ControlLibrary.UnsignedIntControl();
             this.SuspendLayout();
             // 
             // OKBtn
@@ -138,8 +138,8 @@ namespace Krystals4Application
 		private System.Windows.Forms.Button CancelBtn;
 		private System.Windows.Forms.Label NumberOfSubpathsLabel;
         private System.Windows.Forms.Label ValueLabel;
-        public Krystals4ControlLibrary.UnsignedIntControl ValueUIntControl;
+        public Krystals5ControlLibrary.UnsignedIntControl ValueUIntControl;
         private System.Windows.Forms.Label commentText;
-        public Krystals4ControlLibrary.UnsignedIntSeqControl StartMomentIntSeqControl;
+        public Krystals5ControlLibrary.UnsignedIntSeqControl StartMomentIntSeqControl;
 	}
 }

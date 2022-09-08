@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Krystals4ObjectLibrary", "Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj", "{383E2844-41A4-488F-A683-D3EAE9AF4AF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Krystals5ObjectLibrary", "Krystals4ObjectLibrary\Krystals5ObjectLibrary.csproj", "{383E2844-41A4-488F-A683-D3EAE9AF4AF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Krystals4Application", "Krystals4Application\Krystals4Application.csproj", "{93791484-2CA8-427A-9D19-3232D3753983}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Krystals5Application", "Krystals4Application\Krystals5Application.csproj", "{93791484-2CA8-427A-9D19-3232D3753983}"
 	ProjectSection(ProjectDependencies) = postProject
 		{383E2844-41A4-488F-A683-D3EAE9AF4AF5} = {383E2844-41A4-488F-A683-D3EAE9AF4AF5}
 	EndProjectSection

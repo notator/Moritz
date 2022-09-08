@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     public sealed partial class PermutationKrystal : Krystal
     {

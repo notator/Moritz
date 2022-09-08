@@ -1,4 +1,4 @@
-namespace Krystals4Application
+namespace Krystals5Application
 {
     partial class ExpansionEditor
     {
@@ -77,7 +77,7 @@ namespace Krystals4Application
             this.ExpandButton = new System.Windows.Forms.Button();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.TreeView = new System.Windows.Forms.TreeView();
-            this.PointGroupParameters = new Krystals4ControlLibrary.PointGroupParameters();
+            this.PointGroupParameters = new Krystals5ControlLibrary.PointGroupParameters();
             this.RadioButtonFixedInput = new System.Windows.Forms.RadioButton();
             this.RadioButtonFixedOutput = new System.Windows.Forms.RadioButton();
             this.RadioButtonInputPlanet = new System.Windows.Forms.RadioButton();
@@ -671,7 +671,7 @@ namespace Krystals4Application
         private System.Windows.Forms.ComboBox FixedInputsComboBox;
 		private System.Windows.Forms.ComboBox InputSubpathsComboBox;
         private System.Windows.Forms.ComboBox InputPlanetsComboBox;
-        private Krystals4ControlLibrary.PointGroupParameters PointGroupParameters;
+        private Krystals5ControlLibrary.PointGroupParameters PointGroupParameters;
         private System.Windows.Forms.Panel menuPanel;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;

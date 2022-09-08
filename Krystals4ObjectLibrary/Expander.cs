@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Xml;
 using System.IO;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
     /// <summary>
     /// The field, consisting of input and output gametes, used to create ExpansionKrystals

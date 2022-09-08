@@ -2,10 +2,10 @@ using System;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Krystals4ControlLibrary;
-using Krystals4ObjectLibrary;
+using Krystals5ControlLibrary;
+using Krystals5ObjectLibrary;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
     internal partial class ModulationEditor : Form
     {

@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Krystals4ControlLibrary
+namespace Krystals5ControlLibrary
 {
     public class SimpleUIntControl : TextBox
     {

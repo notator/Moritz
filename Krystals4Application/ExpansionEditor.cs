@@ -4,11 +4,11 @@ using System.Drawing;
 using System.Text;
 using System.IO;
 using System.Windows.Forms;
-using Krystals4ControlLibrary;
-using Krystals4ObjectLibrary;
+using Krystals5ControlLibrary;
+using Krystals5ObjectLibrary;
 using Moritz.Krystals;
 
-namespace Krystals4Application
+namespace Krystals5Application
 {
     internal partial class ExpansionEditor : Form
     {

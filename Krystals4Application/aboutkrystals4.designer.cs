@@ -1,6 +1,6 @@
-namespace Krystals4Application
+namespace Krystals5Application
 {
-    partial class AboutKrystals4
+    partial class AboutKrystals5
     {
         /// <summary>
         /// Required designer variable.
@@ -37,9 +37,9 @@ namespace Krystals4Application
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Lucida Sans Unicode", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(52, 90);
+            this.label4.Location = new System.Drawing.Point(51, 90);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(208, 16);
+            this.label4.Size = new System.Drawing.Size(207, 16);
             this.label4.TabIndex = 10;
             this.label4.Text = "mailto: j.ingram@netcologne.de";
             // 
@@ -47,40 +47,40 @@ namespace Krystals4Application
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Lucida Sans Unicode", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(52, 129);
+            this.label2.Location = new System.Drawing.Point(31, 129);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(208, 16);
+            this.label2.Size = new System.Drawing.Size(247, 16);
             this.label2.TabIndex = 9;
-            this.label2.Text = "© copyright James Ingram 2006";
+            this.label2.Text = "© copyright James Ingram 2006, 2022";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Lucida Sans Unicode", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(87, 44);
+            this.label1.Location = new System.Drawing.Point(103, 44);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(138, 23);
+            this.label1.Size = new System.Drawing.Size(102, 23);
             this.label1.TabIndex = 8;
-            this.label1.Text = "Krystals 4.0.1";
+            this.label1.Text = "Krystals 5";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // AboutKrystals4
+            // AboutKrystals5
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Beige;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(252)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(312, 209);
             this.ControlBox = false;
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "AboutKrystals4";
+            this.Name = "AboutKrystals5";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About Krystals 4.0.1";
-            this.Click += new System.EventHandler(this.AboutKrystals4_Click);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.AboutKrystals4_Paint);
+            this.Click += new System.EventHandler(this.AboutKrystals5_Click);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.AboutKrystals5_Paint);
             this.ResumeLayout(false);
             this.PerformLayout();
 

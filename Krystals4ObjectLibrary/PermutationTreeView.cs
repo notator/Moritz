@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace Krystals4ObjectLibrary
+namespace Krystals5ObjectLibrary
 {
 	public class PermutationTreeView
 	{

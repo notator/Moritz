@@ -65,9 +65,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
+    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals5ObjectLibrary.csproj">
       <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
-      <Name>Krystals4ObjectLibrary</Name>
+      <Name>Krystals5ObjectLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
       <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
