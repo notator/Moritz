@@ -307,6 +307,7 @@ namespace Krystals5Application
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
             this.ClientSize = new System.Drawing.Size(424, 583);
+            this.ControlBox = false;
             this.Controls.Add(this.QuitButton);
             this.Controls.Add(this.AboutButton);
             this.Controls.Add(this.panel1);
