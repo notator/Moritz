@@ -100,7 +100,7 @@ namespace Krystals5Application
             // DeleteUnusedDuplicatesButton
             // 
             this.DeleteUnusedDuplicatesButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.DeleteUnusedDuplicatesButton.Location = new System.Drawing.Point(217, 51);
+            this.DeleteUnusedDuplicatesButton.Location = new System.Drawing.Point(217, 49);
             this.DeleteUnusedDuplicatesButton.Name = "DeleteUnusedDuplicatesButton";
             this.DeleteUnusedDuplicatesButton.Size = new System.Drawing.Size(160, 42);
             this.DeleteUnusedDuplicatesButton.TabIndex = 5;
@@ -144,6 +144,7 @@ namespace Krystals5Application
             this.archivePanel.Controls.Add(this.label1);
             this.archivePanel.Controls.Add(this.archivelabel);
             this.archivePanel.Controls.Add(this.SaveKrystalsWithNewNamesButton);
+            this.archivePanel.Controls.Add(this.DeleteUnusedDuplicatesButton);
             this.archivePanel.Location = new System.Drawing.Point(12, 442);
             this.archivePanel.Name = "archivePanel";
             this.archivePanel.Size = new System.Drawing.Size(400, 106);
@@ -176,7 +177,6 @@ namespace Krystals5Application
             this.GlobalPanel.Controls.Add(this.globalTextlabel);
             this.GlobalPanel.Controls.Add(this.globalLabel);
             this.GlobalPanel.Controls.Add(this.OpenKrystalsBrowserButton);
-            this.GlobalPanel.Controls.Add(this.DeleteUnusedDuplicatesButton);
             this.GlobalPanel.Location = new System.Drawing.Point(12, 38);
             this.GlobalPanel.Name = "GlobalPanel";
             this.GlobalPanel.Size = new System.Drawing.Size(400, 106);

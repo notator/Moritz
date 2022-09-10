@@ -315,6 +315,85 @@ namespace Krystals5ObjectLibrary
 
         #endregion
 
+        #region GetKrystalScoresDict
+
+        /// <summary>
+        /// The returned dictionary contains krystal/listOfScoresThat UseIt
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, List<string>> GetKrystalScoresDict()
+        {
+            var rval = new Dictionary<string, List<string>>();
+            string scoresPath = M.LocalMoritzScoresFolder;
+            var allScoreSettings = Directory.EnumerateFiles(scoresPath, "*.mkss", SearchOption.AllDirectories);
+            foreach(var scoreSettings in allScoreSettings)
+            {
+                string scoreName = Path.GetFileName(scoreSettings);
+                scoreName = scoreName.Remove(scoreName.IndexOf(".mkss"));
+
+                var scoreKrystals = GetScoreKrystals(scoreSettings);
+                foreach(var krystalName in scoreKrystals)
+                {
+                    if(!rval.ContainsKey(krystalName))
+                    {
+                        rval.Add(krystalName, new List<string>() { scoreName });
+                    }
+                    else if(!rval[krystalName].Contains(scoreName))
+                    {
+                        rval[krystalName].Add(scoreName);
+                    }
+                }
+            }
+            return rval;
+        }
+        private static List<string> GetScoreKrystals(string scoreSettings)
+        {
+            List<string> scoreKrystals = null;
+            try
+            {
+                using(XmlReader r = XmlReader.Create(scoreSettings))
+                {
+                    M.ReadToXmlElementTag(r, "moritzKrystalScore"); // check that this is a krystal score settings file
+
+                    M.ReadToXmlElementTag(r, "krystals", "moritzKrystalScore");
+
+                    if(r.Name == "moritzKrystalScore")
+                    {
+                        scoreKrystals = new List<string>();
+                    }
+                    else
+                    {
+                        Debug.Assert(r.Name == "krystals");
+                        scoreKrystals = GetKrystals(r);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return scoreKrystals;
+        }
+        private static List<string> GetKrystals(XmlReader r)
+        {
+            List<string> scoreKrystals = new List<string>();
+            Debug.Assert(r.Name == "krystals");
+
+            M.ReadToXmlElementTag(r, "krystal");
+            while(r.Name == "krystal")
+            {
+                if(r.NodeType != XmlNodeType.EndElement)
+                {
+                    r.MoveToAttribute(0);
+                    scoreKrystals.Add(r.Value);
+                }
+                M.ReadToXmlElementTag(r, "krystal", "krystals");
+            }
+            return scoreKrystals;
+        }
+        #endregion
+
         public static void RebuildKrystalFamily()
         {
         //    KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
@@ -885,6 +964,33 @@ namespace Krystals5ObjectLibrary
             return components[1];
         }
 
+        public static KrystalType GetKrystalTypeFromKrystalName(string krystalName)
+        {
+            Debug.Assert(IsKrystalFilename(krystalName));
+
+            KrystalType rval = KrystalType.constant; // default 
+            char[] dot = new char[] { '.' };
+            var components = krystalName.Split(dot);
+            var typeString = components[components.Length - 2];
+
+            if(typeString == KrystalType.constant.ToString())
+                rval = KrystalType.constant;
+            else if(typeString == KrystalType.line.ToString())
+                rval = KrystalType.line;
+            else if(typeString == KrystalType.exp.ToString())
+                rval = KrystalType.exp;
+            else if(typeString == KrystalType.mod.ToString())
+                rval = KrystalType.mod;
+            else if(typeString == KrystalType.perm.ToString())
+                rval = KrystalType.perm;
+            else if(typeString == KrystalType.path.ToString())
+                rval = KrystalType.path;
+            else
+                throw new ApplicationException();
+
+            return rval;
+        }
+
         /// <summary>
         /// Returns a normalised list in which the first element is always 0 or 1.
         /// </summary>
@@ -945,6 +1051,7 @@ namespace Krystals5ObjectLibrary
         {
             get { return DateTime.Today.ToString("dddd dd.MM.yyyy", _dateTimeFormat) + ", " + DateTime.Now.ToLongTimeString();}
         }
+
         #region public variables
         //the following three set from Moritz.Preferences in the above constructor
         public static readonly string KrystalsFolder = "";
@@ -981,7 +1088,76 @@ namespace Krystals5ObjectLibrary
             perm,
             path
         };
- 
+
+        public static string BrowserChildrenTreeViewRootNodeName(KrystalType krystalType)
+        {
+            string rval = "";
+            switch(krystalType)
+            {
+                case KrystalType.constant:
+                {
+                    rval = "Constants";
+                    break;
+                }
+                case KrystalType.line:
+                {
+                    rval = "Lines";
+                    break;
+                }
+                case KrystalType.exp:
+                {
+                    rval = "Expansions";
+                    break;
+                }
+                case KrystalType.mod:
+                {
+                    rval = "Modulations";
+                    break;
+                }
+                case KrystalType.perm:
+                {
+                    rval = "Permutations";
+                    break;
+                }
+                case KrystalType.path:
+                {
+                    rval = "Paths";
+                    break;
+                }
+                default:
+                    throw new ApplicationException();
+            }
+
+            return rval;
+        }
+
+        /// <summary>
+        /// Copies the files in the directoryPath to a new, parallel directory "*_MoritzBackup".
+        /// Returns the name of the new backup directory (not its Path).
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        public static string CopyDirectoryToMoritzBackup(string directoryPath)
+        {
+            var backupDirectoryPath = directoryPath + @"_MoritzBackup";
+            int index = 1;
+            while(Directory.Exists(backupDirectoryPath))
+            {
+                backupDirectoryPath = directoryPath + @"_MoritzBackup" + index.ToString();
+                index++;
+            }
+
+            Directory.CreateDirectory(backupDirectoryPath);
+            var filePaths = Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories);
+            foreach(var filePath in filePaths)
+            {
+                var backupFilePath = filePath.Replace(directoryPath, backupDirectoryPath); // should cope with nested directories
+
+                File.Copy(filePath, backupFilePath);
+            }
+
+            return Path.GetFileName(backupDirectoryPath);
+        }
+
         // used to index the Krystal dialog filter (see above)
         public enum DialogFilterIndex { allKrystals, constant, line, expansion, modulation, permutation, path, expander, modulator, svg };
         public enum PointGroupShape { circle, spiral, straightLine };

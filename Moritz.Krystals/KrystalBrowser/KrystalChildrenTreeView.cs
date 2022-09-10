@@ -148,7 +148,7 @@ namespace Moritz.Krystals
             }
 
             TreeNode constantRoot, lineRoot, expansionRoot, modulationRoot, permutationRoot, pathRoot;
-            InitializeKrystalFamilyTreeView(out constantRoot, out lineRoot, out expansionRoot, out modulationRoot, out permutationRoot, out pathRoot);
+            InitializeKrystalChildrenTreeView(out constantRoot, out lineRoot, out expansionRoot, out modulationRoot, out permutationRoot, out pathRoot);
 
             int index;
             foreach(Dependency dependency in krystalFamily.DependencyList)
@@ -201,19 +201,19 @@ namespace Moritz.Krystals
             this.CollapseAll();
         }
 
-        private void InitializeKrystalFamilyTreeView(out TreeNode constantRoot, out TreeNode lineRoot, out TreeNode expansionRoot, out TreeNode modulationRoot, out TreeNode permutationRoot, out TreeNode pathRoot)
+        private void InitializeKrystalChildrenTreeView(out TreeNode constantRoot, out TreeNode lineRoot, out TreeNode expansionRoot, out TreeNode modulationRoot, out TreeNode permutationRoot, out TreeNode pathRoot)
         {
             this.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Location = new System.Drawing.Point(0, 0);
 
             this.BeginUpdate();
             this.Nodes.Clear();
-            constantRoot = new TreeNode("Constants");
-            lineRoot = new TreeNode("Lines");
-            expansionRoot = new TreeNode("Expansions");
-            modulationRoot = new TreeNode("Modulations");
-            permutationRoot = new TreeNode("Permutations");
-            pathRoot = new TreeNode("Paths");
+            constantRoot = new TreeNode(K.BrowserChildrenTreeViewRootNodeName(K.KrystalType.constant));
+            lineRoot = new TreeNode(K.BrowserChildrenTreeViewRootNodeName(K.KrystalType.line));
+            expansionRoot = new TreeNode(K.BrowserChildrenTreeViewRootNodeName(K.KrystalType.exp));
+            modulationRoot = new TreeNode(K.BrowserChildrenTreeViewRootNodeName(K.KrystalType.mod));
+            permutationRoot = new TreeNode(K.BrowserChildrenTreeViewRootNodeName(K.KrystalType.perm));
+            pathRoot = new TreeNode(K.BrowserChildrenTreeViewRootNodeName(K.KrystalType.path));
             this.Nodes.Add(constantRoot);
             this.Nodes.Add(lineRoot);
             this.Nodes.Add(expansionRoot);

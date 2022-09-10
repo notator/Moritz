@@ -89,7 +89,7 @@ namespace Moritz.Krystals
                 this.CloseButton.Show();
             }
 
-            Dictionary<string, List<string>> krystalScoresDict = GetKrystalScoresDict();
+            Dictionary<string, List<string>> krystalScoresDict = K.GetKrystalScoresDict();
 
             _krystalFamily = new KrystalFamily(this._krystalsFolder, krystalScoresDict);
 
@@ -101,85 +101,6 @@ namespace Moritz.Krystals
 
             SetForKrystal(selectKrystalName);
         }
-
-        #region GetKrystalScoresDict
-
-        /// <summary>
-        /// The returned dictionary contains krystal/listOfScoresContainingIt
-        /// </summary>
-        /// <returns></returns>
-        private Dictionary<string, List<string>> GetKrystalScoresDict()
-        {
-            var rval = new Dictionary<string, List<string>>();
-            string scoresPath = M.LocalMoritzScoresFolder;
-            var allScoreSettings = Directory.EnumerateFiles(scoresPath, "*.mkss", SearchOption.AllDirectories);
-            foreach(var scoreSettings in allScoreSettings)
-            {
-                string scoreName = Path.GetFileName(scoreSettings);
-                scoreName = scoreName.Remove(scoreName.IndexOf(".mkss"));
-
-                var scoreKrystals = GetScoreKrystals(scoreSettings);
-                foreach(var krystalName in scoreKrystals)
-                {
-                    if(!rval.ContainsKey(krystalName))
-                    {
-                        rval.Add(krystalName, new List<string>() {scoreName});
-                    }
-                    else if(!rval[krystalName].Contains(scoreName))
-                    {
-                        rval[krystalName].Add(scoreName);
-                    }
-                }
-            }
-            return rval;
-        }
-        private List<string> GetScoreKrystals(string scoreSettings)
-        {
-            List<string> scoreKrystals = null;
-            try
-            {
-                using(XmlReader r = XmlReader.Create(scoreSettings))
-                {
-                    M.ReadToXmlElementTag(r, "moritzKrystalScore"); // check that this is a krystal score settings file
-
-                    M.ReadToXmlElementTag(r, "krystals", "moritzKrystalScore");
-
-                    if(r.Name == "moritzKrystalScore")
-                    {
-                        scoreKrystals = new List<string>();
-                    }
-                    else
-                    {
-                        Debug.Assert(r.Name == "krystals");
-                        scoreKrystals = GetKrystals(r);
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            return scoreKrystals;
-        }
-        private List<string> GetKrystals(XmlReader r)
-        {
-            List<string> scoreKrystals = new List<string>();
-            Debug.Assert(r.Name == "krystals");
-
-            M.ReadToXmlElementTag(r, "krystal");
-            while(r.Name == "krystal")
-            {
-                if(r.NodeType != XmlNodeType.EndElement)
-                {
-                    r.MoveToAttribute(0);
-                    scoreKrystals.Add(r.Value);
-                }
-                M.ReadToXmlElementTag(r, "krystal", "krystals");
-            }
-            return scoreKrystals;
-        }
-        #endregion
 
         /// <summary>
         /// Krystals can only be deleted if they have no children (i.e. they are not used to create scores or other krystals)
