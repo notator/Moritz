@@ -1,4 +1,3 @@
-using Krystals5ObjectLibrary;
 
 using Moritz.Globals;
 
@@ -11,7 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Moritz.Krystals
+namespace Krystals5ObjectLibrary
 {
     public delegate void ReturnKrystalDelegate(Krystal krystal);
 

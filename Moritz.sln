@@ -10,11 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Krystals5Application", "Kry
 		{383E2844-41A4-488F-A683-D3EAE9AF4AF5} = {383E2844-41A4-488F-A683-D3EAE9AF4AF5}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Krystals", "Moritz.Krystals\Moritz.Krystals.csproj", "{DF448BEC-155B-4A56-82BD-8FD1978A85AF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E68C2A79-CDAB-46F5-A6EE-534CE2D99577} = {E68C2A79-CDAB-46F5-A6EE-534CE2D99577}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Globals", "Moritz.Globals\Moritz.Globals.csproj", "{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Xml", "Moritz.Xml\Moritz.Xml.csproj", "{B239C302-A15D-4397-9F3C-EE6CC85440F3}"
@@ -79,17 +74,6 @@ Global
 		{93791484-2CA8-427A-9D19-3232D3753983}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{93791484-2CA8-427A-9D19-3232D3753983}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{93791484-2CA8-427A-9D19-3232D3753983}.Release|x86.ActiveCfg = Release|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Debug|x86.Build.0 = Debug|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{DF448BEC-155B-4A56-82BD-8FD1978A85AF}.Release|x86.ActiveCfg = Release|Any CPU
 		{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

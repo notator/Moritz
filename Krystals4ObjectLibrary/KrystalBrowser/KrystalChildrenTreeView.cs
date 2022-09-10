@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
-using Krystals5ObjectLibrary;
-
-namespace Moritz.Krystals
+namespace Krystals5ObjectLibrary
 {
     internal class KrystalChildrenNode : TreeNode
     {

@@ -291,10 +291,6 @@
       <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
-      <Project>{DF448BEC-155B-4A56-82BD-8FD1978A85AF}</Project>
-      <Name>Moritz.Krystals</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

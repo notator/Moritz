@@ -6,7 +6,6 @@ using System.IO;
 using System.Windows.Forms;
 using Krystals5ControlLibrary;
 using Krystals5ObjectLibrary;
-using Moritz.Krystals;
 
 namespace Krystals5Application
 {

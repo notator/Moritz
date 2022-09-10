@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-using Krystals5ObjectLibrary;
-
-namespace Moritz.Krystals
+namespace Krystals5ObjectLibrary
 {
 	internal class AncestorsNode : TreeNode
 	{

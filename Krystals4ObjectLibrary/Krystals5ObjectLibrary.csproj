@@ -49,6 +49,14 @@
     <Compile Include="Field.cs" />
     <Compile Include="ConstantKrystal.cs" />
     <Compile Include="InputKrystal.cs" />
+    <Compile Include="KrystalBrowser\KrystalAncestorsTreeView.cs" />
+    <Compile Include="KrystalBrowser\KrystalChildrenTreeView.cs" />
+    <Compile Include="KrystalBrowser\KrystalsBrowser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="KrystalBrowser\KrystalsBrowser.designer.cs">
+      <DependentUpon>KrystalsBrowser.cs</DependentUpon>
+    </Compile>
     <Compile Include="LineKrystal.cs" />
     <Compile Include="SvgNode.cs" />
     <Compile Include="SvgPath.cs" />
@@ -85,6 +93,12 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="KrystalBrowser\KrystalsBrowser.resx">
+      <DependentUpon>KrystalsBrowser.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -127,10 +127,6 @@
       <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
-      <Project>{df448bec-155b-4a56-82bd-8fd1978a85af}</Project>
-      <Name>Moritz.Krystals</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
       <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
       <Name>Moritz.Midi</Name>

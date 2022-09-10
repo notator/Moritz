@@ -1,7 +1,6 @@
 using Krystals5ObjectLibrary;
 
 using Moritz.Globals; // Preferences
-using Moritz.Krystals; //KrystalBrowser
 
 using System;
 using System.Collections.Generic;
