@@ -32,7 +32,6 @@ namespace Krystals5Application
             this.NewConstKrysButton = new System.Windows.Forms.Button();
             this.NewExpKrysButton = new System.Windows.Forms.Button();
             this.NewModKrysButton = new System.Windows.Forms.Button();
-            this.DeleteUnusedDuplicatesButton = new System.Windows.Forms.Button();
             this.NewPathKrysButton = new System.Windows.Forms.Button();
             this.OpenKrystalsBrowserButton = new System.Windows.Forms.Button();
             this.SaveKrystalsWithNewNamesButton = new System.Windows.Forms.Button();
@@ -97,16 +96,6 @@ namespace Krystals5Application
             this.NewModKrysButton.Text = "open modulation editor";
             this.NewModKrysButton.Click += new System.EventHandler(this.NewModulatedKrystalButton_Click);
             // 
-            // DeleteUnusedDuplicatesButton
-            // 
-            this.DeleteUnusedDuplicatesButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.DeleteUnusedDuplicatesButton.Location = new System.Drawing.Point(217, 49);
-            this.DeleteUnusedDuplicatesButton.Name = "DeleteUnusedDuplicatesButton";
-            this.DeleteUnusedDuplicatesButton.Size = new System.Drawing.Size(160, 42);
-            this.DeleteUnusedDuplicatesButton.TabIndex = 5;
-            this.DeleteUnusedDuplicatesButton.Text = "delete unused duplicates";
-            this.DeleteUnusedDuplicatesButton.Click += new System.EventHandler(this.DeleteUnusedDuplicateKrystalsButton_Click);
-            // 
             // NewPathKrysButton
             // 
             this.NewPathKrysButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -144,7 +133,6 @@ namespace Krystals5Application
             this.archivePanel.Controls.Add(this.label1);
             this.archivePanel.Controls.Add(this.archivelabel);
             this.archivePanel.Controls.Add(this.SaveKrystalsWithNewNamesButton);
-            this.archivePanel.Controls.Add(this.DeleteUnusedDuplicatesButton);
             this.archivePanel.Location = new System.Drawing.Point(12, 442);
             this.archivePanel.Name = "archivePanel";
             this.archivePanel.Size = new System.Drawing.Size(400, 106);
@@ -334,7 +322,6 @@ namespace Krystals5Application
         private System.Windows.Forms.Button NewConstKrysButton;
         private System.Windows.Forms.Button NewExpKrysButton;
         private System.Windows.Forms.Button NewModKrysButton;
-        private System.Windows.Forms.Button DeleteUnusedDuplicatesButton;
         private System.Windows.Forms.Button NewPathKrysButton;
         private System.Windows.Forms.Button OpenKrystalsBrowserButton;
         private System.Windows.Forms.Button SaveKrystalsWithNewNamesButton;
