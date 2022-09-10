@@ -1,39 +1,39 @@
+using Moritz.Globals;
+
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Diagnostics;
-
-using Moritz.Globals;
+using System.Xml;
 
 namespace Moritz.Spec
 {
-	public abstract class BasicDurationDef
-	{
-		public BasicDurationDef(int msDuration)
-		{
-			//Debug.Assert(msDuration > 0, "msDuration out of range");
-			if(msDuration <= 0)
-			{
-				throw new ApplicationException("msDuration out of range");
-			}
+    public abstract class BasicDurationDef
+    {
+        public BasicDurationDef(int msDuration)
+        {
+            //Debug.Assert(msDuration > 0, "msDuration out of range");
+            if(msDuration <= 0)
+            {
+                throw new ApplicationException("msDuration out of range");
+            }
 
-			MsDuration = msDuration;
-		}
-		public int MsDuration { get; set; }
-	}
+            MsDuration = msDuration;
+        }
+        public int MsDuration { get; set; }
+    }
 
-	public class BasicMidiRestDef : BasicDurationDef
-	{
-		public BasicMidiRestDef(int msDuration)
-			:base(msDuration)
-		{
-		}
-	}
+    public class BasicMidiRestDef : BasicDurationDef
+    {
+        public BasicMidiRestDef(int msDuration)
+            : base(msDuration)
+        {
+        }
+    }
 
-	public class BasicMidiChordDef : BasicDurationDef
+    public class BasicMidiChordDef : BasicDurationDef
     {
         public BasicMidiChordDef(int msDuration, byte? bank, byte? patch, bool hasChordOff, List<byte> pitches, List<byte> velocities)
-			:base(msDuration)
+            : base(msDuration)
         {
             BankIndex = bank;
             PatchIndex = patch;
@@ -48,7 +48,7 @@ namespace Moritz.Spec
             foreach(byte pitch in Pitches)
                 Debug.Assert(pitch >= 0 && pitch <= 127);
             foreach(byte velocity in Velocities)
-                M.AssertIsVelocityValue(velocity);     
+                M.AssertIsVelocityValue(velocity);
             #endregion
         }
 
@@ -64,18 +64,18 @@ namespace Moritz.Spec
         /// <param name="rootPitch">The lowest pitch</param>
         /// <param name="density">The number of pitches. The actual number created can be smaller.</param>
         public BasicMidiChordDef(int msDuration, Mode mode, int rootPitch, int density)
-			: base(msDuration)
-		{
-			#region conditions
-			//Debug.Assert(density > 0 && density <= 12);
-			//Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
-			if(density < 1 || density > 12 || rootPitch < 0 || rootPitch > 127)
-			{
-				throw new ApplicationException();
-			}
-			#endregion conditions
+            : base(msDuration)
+        {
+            #region conditions
+            //Debug.Assert(density > 0 && density <= 12);
+            //Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+            if(density < 1 || density > 12 || rootPitch < 0 || rootPitch > 127)
+            {
+                throw new ApplicationException();
+            }
+            #endregion conditions
 
-			Pitches = mode.GetChord(rootPitch, density);
+            Pitches = mode.GetChord(rootPitch, density);
             var newVelocities = new List<byte>();
             foreach(byte pitch in Pitches) // can be less than nPitchesPerChord
             {
@@ -84,24 +84,24 @@ namespace Moritz.Spec
             Velocities = newVelocities;
         }
 
-		internal void AssertConsistency()
-		{
-			//Debug.Assert(Pitches != null && Pitches.Count > 0);
-			//Debug.Assert(Velocities != null && Velocities.Count == Pitches.Count);
-			if(Pitches == null || Pitches.Count == 0 || Velocities == null || Velocities.Count != Pitches.Count)
-			{
-				throw new ApplicationException();
-			}
-		}
+        internal void AssertConsistency()
+        {
+            //Debug.Assert(Pitches != null && Pitches.Count > 0);
+            //Debug.Assert(Velocities != null && Velocities.Count == Pitches.Count);
+            if(Pitches == null || Pitches.Count == 0 || Velocities == null || Velocities.Count != Pitches.Count)
+            {
+                throw new ApplicationException();
+            }
+        }
 
-		#region Inversion
-		/// <summary>
-		/// Creates a BasicMidiChordDef having the original base pitch,
-		/// but in which the top-bottom order of the prime intervals is reversed. 
-		/// Velocities remain in the same order, bottom to top. They are not inverted. 
-		/// </summary>
-		/// <returns></returns>
-		public BasicMidiChordDef Inversion()
+        #region Inversion
+        /// <summary>
+        /// Creates a BasicMidiChordDef having the original base pitch,
+        /// but in which the top-bottom order of the prime intervals is reversed. 
+        /// Velocities remain in the same order, bottom to top. They are not inverted. 
+        /// </summary>
+        /// <returns></returns>
+        public BasicMidiChordDef Inversion()
         {
             List<byte> pitches = Pitches; // default if Pitches.Count == 1
 
@@ -161,13 +161,13 @@ namespace Moritz.Spec
                 {
                     MidiMsg msg = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_BANK_CHANGE_0, BankIndex);
                     msg.WriteSVG(w);
-                    carryMsgs.BankState = (byte) BankIndex;
+                    carryMsgs.BankState = (byte)BankIndex;
                 }
                 if(PatchIndex != null && PatchIndex != carryMsgs.PatchState)
                 {
                     MidiMsg msg = new MidiMsg(M.CMD_PATCH_CHANGE_0xC0 + channel, (int)PatchIndex, null);
                     msg.WriteSVG(w);
-                    carryMsgs.PatchState = (byte) PatchIndex;
+                    carryMsgs.PatchState = (byte)PatchIndex;
                 }
                 if(PitchWheelDeviation != null && PitchWheelDeviation != carryMsgs.PitchWheelDeviationState)
                 {
@@ -175,7 +175,7 @@ namespace Moritz.Spec
                     msg1.WriteSVG(w);
                     MidiMsg msg2 = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_DATAENTRY_COARSE_6, PitchWheelDeviation);
                     msg2.WriteSVG(w);
-                    carryMsgs.PitchWheelDeviationState = (byte) PitchWheelDeviation;
+                    carryMsgs.PitchWheelDeviationState = (byte)PitchWheelDeviation;
                 }
                 w.WriteEndElement(); // switches
             }
@@ -245,38 +245,38 @@ namespace Moritz.Spec
             for(int i = 0; i < Velocities.Count; ++i)
             {
                 byte velocity = (byte)Math.Round((Velocities[i] * factor));
-                Velocities[i] = M.VelocityValue(velocity); 
+                Velocities[i] = M.VelocityValue(velocity);
             }
         }
 
-		/// <summary>
-		/// Velocities having originalVelocity are changed to newVelocity.
-		/// Velocity values above originalVelocity are changed proportionally with max possible velocity at 127.
-		/// Velocity values below originalVelocity are changed proportionally with min possible velocity at 1.
-		/// </summary>
-		/// <param name="factor">greater than 0</param>
-		public void AdjustVelocities(byte originalVelocity, byte newVelocity)
-		{
-			M.AssertIsVelocityValue(originalVelocity);
-			M.AssertIsVelocityValue(newVelocity);
-			double upperFactor = ((double)127 - originalVelocity) / ((double)127 - newVelocity);
-			double lowerFactor = ((double)newVelocity) / ((double)originalVelocity);
-			for(int i = 0; i < Velocities.Count; i++)
-			{
-				byte oldVel = Velocities[i];
-				byte newVel = 0;
-				if(oldVel > originalVelocity)
-				{
-					newVel = (byte)(originalVelocity + Math.Round((oldVel - originalVelocity) * upperFactor));
-				}
-				else
-				{
-					newVel = (byte)(Math.Round(oldVel * lowerFactor));
-				}
-				newVel = M.VelocityValue(newVel);
-				Velocities[i] = newVel;
-			}
-		}
+        /// <summary>
+        /// Velocities having originalVelocity are changed to newVelocity.
+        /// Velocity values above originalVelocity are changed proportionally with max possible velocity at 127.
+        /// Velocity values below originalVelocity are changed proportionally with min possible velocity at 1.
+        /// </summary>
+        /// <param name="factor">greater than 0</param>
+        public void AdjustVelocities(byte originalVelocity, byte newVelocity)
+        {
+            M.AssertIsVelocityValue(originalVelocity);
+            M.AssertIsVelocityValue(newVelocity);
+            double upperFactor = ((double)127 - originalVelocity) / ((double)127 - newVelocity);
+            double lowerFactor = ((double)newVelocity) / ((double)originalVelocity);
+            for(int i = 0; i < Velocities.Count; i++)
+            {
+                byte oldVel = Velocities[i];
+                byte newVel = 0;
+                if(oldVel > originalVelocity)
+                {
+                    newVel = (byte)(originalVelocity + Math.Round((oldVel - originalVelocity) * upperFactor));
+                }
+                else
+                {
+                    newVel = (byte)(Math.Round(oldVel * lowerFactor));
+                }
+                newVel = M.VelocityValue(newVel);
+                Velocities[i] = newVel;
+            }
+        }
 
         /// <summary>
         /// The arguments must both be in range [1..127].
@@ -289,7 +289,7 @@ namespace Moritz.Spec
             M.AssertIsVelocityValue(rootVelocity);
             M.AssertIsVelocityValue(topVelocity);
             #endregion conditions
-            
+
             if(Velocities.Count > 1)
             {
                 double increment = (((double)(topVelocity - rootVelocity)) / (Velocities.Count - 1));
@@ -310,5 +310,5 @@ namespace Moritz.Spec
         public byte? PatchIndex = null; // optional. If null, patch commands are not sent
         public byte? PitchWheelDeviation = null; // optional. If null, PitchWheelDeviation commands are not sent
         public bool HasChordOff = true;
-	}
+    }
 }

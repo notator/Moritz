@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Moritz.Globals.IODevices
 {
@@ -35,11 +35,11 @@ namespace Moritz.Globals.IODevices
 
             if(numberOfDevices > 0)
             {
-                for(Int32 i = 0 ; i < numberOfDevices ; i++)
+                for(Int32 i = 0; i < numberOfDevices; i++)
                 {
                     MIDIOUTCAPS caps = new MIDIOUTCAPS();
                     uint returnValue = Functions.midiOutGetDevCaps(i, ref caps, (UInt32)Marshal.SizeOf(caps));
-                    Debug.Assert(returnValue  == Constants.MMSYSERR_NOERROR);
+                    Debug.Assert(returnValue == Constants.MMSYSERR_NOERROR);
                     if(string.Compare(caps.szPname, "VirtualMIDISynth #1") != 0)
                     {
                         devices.Add(new OutputDevice(i, caps));
@@ -83,10 +83,10 @@ namespace Moritz.Globals.IODevices
 
             if(numberOfInDevices > 0)
             {
-                for(Int32 i = 0 ; i < numberOfInDevices ; i++)
+                for(Int32 i = 0; i < numberOfInDevices; i++)
                 {
                     MIDIINCAPS caps = new MIDIINCAPS();
-                    if(Functions.MidiInGetDevCaps(i, ref caps, (UInt32) Marshal.SizeOf(caps)) == Constants.MMSYSERR_NOERROR)
+                    if(Functions.MidiInGetDevCaps(i, ref caps, (UInt32)Marshal.SizeOf(caps)) == Constants.MMSYSERR_NOERROR)
                     {
                         devices.Add(new InputDevice(i, caps));
                     }

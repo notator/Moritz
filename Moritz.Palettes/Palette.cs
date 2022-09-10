@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Krystals5ObjectLibrary;
+
+using Moritz.Globals;
+using Moritz.Spec;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using Krystals5ObjectLibrary;
-using Moritz.Globals;
-using Moritz.Midi;
-using Moritz.Symbols;
-using Moritz.Spec;
 
 namespace Moritz.Palettes
 {
@@ -14,14 +13,14 @@ namespace Moritz.Palettes
     {
         public Palette(PaletteForm paletteForm)
         {
-			Name = paletteForm.PaletteName;
+            Name = paletteForm.PaletteName;
 
-			BasicChordFormSettings bcfs = new BasicChordFormSettings
-			{
-				Durations = M.StringToIntList(paletteForm.BasicChordControl.DurationsTextBox.Text, ','),
-				Velocities = M.StringToByteList(paletteForm.BasicChordControl.VelocitiesTextBox.Text, ',')
-			};
-			NormalizeVelocities(bcfs.Velocities);
+            BasicChordFormSettings bcfs = new BasicChordFormSettings
+            {
+                Durations = M.StringToIntList(paletteForm.BasicChordControl.DurationsTextBox.Text, ','),
+                Velocities = M.StringToByteList(paletteForm.BasicChordControl.VelocitiesTextBox.Text, ',')
+            };
+            NormalizeVelocities(bcfs.Velocities);
             bcfs.MidiPitches = M.StringToByteList(paletteForm.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcfs.ChordOffs = M.StringToBoolList(paletteForm.BasicChordControl.ChordOffsTextBox.Text, ',');
             bcfs.ChordDensities = M.StringToByteList(paletteForm.BasicChordControl.ChordDensitiesTextBox.Text, ',');
@@ -48,14 +47,14 @@ namespace Moritz.Palettes
                 _ornamentSettings = new OrnamentSettings(paletteForm);
             }
 
-			var values = new List<IUniqueDef>();
-			for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
+            var values = new List<IUniqueDef>();
+            for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
             {
-				IUniqueDef dd = GetDurationDef(chordIndex);
+                IUniqueDef dd = GetDurationDef(chordIndex);
                 values.Add(dd);
             }
 
-			SetValues(values);
+            SetValues(values);
 
             _isPercussionPalette = paletteForm.IsPercussionPalette;
         }
@@ -67,13 +66,13 @@ namespace Moritz.Palettes
         /// <param name="paletteChordForm"></param>
         public Palette(PaletteChordForm paletteChordForm)
         {
-			BasicChordFormSettings bcfs = new BasicChordFormSettings
-			{
-				Durations = M.StringToIntList(paletteChordForm.DurationTextBox.Text, ','),
-				Velocities = M.StringToByteList(paletteChordForm.VelocityTextBox.Text, ',')
-			};
-			NormalizeVelocities(bcfs.Velocities);
-            bcfs.MidiPitches = M.StringToByteList(paletteChordForm.BaseMidiPitchTextBox.Text,  ',');
+            BasicChordFormSettings bcfs = new BasicChordFormSettings
+            {
+                Durations = M.StringToIntList(paletteChordForm.DurationTextBox.Text, ','),
+                Velocities = M.StringToByteList(paletteChordForm.VelocityTextBox.Text, ',')
+            };
+            NormalizeVelocities(bcfs.Velocities);
+            bcfs.MidiPitches = M.StringToByteList(paletteChordForm.BaseMidiPitchTextBox.Text, ',');
             bcfs.ChordOffs = M.StringToBoolList(paletteChordForm.ChordOffTextBox.Text, ',');
             bcfs.ChordDensities = M.StringToByteList(paletteChordForm.ChordDensityTextBox.Text, ',');
             bcfs.Inversions = paletteChordForm.PaletteForm.GetLinearInversions(paletteChordForm.PaletteForm.BasicChordControl.RootInversionTextBox.Text);
@@ -100,14 +99,14 @@ namespace Moritz.Palettes
                 _ornamentSettings = new OrnamentSettings(paletteChordForm.PaletteForm);
             }
 
-			IUniqueDef dd = GetDurationDef(0);
-			SetValues(new List<IUniqueDef>() { dd });
+            IUniqueDef dd = GetDurationDef(0);
+            SetValues(new List<IUniqueDef>() { dd });
         }
 
-		public IUniqueDef GetIUniqueDef(int index)
-		{
-			return GetClonedValueAt(index);
-		}
+        public IUniqueDef GetIUniqueDef(int index)
+        {
+            return GetClonedValueAt(index);
+        }
 
         /// <summary>
         /// Returns either a new MidiRestDef or a new MidiChordDef
@@ -226,14 +225,14 @@ namespace Moritz.Palettes
                     midiChordSliderDefs,
                     basicMidiChordDefs);
             }
-            return (IUniqueDef) rval;
+            return (IUniqueDef)rval;
         }
 
         private void NormalizeVelocities(List<byte> velocities)
         {
             for(int i = 0; i < velocities.Count; ++i)
             {
-                velocities[i] = (velocities[i] == 0) ? (byte) 1: velocities[i];
+                velocities[i] = (velocities[i] == 0) ? (byte)1 : velocities[i];
             }
         }
 
@@ -315,7 +314,7 @@ namespace Moritz.Palettes
         private readonly List<int> _ornamentNumbers;
         private readonly List<int> _ornamentMinMsDurations;
         private readonly OrnamentSettings _ornamentSettings;
-		private readonly bool _isPercussionPalette;
+        private readonly bool _isPercussionPalette;
         public bool IsPercussionPalette { get { return _isPercussionPalette; } }
 
         public string Name { get; private set; }
@@ -326,12 +325,12 @@ namespace Moritz.Palettes
         /// </summary>
         public MidiChordDef MidiChordDef(int index)
         {
-			if(!(GetClonedValueAt(index) is MidiChordDef midiChordDef))
-			{
-				throw new ApplicationException("The indexed object was not a MidiChordDef.");
-			}
+            if(!(GetClonedValueAt(index) is MidiChordDef midiChordDef))
+            {
+                throw new ApplicationException("The indexed object was not a MidiChordDef.");
+            }
 
-			return midiChordDef;
+            return midiChordDef;
         }
 
         public Trk NewTrk(int midiChannel, int msPositionReContainer, List<int> sequence)
@@ -351,10 +350,10 @@ namespace Moritz.Palettes
             return trkDef;
         }
 
-		public Trk NewTrk(int midiChannel, int msPositionReContainer, Krystal krystal)
+        public Trk NewTrk(int midiChannel, int msPositionReContainer, Krystal krystal)
         {
             List<int> sequence = krystal.GetValues((uint)1)[0];
-			return NewTrk(midiChannel, msPositionReContainer, sequence);
+            return NewTrk(midiChannel, msPositionReContainer, sequence);
         }
 
         /// <summary>
@@ -378,14 +377,14 @@ namespace Moritz.Palettes
             OrnamentsForm osf = paletteform.OrnamentsForm;
             Debug.Assert(osf != null && osf.Ornaments != null);
 
-			BasicChordFormSettings bcs = new BasicChordFormSettings
-			{
-				/// relative durations
-				Durations = M.StringToIntList(osf.BasicChordControl.DurationsTextBox.Text, ','),
-				/// velocity increments
-				Velocities = M.StringToByteList(osf.BasicChordControl.VelocitiesTextBox.Text, ',')
-			};
-			NormalizeVelocities(bcs.Velocities);
+            BasicChordFormSettings bcs = new BasicChordFormSettings
+            {
+                /// relative durations
+                Durations = M.StringToIntList(osf.BasicChordControl.DurationsTextBox.Text, ','),
+                /// velocity increments
+                Velocities = M.StringToByteList(osf.BasicChordControl.VelocitiesTextBox.Text, ',')
+            };
+            NormalizeVelocities(bcs.Velocities);
             /// transposition intervals
             bcs.MidiPitches = M.StringToByteList(osf.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcs.ChordOffs = M.StringToBoolList(osf.BasicChordControl.ChordOffsTextBox.Text, ',');
@@ -507,11 +506,11 @@ namespace Moritz.Palettes
 
             byte rootPitch = rootPitches[chordIndex];
             int nUpperPitches = densities[chordIndex] - 1;
-			List<byte> midiPitches = new List<byte>
-			{
-				rootPitch
-			};
-			for(int p = 0; p < nUpperPitches; p++)
+            List<byte> midiPitches = new List<byte>
+            {
+                rootPitch
+            };
+            for(int p = 0; p < nUpperPitches; p++)
             {
                 byte newpitch = M.MidiValue(midiPitches[p] + primeIntervals[p]);
                 midiPitches.Add(newpitch);

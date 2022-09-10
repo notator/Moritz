@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
-using System.Diagnostics;
-using System.Text;
+﻿using Moritz.Globals;
 
-using Moritz.Globals;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
 
 namespace Moritz.Palettes
 {
@@ -96,7 +96,7 @@ namespace Moritz.Palettes
         /// </summary>
         /// <param name="attributeString"></param>
         public void Set(string attributeString)
-        { 
+        {
             string[] values = attributeString.Split(',');
             Debug.Assert(values.Length == _boxes.Count);
             for(int i = 0; i < _boxes.Count; ++i)
@@ -127,14 +127,14 @@ namespace Moritz.Palettes
             this.SuspendLayout();
             for(int i = 0; i < nBoxes; ++i)
             {
-				TextBox textBox = new TextBox
-				{
-					Size = new Size(textBoxWidth, 20),
-					Location = new Point(x, 0),
-					Visible = true,
-					TabIndex = i
-				};
-				x += (textBoxWidth + 1);
+                TextBox textBox = new TextBox
+                {
+                    Size = new Size(textBoxWidth, 20),
+                    Location = new Point(x, 0),
+                    Visible = true,
+                    TabIndex = i
+                };
+                x += (textBoxWidth + 1);
                 textBox.Enter += TextBox_Enter;
                 textBox.Leave += TextBox_Leave;
                 _boxes.Add(textBox);
@@ -158,17 +158,17 @@ namespace Moritz.Palettes
 
         private void TextBox_Leave(object sender, EventArgs e)
         {
-			if(sender is TextBox textBox)
-			{
-				textBox.Text = textBox.Text.Trim();
-				M.LeaveIntRangeTextBox(textBox, true, 1, _minInt, _maxInt, SetTextBoxState);
+            if(sender is TextBox textBox)
+            {
+                textBox.Text = textBox.Text.Trim();
+                M.LeaveIntRangeTextBox(textBox, true, 1, _minInt, _maxInt, SetTextBoxState);
 
-				if(textBox.BackColor == Color.White && _ControlHasChanged != null)
-				{
-					_ControlHasChanged(this); // delegate
-				}
-			}
-		}
+                if(textBox.BackColor == Color.White && _ControlHasChanged != null)
+                {
+                    _ControlHasChanged(this); // delegate
+                }
+            }
+        }
 
         private void TextBox_Enter(object sender, EventArgs e)
         {

@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Moritz.Globals;
+using Moritz.Palettes;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Xml;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Drawing;
-
-using Moritz.Globals;
-using Moritz.Palettes;
 
 namespace Moritz.Composer
 {
@@ -27,25 +26,25 @@ namespace Moritz.Composer
         }
         private List<TextBox> GetAllTextBoxes()
         {
-			List<TextBox> textBoxes = new List<TextBox>
-			{
-				BottomMarginTextBox,
-				TopMarginPage1TextBox,
-				TopMarginOtherPagesTextBox,
-				RightMarginTextBox,
-				LeftMarginTextBox,
-				Page1TitleTextBox,
-				Page1AuthorTextBox,
-				Page1TitleYTextBox,
-				Page1TitleHeightTextBox,
-				Page1AuthorHeightTextBox,
-				AboutLinkTextTextBox,
-				AboutLinkURLTextBox,
-				MetadataCommentTextBox,
-				MetadataKeywordsTextBox
-			};
+            List<TextBox> textBoxes = new List<TextBox>
+            {
+                BottomMarginTextBox,
+                TopMarginPage1TextBox,
+                TopMarginOtherPagesTextBox,
+                RightMarginTextBox,
+                LeftMarginTextBox,
+                Page1TitleTextBox,
+                Page1AuthorTextBox,
+                Page1TitleYTextBox,
+                Page1TitleHeightTextBox,
+                Page1AuthorHeightTextBox,
+                AboutLinkTextTextBox,
+                AboutLinkURLTextBox,
+                MetadataCommentTextBox,
+                MetadataKeywordsTextBox
+            };
 
-			return textBoxes;
+            return textBoxes;
         }
 
         private void SetDefaultValues()
@@ -53,10 +52,10 @@ namespace Moritz.Composer
             this.PaperSizeComboBox.Text = "A3";
             this.LandscapeCheckBox.Checked = false;
 
-			this.Page1TitleTextBox.Text = "";
-			this.Page1AuthorTextBox.Text = "";
-			this.Page1TitleHeightTextBox.Text = "32";
-			this.Page1AuthorHeightTextBox.Text = "16";
+            this.Page1TitleTextBox.Text = "";
+            this.Page1AuthorTextBox.Text = "";
+            this.Page1TitleHeightTextBox.Text = "32";
+            this.Page1AuthorHeightTextBox.Text = "16";
             this.Page1TitleYTextBox.Text = "50";
 
             this.TopMarginPage1TextBox.Text = "90";
@@ -97,10 +96,10 @@ namespace Moritz.Composer
         private void GetMetadata(XmlReader r)
         {
             Debug.Assert(r.Name == "metadata");
-			#region default values
-			this.Page1TitleTextBox.Text = "";
-			this.Page1AuthorTextBox.Text = "";
-			this.MetadataKeywordsTextBox.Text = "";
+            #region default values
+            this.Page1TitleTextBox.Text = "";
+            this.Page1AuthorTextBox.Text = "";
+            this.MetadataKeywordsTextBox.Text = "";
             this.MetadataCommentTextBox.Text = "";
             #endregion
             int count = r.AttributeCount;
@@ -109,17 +108,17 @@ namespace Moritz.Composer
                 r.MoveToAttribute(i);
                 switch(r.Name)
                 {
-					case "page1Title":
-						this.Page1TitleTextBox.Text = r.Value;
-						break;
-					case "page1Author":
-						this.Page1AuthorTextBox.Text = r.Value;
-						break;
+                    case "page1Title":
+                        this.Page1TitleTextBox.Text = r.Value;
+                        break;
+                    case "page1Author":
+                        this.Page1AuthorTextBox.Text = r.Value;
+                        break;
 
-					case "keywords":
-						this.MetadataKeywordsTextBox.Text = r.Value;
-						break;
-					case "comment":
+                    case "keywords":
+                        this.MetadataKeywordsTextBox.Text = r.Value;
+                        break;
+                    case "comment":
                         this.MetadataCommentTextBox.Text = r.Value;
                         break;
                 }
@@ -255,14 +254,14 @@ namespace Moritz.Composer
         {
             w.WriteStartElement("metadata");
 
-			if(!String.IsNullOrEmpty(Page1TitleTextBox.Text))
-				w.WriteAttributeString("page1Title", this.Page1TitleTextBox.Text);
-			if(!String.IsNullOrEmpty(Page1AuthorTextBox.Text))
-				w.WriteAttributeString("page1Author", this.Page1AuthorTextBox.Text);
+            if(!String.IsNullOrEmpty(Page1TitleTextBox.Text))
+                w.WriteAttributeString("page1Title", this.Page1TitleTextBox.Text);
+            if(!String.IsNullOrEmpty(Page1AuthorTextBox.Text))
+                w.WriteAttributeString("page1Author", this.Page1AuthorTextBox.Text);
 
-			if(!String.IsNullOrEmpty(MetadataKeywordsTextBox.Text))
-				w.WriteAttributeString("keywords", this.MetadataKeywordsTextBox.Text);
-			if(!String.IsNullOrEmpty(MetadataCommentTextBox.Text))
+            if(!String.IsNullOrEmpty(MetadataKeywordsTextBox.Text))
+                w.WriteAttributeString("keywords", this.MetadataKeywordsTextBox.Text);
+            if(!String.IsNullOrEmpty(MetadataCommentTextBox.Text))
                 w.WriteAttributeString("comment", this.MetadataCommentTextBox.Text);
 
             w.WriteStartElement("websiteLink");
@@ -366,35 +365,35 @@ namespace Moritz.Composer
             SetSettingsHaveChanged();
         }
 
-		private void CheckTextBoxIsInt(TextBox textBox)
-		{
-			bool okay = true;
-			textBox.Text.Trim();
-			try
-			{
-				int i = int.Parse(textBox.Text, M.En_USNumberFormat);
-			}
-			catch
-			{
-				okay = false;
-			}
+        private void CheckTextBoxIsInt(TextBox textBox)
+        {
+            bool okay = true;
+            textBox.Text.Trim();
+            try
+            {
+                int i = int.Parse(textBox.Text, M.En_USNumberFormat);
+            }
+            catch
+            {
+                okay = false;
+            }
 
-			M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-		}
+            M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
+        }
 
-		private void Page1TitleTextBox_Leave(object sender, EventArgs e)
-		{
-			SetSettingsHaveChanged();
-		}
-		private void Page1AuthorTextBox_Leave(object sender, EventArgs e)
-		{
-			SetSettingsHaveChanged();
-		}
-		private void AboutLinkTextTextBox_Leave(object sender, EventArgs e)
-		{
-			SetSettingsHaveChanged();
-		}
-		private void AboutLinkURLTextBox_Leave(object sender, EventArgs e)
+        private void Page1TitleTextBox_Leave(object sender, EventArgs e)
+        {
+            SetSettingsHaveChanged();
+        }
+        private void Page1AuthorTextBox_Leave(object sender, EventArgs e)
+        {
+            SetSettingsHaveChanged();
+        }
+        private void AboutLinkTextTextBox_Leave(object sender, EventArgs e)
+        {
+            SetSettingsHaveChanged();
+        }
+        private void AboutLinkURLTextBox_Leave(object sender, EventArgs e)
         {
             SetSettingsHaveChanged();
         }
@@ -419,10 +418,10 @@ namespace Moritz.Composer
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
             _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
-			if(!_isLoading)
-			{
-				_assistantComposerForm.UpdateMainFormState();
-			} 
+            if(!_isLoading)
+            {
+                _assistantComposerForm.UpdateMainFormState();
+            }
         }
         #region RevertToSaved
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -493,10 +492,10 @@ namespace Moritz.Composer
         public string PaperSize { get { return PaperSizeComboBox.Text; } }
         public bool Landscape { get { return LandscapeCheckBox.Checked; } }
 
-		public string Page1Title { get { return Page1TitleTextBox.Text; } }
-		public string Page1Author { get { return Page1AuthorTextBox.Text; } }
+        public string Page1Title { get { return Page1TitleTextBox.Text; } }
+        public string Page1Author { get { return Page1AuthorTextBox.Text; } }
 
-		public float TitleHeight { get { return float.Parse(Page1TitleHeightTextBox.Text, M.En_USNumberFormat); } }
+        public float TitleHeight { get { return float.Parse(Page1TitleHeightTextBox.Text, M.En_USNumberFormat); } }
         public float AuthorHeight { get { return float.Parse(Page1AuthorHeightTextBox.Text, M.En_USNumberFormat); } }
         public float TitleY { get { return float.Parse(Page1TitleYTextBox.Text, M.En_USNumberFormat); } }
 

@@ -1,21 +1,17 @@
 
 using System;
-using System.Xml;
-using System.Text;
 using System.Diagnostics;
-
-using Moritz.Globals;
 
 namespace Moritz.Xml
 {
-	public class TextInfo
-	{
+    public class TextInfo
+    {
         public TextInfo(string text, string fontFamily, float fontHeight, TextHorizAlign textHorizAlign)
             : this(text, fontFamily, fontHeight, new ColorString("000000"), textHorizAlign)
         {
         }
 
-        public TextInfo(string text, string fontFamily, float fontHeight, ColorString colorString, 
+        public TextInfo(string text, string fontFamily, float fontHeight, ColorString colorString,
             TextHorizAlign textHorizAlign)
         {
             Debug.Assert(!String.IsNullOrEmpty(text));
@@ -28,7 +24,7 @@ namespace Moritz.Xml
 
         public string FontFamily { get { return _fontFamily; } }
         private readonly string _fontFamily = null;
-        
+
         public string Text { get { return _text; } }
         private readonly string _text = null;
 
@@ -42,6 +38,6 @@ namespace Moritz.Xml
 		/// A string of 6 Hex digits (RRGGBB).
 		/// </summary>
         public ColorString ColorString { get { return _colorString; } }
-        private readonly ColorString _colorString = null; 
+        private readonly ColorString _colorString = null;
     }
 }

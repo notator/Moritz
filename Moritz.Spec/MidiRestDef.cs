@@ -1,5 +1,3 @@
-
-using System.Collections.Generic;
 using Moritz.Xml;
 
 namespace Moritz.Spec
@@ -45,7 +43,7 @@ namespace Moritz.Spec
             w.WriteEndElement(); // moments
 
             // Moritz never writes an envs element here, but other applications might.
-             
+
             w.WriteEndElement(); // score:midi
         }
     }

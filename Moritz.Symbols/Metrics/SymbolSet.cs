@@ -1,8 +1,8 @@
-﻿using System.Drawing;
-using System.Collections.Generic;
-
+﻿using Moritz.Spec;
 using Moritz.Xml;
-using Moritz.Spec;
+
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Moritz.Symbols
 {
@@ -34,7 +34,8 @@ namespace Moritz.Symbols
         /// Feb. 2012: Currently only the StandardSymbolSet supports notehead extender lines. 
         /// </summary>
         public virtual void AddNoteheadExtenderLines(List<Staff> staves,
-            float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding, SvgSystem nextSystem) { }
+            float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding, SvgSystem nextSystem)
+        { }
 
         /// <summary>
         /// This function

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
-using System.Xml;
 using System.IO;
+using System.Text;
+using System.Xml;
 
 namespace Krystals5ObjectLibrary
 {
@@ -28,7 +28,7 @@ namespace Krystals5ObjectLibrary
                 _name = Path.GetFileName(filepath);
                 string gamete = "inputGamete";
                 string gameteFile = "inputGameteFile";
-                for(int inOut = 0 ; inOut < 2 ; inOut++)
+                for(int inOut = 0; inOut < 2; inOut++)
                 {
                     K.ReadToXmlElementTag(r, gamete, gameteFile);
                     if(r.Name.Equals(gameteFile))
@@ -180,13 +180,13 @@ namespace Krystals5ObjectLibrary
 
             if(!equivalentExists && File.Exists(pathname) == false)
             {
-				XmlWriterSettings settings = new XmlWriterSettings
-				{
-					Indent = true,
-					IndentChars = ("\t"),
-					CloseOutput = true
-				};
-				string namePath = K.ExpansionOperatorsFolder + @"\" + _name;
+                XmlWriterSettings settings = new XmlWriterSettings
+                {
+                    Indent = true,
+                    IndentChars = ("\t"),
+                    CloseOutput = true
+                };
+                string namePath = K.ExpansionOperatorsFolder + @"\" + _name;
                 using(XmlWriter w = XmlWriter.Create(namePath, settings))
                 {
                     w.WriteStartDocument();
@@ -237,10 +237,10 @@ namespace Krystals5ObjectLibrary
         /// <returns></returns>
         public int CompareTo(object other)
         {
-			if(!(other is Expander otherExpander))
-				throw new ArgumentException();
+            if(!(other is Expander otherExpander))
+                throw new ArgumentException();
 
-			bool inputGametesAreEquivalent = false;
+            bool inputGametesAreEquivalent = false;
             bool outputGametesAreEquivalent = false;
             Expander thisIN = this;
             Expander thisOUT = this;
@@ -288,7 +288,7 @@ namespace Krystals5ObjectLibrary
             {
                 List<PointGroup> pointGroups1 = gamete1.FixedPointGroups;
                 List<PointGroup> pointGroups2 = gamete2.FixedPointGroups;
-                for(int i = 0 ; i < pointGroups1.Count ; i++)
+                for(int i = 0; i < pointGroups1.Count; i++)
                 {
                     PointGroup pg1 = pointGroups1[i];
                     PointGroup pg2 = pointGroups2[i];
@@ -305,7 +305,7 @@ namespace Krystals5ObjectLibrary
                     && pg1.TranslateRadius == pg2.TranslateRadius)
                     {
                         gametesAreEquivalent = true;
-                        for(int j = 0 ; j < pg1.Value.Count ; j++)
+                        for(int j = 0; j < pg1.Value.Count; j++)
                         {
                             if(pg1.Value[j] != pg2.Value[j])
                             {
@@ -467,19 +467,19 @@ namespace Krystals5ObjectLibrary
                 uint oldNumberOfMoments = _planets[0].Moments;
                 if(oldNumberOfMoments > 0 && oldNumberOfMoments != newNumberOfMoments)
                 {
-                    float factor = ((float) newNumberOfMoments) / ((float) oldNumberOfMoments);
+                    float factor = ((float)newNumberOfMoments) / ((float)oldNumberOfMoments);
                     foreach(Planet planet in _planets)
                     {
                         int lastindex = planet.Subpaths.Count - 1;
                         uint remainingMoments = newNumberOfMoments;
-                        for(int index = 0 ; index < planet.Subpaths.Count ; index++)
+                        for(int index = 0; index < planet.Subpaths.Count; index++)
                         {
                             PointGroup pg = planet.Subpaths[index];
                             if(index == lastindex)
                                 pg.Count = remainingMoments;
                             else
                             {
-                                pg.Count = (uint) (pg.Count * factor);
+                                pg.Count = (uint)(pg.Count * factor);
                                 remainingMoments -= pg.Count;
                             }
                         }
@@ -509,9 +509,9 @@ namespace Krystals5ObjectLibrary
             {
                 foreach(PointGroup p in FixedPointGroups)
                     foreach(uint value in p.Value)
-                        yield return (int) value;
+                        yield return (int)value;
                 foreach(Planet p in _planets)
-                    yield return (int) p.Value;
+                    yield return (int)p.Value;
             }
         }
         #endregion Enumerable Property
@@ -525,7 +525,7 @@ namespace Krystals5ObjectLibrary
                     numberOfValues += pg.Count;
                 foreach(Planet p in _planets)
                     numberOfValues += 1;
-                return (int) numberOfValues;
+                return (int)numberOfValues;
             }
         }
         public int MinValue
@@ -538,7 +538,7 @@ namespace Krystals5ObjectLibrary
                         minVal = minVal < val ? minVal : val;
                 foreach(Planet p in _planets)
                     minVal = minVal < p.Value ? minVal : p.Value;
-                return (int) minVal;
+                return (int)minVal;
             }
         }
         public int MaxValue
@@ -551,7 +551,7 @@ namespace Krystals5ObjectLibrary
                         maxVal = maxVal > val ? maxVal : val;
                 foreach(Planet p in _planets)
                     maxVal = maxVal > p.Value ? maxVal : p.Value;
-                return (int) maxVal;
+                return (int)maxVal;
             }
         }
         public List<PointGroup> FixedPointGroups { get { return _fixedPointGroups; } }
@@ -582,14 +582,14 @@ namespace Krystals5ObjectLibrary
         public Planet(string planetValue, List<uint> startMoments, DensityInputKrystal expansionDensityInputKrystal)
         {
             _expansionDensityInputKrystal = expansionDensityInputKrystal;
-            for(int i = 0 ; i < startMoments.Count ; i++)
+            for(int i = 0; i < startMoments.Count; i++)
             {
-				PointGroup sp = new PointGroup(planetValue)
-				{
-					Shape = K.PointGroupShape.spiral, // default value for planet subpaths
-					StartMoment = startMoments[i]
-				};
-				if(i < startMoments.Count - 1)
+                PointGroup sp = new PointGroup(planetValue)
+                {
+                    Shape = K.PointGroupShape.spiral, // default value for planet subpaths
+                    StartMoment = startMoments[i]
+                };
+                if(i < startMoments.Count - 1)
                     sp.Count = startMoments[i + 1] - startMoments[i];
                 else sp.Count = expansionDensityInputKrystal.NumValues - startMoments[i] + 1;
                 this.AddSubpath(sp);
@@ -669,19 +669,19 @@ namespace Krystals5ObjectLibrary
             if(_subpaths.Count > 1)
             {
                 // all subpaths have at least one point, except the last (which has at least two!)
-                for(int i = 1 ; i < _subpaths.Count ; i++)
+                for(int i = 1; i < _subpaths.Count; i++)
                     if(_subpaths[i].StartMoment <= _subpaths[i - 1].StartMoment)
                         _subpaths[i].StartMoment = _subpaths[i - 1].StartMoment + 1;
 
                 if(_subpaths[_subpaths.Count - 1].StartMoment >= _expansionDensityInputKrystal.NumValues - 1)
                 {
                     _subpaths[_subpaths.Count - 1].StartMoment = _expansionDensityInputKrystal.NumValues - 1;
-                    for(int i = _subpaths.Count - 1 ; i > 0 ; i--)
+                    for(int i = _subpaths.Count - 1; i > 0; i--)
                         if(_subpaths[i].StartMoment == _subpaths[i - 1].StartMoment)
                             _subpaths[i - 1].StartMoment = _subpaths[i].StartMoment - 1;
                 }
 
-                for(int i = 1 ; i < _subpaths.Count ; i++)
+                for(int i = 1; i < _subpaths.Count; i++)
                     if(_subpaths[i].StartMoment == _subpaths[i - 1].StartMoment)
                     {
                         string msg = "Unable to resolve planet subpath counts.\n"
@@ -692,7 +692,7 @@ namespace Krystals5ObjectLibrary
             }
 
             uint nMoments = _expansionDensityInputKrystal.NumValues + 1;
-            for(int i = _subpaths.Count - 1 ; i >= 0 ; i--)
+            for(int i = _subpaths.Count - 1; i >= 0; i--)
             {
                 _subpaths[i].Count = nMoments - _subpaths[i].StartMoment;
                 nMoments -= _subpaths[i].Count;
@@ -712,7 +712,7 @@ namespace Krystals5ObjectLibrary
         {
             // planet --> this
             bool finalGroup;
-            for(int i = 0 ; i < this.Subpaths.Count ; i++)
+            for(int i = 0; i < this.Subpaths.Count; i++)
             {
                 PointGroup pointGroup = this.Subpaths[i];
                 if(i == this.Subpaths.Count - 1)
@@ -766,13 +766,13 @@ namespace Krystals5ObjectLibrary
                 int originalLVIndex = 0;
                 int originalStartMomentIndex = 0;
                 originalStartMoment = originalStartMoments[originalStartMomentIndex];
-                for(int newLVIndex = 0 ; newLVIndex < newLeveledValues.Count ; newLVIndex++)
+                for(int newLVIndex = 0; newLVIndex < newLeveledValues.Count; newLVIndex++)
                 {
                     if(newLeveledValues[newLVIndex].level == originalLeveledValues[originalLVIndex].level)
                     {
                         if(originalLVIndex == originalStartMoment - 1)
                         {
-                            newStartMoments.Add((uint) newLVIndex + 1);
+                            newStartMoments.Add((uint)newLVIndex + 1);
                             originalStartMomentIndex++;
                             if(originalStartMomentIndex == originalStartMoments.Count)
                                 break;
@@ -787,7 +787,7 @@ namespace Krystals5ObjectLibrary
                 uint newStartMoment = 1;
                 int originalStartMomentIndex = 0;
                 originalStartMoment = originalStartMoments[originalStartMomentIndex];
-                for(int originalLVIndex = 0 ; originalLVIndex < originalLeveledValues.Count ; originalLVIndex++)
+                for(int originalLVIndex = 0; originalLVIndex < originalLeveledValues.Count; originalLVIndex++)
                 {
                     if(originalLVIndex == originalStartMoment - 1)
                     {
@@ -797,7 +797,7 @@ namespace Krystals5ObjectLibrary
                             break;
                         originalStartMoment = originalStartMoments[originalStartMomentIndex];
                     }
-                    if(newLeveledValues[(int) newStartMoment - 1].level == originalLeveledValues[originalLVIndex].level)
+                    if(newLeveledValues[(int)newStartMoment - 1].level == originalLeveledValues[originalLVIndex].level)
                     {
                         if(newStartMoment == newLeveledValues.Count)
                         {
@@ -810,12 +810,12 @@ namespace Krystals5ObjectLibrary
             }
             // convert the newStartMoments into Count and StartMoment values in the subgroups
             uint moments = newDIK.NumValues + 1;
-            for(int index = _subpaths.Count - 1 ; index >= 0 ; index--)
+            for(int index = _subpaths.Count - 1; index >= 0; index--)
             {
                 _subpaths[index].Count = moments - newStartMoments[index];
                 moments -= _subpaths[index].Count;
             }
-            for(int index = 0 ; index < _subpaths.Count ; index++)
+            for(int index = 0; index < _subpaths.Count; index++)
                 _subpaths[index].StartMoment = newStartMoments[index];
 
             _expansionDensityInputKrystal = newDIK;
@@ -902,7 +902,7 @@ namespace Krystals5ObjectLibrary
                 switch(r.Name)
                 {
                     case "color":
-                        _color = (K.DisplayColor) Enum.Parse(displayColorType, r.Value);
+                        _color = (K.DisplayColor)Enum.Parse(displayColorType, r.Value);
                         colorRead = true;
                         break;
                     case "count":
@@ -910,7 +910,7 @@ namespace Krystals5ObjectLibrary
                         countRead = true;
                         break;
                     case "shape":
-                        _shape = (K.PointGroupShape) Enum.Parse(pointGroupShapeType, r.Value);
+                        _shape = (K.PointGroupShape)Enum.Parse(pointGroupShapeType, r.Value);
                         shapeRead = true;
                         break;
                 }
@@ -1030,14 +1030,14 @@ namespace Krystals5ObjectLibrary
         /// <returns>The cloned point group.</returns>
         public PointGroup Clone()
         {
-			PointGroup p = new PointGroup
-			{
-				Shape = _shape,
-				Count = _count,
-				StartMoment = _startMoment, // not stored in XML
-				Color = _color
-			};
-			foreach(uint v in _value)
+            PointGroup p = new PointGroup
+            {
+                Shape = _shape,
+                Count = _count,
+                StartMoment = _startMoment, // not stored in XML
+                Color = _color
+            };
+            foreach(uint v in _value)
                 p.Value.Add(v);
             p.FromRadius = _fromRadius;
             p.FromAngle = _fromAngle;
@@ -1070,7 +1070,7 @@ namespace Krystals5ObjectLibrary
             List<PointR> userRadialCoordinates = new List<PointR>();
             float[] relPos = densityInputKrystal.RelativePlanetPointPositions; // simple alias
             float relDistance = 1;
-            int firstPointIndex = (int) p.StartMoment - 1;
+            int firstPointIndex = (int)p.StartMoment - 1;
             if(p.Count > 0)
                 relDistance = relPos[firstPointIndex + p.Count - 1] - relPos[firstPointIndex];
 
@@ -1079,7 +1079,7 @@ namespace Krystals5ObjectLibrary
                 #region circle
                 case K.PointGroupShape.circle:
                     float angleDistanceFactor = 360.0f / relDistance;
-                    for(int i = 0 ; i < p.Count ; i++)
+                    for(int i = 0; i < p.Count; i++)
                     {
                         float a = p.FromAngle + (angleDistanceFactor * (relPos[i + firstPointIndex] - relPos[firstPointIndex]));
                         a += p.RotateAngle;
@@ -1093,7 +1093,7 @@ namespace Krystals5ObjectLibrary
                 case K.PointGroupShape.spiral:
                     float distanceFactorR = (p.ToRadius - p.FromRadius) / relDistance;
                     float distanceFactorA = (p.ToAngle - p.FromAngle) / relDistance;
-                    for(int i = 0 ; i < p.Count ; i++)
+                    for(int i = 0; i < p.Count; i++)
                     {
                         float r = p.FromRadius + (distanceFactorR * (relPos[i + firstPointIndex] - relPos[firstPointIndex]));
                         float a = p.FromAngle + (distanceFactorA * (relPos[i + firstPointIndex] - relPos[firstPointIndex]));
@@ -1116,14 +1116,14 @@ namespace Krystals5ObjectLibrary
                     float endY = endPR.Y;
                     float distanceFactorX = (endX - startX) / relDistance;
                     float distanceFactorY = (endY - startY) / relDistance;
-                    for(int i = 0 ; i < p.Count ; i++)
+                    for(int i = 0; i < p.Count; i++)
                     {
                         float x = startX + (distanceFactorX * (relPos[i + firstPointIndex] - relPos[firstPointIndex]));
                         float y = startY + (distanceFactorY * (relPos[i + firstPointIndex] - relPos[firstPointIndex]));
                         userCartesianCoordinates.Add(new PointF(x, y));
                     }
                     break;
-                #endregion
+                    #endregion
             }
             #region convert from user to windows coordnates
             List<PointF> windowsPixelCoordinates = new List<PointF>();
@@ -1162,7 +1162,7 @@ namespace Krystals5ObjectLibrary
             {
                 case K.PointGroupShape.circle:
                     angleDelta = 360.0f / this.Count;
-                    for(int i = 0 ; i < this.Count ; i++)
+                    for(int i = 0; i < this.Count; i++)
                     {
                         PointR rp = new PointR(this.FromRadius, this.FromAngle + (angleDelta * i) + this.RotateAngle);
                         rp.Shift(this.TranslateRadius, this.TranslateAngle);
@@ -1175,7 +1175,7 @@ namespace Krystals5ObjectLibrary
                         angleDelta = (this.ToAngle - this.FromAngle) / (this.Count - 1);
                         radiusDelta = (this.ToRadius - this.FromRadius) / (this.Count - 1);
                     }
-                    for(int i = 0 ; i < this.Count ; i++)
+                    for(int i = 0; i < this.Count; i++)
                     {
                         PointR rp = new PointR(this.FromRadius + (radiusDelta * i),
                                                 this.FromAngle + (angleDelta * i) + this.RotateAngle);
@@ -1199,7 +1199,7 @@ namespace Krystals5ObjectLibrary
                         xDelta = (endX - startX) / (this.Count - 1);
                         yDelta = (endY - startY) / (this.Count - 1);
                     }
-                    for(int i = 0 ; i < this.Count ; i++)
+                    for(int i = 0; i < this.Count; i++)
                     {
                         PointF rp = new PointF(startX + (xDelta * i), startY + (yDelta * i));
                         userCartesianCoordinates.Add(rp);
@@ -1361,5 +1361,5 @@ namespace Krystals5ObjectLibrary
         private PointF[] _windowsPixelCoordinates; // one PointF per point in this point group
         #endregion private variables
     }
- }
+}
 

@@ -1,8 +1,5 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.Xml;
-using System.Diagnostics;
-
-using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -31,7 +28,7 @@ namespace Moritz.Spec
                 mString = $"0x{_status.ToString("X")} {_data1.ToString()} {_data2.ToString()}";
             }
             w.WriteStartElement("msg");
-            w.WriteAttributeString("m", mString );
+            w.WriteAttributeString("m", mString);
             w.WriteEndElement(); // end of msg
         }
 
@@ -43,7 +40,7 @@ namespace Moritz.Spec
         public int? Data2 { get { return _data2; } }
 
         private int _status;
-        private int _data1; 
+        private int _data1;
         private int? _data2;
     }
 }

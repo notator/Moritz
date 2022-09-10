@@ -29,7 +29,7 @@ namespace Krystals5ControlLibrary
         {
             TextBox tb = sender as TextBox;
             _illegalCharacter = false;
-            if (tb.Text.Length > 0)
+            if(tb.Text.Length > 0)
             {
                 _float.Append(tb.Text);
                 ValidateFloat();
@@ -49,10 +49,10 @@ namespace Krystals5ControlLibrary
         public FloatControlReturnKeyHandler updateContainer;
         private void FloatTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
+            if(e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
             {
                 FloatTextBox_Leave(sender, e);
-                if (updateContainer != null)
+                if(updateContainer != null)
                     updateContainer();
             }
         }
@@ -65,11 +65,11 @@ namespace Krystals5ControlLibrary
             set { FloatTextBox.Text = value.ToString(); } // used to set the box to "0" when empty
         }
 
-		public float Value
-		{
-			get { return float.Parse(FloatTextBox.Text); }
-			set { FloatTextBox.Text = value.ToString(); }
-		}
+        public float Value
+        {
+            get { return float.Parse(FloatTextBox.Text); }
+            set { FloatTextBox.Text = value.ToString(); }
+        }
         #endregion Properties
         #region private functions
         private void ValidateFloat()
@@ -79,29 +79,29 @@ namespace Krystals5ControlLibrary
             bool numeralFound = false;
 
             int i = 0;
-            while( i < _float.Length && _float[i] == " "[0] ) // ignore leading spaces
+            while(i < _float.Length && _float[i] == " "[0]) // ignore leading spaces
                 i++;
-            while( i < _float.Length && _float[i] == "0"[0] ) // ignore leading zeros
+            while(i < _float.Length && _float[i] == "0"[0]) // ignore leading zeros
                 i++;
 
-            if (_float.Length > (i+1) && _float[i] == '-')
+            if(_float.Length > (i + 1) && _float[i] == '-')
             {
                 tempFloat.Append('-');
                 i++;
             }
 
-            while( i < _float.Length )
+            while(i < _float.Length)
             {
-                if (_float[i] == '.' || _float[i] == ',')
+                if(_float[i] == '.' || _float[i] == ',')
                 {
-                    if (!decimalSeparatorFound)
+                    if(!decimalSeparatorFound)
                     {
                         tempFloat.Append(_localDecimalSeparator);
                         decimalSeparatorFound = true;
                     }
                     else _illegalCharacter = true;
                 }
-                else if( Char.IsDigit(_float[i]))
+                else if(Char.IsDigit(_float[i]))
                 {
                     tempFloat.Append(_float[i]);
                     numeralFound = true;
@@ -110,14 +110,14 @@ namespace Krystals5ControlLibrary
                 i++;
             }
 
-            if (numeralFound)
+            if(numeralFound)
             {
-                if (tempFloat[0] == _localDecimalSeparator[0])
+                if(tempFloat[0] == _localDecimalSeparator[0])
                     tempFloat.Insert(0, "0");
-                if (tempFloat[tempFloat.Length - 1] == _localDecimalSeparator[0])
+                if(tempFloat[tempFloat.Length - 1] == _localDecimalSeparator[0])
                     tempFloat.Append("0");
             }
-            if (tempFloat.Length > 0)
+            if(tempFloat.Length > 0)
                 _float = tempFloat;
             else _float = new StringBuilder("0");
         }

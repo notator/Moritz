@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms; // MessageBox
-using System.Diagnostics;
-using System.Xml;
-using System.Text;
-
 using Moritz.Globals;
-using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Xml;
+
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Moritz.Symbols
 {
@@ -29,26 +25,26 @@ namespace Moritz.Symbols
 
             Systems = pageSystems;
 
-			if(pageNumber == 0)
-			{
-				pageFormat.BottomVBPX = GetNewBottomVBPX(pageSystems);
-				pageFormat.BottomMarginPos = (int) (pageFormat.BottomVBPX - pageFormat.DefaultDistanceBetweenSystems);
-			}
+            if(pageNumber == 0)
+            {
+                pageFormat.BottomVBPX = GetNewBottomVBPX(pageSystems);
+                pageFormat.BottomMarginPos = (int)(pageFormat.BottomVBPX - pageFormat.DefaultDistanceBetweenSystems);
+            }
 
             MoveSystemsVertically(pageFormat, pageSystems, (pageNumber == 1 || pageNumber == 0), lastPage);
         }
 
-		private int GetNewBottomVBPX(List<SvgSystem> pageSystems)
-		{
-			int frameHeight = _pageFormat.TopMarginPage1 + 20;
-			foreach(SvgSystem system in pageSystems)
-			{
-				SystemMetrics sm = system.Metrics;
-				frameHeight += (int)((sm.Bottom - sm.Top) + _pageFormat.DefaultDistanceBetweenSystems);
-			}
+        private int GetNewBottomVBPX(List<SvgSystem> pageSystems)
+        {
+            int frameHeight = _pageFormat.TopMarginPage1 + 20;
+            foreach(SvgSystem system in pageSystems)
+            {
+                SystemMetrics sm = system.Metrics;
+                frameHeight += (int)((sm.Bottom - sm.Top) + _pageFormat.DefaultDistanceBetweenSystems);
+            }
 
-			return frameHeight;
-		}
+            return frameHeight;
+        }
 
         /// <summary>
         /// Moves the systems to their correct vertical position. Justifies on all but the last page.
@@ -63,7 +59,7 @@ namespace Moritz.Symbols
             if(firstPage)
             {
                 frameTop = pageFormat.TopMarginPage1;
-				frameHeight = pageFormat.FirstPageFrameHeight; // property uses BottomMarginPos
+                frameHeight = pageFormat.FirstPageFrameHeight; // property uses BottomMarginPos
             }
             else
             {
@@ -82,7 +78,7 @@ namespace Moritz.Symbols
                 systemSeparation = defaultSystemSeparation;
             }
             else
-            {                
+            {
                 if(pageSystems.Count >= 1)
                 {
                     float totalSystemHeight = 0;
@@ -117,9 +113,9 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, Metadata metadata, bool isSinglePageScore)
         {
-			int nOutputVoices = 0;
-			int nInputVoices = 0;
-			GetNumbersOfVoices(Systems[0], ref nOutputVoices, ref nInputVoices);
+            int nOutputVoices = 0;
+            int nInputVoices = 0;
+            GetNumbersOfVoices(Systems[0], ref nOutputVoices, ref nInputVoices);
 
             w.WriteStartDocument(); // standalone="no"
             //<?xml-stylesheet href="../../fontsStyleSheet.css" type="text/css"?>
@@ -128,23 +124,23 @@ namespace Moritz.Symbols
 
             WriteSvgHeader(w);
 
-			metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
+            metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
 
             _score.WriteDefs(w, _pageNumber);
 
-			if(isSinglePageScore)
-			{
-				_score.WriteScoreData(w);
-			}
+            if(isSinglePageScore)
+            {
+                _score.WriteScoreData(w);
+            }
 
-			#region layers
+            #region layers
 
-			if(_pageNumber > 0)
-			{ 
-				WriteFrameLayer(w, _pageFormat.Right, _pageFormat.Bottom);
-			}
+            if(_pageNumber > 0)
+            {
+                WriteFrameLayer(w, _pageFormat.Right, _pageFormat.Bottom);
+            }
 
-			WriteSystemsLayer(w, _pageNumber, metadata);
+            WriteSystemsLayer(w, _pageNumber, metadata);
 
             w.WriteComment(@" Annotations that are added here will be ignored by the AssistantPerformer. ");
 
@@ -154,43 +150,43 @@ namespace Moritz.Symbols
             w.WriteEndDocument();
         }
 
-		private void GetNumbersOfVoices(SvgSystem svgSystem, ref int nOutputVoices, ref int nInputVoices)
-		{
-			nOutputVoices = 0;
-			nInputVoices = 0;
-			foreach(Staff staff in svgSystem.Staves)
-			{
-				foreach(Voice voice in staff.Voices)
-				{
-					if(voice is OutputVoice)
-					{
-						nOutputVoices++;
-					}
-					else if(voice is InputVoice)
-					{
-						nInputVoices++;
-					}
-				}
-			}
-		}
+        private void GetNumbersOfVoices(SvgSystem svgSystem, ref int nOutputVoices, ref int nInputVoices)
+        {
+            nOutputVoices = 0;
+            nInputVoices = 0;
+            foreach(Staff staff in svgSystem.Staves)
+            {
+                foreach(Voice voice in staff.Voices)
+                {
+                    if(voice is OutputVoice)
+                    {
+                        nOutputVoices++;
+                    }
+                    else if(voice is InputVoice)
+                    {
+                        nInputVoices++;
+                    }
+                }
+            }
+        }
 
-		private void WriteFrameLayer(SvgWriter w, float width, float height)
-		{
+        private void WriteFrameLayer(SvgWriter w, float width, float height)
+        {
             w.SvgRect(CSSObjectClass.frame, 0, 0, width, height);
         }
 
-		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)
-		{
+        private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)
+        {
             w.SvgStartGroup(CSSObjectClass.systems.ToString());
 
             //w.WriteAttributeString("style", "display:inline");
 
-			w.SvgText(CSSObjectClass.timeStamp, _infoTextInfo.Text, 32, _infoTextInfo.FontHeight);
+            w.SvgText(CSSObjectClass.timeStamp, _infoTextInfo.Text, 32, _infoTextInfo.FontHeight);
 
-			if(pageNumber == 1 || pageNumber == 0)
-			{
-				WritePage1TitleAndAuthor(w, metadata);
-			}
+            if(pageNumber == 1 || pageNumber == 0)
+            {
+                WritePage1TitleAndAuthor(w, metadata);
+            }
 
             List<CarryMsgs> carryMsgsPerChannel = new List<CarryMsgs>();
             foreach(Staff staff in Systems[0].Staves)
@@ -201,18 +197,18 @@ namespace Moritz.Symbols
                 }
             }
 
-			int systemNumber = 1;
-			foreach(SvgSystem system in Systems)
-			{
-				system.WriteSVG(w, systemNumber++, _pageFormat, carryMsgsPerChannel);
-			}
+            int systemNumber = 1;
+            foreach(SvgSystem system in Systems)
+            {
+                system.WriteSVG(w, systemNumber++, _pageFormat, carryMsgsPerChannel);
+            }
 
-			w.WriteEndElement(); // end layer
-		}
+            w.WriteEndElement(); // end layer
+        }
 
         private void WriteSvgHeader(SvgWriter w)
         {
-			w.WriteAttributeString("xmlns", "http://www.w3.org/2000/svg");
+            w.WriteAttributeString("xmlns", "http://www.w3.org/2000/svg");
             // I think the following is redundant...
             //w.WriteAttributeString("xmlns", "svg", null, "http://www.w3.org/2000/svg");
             // Deleted the following, since it is only advisory, and I think the latest version is 2. See deprecated xlink below.
@@ -220,12 +216,12 @@ namespace Moritz.Symbols
 
             // Namespaces used for standard metadata
             w.WriteAttributeString("xmlns", "dc", null, "http://purl.org/dc/elements/1.1/");
-			w.WriteAttributeString("xmlns", "cc", null, "http://creativecommons.org/ns#");
-			w.WriteAttributeString("xmlns", "rdf", null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+            w.WriteAttributeString("xmlns", "cc", null, "http://creativecommons.org/ns#");
+            w.WriteAttributeString("xmlns", "rdf", null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 
             // Namespace used for linking to svg defs (defined objects)
             // N.B.: xlink is deprecated in SVG 2 
-			// w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
+            // w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
 
             // Standard definition of the "score" namespace.
             // The file documents the additional attributes and elements available in the "score" namespace.
@@ -247,25 +243,25 @@ namespace Moritz.Symbols
             w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (800%)            
         }
 
-		/// <summary>
-		/// Adds the main title and the author to the first page.
-		/// </summary>
-		protected void WritePage1TitleAndAuthor(SvgWriter w, Metadata metadata)
-		{
-			string titlesFontFamily = "Open Sans";
+        /// <summary>
+        /// Adds the main title and the author to the first page.
+        /// </summary>
+        protected void WritePage1TitleAndAuthor(SvgWriter w, Metadata metadata)
+        {
+            string titlesFontFamily = "Open Sans";
 
-			TextInfo titleInfo =
-				new TextInfo(metadata.Page1Title, titlesFontFamily, _pageFormat.Page1TitleHeight,
-					null, TextHorizAlign.center);
-			TextInfo authorInfo =
-			  new TextInfo(metadata.Page1Author, titlesFontFamily, _pageFormat.Page1AuthorHeight,
-				  null, TextHorizAlign.right);
-			w.WriteStartElement("g");
-			w.WriteAttributeString("class", CSSObjectClass.titles.ToString());
-			w.SvgText(CSSObjectClass.mainTitle, titleInfo.Text, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
-			w.SvgText(CSSObjectClass.author, authorInfo.Text, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
-			w.WriteEndElement(); // group
-		}
+            TextInfo titleInfo =
+                new TextInfo(metadata.Page1Title, titlesFontFamily, _pageFormat.Page1TitleHeight,
+                    null, TextHorizAlign.center);
+            TextInfo authorInfo =
+              new TextInfo(metadata.Page1Author, titlesFontFamily, _pageFormat.Page1AuthorHeight,
+                  null, TextHorizAlign.right);
+            w.WriteStartElement("g");
+            w.WriteAttributeString("class", CSSObjectClass.titles.ToString());
+            w.SvgText(CSSObjectClass.mainTitle, titleInfo.Text, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
+            w.SvgText(CSSObjectClass.author, authorInfo.Text, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
+            w.WriteEndElement(); // group
+        }
 
         #region used when creating graphic score
         private readonly SvgScore _score;

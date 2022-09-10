@@ -3,7 +3,7 @@ using Moritz.Xml;
 namespace Moritz.Symbols
 {
     public abstract class NoteObject
-	{
+    {
         public NoteObject(Voice voice)
         {
             Voice = voice; // container
@@ -55,5 +55,5 @@ namespace Moritz.Symbols
         public Voice Voice = null;
         public float FontHeight { get { return _fontHeight; } set { _fontHeight = value; } }
         public float _fontHeight = 0F;
-	}
+    }
 }

@@ -5,7 +5,6 @@ using Moritz.Globals; // Preferences
 using System;
 using System.IO;
 using System.Windows.Forms;
-using System.Xml;
 
 namespace Krystals5Application
 {

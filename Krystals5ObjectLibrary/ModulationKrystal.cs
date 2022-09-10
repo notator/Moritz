@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 using System.Xml;
-using System.IO;
-using Moritz.Globals;
-using System.Linq;
 
 namespace Krystals5ObjectLibrary
 {

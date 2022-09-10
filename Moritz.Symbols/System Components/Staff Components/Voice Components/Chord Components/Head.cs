@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
-
 using Moritz.Globals;
 using Moritz.Xml;
+
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Moritz.Symbols
 {

@@ -1,22 +1,23 @@
+using Krystals5ObjectLibrary;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using Krystals5ObjectLibrary;
 
 namespace Krystals5ControlLibrary
 {
     internal partial class UIntTable : UserControl
     {
-		public UIntTable(int xDim, int yDim,
-			ModulationInputKrystal xInputKrystal, ModulationInputKrystal yInputKrystal)
+        public UIntTable(int xDim, int yDim,
+            ModulationInputKrystal xInputKrystal, ModulationInputKrystal yInputKrystal)
         {
             InitializeComponent();
 
-			_missingXValues = xInputKrystal.MissingAbsoluteValues;
-			_missingYValues = yInputKrystal.MissingAbsoluteValues;
+            _missingXValues = xInputKrystal.MissingAbsoluteValues;
+            _missingYValues = yInputKrystal.MissingAbsoluteValues;
 
-            if ((xDim < xInputKrystal.MaxValue) || (yDim < yInputKrystal.MaxValue))
+            if((xDim < xInputKrystal.MaxValue) || (yDim < yInputKrystal.MaxValue))
             {
                 string msg = "Table size exceeded."
                     + "\nThe maximum number of rows is " + yDim.ToString()
@@ -24,21 +25,21 @@ namespace Krystals5ControlLibrary
                 throw new ApplicationException(msg);
             }
 
-			if(xDim > xInputKrystal.MaxValue)
-				for(int i = (int) xInputKrystal.MaxValue + 1 ; i <= xDim ; i++)
-					_missingXValues.Add(i);
-			if(yDim > yInputKrystal.MaxValue)
-				for(int i = (int) yInputKrystal.MaxValue + 1 ; i <= yDim ; i++)
-					_missingYValues.Add(i);
+            if(xDim > xInputKrystal.MaxValue)
+                for(int i = (int)xInputKrystal.MaxValue + 1; i <= xDim; i++)
+                    _missingXValues.Add(i);
+            if(yDim > yInputKrystal.MaxValue)
+                for(int i = (int)yInputKrystal.MaxValue + 1; i <= yDim; i++)
+                    _missingYValues.Add(i);
 
             this.SuspendLayout();
             XDim = xDim;
-            YDim = yDim;                
-            for (int y = 0; y < yDim; y++)
-                for (int x = 0; x < xDim; x++)
+            YDim = yDim;
+            for(int y = 0; y < yDim; y++)
+                for(int x = 0; x < xDim; x++)
                 {
                     SimpleUIntControl uic = new SimpleUIntControl();
-					uic.Text = "1";
+                    uic.Text = "1";
                     //uic.ValueHasChanged += new SimpleUIntControl.SimpleUintControlValueChanged(ValueHasChanged);
                     //uic.ReturnKeyPressed += new SimpleUIntControl.SimpleUintControlReturnKeyHandler(ReturnKeyPressed);
                     uic.EventHandler += new SimpleUIntControl.SimpleUintControlEventHandler(HandleSimpleUIntControlEvent);
@@ -53,7 +54,7 @@ namespace Krystals5ControlLibrary
         #region events
         #region delegates
         #region to notify the container of events which happen in the table
-        public delegate void UIntTableEventHandler(object sender, UITableEventArgs e );
+        public delegate void UIntTableEventHandler(object sender, UITableEventArgs e);
         public UIntTableEventHandler EventHandler;
         #endregion return key
         #endregion delegates
@@ -75,10 +76,10 @@ namespace Krystals5ControlLibrary
             g.DrawLine(Pens.Gray, new Point(0, _xLabelsHeight), new Point(_yLabelsWidth - 1, _xLabelsHeight));
             int lineYPos = (_xLabelsHeight + _cellHeight + 1); // height of next Y-Labels line separator
             int xPadding = 2; // distance from right-aligned label to first table cell
-            
-            for (int row = 0; row < YDim; row++)
+
+            for(int row = 0; row < YDim; row++)
             {
-                if (_missingYValues.Contains(row + 1))
+                if(_missingYValues.Contains(row + 1))
                 {
                     g.FillRectangle(MissingValueBackgroundBrush, 0, lineYPos - _cellHeight, _yLabelsWidth, _cellHeight);
                 }
@@ -98,9 +99,9 @@ namespace Krystals5ControlLibrary
             int lineXPos = _yLabelsWidth; // position of first X-Labels line separator
             labelYPos = _xLabelsHeight - 1 - fontHeight; // ((_cellHeight - fontHeight) / 2); 
             g.DrawLine(Pens.Gray, new Point(_yLabelsWidth, 0), new Point(_yLabelsWidth, _xLabelsHeight));
-            for (int column = 0; column < XDim; column++)
+            for(int column = 0; column < XDim; column++)
             {
-                if (_missingXValues.Contains(column + 1))
+                if(_missingXValues.Contains(column + 1))
                 {
                     g.FillRectangle(MissingValueBackgroundBrush, lineXPos + 1, 0, _cellWidth, _xLabelsHeight);
                 }
@@ -112,7 +113,7 @@ namespace Krystals5ControlLibrary
                 g.DrawLine(Pens.Gray, new Point(lineXPos, 0), new Point(lineXPos, _xLabelsHeight));
             }
             #endregion draw x-labels
-			ResumeLayout();
+            ResumeLayout();
         }
         #endregion events
         #region private functions
@@ -120,9 +121,9 @@ namespace Krystals5ControlLibrary
         {
             Control UIntControl = sender as Control;
             TableLayoutPanelCellPosition pos = TableLayoutPanel.GetCellPosition(UIntControl);
-            if (EventHandler != null)
+            if(EventHandler != null)
             {
-                switch (e.Message)
+                switch(e.Message)
                 {
                     case SUICMessage.Return:
                         EventHandler(this, new UITableEventArgs(UITableMessage.Return));
@@ -131,9 +132,9 @@ namespace Krystals5ControlLibrary
                         EventHandler(this, new UITableEventArgs(UITableMessage.ValueChanged));
                         break;
                     case SUICMessage.Left:
-                        if (pos.Column > 0 )
+                        if(pos.Column > 0)
                             pos.Column--;
-                        else if (pos.Column == 0 && pos.Row > 0)
+                        else if(pos.Column == 0 && pos.Row > 0)
                         {
                             pos.Column = TableLayoutPanel.ColumnCount - 1;
                             pos.Row--;
@@ -141,7 +142,7 @@ namespace Krystals5ControlLibrary
                         TableLayoutPanel.GetControlFromPosition(pos.Column, pos.Row).Select();
                         break;
                     case SUICMessage.Right:
-                        if (pos.Column < TableLayoutPanel.ColumnCount - 1)
+                        if(pos.Column < TableLayoutPanel.ColumnCount - 1)
                             pos.Column++;
                         else if(pos.Column == TableLayoutPanel.ColumnCount - 1 && pos.Row < TableLayoutPanel.RowCount - 1)
                         {
@@ -151,12 +152,12 @@ namespace Krystals5ControlLibrary
                         TableLayoutPanel.GetControlFromPosition(pos.Column, pos.Row).Select();
                         break;
                     case SUICMessage.Up:
-                        if (pos.Row > 0)
+                        if(pos.Row > 0)
                             pos.Row--;
                         TableLayoutPanel.GetControlFromPosition(pos.Column, pos.Row).Select();
                         break;
                     case SUICMessage.Down:
-                        if (pos.Row < TableLayoutPanel.RowCount - 1) pos.Row++;
+                        if(pos.Row < TableLayoutPanel.RowCount - 1) pos.Row++;
                         TableLayoutPanel.GetControlFromPosition(pos.Column, pos.Row).Select();
                         break;
                     case SUICMessage.Pos1:
@@ -170,27 +171,27 @@ namespace Krystals5ControlLibrary
         public int[,] IntArray
         {
             get
-            { 
-                int[,] returnArray = new int[XDim,YDim];
-                for( int y = 0; y < YDim ; y++ )
-                    for(int x = 0; x < XDim ; x++ )
+            {
+                int[,] returnArray = new int[XDim, YDim];
+                for(int y = 0; y < YDim; y++)
+                    for(int x = 0; x < XDim; x++)
                     {
                         SimpleUIntControl c = TableLayoutPanel.GetControlFromPosition(x, y) as SimpleUIntControl;
-                        if( c.ValueString.Length == 0 )
-                            throw new ApplicationException(String.Format("Cell not set at [ {0}, {1} ]", (x+1), (y+1) ));
-                        returnArray[x,y] = int.Parse( c.ValueString ); // an empty string parses as zero
+                        if(c.ValueString.Length == 0)
+                            throw new ApplicationException(String.Format("Cell not set at [ {0}, {1} ]", (x + 1), (y + 1)));
+                        returnArray[x, y] = int.Parse(c.ValueString); // an empty string parses as zero
                     }
                 return returnArray;
             }
             set
             {
-                if (value.Length != XDim * YDim)
+                if(value.Length != XDim * YDim)
                     throw new ApplicationException("Attempt to allocate an array of the wrong size to the table of unsigned integers.");
-                for (int y = 0; y < YDim; y++)
-                    for (int x = 0; x < XDim; x++)
+                for(int y = 0; y < YDim; y++)
+                    for(int x = 0; x < XDim; x++)
                     {
                         SimpleUIntControl c = TableLayoutPanel.GetControlFromPosition(x, y) as SimpleUIntControl;
-                        if ( value[x, y] < 0 )
+                        if(value[x, y] < 0)
                             throw new ApplicationException("Attempt to set a negative value in the table of unsigned integers.");
                         c.ValueString = value[x, y].ToString();
                     }
@@ -211,7 +212,7 @@ namespace Krystals5ControlLibrary
             {
                 TableLayoutPanel.RowStyles.Clear();
                 TableLayoutPanel.RowCount = value;
-                for (int i = 0; i < value; i++)
+                for(int i = 0; i < value; i++)
                     this.TableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, _cellHeight));
             }
         }
@@ -222,17 +223,17 @@ namespace Krystals5ControlLibrary
             {
                 TableLayoutPanel.ColumnStyles.Clear();
                 TableLayoutPanel.ColumnCount = value;
-                for (int i = 0; i < value; i++)
+                for(int i = 0; i < value; i++)
                     this.TableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, _cellWidth));
             }
         }
         public new int Width
         {
-            get { return  (TableLayoutPanel.Width + _yLabelsWidth); }
+            get { return (TableLayoutPanel.Width + _yLabelsWidth); }
         }
         public new int Height
         {
-            get { return  (TableLayoutPanel.Height + _xLabelsHeight); }
+            get { return (TableLayoutPanel.Height + _xLabelsHeight); }
         }
         public float ArrayCentreX
         {
@@ -267,4 +268,4 @@ namespace Krystals5ControlLibrary
         public UITableMessage Message;
     }
 
- }
+}

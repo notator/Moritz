@@ -19,20 +19,20 @@ namespace Moritz.Midi
     }
 
     public class BankControl : MidiSwitch
-	{
-		public BankControl(int channel, byte value)
+    {
+        public BankControl(int channel, byte value)
             : base(channel, ControllerType.BankSelect, value)
         {
             // ControllerType.BankSelectFine is ignored
-		}
-	}
+        }
+    }
     public class PatchControl : MidiSwitch
-	{
-		public PatchControl(int channel, byte value)
-			: base(channel, ChannelCommand.ProgramChange, value)
-		{
-		}
-	}
+    {
+        public PatchControl(int channel, byte value)
+            : base(channel, ChannelCommand.ProgramChange, value)
+        {
+        }
+    }
     public class PitchWheelDeviation : MidiSwitch
     {
         /// <remarks>

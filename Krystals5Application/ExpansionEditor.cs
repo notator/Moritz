@@ -1,11 +1,12 @@
+using Krystals5ControlLibrary;
+
+using Krystals5ObjectLibrary;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
-using System.IO;
 using System.Windows.Forms;
-using Krystals5ControlLibrary;
-using Krystals5ObjectLibrary;
 
 namespace Krystals5Application
 {
@@ -69,7 +70,7 @@ namespace Krystals5Application
 
             ZoomComboBox.SelectedIndex = 4;
         }
- 
+
         #region Getting and Setting PointGroupParameters
         /// <summary>
         /// Called from the ExpansionFieldEditor constructor, this function initialises
@@ -84,12 +85,12 @@ namespace Krystals5Application
             #region set up fixed input combobox
             ComboBox.ObjectCollection fixedInputNames = FixedInputsComboBox.Items;
             fixedInputNames.Clear();
-            foreach (PointGroup p in _expander.InputGamete.FixedPointGroups)
+            foreach(PointGroup p in _expander.InputGamete.FixedPointGroups)
             {
                 string newInputGroupName = "Input Group " + (fixedInputNames.Count + 1).ToString();
                 fixedInputNames.Add(newInputGroupName);
             }
-            if (_expander.InputGamete.FixedPointGroups.Count > 0)
+            if(_expander.InputGamete.FixedPointGroups.Count > 0)
                 FixedInputsComboBox.SelectedIndex = _fixedInputPointsIndex = 0;
             else
                 _fixedInputPointsIndex = -1;
@@ -97,12 +98,12 @@ namespace Krystals5Application
             #region set up fixed output combobox
             ComboBox.ObjectCollection fixedOutputNames = FixedOutputsComboBox.Items;
             fixedOutputNames.Clear();
-            foreach (PointGroup p in _expander.OutputGamete.FixedPointGroups)
+            foreach(PointGroup p in _expander.OutputGamete.FixedPointGroups)
             {
                 string newOutputGroupName = "Output Group " + (fixedOutputNames.Count + 1).ToString();
                 fixedOutputNames.Add(newOutputGroupName);
             }
-            if (_expander.OutputGamete.FixedPointGroups.Count > 0)
+            if(_expander.OutputGamete.FixedPointGroups.Count > 0)
                 FixedOutputsComboBox.SelectedIndex = _fixedOutputPointsIndex = 0;
             else
                 _fixedOutputPointsIndex = -1;
@@ -110,14 +111,14 @@ namespace Krystals5Application
             #region set up input planet comboboxes
             ComboBox.ObjectCollection inputPlanetNames = InputPlanetsComboBox.Items;
             inputPlanetNames.Clear();
-            foreach (Planet planet in _expander.InputGamete.Planets)
+            foreach(Planet planet in _expander.InputGamete.Planets)
             {
                 string newInputPlanetName = "Input Planet " + (inputPlanetNames.Count + 1).ToString();
                 inputPlanetNames.Add(newInputPlanetName);
                 _inputSubpathIndex.Add(0);
                 ReloadSubpathsComboBox(InputSubpathsComboBox, (int)planet.Subpaths.Count);
             }
-            if (_expander.InputGamete.Planets.Count > 0)
+            if(_expander.InputGamete.Planets.Count > 0)
             {
                 InputPlanetsComboBox.SelectedIndex = _inputPlanetIndex = 0;
                 InputSubpathsComboBox.SelectedIndex = 0;
@@ -128,14 +129,14 @@ namespace Krystals5Application
             #region set up output planet comboboxes
             ComboBox.ObjectCollection outputPlanetNames = OutputPlanetsComboBox.Items;
             outputPlanetNames.Clear();
-            foreach (Planet planet in _expander.OutputGamete.Planets)
+            foreach(Planet planet in _expander.OutputGamete.Planets)
             {
                 string newPlanetName = "Output Planet " + (outputPlanetNames.Count + 1).ToString();
                 outputPlanetNames.Add(newPlanetName);
                 _outputSubpathIndex.Add(0);
                 ReloadSubpathsComboBox(OutputSubpathsComboBox, (int)planet.Subpaths.Count);
             }
-            if (_expander.OutputGamete.Planets.Count > 0)
+            if(_expander.OutputGamete.Planets.Count > 0)
             {
                 OutputPlanetsComboBox.SelectedIndex = _outputPlanetIndex = 0;
                 OutputSubpathsComboBox.SelectedIndex = 0;
@@ -157,27 +158,27 @@ namespace Krystals5Application
         /// <returns></returns>
         private void GetPointGroupParameters()
         {
-            if (!PointGroupParameters.Busy)
+            if(!PointGroupParameters.Busy)
                 throw new ApplicationException("GetPointGroupParameters(): PointGroupParameters must be locked before calling this function.");
             PointGroup pg = PointGroupParameters.GetPointGroup();
-            switch (_oldEditorState)
+            switch(_oldEditorState)
             {
                 case EditorState.FixedInput:
-                    if ((_fixedInputPointsIndex >= 0)
+                    if((_fixedInputPointsIndex >= 0)
                     && (_fixedInputPointsIndex < _expander.InputGamete.FixedPointGroups.Count))
                     {
                         _expander.InputGamete.FixedPointGroups[_fixedInputPointsIndex] = pg;
                     }
                     break;
                 case EditorState.FixedOutput:
-                    if ((_fixedOutputPointsIndex >= 0)
+                    if((_fixedOutputPointsIndex >= 0)
                     && (_fixedOutputPointsIndex < _expander.OutputGamete.FixedPointGroups.Count))
                     {
                         _expander.OutputGamete.FixedPointGroups[_fixedOutputPointsIndex] = pg;
                     }
                     break;
                 case EditorState.InputPlanet:
-                    if ((_inputPlanetIndex >= 0)
+                    if((_inputPlanetIndex >= 0)
                     && (_inputPlanetIndex < _expander.InputGamete.Planets.Count)
                     && (_inputSubpathIndex[_inputPlanetIndex] >= 0)
                     && (_inputSubpathIndex[_inputPlanetIndex] < _expander.InputGamete.Planets[_inputPlanetIndex].Subpaths.Count))
@@ -190,7 +191,7 @@ namespace Krystals5Application
                     }
                     break;
                 case EditorState.OutputPlanet:
-                    if ((_outputPlanetIndex >= 0)
+                    if((_outputPlanetIndex >= 0)
                     && (_outputPlanetIndex < _expander.OutputGamete.Planets.Count)
                     && (_outputSubpathIndex[_outputPlanetIndex] >= 0)
                     && (_outputSubpathIndex[_outputPlanetIndex] < _expander.OutputGamete.Planets[_outputPlanetIndex].Subpaths.Count))
@@ -217,9 +218,9 @@ namespace Krystals5Application
             bool plausible = true;
             int previousValue = int.MaxValue;
             values.Sort();
-            foreach (int value in values)
+            foreach(int value in values)
             {
-                if (value == previousValue)
+                if(value == previousValue)
                 {
                     string msg = "Point value Error in " + inoutString + " points:\n\n"
                                 + "Value '" + value.ToString() + "' is used twice.";
@@ -238,25 +239,25 @@ namespace Krystals5Application
         private void SetPointGroupParameterValues()
         {
             PointGroupParameters.SetPointGroup(null); // default values
-            switch (_newEditorState)
+            switch(_newEditorState)
             {
                 case EditorState.FixedInput:
-                    if (_fixedInputPointsIndex >= 0 && _expander.InputGamete.FixedPointGroups.Count > _fixedInputPointsIndex)
+                    if(_fixedInputPointsIndex >= 0 && _expander.InputGamete.FixedPointGroups.Count > _fixedInputPointsIndex)
                         PointGroupParameters.SetPointGroup(_expander.InputGamete.FixedPointGroups[_fixedInputPointsIndex]);
                     break;
                 case EditorState.FixedOutput:
-                    if (_fixedOutputPointsIndex >= 0 && _expander.OutputGamete.FixedPointGroups.Count > _fixedOutputPointsIndex)
+                    if(_fixedOutputPointsIndex >= 0 && _expander.OutputGamete.FixedPointGroups.Count > _fixedOutputPointsIndex)
                         PointGroupParameters.SetPointGroup(_expander.OutputGamete.FixedPointGroups[_fixedOutputPointsIndex]);
                     break;
                 case EditorState.InputPlanet:
-                    if (_inputPlanetIndex >= 0 && _inputSubpathIndex[_inputPlanetIndex] >= 0 && _expander.InputGamete.Planets.Count > _inputPlanetIndex
+                    if(_inputPlanetIndex >= 0 && _inputSubpathIndex[_inputPlanetIndex] >= 0 && _expander.InputGamete.Planets.Count > _inputPlanetIndex
                     && _expander.InputGamete.Planets[_inputPlanetIndex].Subpaths.Count > _inputSubpathIndex[_inputPlanetIndex])
                     {
                         PointGroupParameters.SetPointGroup(_expander.InputGamete.Planets[_inputPlanetIndex].Subpaths[_inputSubpathIndex[_inputPlanetIndex]]);
                     }
                     break;
                 case EditorState.OutputPlanet:
-                    if (_outputPlanetIndex >= 0 && _outputSubpathIndex[_outputPlanetIndex] >= 0 && _expander.OutputGamete.Planets.Count > _outputPlanetIndex
+                    if(_outputPlanetIndex >= 0 && _outputSubpathIndex[_outputPlanetIndex] >= 0 && _expander.OutputGamete.Planets.Count > _outputPlanetIndex
                     && _expander.OutputGamete.Planets[_outputPlanetIndex].Subpaths.Count > _outputSubpathIndex[_outputPlanetIndex])
                     {
                         PointGroupParameters.SetPointGroup(_expander.OutputGamete.Planets[_outputPlanetIndex].Subpaths[_outputSubpathIndex[_outputPlanetIndex]]);
@@ -318,11 +319,11 @@ namespace Krystals5Application
         private bool CheckSaved()
         {
             bool showInformationWindow = false;
-            if (SaveButton.Enabled == true)
+            if(SaveButton.Enabled == true)
             {
                 string msg = "Save the current krystal and expander?     ";
                 DialogResult result = MessageBox.Show(msg, "Closing", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-                if (result == DialogResult.Yes)
+                if(result == DialogResult.Yes)
                 {
                     Save();
                     showInformationWindow = true;
@@ -349,9 +350,9 @@ namespace Krystals5Application
             // or "UUU.UUU: mUUU, pUUU, dUUU"
             int beforeNumber = text.IndexOf("m"); // immediately before the moment number
             int afterNumber = text.IndexOf(","); // immediately after the moment number (-1 if no comma)
-            if (afterNumber > 0)
+            if(afterNumber > 0)
                 text = text.Remove(afterNumber);
-            if (beforeNumber > 0)
+            if(beforeNumber > 0)
                 text = text.Remove(0, beforeNumber + 1);
             uint momentNumber = uint.Parse(text);
             MarkPointsAt(momentNumber);
@@ -364,19 +365,19 @@ namespace Krystals5Application
         private void MarkPointsAt(uint momentNumber)
         {
             _painter.ClearAllPointMarkers();
-            foreach (Planet planet in _expander.InputGamete.Planets)
+            foreach(Planet planet in _expander.InputGamete.Planets)
             {
-                for (int i = planet.Subpaths.Count - 1; i > -1; i--)
+                for(int i = planet.Subpaths.Count - 1; i > -1; i--)
                 {
                     PointGroup pg = planet.Subpaths[i];
-                    if (pg.Visible)
+                    if(pg.Visible)
                     {
                         int pointIndex = (int)(momentNumber - pg.StartMoment);
-                        if (pointIndex >= 0 && pointIndex < pg.WindowsPixelCoordinates.Length)
+                        if(pointIndex >= 0 && pointIndex < pg.WindowsPixelCoordinates.Length)
                         {
                             // adds the new point marker to the painter's list
                             //if (planet.Value == _outputKrystal.PointsInputKrystal.AlignedValues[momentNumber - 1])
-                            if (planet.Value == _strandNodeList[(int)momentNumber - 1].StrandPoint)
+                            if(planet.Value == _strandNodeList[(int)momentNumber - 1].StrandPoint)
                                 _painter.CreatePointMarker(pg.WindowsPixelCoordinates[pointIndex], planet.Value.ToString(),
                                     true, true); // highlight
                             else
@@ -387,13 +388,13 @@ namespace Krystals5Application
                     }
                 }
             }
-            foreach (Planet planet in _expander.OutputGamete.Planets)
+            foreach(Planet planet in _expander.OutputGamete.Planets)
             {
-                for (int i = planet.Subpaths.Count - 1; i > -1; i--)
+                for(int i = planet.Subpaths.Count - 1; i > -1; i--)
                 {
                     PointGroup pg = planet.Subpaths[i];
                     int pointIndex = (int)(momentNumber - pg.StartMoment);
-                    if (pointIndex >= 0 && pointIndex < pg.WindowsPixelCoordinates.Length)
+                    if(pointIndex >= 0 && pointIndex < pg.WindowsPixelCoordinates.Length)
                     {   // adds the new point marker to the painter's list
                         _painter.CreatePointMarker(pg.WindowsPixelCoordinates[pointIndex], planet.Value.ToString(),
                             false, true); // always highlight output points
@@ -401,19 +402,19 @@ namespace Krystals5Application
                     }
                 }
             }
-            foreach (PointGroup pg in _expander.InputGamete.FixedPointGroups)
+            foreach(PointGroup pg in _expander.InputGamete.FixedPointGroups)
             {
-                if (pg.Value.Count > 0) // can fail if the pointgroup settings are not complete when the tree is selected
-                    for (int i = 0; i < pg.Count; i++)
-                        if (pg.Value[i] == _strandNodeList[(int)momentNumber - 1].StrandPoint)//_outputKrystal.PointsInputKrystal.AlignedValues[momentNumber - 1])
+                if(pg.Value.Count > 0) // can fail if the pointgroup settings are not complete when the tree is selected
+                    for(int i = 0; i < pg.Count; i++)
+                        if(pg.Value[i] == _strandNodeList[(int)momentNumber - 1].StrandPoint)//_outputKrystal.PointsInputKrystal.AlignedValues[momentNumber - 1])
                             _painter.CreatePointMarker(pg.WindowsPixelCoordinates[i], pg.Value[i].ToString(), true, true); // highlight
                         else
                             _painter.CreatePointMarker(pg.WindowsPixelCoordinates[i], pg.Value[i].ToString(), true, false); // empty
             }
-            foreach (PointGroup pg in _expander.OutputGamete.FixedPointGroups)
+            foreach(PointGroup pg in _expander.OutputGamete.FixedPointGroups)
             {
-                if (pg.Value.Count > 0) // can fail if the pointgroup settings are not complete when the tree is selected
-                    for (int i = 0; i < pg.Count; i++)
+                if(pg.Value.Count > 0) // can fail if the pointgroup settings are not complete when the tree is selected
+                    for(int i = 0; i < pg.Count; i++)
                         _painter.CreatePointMarker(pg.WindowsPixelCoordinates[i], pg.Value[i].ToString(), false, true); // highlighted output points
             }
 
@@ -428,15 +429,15 @@ namespace Krystals5Application
         private void FieldPanel_MouseDown(object sender, MouseEventArgs e)
         {
             _painter.ClearAllPointMarkers();
-            if (e.Button == MouseButtons.Left)
+            if(e.Button == MouseButtons.Left)
             {
                 RedrawFieldPanel();
             }
             else
-                if (e.Button == MouseButtons.Right)
-                {
-                    ShowPointInfo(e.Location);
-                } // if right mouse button
+                if(e.Button == MouseButtons.Right)
+            {
+                ShowPointInfo(e.Location);
+            } // if right mouse button
         }
         /// <summary>
         /// Displays a message box with information about the point at the given coordinate
@@ -453,22 +454,22 @@ namespace Krystals5Application
             GetFixedPointCandidates(mouseRect, candidates, _expander.OutputGamete.FixedPointGroups, false);
             ExpansionFieldPointInfo pointInfo = new ExpansionFieldPointInfo();
             string msg = "Point not found";
-            if (candidates.Count > 0)
+            if(candidates.Count > 0)
             {
                 //PointF mousePoint = new PointF((float)e.X, (float)e.Y);
                 float currentDistanceSquared = float.MaxValue;
-                foreach (ExpansionFieldPointInfo efpi in candidates)
+                foreach(ExpansionFieldPointInfo efpi in candidates)
                 {
                     float deltaX = mousePoint.X - efpi.location.X;
                     float deltaY = mousePoint.Y - efpi.location.Y;
                     float distanceSquared = (deltaX * deltaX) + (deltaY * deltaY);
-                    if (distanceSquared < currentDistanceSquared)
+                    if(distanceSquared < currentDistanceSquared)
                     {
                         currentDistanceSquared = distanceSquared;
                         pointInfo = efpi;
                     }
                 }
-                if (pointInfo.isPlanet)
+                if(pointInfo.isPlanet)
                 {
                     PointR userCoordinates = _painter.UserCoordinates(pointInfo.location);
                     msg = String.Format("{0}\n{1}\n\nsection: {2}\nmoment: {3}\n\nradius: {4:f3}\nangle: {5:f2}\n\nvalue: {6}",
@@ -501,25 +502,25 @@ namespace Krystals5Application
         {
             PointF testPoint;
             //uint[] flatInputValues = _outputKrystal.PointsInputKrystal.AlignedValues;
-            for (int planetIndex = 0; planetIndex < planets.Count; planetIndex++)
+            for(int planetIndex = 0; planetIndex < planets.Count; planetIndex++)
             {
-                for (int spi = 0; spi < planets[planetIndex].Subpaths.Count; spi++)
+                for(int spi = 0; spi < planets[planetIndex].Subpaths.Count; spi++)
                 {
-                    for (int pointIndex = 0; pointIndex < planets[planetIndex].Subpaths[spi].Count; pointIndex++)
+                    for(int pointIndex = 0; pointIndex < planets[planetIndex].Subpaths[spi].Count; pointIndex++)
                     {
                         PointGroup pointGroup = planets[planetIndex].Subpaths[spi];
                         testPoint = pointGroup.WindowsPixelCoordinates[pointIndex];
-                        if (mouseR.Contains(testPoint))
+                        if(mouseR.Contains(testPoint))
                         {
-							ExpansionFieldPointInfo ppi = new ExpansionFieldPointInfo
-							{
-								location = testPoint,
-								isPlanet = true
-							};
-							if (!inputPlanets || pointGroup.Value[0] == _strandNodeList[(int)(pointIndex + pointGroup.StartMoment - 1)].StrandPoint)
+                            ExpansionFieldPointInfo ppi = new ExpansionFieldPointInfo
+                            {
+                                location = testPoint,
+                                isPlanet = true
+                            };
+                            if(!inputPlanets || pointGroup.Value[0] == _strandNodeList[(int)(pointIndex + pointGroup.StartMoment - 1)].StrandPoint)
                                 ppi.isUsed = true;
                             else ppi.isUsed = false;
-                            if (inputPlanets)
+                            if(inputPlanets)
                             {
                                 ppi.comboBoxName = "Input Planet " + (planetIndex + 1).ToString();
                                 ppi.isInput = true;
@@ -543,20 +544,20 @@ namespace Krystals5Application
         {
             PointF testPoint;
 
-            for (int pgi = 0; pgi < pointGroups.Count; pgi++)
+            for(int pgi = 0; pgi < pointGroups.Count; pgi++)
             {
-                for (int pointIndex = 0; pointIndex < pointGroups[pgi].Count; pointIndex++)
+                for(int pointIndex = 0; pointIndex < pointGroups[pgi].Count; pointIndex++)
                 {
                     testPoint = pointGroups[pgi].WindowsPixelCoordinates[pointIndex];
-                    if (mouseR.Contains(testPoint))
+                    if(mouseR.Contains(testPoint))
                     {
-						ExpansionFieldPointInfo ppi = new ExpansionFieldPointInfo
-						{
-							location = testPoint,
-							isPlanet = false,
-							isUsed = true
-						};
-						if (inputGroup)
+                        ExpansionFieldPointInfo ppi = new ExpansionFieldPointInfo
+                        {
+                            location = testPoint,
+                            isPlanet = false,
+                            isUsed = true
+                        };
+                        if(inputGroup)
                         {
                             ppi.comboBoxName = "Input Group " + (pgi + 1).ToString();
                             ppi.isInput = true;
@@ -590,10 +591,10 @@ namespace Krystals5Application
         /// <param name="e"></param>
         private void FixedInputsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!PointGroupParameters.Busy)
+            if(!PointGroupParameters.Busy)
             {
                 PointGroupParameters.Busy = true;
-                if (_fixedInputPointsIndex != FixedInputsComboBox.SelectedIndex)
+                if(_fixedInputPointsIndex != FixedInputsComboBox.SelectedIndex)
                 {
                     GetPointGroupParameters();
                     RemoveStrands();
@@ -605,10 +606,10 @@ namespace Krystals5Application
         }
         private void FixedOutputsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!PointGroupParameters.Busy)
+            if(!PointGroupParameters.Busy)
             {
                 PointGroupParameters.Busy = true;
-                if (_fixedOutputPointsIndex != FixedOutputsComboBox.SelectedIndex)
+                if(_fixedOutputPointsIndex != FixedOutputsComboBox.SelectedIndex)
                 {
                     GetPointGroupParameters();
                     RemoveStrands();
@@ -620,10 +621,10 @@ namespace Krystals5Application
         }
         private void InputPlanetsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!PointGroupParameters.Busy)
+            if(!PointGroupParameters.Busy)
             {
                 PointGroupParameters.Busy = true;
-                if (_inputPlanetIndex != InputPlanetsComboBox.SelectedIndex)
+                if(_inputPlanetIndex != InputPlanetsComboBox.SelectedIndex)
                 {
                     GetPointGroupParameters();
                     RemoveStrands();
@@ -637,10 +638,10 @@ namespace Krystals5Application
         }
         private void OutputPlanetsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!PointGroupParameters.Busy)
+            if(!PointGroupParameters.Busy)
             {
                 PointGroupParameters.Busy = true;
-                if (_outputPlanetIndex != OutputPlanetsComboBox.SelectedIndex)
+                if(_outputPlanetIndex != OutputPlanetsComboBox.SelectedIndex)
                 {
                     GetPointGroupParameters();
                     RemoveStrands();
@@ -654,10 +655,10 @@ namespace Krystals5Application
         }
         private void InputSubpathComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!PointGroupParameters.Busy)
+            if(!PointGroupParameters.Busy)
             {
                 PointGroupParameters.Busy = true;
-                if (_inputSubpathIndex[InputPlanetsComboBox.SelectedIndex] != InputSubpathsComboBox.SelectedIndex)
+                if(_inputSubpathIndex[InputPlanetsComboBox.SelectedIndex] != InputSubpathsComboBox.SelectedIndex)
                 {
                     GetPointGroupParameters();
                     RemoveStrands();
@@ -669,10 +670,10 @@ namespace Krystals5Application
         }
         private void OutputSubpathComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!PointGroupParameters.Busy)
+            if(!PointGroupParameters.Busy)
             {
                 PointGroupParameters.Busy = true;
-                if (_outputSubpathIndex[OutputPlanetsComboBox.SelectedIndex] != OutputSubpathsComboBox.SelectedIndex)
+                if(_outputSubpathIndex[OutputPlanetsComboBox.SelectedIndex] != OutputSubpathsComboBox.SelectedIndex)
                 {
                     GetPointGroupParameters();
                     RemoveStrands();
@@ -693,7 +694,7 @@ namespace Krystals5Application
         {
             CheckSaved();
             NewExpansionDialog kd = new NewExpansionDialog();
-            if (kd.ShowDialog() == DialogResult.OK)
+            if(kd.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
@@ -727,7 +728,7 @@ namespace Krystals5Application
 
                     LoadNewOutputKrystalIntoEditor();
                 }
-                catch (ApplicationException ae)
+                catch(ApplicationException ae)
                 {
                     MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -743,7 +744,7 @@ namespace Krystals5Application
             try
             {
                 string expansionKrystalFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.expansion);
-                if (expansionKrystalFilepath.Length > 0)
+                if(expansionKrystalFilepath.Length > 0)
                 {
                     _outputKrystal = new ExpansionKrystal(expansionKrystalFilepath);
 
@@ -756,7 +757,7 @@ namespace Krystals5Application
                     LoadNewOutputKrystalIntoEditor();
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -772,7 +773,7 @@ namespace Krystals5Application
             try
             {
                 string densityInputFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.allKrystals);
-                if (densityInputFilepath.Length > 0)
+                if(densityInputFilepath.Length > 0)
                 {
                     _outputKrystal.DensityInputKrystal = new DensityInputKrystal(densityInputFilepath);
                     _outputKrystal.DensityInputFilename = _outputKrystal.DensityInputKrystal.Name;
@@ -780,7 +781,7 @@ namespace Krystals5Application
                     LoadNewKrystalInputFileIntoEditor();
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -795,7 +796,7 @@ namespace Krystals5Application
             try
             {
                 string pointsInputFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.allKrystals);
-                if (pointsInputFilepath.Length > 0)
+                if(pointsInputFilepath.Length > 0)
                 {
                     PointsInputKrystal pik = new PointsInputKrystal(pointsInputFilepath);
                     _outputKrystal.PointsInputKrystal = pik;
@@ -803,7 +804,7 @@ namespace Krystals5Application
                     LoadNewKrystalInputFileIntoEditor();
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -814,13 +815,13 @@ namespace Krystals5Application
             CheckSaved();
             try
             {
-                if (_outputKrystal.DensityInputKrystal == null)
+                if(_outputKrystal.DensityInputKrystal == null)
                 {
                     string msg = "Expanders can only be loaded if the density input krystal has been loaded.";
                     throw new ApplicationException(msg);
                 }
                 string expanderFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.expander);
-                if (expanderFilepath.Length > 0)
+                if(expanderFilepath.Length > 0)
                 {
                     _outputKrystal.Expander = _expander = new Expander(expanderFilepath, _outputKrystal.DensityInputKrystal);
 
@@ -835,11 +836,11 @@ namespace Krystals5Application
                     _painter.ClearAllPointMarkers();
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -849,18 +850,18 @@ namespace Krystals5Application
             CheckSaved();
             try
             {
-                if (_outputKrystal.DensityInputKrystal == null)
+                if(_outputKrystal.DensityInputKrystal == null)
                 {
                     string msg = "Gametes can only be loaded if the density input krystal has been loaded.";
                     throw new ApplicationException(msg);
                 }
                 string expanderFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.expander);
-                if (expanderFilepath.Length > 0)
+                if(expanderFilepath.Length > 0)
                 {
                     Expander exp = new Expander(expanderFilepath, _outputKrystal.DensityInputKrystal);
                     _expander.InputGamete = exp.InputGamete;
 
-                    if (String.IsNullOrEmpty(exp.InputGameteName))
+                    if(String.IsNullOrEmpty(exp.InputGameteName))
                         _expander.InputGameteName = exp.Name; // external gamete
                     else
                         _expander.InputGameteName = exp.InputGameteName;  // nested external gamete
@@ -868,16 +869,16 @@ namespace Krystals5Application
 
                     LoadNewGameteIntoEditor();
 
-                    if (_expander.OutputGamete.NumberOfValues == 0)
+                    if(_expander.OutputGamete.NumberOfValues == 0)
                         ExpandButton.Enabled = false;
                     else ExpandButton.Enabled = true;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -887,13 +888,13 @@ namespace Krystals5Application
             CheckSaved();
             try
             {
-                if (_outputKrystal.DensityInputKrystal == null)
+                if(_outputKrystal.DensityInputKrystal == null)
                 {
                     string msg = "Gametes can only be loaded if the density input krystal has been loaded.";
                     throw new ApplicationException(msg);
                 }
                 string expanderFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.expander);
-                if (expanderFilepath.Length > 0)
+                if(expanderFilepath.Length > 0)
                 {
                     Expander exp = new Expander(expanderFilepath, _outputKrystal.DensityInputKrystal);
                     _expander.OutputGamete = exp.OutputGamete;
@@ -905,16 +906,16 @@ namespace Krystals5Application
 
                     LoadNewGameteIntoEditor();
 
-                    if (_expander.InputGamete.NumberOfValues == 0)
+                    if(_expander.InputGamete.NumberOfValues == 0)
                         ExpandButton.Enabled = false;
                     else ExpandButton.Enabled = true;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -926,11 +927,11 @@ namespace Krystals5Application
             {
                 Save();
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1028,19 +1029,19 @@ namespace Krystals5Application
         /// <returns>A path to a file to be replaced, or an empty string if the dialog is cancelled.</returns>
         public string GetExpansionKrystalFilepathFromReplaceFileDialog()
         {
-			SaveFileDialog saveFileDialog = new SaveFileDialog
-			{
-				InitialDirectory = @"D:\krystals\krystals",
-				Filter = K.DialogFilter,
-				FilterIndex = (int)K.DialogFilterIndex.expansion + 1,
-				Title = "Replace krystal",
-				RestoreDirectory = true,
-				SupportMultiDottedExtensions = true,
-				AddExtension = true,
-				OverwritePrompt = false // suppresses the standard "file exists" warning
-			};
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = @"D:\krystals\krystals",
+                Filter = K.DialogFilter,
+                FilterIndex = (int)K.DialogFilterIndex.expansion + 1,
+                Title = "Replace krystal",
+                RestoreDirectory = true,
+                SupportMultiDottedExtensions = true,
+                AddExtension = true,
+                OverwritePrompt = false // suppresses the standard "file exists" warning
+            };
 
-			if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            if(saveFileDialog.ShowDialog() == DialogResult.OK)
                 return saveFileDialog.FileName;
             else return "";
         }
@@ -1055,13 +1056,13 @@ namespace Krystals5Application
             string msg = "Error: illegal expansion krystal name.\n";
             string name = krystalName; // a copy
             string beginning = String.Format("xk{0}", (int)_outputKrystal.Level);
-            if (!name.Contains(beginning) || name.IndexOf(beginning) != 0)
+            if(!name.Contains(beginning) || name.IndexOf(beginning) != 0)
             {
                 msg = msg + "The name must contain the krystal's correct level.";
                 throw new ApplicationException(msg);
             }
 
-            if (!name.EndsWith(K.KrystalFilenameSuffix))
+            if(!name.EndsWith(K.KrystalFilenameSuffix))
             {
                 msg = msg + "The name must end with the correct extender (" + K.KrystalFilenameSuffix + ").";
                 throw new ApplicationException(msg);
@@ -1083,7 +1084,7 @@ namespace Krystals5Application
                 throw new ApplicationException(msg);
             }
 
-            if (!(expID[0] == '(') || !(expID[expID.Length - 1] == ')'))
+            if(!(expID[0] == '(') || !(expID[expID.Length - 1] == ')'))
             {
                 msg = msg + "The name must contain an expander ID (enclosed in brackets)";
                 throw new ApplicationException(msg);
@@ -1092,7 +1093,7 @@ namespace Krystals5Application
 
             string expIDStart = String.Format("{0}.{1}.",
                 _expander.InputGamete.NumberOfValues, _expander.OutputGamete.NumberOfValues);
-            if (!expID.Contains(expIDStart) || expID.IndexOf(expIDStart) != 0)
+            if(!expID.Contains(expIDStart) || expID.IndexOf(expIDStart) != 0)
             {
                 msg = msg + "The expander ID must contain the correct input and output domains";
                 throw new ApplicationException(msg);
@@ -1120,7 +1121,7 @@ namespace Krystals5Application
             SetTreeView();
             _painter.ClearAllPointMarkers();
             RedrawFieldPanel();
-            if (_outputKrystal.Strands.Count > 0)
+            if(_outputKrystal.Strands.Count > 0)
                 _expansionTreeView.DisplayStrands(_outputKrystal.Strands); // appends the strand values to the existing tree display of the input values
             LoadGametesIntoEditor();
             DisableAllSaving();
@@ -1165,11 +1166,11 @@ namespace Krystals5Application
         /// </summary>
         private void SetTreeView()
         {
-            if (_strandNodeList != null)
+            if(_strandNodeList != null)
                 _strandNodeList.Clear();
-            if (_expansionTreeView != null)
+            if(_expansionTreeView != null)
                 _expansionTreeView.Clear();
-            if (_outputKrystal != null
+            if(_outputKrystal != null
                 && _outputKrystal.DensityInputKrystal != null
                 && _outputKrystal.PointsInputKrystal != null)
             {
@@ -1216,7 +1217,7 @@ namespace Krystals5Application
         {
             try
             {
-                if (!PointGroupParameters.Busy)
+                if(!PointGroupParameters.Busy)
                 {
                     PointGroupParameters.Busy = true;
                     _outputKrystal.Expander.InputGameteName = "";
@@ -1227,7 +1228,7 @@ namespace Krystals5Application
                     PointGroupParameters.Busy = false;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1240,7 +1241,7 @@ namespace Krystals5Application
         {
             try
             {
-                if (!PointGroupParameters.Busy)
+                if(!PointGroupParameters.Busy)
                 {
                     PointGroupParameters.Busy = true;
                     _outputKrystal.Expander.OutputGameteName = "";
@@ -1252,7 +1253,7 @@ namespace Krystals5Application
                     PointGroupParameters.Busy = false;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1265,25 +1266,25 @@ namespace Krystals5Application
         {
             try
             {
-                if (_outputKrystal.DensityInputKrystal == null)
+                if(_outputKrystal.DensityInputKrystal == null)
                 {
                     string msg = "New planets can only be created if the density input krystal has been loaded.";
                     throw new ApplicationException(msg);
                 }
-                if (!PointGroupParameters.Busy)
+                if(!PointGroupParameters.Busy)
                 {
                     PointGroupParameters.Busy = true;
                     _outputKrystal.Expander.InputGameteName = "";
                     GetPointGroupParameters();
                     RemoveStrands();
                     SetPlanetInputState();
-                    while (!DoNewPlanetDialog(true))
+                    while(!DoNewPlanetDialog(true))
                         ;
                     UpdateEditorForNewOrDeletedPointGroup();
                     PointGroupParameters.Busy = false;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1296,25 +1297,25 @@ namespace Krystals5Application
         {
             try
             {
-                if (_outputKrystal.DensityInputKrystal == null)
+                if(_outputKrystal.DensityInputKrystal == null)
                 {
                     string msg = "New planets can only be created if the density input krystal has been loaded.";
                     throw new ApplicationException(msg);
                 }
-                if (!PointGroupParameters.Busy)
+                if(!PointGroupParameters.Busy)
                 {
                     PointGroupParameters.Busy = true;
                     _outputKrystal.Expander.OutputGameteName = "";
                     GetPointGroupParameters();
                     RemoveStrands();
                     SetPlanetOutputState();
-                    while (!DoNewPlanetDialog(false))
+                    while(!DoNewPlanetDialog(false))
                         ;
                     UpdateEditorForNewOrDeletedPointGroup();
                     PointGroupParameters.Busy = false;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1330,84 +1331,84 @@ namespace Krystals5Application
             {
                 string msg = "Delete the current point group?";
                 DialogResult result = MessageBox.Show(msg, "Delete?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
-                if (result == DialogResult.Yes)
+                if(result == DialogResult.Yes)
                 {
                     #region save current state
                     int savedFixedInputPointsIndex = _fixedInputPointsIndex;
                     int savedFixedOutputPointsIndex = _fixedOutputPointsIndex;
                     int savedInputSubpathIndex = -1;
-                    if (_inputPlanetIndex >= 0)
+                    if(_inputPlanetIndex >= 0)
                         savedInputSubpathIndex = _inputSubpathIndex[_inputPlanetIndex];
                     int savedInputPlanetIndex = _inputPlanetIndex;
                     int savedOutputSubpathIndex = -1;
-                    if (_outputPlanetIndex >= 0)
+                    if(_outputPlanetIndex >= 0)
                         savedOutputSubpathIndex = _outputSubpathIndex[_outputPlanetIndex];
                     int savedOutputPlanetIndex = _outputPlanetIndex;
                     #endregion save current state
                     #region delete the point group, update the saved version of the state
-                    switch (_oldEditorState)
+                    switch(_oldEditorState)
                     {
                         case EditorState.FixedInput:
-                            if (_fixedInputPointsIndex >= 0 && _expander.InputGamete.FixedPointGroups.Count > 0)
+                            if(_fixedInputPointsIndex >= 0 && _expander.InputGamete.FixedPointGroups.Count > 0)
                             {
                                 _expander.InputGamete.FixedPointGroups.RemoveAt(_fixedInputPointsIndex);
-                                if (_expander.InputGamete.FixedPointGroups.Count == 0)
+                                if(_expander.InputGamete.FixedPointGroups.Count == 0)
                                     savedFixedInputPointsIndex = -1;
-                                else if (savedFixedInputPointsIndex > 0)
+                                else if(savedFixedInputPointsIndex > 0)
                                     savedFixedInputPointsIndex--;
                             }
                             break;
                         case EditorState.FixedOutput:
-                            if (_fixedOutputPointsIndex >= 0 && _expander.OutputGamete.FixedPointGroups.Count > 0)
+                            if(_fixedOutputPointsIndex >= 0 && _expander.OutputGamete.FixedPointGroups.Count > 0)
                             {
                                 _expander.OutputGamete.FixedPointGroups.RemoveAt(_fixedOutputPointsIndex);
-                                if (_expander.OutputGamete.FixedPointGroups.Count == 0)
+                                if(_expander.OutputGamete.FixedPointGroups.Count == 0)
                                     savedFixedOutputPointsIndex = -1;
-                                else if (savedFixedOutputPointsIndex > 0)
+                                else if(savedFixedOutputPointsIndex > 0)
                                     savedFixedOutputPointsIndex--;
                             }
                             break;
                         case EditorState.InputPlanet:
-                            if (_inputPlanetIndex >= 0 && _inputSubpathIndex[_inputPlanetIndex] >= 0
+                            if(_inputPlanetIndex >= 0 && _inputSubpathIndex[_inputPlanetIndex] >= 0
                                 && _expander.InputGamete.Planets.Count > 0)
                             {
                                 _expander.InputGamete.Planets[_inputPlanetIndex].Subpaths.RemoveAt(_inputSubpathIndex[_inputPlanetIndex]);
-                                if (_expander.InputGamete.Planets[_inputPlanetIndex].Subpaths.Count == 0)
+                                if(_expander.InputGamete.Planets[_inputPlanetIndex].Subpaths.Count == 0)
                                 {
                                     savedInputSubpathIndex = -1;
                                     _expander.InputGamete.Planets.RemoveAt(_inputPlanetIndex);
-                                    if (_expander.InputGamete.Planets.Count == 0)
+                                    if(_expander.InputGamete.Planets.Count == 0)
                                         savedInputPlanetIndex = -1;
-                                    else if (savedInputPlanetIndex > 0)
+                                    else if(savedInputPlanetIndex > 0)
                                         savedInputPlanetIndex--;
                                 }
                                 else
                                 {
                                     _expander.InputGamete.Planets[_inputPlanetIndex].NormaliseSubpaths();
                                     PointGroupParameters.SetPointGroup(_expander.InputGamete.Planets[_inputPlanetIndex].Subpaths[0]);
-                                    if (savedInputSubpathIndex > 0)
+                                    if(savedInputSubpathIndex > 0)
                                         savedInputSubpathIndex--;
                                 }
                             }
                             break;
                         case EditorState.OutputPlanet:
-                            if (_outputPlanetIndex >= 0 && _outputSubpathIndex[_outputPlanetIndex] >= 0 && _expander.OutputGamete.Planets.Count > 0)
+                            if(_outputPlanetIndex >= 0 && _outputSubpathIndex[_outputPlanetIndex] >= 0 && _expander.OutputGamete.Planets.Count > 0)
                             {
                                 _expander.OutputGamete.Planets[_outputPlanetIndex].Subpaths.RemoveAt(_outputSubpathIndex[_outputPlanetIndex]);
-                                if (_expander.OutputGamete.Planets[_outputPlanetIndex].Subpaths.Count == 0)
+                                if(_expander.OutputGamete.Planets[_outputPlanetIndex].Subpaths.Count == 0)
                                 {
                                     savedOutputSubpathIndex = -1;
                                     _expander.OutputGamete.Planets.RemoveAt(_outputPlanetIndex);
-                                    if (_expander.InputGamete.Planets.Count == 0)
+                                    if(_expander.InputGamete.Planets.Count == 0)
                                         savedOutputPlanetIndex = -1;
-                                    else if (savedOutputPlanetIndex > 0)
+                                    else if(savedOutputPlanetIndex > 0)
                                         savedOutputPlanetIndex--;
                                 }
                                 else
                                 {
                                     _expander.InputGamete.Planets[_inputPlanetIndex].NormaliseSubpaths();
                                     PointGroupParameters.SetPointGroup(_expander.InputGamete.Planets[_inputPlanetIndex].Subpaths[0]);
-                                    if (savedOutputSubpathIndex > 0)
+                                    if(savedOutputSubpathIndex > 0)
                                         savedOutputSubpathIndex--;
                                 }
                             }
@@ -1416,7 +1417,7 @@ namespace Krystals5Application
                     #endregion delete the point group, update the saved version of the state
                     #region reset the state of the editor
                     ResetComboBoxes();
-                    switch (_oldEditorState)
+                    switch(_oldEditorState)
                     {
                         case EditorState.FixedInput:
                             _fixedInputPointsIndex = savedFixedInputPointsIndex;
@@ -1426,12 +1427,12 @@ namespace Krystals5Application
                             break;
                         case EditorState.InputPlanet:
                             _inputPlanetIndex = savedInputPlanetIndex;
-                            if (_inputPlanetIndex >= 0)
+                            if(_inputPlanetIndex >= 0)
                                 _inputSubpathIndex[_inputPlanetIndex] = savedInputSubpathIndex;
                             break;
                         case EditorState.OutputPlanet:
                             _outputPlanetIndex = savedOutputPlanetIndex;
-                            if (_outputPlanetIndex >= 0)
+                            if(_outputPlanetIndex >= 0)
                                 _outputSubpathIndex[_outputPlanetIndex] = savedOutputSubpathIndex;
                             break;
                     }
@@ -1440,11 +1441,11 @@ namespace Krystals5Application
                     #endregion reset the state of the editor
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1455,7 +1456,7 @@ namespace Krystals5Application
             {
                 string msg = "Delete the current planet?";
                 DialogResult result = MessageBox.Show(msg, "Delete?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
-                if (result == DialogResult.Yes)
+                if(result == DialogResult.Yes)
                 {
                     #region save current state
                     int savedInputSubpathIndex = 0;
@@ -1464,31 +1465,31 @@ namespace Krystals5Application
                     int savedOutputPlanetIndex = _outputPlanetIndex;
                     #endregion save current state
                     #region delete the point group, update the saved version of the state
-                    switch (_oldEditorState)
+                    switch(_oldEditorState)
                     {
                         case EditorState.InputPlanet:
-                            if (_inputPlanetIndex >= 0 && _expander.InputGamete.Planets.Count > 0)
+                            if(_inputPlanetIndex >= 0 && _expander.InputGamete.Planets.Count > 0)
                             {
                                 _expander.InputGamete.Planets.RemoveAt(_inputPlanetIndex);
-                                if (_expander.InputGamete.Planets.Count == 0)
+                                if(_expander.InputGamete.Planets.Count == 0)
                                 {
                                     savedInputPlanetIndex = -1;
                                     savedInputSubpathIndex = -1;
                                 }
-                                else if (savedInputPlanetIndex > 0)
+                                else if(savedInputPlanetIndex > 0)
                                     savedInputPlanetIndex--;
                             }
                             break;
                         case EditorState.OutputPlanet:
-                            if (_outputPlanetIndex >= 0 && _expander.OutputGamete.Planets.Count > 0)
+                            if(_outputPlanetIndex >= 0 && _expander.OutputGamete.Planets.Count > 0)
                             {
                                 _expander.OutputGamete.Planets.RemoveAt(_outputPlanetIndex);
-                                if (_expander.OutputGamete.Planets.Count == 0)
+                                if(_expander.OutputGamete.Planets.Count == 0)
                                 {
                                     savedOutputPlanetIndex = -1;
                                     savedOutputSubpathIndex = -1;
                                 }
-                                else if (savedOutputPlanetIndex > 0)
+                                else if(savedOutputPlanetIndex > 0)
                                     savedOutputPlanetIndex--;
                             }
                             break;
@@ -1496,11 +1497,11 @@ namespace Krystals5Application
                     #endregion delete the point group, update the saved version of the state
                     #region reset the state of the editor
                     ResetComboBoxes();
-                    switch (_oldEditorState)
+                    switch(_oldEditorState)
                     {
                         case EditorState.InputPlanet:
                             _inputPlanetIndex = savedInputPlanetIndex;
-                            if (_inputPlanetIndex >= 0)
+                            if(_inputPlanetIndex >= 0)
                             {
                                 _inputSubpathIndex[_inputPlanetIndex] = savedInputSubpathIndex;
                                 InputPlanetsComboBox.SelectedIndex = _inputPlanetIndex;
@@ -1510,7 +1511,7 @@ namespace Krystals5Application
                             break;
                         case EditorState.OutputPlanet:
                             _outputPlanetIndex = savedOutputPlanetIndex;
-                            if (_outputPlanetIndex >= 0)
+                            if(_outputPlanetIndex >= 0)
                             {
                                 _outputSubpathIndex[_outputPlanetIndex] = savedOutputSubpathIndex;
                                 OutputPlanetsComboBox.SelectedIndex = _outputPlanetIndex;
@@ -1525,11 +1526,11 @@ namespace Krystals5Application
                     #endregion reset the state of the editor
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1541,15 +1542,15 @@ namespace Krystals5Application
         }
         private void MenuItemEditFixedOutputPoints_Click(object sender, EventArgs e)
         {
-            SetEditFixedOutputPoints(); 
+            SetEditFixedOutputPoints();
         }
         private void MenuItemEditInputPlanets_Click(object sender, EventArgs e)
         {
-            SetEditInputPlanets(); 
+            SetEditInputPlanets();
         }
         private void MenuItemEditOutputPlanets_Click(object sender, EventArgs e)
         {
-            SetEditOutputPlanets(); 
+            SetEditOutputPlanets();
         }
         #region Edit menu helper functions
         #region ComboBoxes
@@ -1559,18 +1560,18 @@ namespace Krystals5Application
         private void ResetComboBoxes()
         {
             int index;
-            switch (_oldEditorState)
+            switch(_oldEditorState)
             {
                 #region fixed input points
                 case EditorState.FixedInput:
                     FixedInputsComboBox.Items.Clear();
-                    if (_expander.InputGamete.FixedPointGroups.Count == 0)
+                    if(_expander.InputGamete.FixedPointGroups.Count == 0)
                         _fixedInputPointsIndex = -1;
                     else
                     {
                         _fixedInputPointsIndex = 0;
                         index = 1;
-                        foreach (PointGroup p in _expander.InputGamete.FixedPointGroups)
+                        foreach(PointGroup p in _expander.InputGamete.FixedPointGroups)
                         {
                             string newGroupName = "Input Group " + (index++).ToString();
                             FixedInputsComboBox.Items.Add(newGroupName);
@@ -1581,13 +1582,13 @@ namespace Krystals5Application
                 #region fixed output points
                 case EditorState.FixedOutput:
                     FixedOutputsComboBox.Items.Clear();
-                    if (_expander.OutputGamete.FixedPointGroups.Count == 0)
+                    if(_expander.OutputGamete.FixedPointGroups.Count == 0)
                         _fixedOutputPointsIndex = -1;
                     else
                     {
                         _fixedOutputPointsIndex = 0;
                         index = 1;
-                        foreach (PointGroup p in _expander.OutputGamete.FixedPointGroups)
+                        foreach(PointGroup p in _expander.OutputGamete.FixedPointGroups)
                         {
                             string newGroupName = "Output Group " + (index++).ToString();
                             FixedOutputsComboBox.Items.Add(newGroupName);
@@ -1600,20 +1601,20 @@ namespace Krystals5Application
                     InputPlanetsComboBox.Items.Clear();
                     InputSubpathsComboBox.Items.Clear();
                     _inputSubpathIndex.Clear();
-                    if (_expander.InputGamete.Planets.Count == 0)
+                    if(_expander.InputGamete.Planets.Count == 0)
                         _inputPlanetIndex = -1;
                     else
                     {
                         _inputPlanetIndex = 0;
                         index = 1;
-                        foreach (Planet p in _expander.InputGamete.Planets)
+                        foreach(Planet p in _expander.InputGamete.Planets)
                         {
                             string newGroupName = "Input Planet " + (index++).ToString();
                             InputPlanetsComboBox.Items.Add(newGroupName);
                             _inputSubpathIndex.Add(0);
                         }
                         index = 1;
-                        foreach (PointGroup sg in _expander.InputGamete.Planets[0].Subpaths)
+                        foreach(PointGroup sg in _expander.InputGamete.Planets[0].Subpaths)
                         {
                             string newGroupName = "Subpath " + (index++).ToString();
                             InputSubpathsComboBox.Items.Add(newGroupName);
@@ -1627,20 +1628,20 @@ namespace Krystals5Application
                     OutputPlanetsComboBox.Items.Clear();
                     OutputSubpathsComboBox.Items.Clear();
                     _outputSubpathIndex.Clear();
-                    if (_expander.OutputGamete.Planets.Count == 0)
+                    if(_expander.OutputGamete.Planets.Count == 0)
                         _outputPlanetIndex = -1;
                     else
                     {
                         _outputPlanetIndex = 0;
                         index = 1;
-                        foreach (Planet p in _expander.OutputGamete.Planets)
+                        foreach(Planet p in _expander.OutputGamete.Planets)
                         {
                             string newGroupName = "Output Planet " + (index++).ToString();
                             OutputPlanetsComboBox.Items.Add(newGroupName);
                             _outputSubpathIndex.Add(0);
                         }
                         index = 1;
-                        foreach (PointGroup sg in _expander.OutputGamete.Planets[0].Subpaths)
+                        foreach(PointGroup sg in _expander.OutputGamete.Planets[0].Subpaths)
                         {
                             string newGroupName = "Subpath " + (index++).ToString();
                             OutputSubpathsComboBox.Items.Add(newGroupName);
@@ -1648,7 +1649,7 @@ namespace Krystals5Application
                         _outputSubpathIndex[_outputPlanetIndex] = 0;
                     }
                     break;
-                #endregion output planets
+                    #endregion output planets
             }
         }
         /// <summary>
@@ -1662,7 +1663,7 @@ namespace Krystals5Application
         private void CreateNewFixedPointGroup(bool inputGroup)
         {
             PointGroup p = new PointGroup();
-            if (inputGroup)
+            if(inputGroup)
             {
                 _expander.InputGamete.FixedPointGroups.Add(p);
                 p.Shape = K.PointGroupShape.spiral; // default value for fixed input groups
@@ -1689,19 +1690,19 @@ namespace Krystals5Application
         private bool DoNewPlanetDialog(bool isInputPlanet)
         {
             NewPlanetDialog dlg = new NewPlanetDialog();
-            if (isInputPlanet)
+            if(isInputPlanet)
                 dlg.Text = "new input planet";
             else
                 dlg.Text = "new output planet";
             DialogResult result = dlg.ShowDialog();
             bool success = true; // this value is also returned if result == DialogResult.Cancel
-            if (result == DialogResult.OK)
+            if(result == DialogResult.OK)
             {
                 string planetValue = dlg.ValueUIntControl.UnsignedInteger.ToString();
                 List<uint> startValues = K.GetUIntList(dlg.StartMomentIntSeqControl.Sequence.ToString());
                 success = CheckPlanet(planetValue, startValues, isInputPlanet);
 
-                if (success)
+                if(success)
                     CreateNewPlanet(planetValue, startValues, isInputPlanet);
             }
             return success;
@@ -1709,27 +1710,27 @@ namespace Krystals5Application
         private bool CheckPlanet(string planetValue, List<uint> startValues, bool isInputPlanet)
         {
             bool success = true;
-            if (planetValue.Length == 0)
+            if(planetValue.Length == 0)
             {
                 success = false;
                 MessageBox.Show("The planet must have a value.", "planet parameter error",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            if (success && startValues.Count == 0)
+            if(success && startValues.Count == 0)
             {
                 success = false;
                 MessageBox.Show("The planet must have one or more subpaths.", "planet parameter error",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
 
-            if (success)
+            if(success)
             {
-                if (startValues[0] != 1 || startValues[startValues.Count - 1] > _outputKrystal.DensityInputKrystal.NumValues)
+                if(startValues[0] != 1 || startValues[startValues.Count - 1] > _outputKrystal.DensityInputKrystal.NumValues)
                     success = false;
-                for (int val = 1; val < startValues.Count; val++)
-                    if (startValues[val] <= startValues[val - 1])
+                for(int val = 1; val < startValues.Count; val++)
+                    if(startValues[val] <= startValues[val - 1])
                         success = false;
-                if (!success)
+                if(!success)
                     MessageBox.Show("Error: invalid start moment.", "planet parameter error",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1739,9 +1740,9 @@ namespace Krystals5Application
         private void CreateNewPlanet(string planetValue, List<uint> startValues, bool isInputPlanet)
         {
             Planet p = new Planet(planetValue, startValues, _outputKrystal.DensityInputKrystal);
-            if (isInputPlanet)
+            if(isInputPlanet)
             {
-                foreach (PointGroup pg in p.Subpaths)
+                foreach(PointGroup pg in p.Subpaths)
                     pg.Color = K.DisplayColor.black; // default for input points
                 _expander.InputGamete.Planets.Add(p);
                 ComboBox.ObjectCollection existingPlanets = InputPlanetsComboBox.Items;
@@ -1754,7 +1755,7 @@ namespace Krystals5Application
             }
             else
             {
-                foreach (PointGroup pg in p.Subpaths)
+                foreach(PointGroup pg in p.Subpaths)
                     pg.Color = K.DisplayColor.red; // default for output points
                 _expander.OutputGamete.Planets.Add(p);
                 ComboBox.ObjectCollection existingPlanets = OutputPlanetsComboBox.Items;
@@ -1770,7 +1771,7 @@ namespace Krystals5Application
         private void ReloadSubpathsComboBox(ComboBox subpathsComboBox, int numberOfSubpaths)
         {
             subpathsComboBox.Items.Clear();
-            for (int i = 0; i < numberOfSubpaths; i++)
+            for(int i = 0; i < numberOfSubpaths; i++)
             {
                 string newSubpathName = "Subpath " + (i + 1).ToString();
                 subpathsComboBox.Items.Add(newSubpathName);
@@ -1785,7 +1786,7 @@ namespace Krystals5Application
         {
             try
             {
-                if (!PointGroupParameters.Busy)
+                if(!PointGroupParameters.Busy)
                 {
                     PointGroupParameters.Busy = true;
                     GetPointGroupParameters();
@@ -1795,11 +1796,11 @@ namespace Krystals5Application
                     PointGroupParameters.Busy = false;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1811,7 +1812,7 @@ namespace Krystals5Application
         {
             try
             {
-                if (!PointGroupParameters.Busy)
+                if(!PointGroupParameters.Busy)
                 {
                     PointGroupParameters.Busy = true;
                     GetPointGroupParameters();
@@ -1821,11 +1822,11 @@ namespace Krystals5Application
                     PointGroupParameters.Busy = false;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1837,7 +1838,7 @@ namespace Krystals5Application
         {
             try
             {
-                if (!PointGroupParameters.Busy)
+                if(!PointGroupParameters.Busy)
                 {
                     PointGroupParameters.Busy = true;
                     GetPointGroupParameters();
@@ -1847,11 +1848,11 @@ namespace Krystals5Application
                     PointGroupParameters.Busy = false;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1863,7 +1864,7 @@ namespace Krystals5Application
         {
             try
             {
-                if (!PointGroupParameters.Busy)
+                if(!PointGroupParameters.Busy)
                 {
                     PointGroupParameters.Busy = true;
                     GetPointGroupParameters();
@@ -1873,11 +1874,11 @@ namespace Krystals5Application
                     PointGroupParameters.Busy = false;
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            catch (SystemException ae)
+            catch(SystemException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -1887,7 +1888,7 @@ namespace Krystals5Application
         /// </summary>
         private void SetFixedInputState()
         {
-            if (_oldEditorState != EditorState.FixedInput)
+            if(_oldEditorState != EditorState.FixedInput)
             {
                 _newEditorState = EditorState.FixedInput;
                 ConfigureEditorControls();
@@ -1899,7 +1900,7 @@ namespace Krystals5Application
         /// </summary>
         private void SetFixedOutputState()
         {
-            if (_oldEditorState != EditorState.FixedOutput)
+            if(_oldEditorState != EditorState.FixedOutput)
             {
                 _newEditorState = EditorState.FixedOutput;
                 ConfigureEditorControls();
@@ -1911,7 +1912,7 @@ namespace Krystals5Application
         /// </summary>
         private void SetPlanetInputState()
         {
-            if (_oldEditorState != EditorState.InputPlanet)
+            if(_oldEditorState != EditorState.InputPlanet)
             {
                 _newEditorState = EditorState.InputPlanet;
                 ConfigureEditorControls();
@@ -1923,7 +1924,7 @@ namespace Krystals5Application
         /// </summary>
         private void SetPlanetOutputState()
         {
-            if (_oldEditorState != EditorState.OutputPlanet)
+            if(_oldEditorState != EditorState.OutputPlanet)
             {
                 _newEditorState = EditorState.OutputPlanet;
                 ConfigureEditorControls();
@@ -1945,11 +1946,11 @@ namespace Krystals5Application
         private void ConfigureEditorControls()
         {
             #region set editor controls
-            switch (_newEditorState)
+            switch(_newEditorState)
             {
                 case EditorState.FixedInput:
                     FixedInputsComboBox.Visible = true;
-                    if (_fixedInputPointsIndex >= 0)
+                    if(_fixedInputPointsIndex >= 0)
                     {
                         FixedInputsComboBox.SelectedIndex = _fixedInputPointsIndex;
                         EnableDeletePointGroupMenuItem();
@@ -1973,7 +1974,7 @@ namespace Krystals5Application
                 case EditorState.FixedOutput:
                     FixedInputsComboBox.Visible = false;
                     FixedOutputsComboBox.Visible = true;
-                    if (_fixedOutputPointsIndex >= 0)
+                    if(_fixedOutputPointsIndex >= 0)
                     {
                         FixedOutputsComboBox.SelectedIndex = _fixedOutputPointsIndex;
                         EnableDeletePointGroupMenuItem();
@@ -1998,7 +1999,7 @@ namespace Krystals5Application
                     FixedOutputsComboBox.Visible = false;
                     InputPlanetsComboBox.Visible = true;
                     InputSubpathsComboBox.Visible = true;
-                    if (_inputPlanetIndex >= 0)
+                    if(_inputPlanetIndex >= 0)
                     {
                         InputPlanetsComboBox.SelectedIndex = _inputPlanetIndex;
                         InputSubpathsComboBox.SelectedIndex = _inputSubpathIndex[_inputPlanetIndex];
@@ -2027,7 +2028,7 @@ namespace Krystals5Application
                     InputSubpathsComboBox.Visible = false;
                     OutputPlanetsComboBox.Visible = true;
                     OutputSubpathsComboBox.Visible = true;
-                    if (_outputPlanetIndex >= 0)
+                    if(_outputPlanetIndex >= 0)
                     {
                         OutputPlanetsComboBox.SelectedIndex = _outputPlanetIndex;
                         OutputSubpathsComboBox.SelectedIndex = _outputSubpathIndex[_outputPlanetIndex];
@@ -2083,7 +2084,7 @@ namespace Krystals5Application
         private void RemoveStrands()
         {
             _outputKrystal.Strands.Clear();
-            if (_expansionTreeView != null)
+            if(_expansionTreeView != null)
                 _expansionTreeView.RemoveStrands();
         }
         #endregion  Edit menu helper functions
@@ -2110,10 +2111,10 @@ namespace Krystals5Application
         /// </summary>
         private void SetStatusText()
         {
-            if (_outputKrystal != null)
+            if(_outputKrystal != null)
             {
                 string moments, densityInputFilename, pointsInputFilename;
-                if (_outputKrystal.DensityInputKrystal == null)
+                if(_outputKrystal.DensityInputKrystal == null)
                 {
                     moments = "<unassigned>";
                     densityInputFilename = "<unassigned>";
@@ -2124,7 +2125,7 @@ namespace Krystals5Application
                     densityInputFilename = _outputKrystal.DensityInputKrystal.Name;
                 }
 
-                if (_outputKrystal.PointsInputKrystal == null)
+                if(_outputKrystal.PointsInputKrystal == null)
                     pointsInputFilename = "<unassigned>";
                 else pointsInputFilename = _outputKrystal.PointsInputKrystal.Name;
 
@@ -2132,9 +2133,9 @@ namespace Krystals5Application
                         moments, densityInputFilename, pointsInputFilename));
 
                 StatusTextBox.Text = sb.ToString();
-                
+
                 #region set form title
-		        string expanderName = "";
+                string expanderName = "";
                 string krystalName = "";
                 if(_expander != null)
                 {
@@ -2150,7 +2151,7 @@ namespace Krystals5Application
                     }
                 }
                 this.Text = "output krystal: " + krystalName + "    ||    expander: " + expanderName;
-	            #endregion
+                #endregion
             }
             else // status line is empty, but set window title text
                 this.Text = "expansion editor";
@@ -2190,7 +2191,7 @@ namespace Krystals5Application
         #region Command Buttons
         protected void ExpandButton_Click(object sender, EventArgs e)
         {
-            if (!PointGroupParameters.Busy) // because GetPointGroupParameters() is called...
+            if(!PointGroupParameters.Busy) // because GetPointGroupParameters() is called...
             {
                 PointGroupParameters.Busy = true;
                 try
@@ -2214,7 +2215,7 @@ namespace Krystals5Application
                     EnableSaving();
                     SetStatusText();
                 }
-                catch (ApplicationException ae)
+                catch(ApplicationException ae)
                 {
                     MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -2231,24 +2232,24 @@ namespace Krystals5Application
         {
             CheckGametePoints("input"); // throws an exception on failure
             CheckGametePoints("output"); // throws an exception on failure
-            if (_outputKrystal.DensityInputKrystal == null)
+            if(_outputKrystal.DensityInputKrystal == null)
             {
                 string msg = "Error: the density input krystal has not been set";
                 throw new ApplicationException(msg);
             }
-            if (_outputKrystal.PointsInputKrystal == null)
+            if(_outputKrystal.PointsInputKrystal == null)
             {
                 string msg = "Error: the points input krystal has not been set";
                 throw new ApplicationException(msg);
             }
-            if (_outputKrystal.PointsInputKrystal.MaxValue > _expander.InputGamete.MaxValue)
+            if(_outputKrystal.PointsInputKrystal.MaxValue > _expander.InputGamete.MaxValue)
             {
                 string msg = String.Format("Error: the input gamete does not have points corresponding to\n"
                     + "all the values in the points input krystal (range {0}..{1}).",
                     _outputKrystal.PointsInputKrystal.MinValue, _outputKrystal.PointsInputKrystal.MaxValue);
                 throw new ApplicationException(msg);
             }
-            if (RedundantInputGametePointsExist)
+            if(RedundantInputGametePointsExist)
             {
                 string msg = "Warning: The input gamete contains points which are never used.";
                 MessageBox.Show(msg, "redundant input points", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -2267,34 +2268,34 @@ namespace Krystals5Application
         {
             List<uint> valuesList = new List<uint>();
             int maxValue = 0;
-            if (inputOutput.Equals("input"))
+            if(inputOutput.Equals("input"))
             {
                 valuesList = _expander.InputGamete.GetActualValues();
                 maxValue = _expander.InputGamete.MaxValue;
             }
-            else if (inputOutput.Equals("output"))
+            else if(inputOutput.Equals("output"))
             {
                 valuesList = _expander.OutputGamete.GetActualValues();
                 maxValue = _expander.OutputGamete.MaxValue;
             }
 
-            if (valuesList.Count == 0)
+            if(valuesList.Count == 0)
             {
                 string msg = "Error: The " + inputOutput + " gamete may not be empty.";
                 throw new ApplicationException(msg);
             }
-            if (valuesList.Contains(0))
+            if(valuesList.Contains(0))
             {
                 string msg = "Error: The minimum value in the " + inputOutput + " gamete must be 1.";
                 throw new ApplicationException(msg);
             }
-            for (uint val = 1; val <= valuesList.Count; val++)
-                if (!valuesList.Contains(val))
+            for(uint val = 1; val <= valuesList.Count; val++)
+                if(!valuesList.Contains(val))
                 {
                     string msg;
-                    if (val == 1)
+                    if(val == 1)
                         msg = "Error: The minimum value in the " + inputOutput + " gamete must be 1.";
-                    else if (val < maxValue)
+                    else if(val < maxValue)
                         msg = "Error: The values in the " + inputOutput + " gamete must be contiguous.";
                     else
                         msg = "Error: The " + inputOutput + " gamete contains duplicate values.";
@@ -2314,8 +2315,8 @@ namespace Krystals5Application
                 List<int> kValuesList = _outputKrystal.PointsInputKrystal.AbsoluteValues; // set by the K.GetKrystalFromFile() krystal factory
                 List<uint> eValuesList = _expander.InputGamete.GetActualValues();
 
-                foreach (uint ui in eValuesList)
-                    if (!kValuesList.Contains((int)ui))
+                foreach(uint ui in eValuesList)
+                    if(!kValuesList.Contains((int)ui))
                     {
                         returnValue = true;
                         break;
@@ -2343,30 +2344,30 @@ namespace Krystals5Application
         /// </summary>
         private void PointGroupParametersChangedDelegate()
         {
-            if (!PointGroupParameters.Busy)
+            if(!PointGroupParameters.Busy)
             {
                 PointGroupParameters.Busy = true;
                 _painter.ClearAllPointMarkers();
                 GetPointGroupParameters();
                 RemoveStrands();
                 RedrawFieldPanel();
-                if ((_oldEditorState == EditorState.FixedInput || _oldEditorState == EditorState.InputPlanet)
+                if((_oldEditorState == EditorState.FixedInput || _oldEditorState == EditorState.InputPlanet)
                     && !String.IsNullOrEmpty(_expander.InputGameteName))
                 {
                     _expander.InputGameteName = "";
                 }
-                if ((_oldEditorState == EditorState.FixedOutput || _oldEditorState == EditorState.OutputPlanet)
+                if((_oldEditorState == EditorState.FixedOutput || _oldEditorState == EditorState.OutputPlanet)
                     && !String.IsNullOrEmpty(_expander.OutputGameteName))
                 {
                     _expander.OutputGameteName = "";
                 }
-                if (_oldEditorState == _newEditorState)
+                if(_oldEditorState == _newEditorState)
                 {
                     //_expanderIsSaved = false;
                     //_krystalIsSaved = false;
                     _expander.Name = K.UntitledExpanderName;
                     SetStatusText();
-                    if (_expander.InputGamete.NumberOfValues > 0 && _expander.OutputGamete.NumberOfValues > 0)
+                    if(_expander.InputGamete.NumberOfValues > 0 && _expander.OutputGamete.NumberOfValues > 0)
                         this.ExpandButton.Enabled = true;
                     else this.ExpandButton.Enabled = false;
                     DisableAllSaving();
@@ -2397,7 +2398,7 @@ namespace Krystals5Application
         /// </summary>
         private void RedrawFieldPanel()
         {
-            if (_fieldPanelGraphicsBuffer != null)
+            if(_fieldPanelGraphicsBuffer != null)
                 _fieldPanelGraphicsBuffer.Dispose();
             _fieldPanelGraphicsBuffer = _bufferedGraphicsContext.Allocate(FieldPanel.CreateGraphics(), FieldPanel.DisplayRectangle);
 
@@ -2407,7 +2408,7 @@ namespace Krystals5Application
                 _painter.Draw(_fieldPanelGraphicsBuffer.Graphics, _outputKrystal, scalePercent);
                 _fieldPanelGraphicsBuffer.Render();
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -2442,7 +2443,7 @@ namespace Krystals5Application
                 #region public functions
                 public void Draw(Graphics g)
                 {
-                    if (!_isInput) // filled output point
+                    if(!_isInput) // filled output point
                     {
                         float x = _centreX - _outputRadius;
                         float y = _centreY - _outputRadius;
@@ -2455,7 +2456,7 @@ namespace Krystals5Application
                         float x = _centreX - _inputRadius;
                         float y = _centreY - _inputRadius;
                         float diameter = _inputRadius * 2;
-                        if (_isUsed) // used input point
+                        if(_isUsed) // used input point
                         {
                             g.FillEllipse(_inputMarkerFillBrush, x, y, diameter, diameter);
                             g.DrawEllipse(_inputMarkerPen, x, y, diameter, diameter);
@@ -2468,7 +2469,7 @@ namespace Krystals5Application
                 }
                 public void Rescale(float newScale, float newFieldPanelCentreX, float newFieldPanelCentreY)
                 {
-                    if (newScale != _scale
+                    if(newScale != _scale
                         || newFieldPanelCentreX != _fieldPanelCentreX
                         || newFieldPanelCentreY != _fieldPanelCentreY)
                     {
@@ -2506,7 +2507,7 @@ namespace Krystals5Application
             }
             #endregion PointMarker class
             #region properties
-            public List<StrandNode> StrandNodeList { set{ _strandNodeList = value; }}
+            public List<StrandNode> StrandNodeList { set { _strandNodeList = value; } }
             #endregion
             #region public functions
             /// <summary>
@@ -2535,35 +2536,35 @@ namespace Krystals5Application
                 DrawBackground(_g);
                 DrawPointMarkers(_scale, _fieldPanelCentreX, _fieldPanelCentreY);
 
-                if (outputKrystal != null)
+                if(outputKrystal != null)
                 {
                     _densityInputKrystal = outputKrystal.DensityInputKrystal;
                     _pointsInputKrystal = outputKrystal.PointsInputKrystal;
 
                     Expander ef = outputKrystal.Expander;
-                    if (ef != null)
+                    if(ef != null)
                     {
-                        foreach (Planet planet in ef.OutputGamete.Planets)
+                        foreach(Planet planet in ef.OutputGamete.Planets)
                         {
-                            planet.GetPlanetCoordinates(_densityInputKrystal, 
+                            planet.GetPlanetCoordinates(_densityInputKrystal,
                                                         _fieldPanelCentreX, _fieldPanelCentreY,
                                                         _scale);
                             DrawPlanetBackground(planet, false); // draws unused input points and the line
                         }
-                        foreach (Planet planet in ef.InputGamete.Planets)
+                        foreach(Planet planet in ef.InputGamete.Planets)
                         {
                             planet.GetPlanetCoordinates(_densityInputKrystal,
                                                         _fieldPanelCentreX, _fieldPanelCentreY,
                                                         _scale);
                             DrawPlanetBackground(planet, true); // draws unused input points and the line
                         }
-                        foreach (Planet planet in ef.OutputGamete.Planets)
+                        foreach(Planet planet in ef.OutputGamete.Planets)
                             DrawPlanet(planet, true); // true means draw output planet
-                        foreach (PointGroup p in ef.OutputGamete.FixedPointGroups)
+                        foreach(PointGroup p in ef.OutputGamete.FixedPointGroups)
                             DrawFixedDots(p, false);
-                        foreach (PointGroup p in ef.InputGamete.FixedPointGroups)
+                        foreach(PointGroup p in ef.InputGamete.FixedPointGroups)
                             DrawFixedDots(p, true);
-                        foreach (Planet planet in ef.InputGamete.Planets)
+                        foreach(Planet planet in ef.InputGamete.Planets)
                             DrawPlanet(planet, false); // false means draw input planet
                     } // if (ef != null)
                 }
@@ -2628,7 +2629,7 @@ namespace Krystals5Application
                 userX = (windowsCoordinates.X - _fieldPanelCentreX);
                 userY = (_fieldPanelCentreY - windowsCoordinates.Y);
 
-                if (userX == 0)
+                if(userX == 0)
                     radians = 0;
                 else
                     radians = (float)Math.Atan((double)userY / userX);
@@ -2636,9 +2637,9 @@ namespace Krystals5Application
                 radius = (float)Math.Sqrt((userX * userX) + (userY * userY)) / _scale;
 
                 degrees = (float)radians * 360f / (float)(Math.PI * 2);
-                if (userX < 0)
+                if(userX < 0)
                     degrees = degrees + 180f;
-                else if (userY < 0)
+                else if(userY < 0)
                     degrees = degrees + 360f;
 
                 return (new PointR(radius, degrees));
@@ -2656,21 +2657,21 @@ namespace Krystals5Application
                 clone.Count = 200;
                 clone.GetFixedPointWindowsPixelCoordinates(_fieldPanelCentreX, _fieldPanelCentreY, _scale);
                 return clone.WindowsPixelCoordinates;
-            } 
+            }
             #endregion
             #region private functions
             private void DrawPlanetBackground(Planet planet, bool drawUnusedPoints)
             {
                 bool finalGroup;
-                for (int i = 0; i < planet.Subpaths.Count; i++)
+                for(int i = 0; i < planet.Subpaths.Count; i++)
                 {
                     PointGroup pointGroup = planet.Subpaths[i];
-                    if (pointGroup.Visible)
+                    if(pointGroup.Visible)
                     {
-                        if (i == planet.Subpaths.Count - 1)
+                        if(i == planet.Subpaths.Count - 1)
                             finalGroup = true;
                         else finalGroup = false;
-                        if (drawUnusedPoints && _strandNodeList.Count > 0)
+                        if(drawUnusedPoints && _strandNodeList.Count > 0)
                             DrawDots(pointGroup, i, true, false, finalGroup); // unused input planet points
                         DrawConnectingLine(pointGroup);
                     }
@@ -2679,11 +2680,11 @@ namespace Krystals5Application
 
             private void DrawPlanet(Planet planet, bool outputPlanet)
             {
-                for (int i = 0; i < planet.Subpaths.Count; i++)
+                for(int i = 0; i < planet.Subpaths.Count; i++)
                 {
-                    if (planet.Subpaths[i].Visible && _strandNodeList.Count > 0)
+                    if(planet.Subpaths[i].Visible && _strandNodeList.Count > 0)
                     {
-                        if (outputPlanet)
+                        if(outputPlanet)
                             DrawDots(planet.Subpaths[i], i, false, false, (i == planet.Subpaths.Count - 1));
                         else
                             DrawDots(planet.Subpaths[i], i, true, false, (i == planet.Subpaths.Count - 1));
@@ -2693,11 +2694,11 @@ namespace Krystals5Application
 
             private void DrawConnectingLine(PointGroup p)
             {
-                if (p.Visible)
+                if(p.Visible)
                 {
                     PointF[] connectingLineCoordinates = ConnectingLineCoordinates(p);
                     GetTheLinePen(p.Color);
-                    if (p.Shape == K.PointGroupShape.circle)
+                    if(p.Shape == K.PointGroupShape.circle)
                         _g.DrawClosedCurve(_theDottedLinePen, connectingLineCoordinates);
                     else
                         _g.DrawCurve(_theDottedLinePen, connectingLineCoordinates);
@@ -2705,7 +2706,7 @@ namespace Krystals5Application
             }
             private void DrawFixedDots(PointGroup pointGroup, bool inputPoints)
             {
-                if (pointGroup.Visible)
+                if(pointGroup.Visible)
                 {
                     pointGroup.GetFixedPointWindowsPixelCoordinates(_fieldPanelCentreX, _fieldPanelCentreY, _scale);
                     DrawDots(pointGroup, 0, inputPoints, true, true);
@@ -2724,20 +2725,20 @@ namespace Krystals5Application
                 PointF[] points = p.WindowsPixelCoordinates; // these points are scaled and centred
                 GetTheDotPen(p.Color);
                 int dotsToDraw = points.Length;
-                if (!drawFinalDot)
+                if(!drawFinalDot)
                     dotsToDraw--;
 
                 float _dotOffset = (_dotSize - 1) / 2; // used by both input and output points!
 
                 #region draw output points
-                if (inputPoints == false) // output points
+                if(inputPoints == false) // output points
                 {
                     float _ringOffset = (_ringSize - 1) / 2;
-                    for (int i = 0; i < dotsToDraw; i++)
+                    for(int i = 0; i < dotsToDraw; i++)
                     {
-                        if (_pointMarkers.Count == 0) // editing mode
+                        if(_pointMarkers.Count == 0) // editing mode
                         {
-                            if (fixedPoints || (pointGroupIndex == 0 && i == 0)) // fixed points or the first dot of an output planet
+                            if(fixedPoints || (pointGroupIndex == 0 && i == 0)) // fixed points or the first dot of an output planet
                             {
                                 DrawDot(_theDotPen, _theRingFillBrush, points[i].X - _ringOffset, points[i].Y - _ringOffset, _ringSize);
                                 DrawLabel(points[i], p.Value[i].ToString());
@@ -2750,15 +2751,15 @@ namespace Krystals5Application
                         else // time-slice mode
                         {
                             bool drawn = false;
-                            foreach (PointMarker pm in _pointMarkers) // markers have been set for all fixed points
-                                if (pm.PointF.Equals(points[i])) // the output point at this moment
+                            foreach(PointMarker pm in _pointMarkers) // markers have been set for all fixed points
+                                if(pm.PointF.Equals(points[i])) // the output point at this moment
                                 {
                                     DrawDot(_theDotPen, _theRingFillBrush, points[i].X - _ringOffset, points[i].Y - _ringOffset, _ringSize);
                                     DrawLabel(points[i], pm.PointValue);
                                     drawn = true;
                                     break;
                                 }
-                            if (!drawn) // output planet points at other moments
+                            if(!drawn) // output planet points at other moments
                             {
                                 DrawDot(_unusedOutputPointsPen, _unusedOutputPointsPen.Brush, points[i].X - _dotOffset, points[i].Y - _dotOffset, _dotSize);
                             }
@@ -2769,20 +2770,20 @@ namespace Krystals5Application
                 #region draw input points
                 else // inputPoints == true
                 {
-                    for (int i = 0; i < dotsToDraw; i++)
+                    for(int i = 0; i < dotsToDraw; i++)
                     {
-                        if (_pointMarkers.Count == 0) // editing mode
+                        if(_pointMarkers.Count == 0) // editing mode
                         {
-                            if (fixedPoints) // fixed input points
+                            if(fixedPoints) // fixed input points
                             {
                                 DrawDot(_theDotPen, _theDotPen.Brush, points[i].X - _dotOffset, points[i].Y - _dotOffset, _dotSize);
                                 DrawLabel(points[i], p.Value[i].ToString());
                             }
                             else // input planet in editing mode
                             {
-                                if (pointGroupIndex == 0 && i == 0)
+                                if(pointGroupIndex == 0 && i == 0)
                                     DrawLabel(points[i], p.Value[i].ToString());
-                                if (p.Value[0] == _strandNodeList[i + ((int)p.StartMoment) - 1].StrandPoint)
+                                if(p.Value[0] == _strandNodeList[i + ((int)p.StartMoment) - 1].StrandPoint)
                                 {
                                     DrawDot(_theDotPen, _theDotPen.Brush, points[i].X - _dotOffset, points[i].Y - _dotOffset, _dotSize);
                                 }
@@ -2795,10 +2796,10 @@ namespace Krystals5Application
                         else // time-slice mode
                         {
                             bool pointDrawn = false;
-                            foreach (PointMarker pm in _pointMarkers) // markers have been set for all fixed points
-                                if (pm.PointF.Equals(points[i])) // the input point at this moment
+                            foreach(PointMarker pm in _pointMarkers) // markers have been set for all fixed points
+                                if(pm.PointF.Equals(points[i])) // the input point at this moment
                                 {
-                                    if (fixedPoints) // all fixed points are marked in time-slice mode!
+                                    if(fixedPoints) // all fixed points are marked in time-slice mode!
                                     {
                                         DrawDot(_theDotPen, _theDotPen.Brush, points[i].X - _dotOffset, points[i].Y - _dotOffset, _dotSize);
                                         DrawLabel(points[i], p.Value[i].ToString());
@@ -2808,9 +2809,9 @@ namespace Krystals5Application
                                         DrawLabel(points[i], p.Value[0].ToString());
                                     break;
                                 }
-                            if (!pointDrawn) // unmarked input planet points in time-slice mode
+                            if(!pointDrawn) // unmarked input planet points in time-slice mode
                             {
-                                if (p.Value[0] == _strandNodeList[i + ((int)p.StartMoment) - 1].StrandPoint)
+                                if(p.Value[0] == _strandNodeList[i + ((int)p.StartMoment) - 1].StrandPoint)
                                 {
                                     DrawDot(_theDotPen, _theDotPen.Brush, points[i].X - _dotOffset, points[i].Y - _dotOffset, _dotSize);
                                 }
@@ -2839,17 +2840,17 @@ namespace Krystals5Application
                 float userCartesianX = pointF.X - _fieldPanelCentreX;
                 float userCartesianY = _fieldPanelCentreY - pointF.Y;
                 double alpha = 0.0;
-                if (userCartesianX == 0)
+                if(userCartesianX == 0)
                 {
-                    if (userCartesianY == 0)
+                    if(userCartesianY == 0)
                         alpha = 0.0;
-                    else if (userCartesianY > 0)
+                    else if(userCartesianY > 0)
                         alpha = Math.PI / 2;
                     else alpha = Math.PI / -2;
                 }
                 else alpha = Math.Atan(userCartesianY / userCartesianX);
 
-                if (userCartesianX < 0) alpha += Math.PI;
+                if(userCartesianX < 0) alpha += Math.PI;
 
                 float labelX = pointF.X + (_labelOffset * (float)Math.Cos(alpha)) - (width / 2.0f);
                 float labelY = pointF.Y - (_labelOffset * (float)Math.Sin(alpha)) - (_labelsHeight / 2.0f);
@@ -2859,7 +2860,7 @@ namespace Krystals5Application
 
             private void GetTheDotPen(K.DisplayColor color)
             {
-                switch (color)
+                switch(color)
                 {
                     case K.DisplayColor.black: _theDotPen.Brush = Brushes.Black; break;
                     case K.DisplayColor.red: _theDotPen.Brush = Brushes.Red; break;
@@ -2873,7 +2874,7 @@ namespace Krystals5Application
             }
             private void GetTheLinePen(K.DisplayColor dotColor)
             {
-                switch (dotColor)
+                switch(dotColor)
                 {
                     case K.DisplayColor.black: _theDottedLinePen.Brush = Brushes.Gray; break;
                     case K.DisplayColor.red: _theDottedLinePen.Brush = Brushes.OrangeRed; break;
@@ -2890,14 +2891,14 @@ namespace Krystals5Application
             /// </summary>
             private void DrawPointMarkers(float scale, float fieldPanelCentreX, float fieldPanelCentreY)
             {
-                if (_singlePointMarker != null)
+                if(_singlePointMarker != null)
                 {
                     _singlePointMarker.Rescale(scale, fieldPanelCentreX, fieldPanelCentreY);
                     _singlePointMarker.Draw(_g);
                     DrawLabel(_singlePointMarker.PointF, _singlePointMarker.PointValue);
                 }
                 else
-                    foreach (PointMarker pm in _pointMarkers)
+                    foreach(PointMarker pm in _pointMarkers)
                     {
                         pm.Rescale(scale, fieldPanelCentreX, fieldPanelCentreY);
                         pm.Draw(_g);

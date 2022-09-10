@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+
+using System;
 using System.Security.AccessControl;
-using Microsoft.Win32;
 
 namespace Moritz.Globals.IODevices
 {
@@ -57,7 +58,7 @@ namespace Moritz.Globals.IODevices
                 }
                 finally
                 {
-                    if (defaultKey != null)
+                    if(defaultKey != null)
                     {
                         defaultKey.Close();
                     }
@@ -75,7 +76,7 @@ namespace Moritz.Globals.IODevices
                 }
                 finally
                 {
-                    if (defaultKey != null)
+                    if(defaultKey != null)
                     {
                         defaultKey.Close();
                     }
@@ -143,7 +144,7 @@ namespace Moritz.Globals.IODevices
                 }
                 finally
                 {
-                    if (defaultKey != null)
+                    if(defaultKey != null)
                     {
                         defaultKey.Close();
                     }
@@ -161,7 +162,7 @@ namespace Moritz.Globals.IODevices
                 }
                 finally
                 {
-                    if (defaultKey != null)
+                    if(defaultKey != null)
                     {
                         defaultKey.Close();
                     }

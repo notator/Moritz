@@ -1,9 +1,10 @@
-using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-
 using Krystals5ObjectLibrary;
+
 using Moritz.Globals;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Moritz.Spec
 {
@@ -37,10 +38,10 @@ namespace Moritz.Spec
         {
         }
 
-		/// <summary>
-		/// Returns a deep clone of this Trk.
-		/// </summary>
-		public object Clone()
+        /// <summary>
+        /// Returns a deep clone of this Trk.
+        /// </summary>
+        public object Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
             Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs) { Container = this.Container };
@@ -48,10 +49,10 @@ namespace Moritz.Spec
             return trk;
         }
 
-		/// <summary>
-		/// Also used by Clone() functions in subclasses
-		/// </summary>
-		protected List<IUniqueDef> GetUniqueDefsClone()
+        /// <summary>
+        /// Also used by Clone() functions in subclasses
+        /// </summary>
+        protected List<IUniqueDef> GetUniqueDefsClone()
         {
             List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
             foreach(IUniqueDef iu in _uniqueDefs)
@@ -62,38 +63,38 @@ namespace Moritz.Spec
             return clonedIUDs;
         }
 
-		#endregion constructors
-		/// <summary>
-		/// When this function is called, VoiceDef.AssertConsistency() is called (see documentation there), then
-		/// the following are checked:
-		/// 1. MidiChannels are in range [0..15]
-		/// 2. The Container is either null, a Seq or a Bar.
-		/// 3. If the Container is a Seq, the UniqueDefs contain any combination of MidiRestDef and MidiChordDef.
-		///    If the Container is a Bar, the UniqueDefs can also contain ClefDef and CautionaryChordDef objects.
-		/// </summary>
-		public override void AssertConsistency()
-		{
-			base.AssertConsistency();
+        #endregion constructors
+        /// <summary>
+        /// When this function is called, VoiceDef.AssertConsistency() is called (see documentation there), then
+        /// the following are checked:
+        /// 1. MidiChannels are in range [0..15]
+        /// 2. The Container is either null, a Seq or a Bar.
+        /// 3. If the Container is a Seq, the UniqueDefs contain any combination of MidiRestDef and MidiChordDef.
+        ///    If the Container is a Bar, the UniqueDefs can also contain ClefDef and CautionaryChordDef objects.
+        /// </summary>
+        public override void AssertConsistency()
+        {
+            base.AssertConsistency();
 
-			Debug.Assert(MidiChannel >= 0 && MidiChannel <= 15);
+            Debug.Assert(MidiChannel >= 0 && MidiChannel <= 15);
 
-			Debug.Assert(Container == null || Container is Seq || Container is Bar);
+            Debug.Assert(Container == null || Container is Seq || Container is Bar);
 
-			if(Container == null || Container is Seq)
-			{
-				foreach(IUniqueDef iud in UniqueDefs)
-				{
-					Debug.Assert(iud is MidiChordDef || iud is MidiRestDef);
-				}
-			}
-			else if(Container is Bar)
-			{
-				foreach(IUniqueDef iud in UniqueDefs)
-				{
-					Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefDef || iud is CautionaryChordDef);
-				}
-			}
-		}
+            if(Container == null || Container is Seq)
+            {
+                foreach(IUniqueDef iud in UniqueDefs)
+                {
+                    Debug.Assert(iud is MidiChordDef || iud is MidiRestDef);
+                }
+            }
+            else if(Container is Bar)
+            {
+                foreach(IUniqueDef iud in UniqueDefs)
+                {
+                    Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefDef || iud is CautionaryChordDef);
+                }
+            }
+        }
 
 
         #region Add, Remove, Insert, Replace objects in the Trk
@@ -106,63 +107,63 @@ namespace Moritz.Spec
         {
             Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefDef);
             _Add(iUniqueDef);
-		}
-		/// <summary>
-		/// Moves the argument's UniqueDefs to the end of this Trk _without_cloning_them_.
-		/// Sets the MsPositions of the appended UniqueDefs.
-		/// This function automatically agglommerates rests.
-		/// </summary>
-		public override void AddRange(VoiceDef trk)
+        }
+        /// <summary>
+        /// Moves the argument's UniqueDefs to the end of this Trk _without_cloning_them_.
+        /// Sets the MsPositions of the appended UniqueDefs.
+        /// This function automatically agglommerates rests.
+        /// </summary>
+        public override void AddRange(VoiceDef trk)
         {
             Debug.Assert(trk is Trk);
             _AddRange(trk);
         }
 
-		/// <summary>
-		/// Appends **clones** of the trk2.UniqueDefs after the end of this trk's UniqueDefs at msPositionReThisTrk, inserting a rest as necessary.
-		/// To simply concatenate trk2 with this trk, pass this trk's MsDuration as the second argument.
-		/// An exception will be thrown if msPositionReThisTrk is less than the current duration of this trk.
-		/// Any rests that result from this operation are silently agglommerated.
-		/// The MsPositionReFirstUD values in the concatenated IUniqueDefs are automatically adjusted for this trk. 
-		/// </summary>
-		public void ConcatCloneAt(Trk trk2, int msPositionReThisTrk)
-		{
-			Debug.Assert(MsDuration <= msPositionReThisTrk);
-			if(msPositionReThisTrk > MsDuration)
-			{
-				int msDuration = (msPositionReThisTrk - MsDuration);
-				IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
-				if(lastIud is MidiRestDef finalRestDef) // Trks are "OutputVoiceDefs" so cannot contain InputRestDefs.
-				{
-					lastIud.MsDuration += msDuration;
-				}
-				else
-				{
-					MidiRestDef midiRestDef = new MidiRestDef(0, msDuration);
-					this.Add(midiRestDef);
-				}
-			}
+        /// <summary>
+        /// Appends **clones** of the trk2.UniqueDefs after the end of this trk's UniqueDefs at msPositionReThisTrk, inserting a rest as necessary.
+        /// To simply concatenate trk2 with this trk, pass this trk's MsDuration as the second argument.
+        /// An exception will be thrown if msPositionReThisTrk is less than the current duration of this trk.
+        /// Any rests that result from this operation are silently agglommerated.
+        /// The MsPositionReFirstUD values in the concatenated IUniqueDefs are automatically adjusted for this trk. 
+        /// </summary>
+        public void ConcatCloneAt(Trk trk2, int msPositionReThisTrk)
+        {
+            Debug.Assert(MsDuration <= msPositionReThisTrk);
+            if(msPositionReThisTrk > MsDuration)
+            {
+                int msDuration = (msPositionReThisTrk - MsDuration);
+                IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
+                if(lastIud is MidiRestDef finalRestDef) // Trks are "OutputVoiceDefs" so cannot contain InputRestDefs.
+                {
+                    lastIud.MsDuration += msDuration;
+                }
+                else
+                {
+                    MidiRestDef midiRestDef = new MidiRestDef(0, msDuration);
+                    this.Add(midiRestDef);
+                }
+            }
 
-			foreach(IUniqueDef iu2 in trk2.UniqueDefs)
-			{
-				IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
-				IUniqueDef clonedIUD = (IUniqueDef)iu2.Clone();
-				if(lastIud is RestDef finalRestDef && clonedIUD is RestDef restDef2)
-				{
-					finalRestDef.MsDuration += restDef2.MsDuration;
-				}
-				else
-				{
-					this._Add(clonedIUD);
-				}
-			}
-		}
+            foreach(IUniqueDef iu2 in trk2.UniqueDefs)
+            {
+                IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
+                IUniqueDef clonedIUD = (IUniqueDef)iu2.Clone();
+                if(lastIud is RestDef finalRestDef && clonedIUD is RestDef restDef2)
+                {
+                    finalRestDef.MsDuration += restDef2.MsDuration;
+                }
+                else
+                {
+                    this._Add(clonedIUD);
+                }
+            }
+        }
 
-		/// <summary>
-		/// Inserts the iUniqueDef in the list at the given index, and then
-		/// resets the positions of all the uniqueDefs in the list.
-		/// </summary>
-		public override void Insert(int index, IUniqueDef iUniqueDef)
+        /// <summary>
+        /// Inserts the iUniqueDef in the list at the given index, and then
+        /// resets the positions of all the uniqueDefs in the list.
+        /// </summary>
+        public override void Insert(int index, IUniqueDef iUniqueDef)
         {
             Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is ClefDef);
             _Insert(index, iUniqueDef);
@@ -463,13 +464,13 @@ namespace Moritz.Spec
             {
                 M.AssertIsVelocityValue(velocityPerAbsolutePitch[i]);
             }
-			#endregion conditions
+            #endregion conditions
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
                 if(UniqueDefs[i] is MidiChordDef mcd)
                 {
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-					Debug.Assert(mcd.NotatedMidiPitches.Count > 0);
+                    Debug.Assert(mcd.NotatedMidiPitches.Count > 0);
                 }
             }
         }
@@ -496,7 +497,7 @@ namespace Moritz.Spec
 
             #region find msDurationRangeMin and msDurationRangeMax 
             foreach(IUniqueDef iud in _uniqueDefs)
-            { 
+            {
                 if(iud is MidiChordDef mcd)
                 {
                     msDurationRangeMin = (msDurationRangeMin < mcd.MsDuration) ? msDurationRangeMin : mcd.MsDuration;
@@ -561,8 +562,8 @@ namespace Moritz.Spec
             #region get pitches
             foreach(IUniqueDef iud in _uniqueDefs)
             {
-				if(iud is MidiChordDef mcd)
-				{
+                if(iud is MidiChordDef mcd)
+                {
                     byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
                     if(!pitches.Contains(pitch))
                     {
@@ -576,8 +577,8 @@ namespace Moritz.Spec
                 int mcdMsDuration = (useBottomPitch == true) ? durationForLowestPitch : durationForHighestPitch;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-					if(iud is MidiChordDef mcd)
-					{
+                    if(iud is MidiChordDef mcd)
+                    {
                         mcd.MsDuration = mcdMsDuration;
                     }
                 }
@@ -612,8 +613,8 @@ namespace Moritz.Spec
                 int currentMsDuration = this.MsDuration;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-					if(iud is MidiChordDef mcd)
-					{
+                    if(iud is MidiChordDef mcd)
+                    {
                         byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
                         int oldDuration = mcd.MsDuration;
                         int durPerPitch = msDurPerPitch[pitch];
@@ -625,22 +626,22 @@ namespace Moritz.Spec
             }
         }
 
-		/// <summary>
-		/// Multiplies each expression value in the MidiChordDefs
-		/// from beginIndex to (excluding) endIndex by the argument factor.
-		/// </summary>
-		public void AdjustExpression(int beginIndex, int endIndex, double factor)
+        /// <summary>
+        /// Multiplies each expression value in the MidiChordDefs
+        /// from beginIndex to (excluding) endIndex by the argument factor.
+        /// </summary>
+        public void AdjustExpression(int beginIndex, int endIndex, double factor)
         {
-			if(CheckIndices(beginIndex, endIndex))
-			{
-				for(int i = beginIndex; i < endIndex; ++i)
-				{
-					if(_uniqueDefs[i] is MidiChordDef iumdd)
-					{
-						iumdd.AdjustExpression(factor);
-					}
-				}
-			}
+            if(CheckIndices(beginIndex, endIndex))
+            {
+                for(int i = beginIndex; i < endIndex; ++i)
+                {
+                    if(_uniqueDefs[i] is MidiChordDef iumdd)
+                    {
+                        iumdd.AdjustExpression(factor);
+                    }
+                }
+            }
         }
         /// <summary>
         /// Multiplies each expression value in the UniqueDefs by the argument factor.
@@ -652,54 +653,54 @@ namespace Moritz.Spec
                 mcd.AdjustExpression(factor);
             }
         }
-		/// <summary>
-		/// Multiplies each velocity value in the MidiChordDefs from beginIndex to (exclusive) endIndex by
-		/// the argument factor (which must be greater than zero).
-		/// The resulting velocities are in range 1..127.
-		/// If a resulting velocity would have been less than 1, it is silently coerced to 1.
-		/// If it would have been greater than 127, it is silently coerced to 127.
-		/// </summary>
-		public virtual void AdjustVelocities(int beginIndex, int nonInclusiveEndIndex, double factor)
+        /// <summary>
+        /// Multiplies each velocity value in the MidiChordDefs from beginIndex to (exclusive) endIndex by
+        /// the argument factor (which must be greater than zero).
+        /// The resulting velocities are in range 1..127.
+        /// If a resulting velocity would have been less than 1, it is silently coerced to 1.
+        /// If it would have been greater than 127, it is silently coerced to 127.
+        /// </summary>
+        public virtual void AdjustVelocities(int beginIndex, int nonInclusiveEndIndex, double factor)
         {
-			if(CheckIndices(beginIndex, nonInclusiveEndIndex))
-			{
-				Debug.Assert(factor > 0.0);
-				for(int i = beginIndex; i < nonInclusiveEndIndex; ++i)
-				{
-					if(_uniqueDefs[i] is MidiChordDef mcd)
-					{
-						mcd.AdjustVelocities(factor);
-					}
-				}
-			}
+            if(CheckIndices(beginIndex, nonInclusiveEndIndex))
+            {
+                Debug.Assert(factor > 0.0);
+                for(int i = beginIndex; i < nonInclusiveEndIndex; ++i)
+                {
+                    if(_uniqueDefs[i] is MidiChordDef mcd)
+                    {
+                        mcd.AdjustVelocities(factor);
+                    }
+                }
+            }
         }
 
-		/// <summary>
-		/// Calls MidiChordDef.AdjustVelocities(byte originalVelocity, byte newVelocity) on each MidiChordDef
-		/// in range beginIndex to (exclusive) endIndex.
-		/// The resulting velocities are in range 1..127.
-		/// Velocities having originalVelocity are changed to newVelocity.
-		/// Velocity values above originalVelocity are changed proportionally with max possible velocity at 127.
-		/// Velocity values below originalVelocity are changed proportionally with min possible velocity at 1.
-		/// </summary>
-		public void AdjustVelocities(int beginIndex, int nonInclusiveEndIndex, byte originalVelocity, byte newVelocity)
-		{
-			if(CheckIndices(beginIndex, nonInclusiveEndIndex))
-			{
-				for(int i = beginIndex; i < nonInclusiveEndIndex; ++i)
-				{
-					if(_uniqueDefs[i] is MidiChordDef mcd)
-					{
-						mcd.AdjustVelocities(originalVelocity, newVelocity);
-					}
-				}
-			}
-		}
-		/// <summary>
-		/// Multiplies each velocity value in the MidiChordDefs by the argument factor (must be greater than zero).
-		/// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
-		/// </summary>
-		public virtual void AdjustVelocities(double factor)
+        /// <summary>
+        /// Calls MidiChordDef.AdjustVelocities(byte originalVelocity, byte newVelocity) on each MidiChordDef
+        /// in range beginIndex to (exclusive) endIndex.
+        /// The resulting velocities are in range 1..127.
+        /// Velocities having originalVelocity are changed to newVelocity.
+        /// Velocity values above originalVelocity are changed proportionally with max possible velocity at 127.
+        /// Velocity values below originalVelocity are changed proportionally with min possible velocity at 1.
+        /// </summary>
+        public void AdjustVelocities(int beginIndex, int nonInclusiveEndIndex, byte originalVelocity, byte newVelocity)
+        {
+            if(CheckIndices(beginIndex, nonInclusiveEndIndex))
+            {
+                for(int i = beginIndex; i < nonInclusiveEndIndex; ++i)
+                {
+                    if(_uniqueDefs[i] is MidiChordDef mcd)
+                    {
+                        mcd.AdjustVelocities(originalVelocity, newVelocity);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Multiplies each velocity value in the MidiChordDefs by the argument factor (must be greater than zero).
+        /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
+        /// </summary>
+        public virtual void AdjustVelocities(double factor)
         {
             Debug.Assert(factor > 0.0);
             for(int i = 0; i < UniqueDefs.Count; ++i)
@@ -730,89 +731,89 @@ namespace Moritz.Spec
         /// <param name="endFactor">greater than or equal to 0</param>
         public virtual void AdjustVelocitiesHairpin(int beginIndex, int endIndex, double startFactor, double endFactor)
         {
-			if(CheckIndices(beginIndex, endIndex))
-			{				
-				Debug.Assert(startFactor >= 0 && endFactor >= 0);
-				int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
-				int steps = endIndex - 1 - beginIndex - nNonMidiChordDefs;
-				if(steps > 0)
-				{
-					double factorIncrement = (endFactor - startFactor) / steps;
-					double factor = startFactor;
-					List<IUniqueDef> lmdds = _uniqueDefs;
+            if(CheckIndices(beginIndex, endIndex))
+            {
+                Debug.Assert(startFactor >= 0 && endFactor >= 0);
+                int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+                int steps = endIndex - 1 - beginIndex - nNonMidiChordDefs;
+                if(steps > 0)
+                {
+                    double factorIncrement = (endFactor - startFactor) / steps;
+                    double factor = startFactor;
+                    List<IUniqueDef> lmdds = _uniqueDefs;
 
-					for(int i = beginIndex; i < endIndex; ++i)
-					{
-						MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
-						if(mcd != null)
-						{
-							mcd.AdjustVelocities(factor);
-							factor += factorIncrement;
-						}
-						if(mcd.NotatedMidiPitches.Count == 0)
-						{
-							Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
-						}
-					}
-				}
-			}
+                    for(int i = beginIndex; i < endIndex; ++i)
+                    {
+                        MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
+                        if(mcd != null)
+                        {
+                            mcd.AdjustVelocities(factor);
+                            factor += factorIncrement;
+                        }
+                        if(mcd.NotatedMidiPitches.Count == 0)
+                        {
+                            Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                        }
+                    }
+                }
+            }
         }
-		/// <summary>
-		/// Creates a moving pan from startPanValue at beginIndex to endPanValue at (beginIndex + count - 1).
-		/// (In other words, it sets count MidiChordDefs.)
-		/// Implemented using one pan value per MidiChordDef.
-		/// This function does NOT change pan values outside the position range given in its arguments.
-		/// </summary>
-		/// <param name="beginIndex">The index at which to start setting pan values</param>
-		/// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
-		/// <param name="startPanValue">The MSB of the initial pan value (in range 0..127)</param>
-		/// <param name="endPanValue">The MSB of the final pan value (in range 0..127)</param>
-		public void SetPanGliss(int beginIndex, int count, int startPanValue, int endPanValue)
+        /// <summary>
+        /// Creates a moving pan from startPanValue at beginIndex to endPanValue at (beginIndex + count - 1).
+        /// (In other words, it sets count MidiChordDefs.)
+        /// Implemented using one pan value per MidiChordDef.
+        /// This function does NOT change pan values outside the position range given in its arguments.
+        /// </summary>
+        /// <param name="beginIndex">The index at which to start setting pan values</param>
+        /// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
+        /// <param name="startPanValue">The MSB of the initial pan value (in range 0..127)</param>
+        /// <param name="endPanValue">The MSB of the final pan value (in range 0..127)</param>
+        public void SetPanGliss(int beginIndex, int count, int startPanValue, int endPanValue)
         {
-			int endIndex = beginIndex + count;
-			if(CheckIndices(beginIndex, endIndex))
-			{
-				Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
+            int endIndex = beginIndex + count;
+            if(CheckIndices(beginIndex, endIndex))
+            {
+                Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
 
-				int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
-				int steps = (endIndex - 1 - beginIndex - nNonMidiChordDefs);
-				if(steps > 0)
-				{
-					double increment = ((double)(endPanValue - startPanValue)) / steps;
-					double panValue = startPanValue;
-					List<IUniqueDef> lmdds = _uniqueDefs;
+                int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+                int steps = (endIndex - 1 - beginIndex - nNonMidiChordDefs);
+                if(steps > 0)
+                {
+                    double increment = ((double)(endPanValue - startPanValue)) / steps;
+                    double panValue = startPanValue;
+                    List<IUniqueDef> lmdds = _uniqueDefs;
 
-					for(int i = beginIndex; i < endIndex; ++i)
-					{
-						if(_uniqueDefs[i] is MidiChordDef iumdd)
-						{
-							byte panMsb = (byte) Math.Round(panValue);
-							iumdd.PanMsbs = new List<byte>() { panMsb };
-							panValue += increment;
-						}
-					}
-				}
-			}
+                    for(int i = beginIndex; i < endIndex; ++i)
+                    {
+                        if(_uniqueDefs[i] is MidiChordDef iumdd)
+                        {
+                            byte panMsb = (byte)Math.Round(panValue);
+                            iumdd.PanMsbs = new List<byte>() { panMsb };
+                            panValue += increment;
+                        }
+                    }
+                }
+            }
         }
-		/// <summary>
-		/// Sets the pitchwheelDeviation for MidiChordDefs in the defined range.
-		/// Rests in the range dont change.
-		/// </summary>
-		/// <param name="beginIndex">The index at which to start setting pitchWheelDeviations</param>
-		/// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
-		public void SetPitchWheelDeviation(int beginIndex, int count, int deviation)
+        /// <summary>
+        /// Sets the pitchwheelDeviation for MidiChordDefs in the defined range.
+        /// Rests in the range dont change.
+        /// </summary>
+        /// <param name="beginIndex">The index at which to start setting pitchWheelDeviations</param>
+        /// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
+        public void SetPitchWheelDeviation(int beginIndex, int count, int deviation)
         {
-			int endIndex = beginIndex + count;
-			if(CheckIndices(beginIndex, endIndex))
-			{
-				for(int i = beginIndex; i < endIndex; ++i)
-				{
-					if(this[i] is MidiChordDef mcd)
-					{
-						mcd.PitchWheelDeviation = M.MidiValue(deviation);
-					}
-				}
-			}
+            int endIndex = beginIndex + count;
+            if(CheckIndices(beginIndex, endIndex))
+            {
+                for(int i = beginIndex; i < endIndex; ++i)
+                {
+                    if(this[i] is MidiChordDef mcd)
+                    {
+                        mcd.PitchWheelDeviation = M.MidiValue(deviation);
+                    }
+                }
+            }
         }
         /// <summary>
         /// Removes the pitchwheel commands (not the pitchwheelDeviations)
@@ -821,16 +822,16 @@ namespace Moritz.Spec
         /// </summary>
         public void RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
         {
-			if(CheckIndices(beginIndex, endIndex))
-			{
-				for(int i = beginIndex; i < endIndex; ++i)
-				{
-					if(this[i] is MidiChordDef umcd)
-					{
-						umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
-					}
-				}
-			}
+            if(CheckIndices(beginIndex, endIndex))
+            {
+                for(int i = beginIndex; i < endIndex; ++i)
+                {
+                    if(this[i] is MidiChordDef umcd)
+                    {
+                        umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1519,19 +1520,19 @@ namespace Moritz.Spec
         /// The number of MidiChordDefs and RestDefs in this Trk
         /// </summary>
         public int DurationsCount
-		{
-			get
-			{
-				int count = 0;
-				foreach(IUniqueDef iud in _uniqueDefs)
-				{
-					if(iud is MidiChordDef || iud is MidiRestDef)
-					{
-						count++;
-					}
-				}
-				return count;
-			}
-		}
-	}
+        {
+            get
+            {
+                int count = 0;
+                foreach(IUniqueDef iud in _uniqueDefs)
+                {
+                    if(iud is MidiChordDef || iud is MidiRestDef)
+                    {
+                        count++;
+                    }
+                }
+                return count;
+            }
+        }
+    }
 }

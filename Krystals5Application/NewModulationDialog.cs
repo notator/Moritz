@@ -1,7 +1,8 @@
-using System;
-using System.Windows.Forms;
-using System.IO;
 using Krystals5ObjectLibrary;
+
+using System;
+using System.IO;
+using System.Windows.Forms;
 
 
 namespace Krystals5Application
@@ -36,7 +37,7 @@ namespace Krystals5Application
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-         }
+        }
 
         private void SetXInputButton_Click(object sender, EventArgs e)
         {
@@ -66,7 +67,7 @@ namespace Krystals5Application
         }
         private void OKBtn_Click(object sender, EventArgs e)
         {
-			Close();
+            Close();
         }
         #endregion Events
         #region Properties

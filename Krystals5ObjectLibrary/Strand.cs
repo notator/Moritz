@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
 using System.Xml;
 
 namespace Krystals5ObjectLibrary
@@ -12,7 +10,7 @@ namespace Krystals5ObjectLibrary
     public class Strand
     {
         #region constructors
-		//public Strand() { } // for constructing an empty list of strands
+        //public Strand() { } // for constructing an empty list of strands
         public Strand(XmlReader r)
         {
             // The reader is currently positioned at the start of a strand element.
@@ -34,7 +32,7 @@ namespace Krystals5ObjectLibrary
         {
             Level = level;
             Values = values;
-		}
+        }
         #endregion constructors
         #region Properties
         public override string ToString()

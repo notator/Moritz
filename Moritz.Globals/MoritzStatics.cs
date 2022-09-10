@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -9,369 +10,368 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
-using System.Diagnostics;
 
 namespace Moritz.Globals
 {
     public delegate void SetDialogStateDelegate(TextBox textBox, bool success);
 
-	/// <summary>
-	/// The static class M contains solution-wide constants and generally useful functions.
-	/// </summary>
-	public static class M
-	{
-		static M()
-		{
-			//Creates and initializes the CultureInfo which uses the international sort.
-			CultureInfo ci = new CultureInfo("en-US", false);
-			En_USNumberFormat = ci.NumberFormat;
+    /// <summary>
+    /// The static class M contains solution-wide constants and generally useful functions.
+    /// </summary>
+    public static class M
+    {
+        static M()
+        {
+            //Creates and initializes the CultureInfo which uses the international sort.
+            CultureInfo ci = new CultureInfo("en-US", false);
+            En_USNumberFormat = ci.NumberFormat;
 
-			SetMidiPitchDict();
+            SetMidiPitchDict();
 
-			Preferences = new Preferences();
+            Preferences = new Preferences();
 
-			MoritzPerformanceOptionsExtension = ".mpox";
-			MoritzKrystalScoreSettingsExtension = ".mkss";
-		}
+            MoritzPerformanceOptionsExtension = ".mpox";
+            MoritzKrystalScoreSettingsExtension = ".mkss";
+        }
 
-		/// <summary>
-		/// The clefs are:
-		///     four treble clefs (0, 1, 2, 3 octaves higher),
-		///     four bass clefs (0, 1, 2, 3 octaves lower)
-		///     no clef 
-		/// </summary>
-		public static List<string> Clefs = new List<string>() { "t", "t1", "t2", "t3", "b", "b1", "b2", "b3", "n" };
+        /// <summary>
+        /// The clefs are:
+        ///     four treble clefs (0, 1, 2, 3 octaves higher),
+        ///     four bass clefs (0, 1, 2, 3 octaves lower)
+        ///     no clef 
+        /// </summary>
+        public static List<string> Clefs = new List<string>() { "t", "t1", "t2", "t3", "b", "b1", "b2", "b3", "n" };
 
-		/// <summary>
-		/// Converts the value to a string, using as few decimal places as possible (maximum 4) and a '.' decimal point where necessary.
-		/// Use this whenever writing an attribute to SVG.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static string FloatToShortString(float value)
-		{
-			return value.ToString("0.####", En_USNumberFormat);
-		}
+        /// <summary>
+        /// Converts the value to a string, using as few decimal places as possible (maximum 4) and a '.' decimal point where necessary.
+        /// Use this whenever writing an attribute to SVG.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string FloatToShortString(float value)
+        {
+            return value.ToString("0.####", En_USNumberFormat);
+        }
 
-		/// <summary>
-		/// Returns the names of all scores which have a .mkss file in
-		/// the folders below the baseFolderPath(without the .mkss extension).
-		/// </summary>
-		/// <param name="baseFolderPath"></param>
-		/// <returns></returns>
-		public static List<string> ScoreNames(string baseFolderPath)
-		{
-			List<string> scoreNames = new List<string>();
-			DirectoryInfo directoryInfo = new DirectoryInfo(baseFolderPath);
-			IEnumerable<FileInfo> fileInfos =
-				directoryInfo.EnumerateFiles("*" + M.MoritzKrystalScoreSettingsExtension, SearchOption.AllDirectories);
-			foreach(FileInfo fileInfo in fileInfos)
-			{
-				scoreNames.Add(Path.GetFileNameWithoutExtension(fileInfo.FullName));
-			}
-			return scoreNames;
-		}
+        /// <summary>
+        /// Returns the names of all scores which have a .mkss file in
+        /// the folders below the baseFolderPath(without the .mkss extension).
+        /// </summary>
+        /// <param name="baseFolderPath"></param>
+        /// <returns></returns>
+        public static List<string> ScoreNames(string baseFolderPath)
+        {
+            List<string> scoreNames = new List<string>();
+            DirectoryInfo directoryInfo = new DirectoryInfo(baseFolderPath);
+            IEnumerable<FileInfo> fileInfos =
+                directoryInfo.EnumerateFiles("*" + M.MoritzKrystalScoreSettingsExtension, SearchOption.AllDirectories);
+            foreach(FileInfo fileInfo in fileInfos)
+            {
+                scoreNames.Add(Path.GetFileNameWithoutExtension(fileInfo.FullName));
+            }
+            return scoreNames;
+        }
 
-		public static void PopulateComboBox(ComboBox comboBox, List<string> items)
-		{
-			comboBox.SuspendLayout();
-			comboBox.Items.Clear();
-			foreach(string item in items)
-			{
-				comboBox.Items.Add(item);
-			}
-			comboBox.ResumeLayout();
-			comboBox.SelectedIndex = 0;
-		}
+        public static void PopulateComboBox(ComboBox comboBox, List<string> items)
+        {
+            comboBox.SuspendLayout();
+            comboBox.Items.Clear();
+            foreach(string item in items)
+            {
+                comboBox.Items.Add(item);
+            }
+            comboBox.ResumeLayout();
+            comboBox.SelectedIndex = 0;
+        }
 
-		public static void CreateDirectoryIfItDoesNotExist(string directoryPath)
-		{
-			if(!Directory.Exists(directoryPath))
-			{
-				Directory.CreateDirectory(directoryPath);
-				while(!Directory.Exists(directoryPath))
-					Thread.Sleep(100);
-			}
-		}
+        public static void CreateDirectoryIfItDoesNotExist(string directoryPath)
+        {
+            if(!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+                while(!Directory.Exists(directoryPath))
+                    Thread.Sleep(100);
+            }
+        }
 
-		public static string ScoreFolderName(string scoreName)
-		{
-			return scoreName + " score";
-		}
+        public static string ScoreFolderName(string scoreName)
+        {
+            return scoreName + " score";
+        }
 
-		/// <summary>
-		/// The AlgorithmFolder contains:
-		///     a. 'xxx score' folders containing the various scores associated with the algorithm.
-		///     b. performance options files (.mpox)
-		///     c. a 'midi' folder containing midi recordings created by the AssistantPerformer
-		/// </summary>
-		public static string AlgorithmFolder(string scorePathname)
-		{
-			string folder = Path.GetDirectoryName(scorePathname);
-			folder = folder.Remove(folder.LastIndexOf(@"\"));
-			return folder;
-		}
+        /// <summary>
+        /// The AlgorithmFolder contains:
+        ///     a. 'xxx score' folders containing the various scores associated with the algorithm.
+        ///     b. performance options files (.mpox)
+        ///     c. a 'midi' folder containing midi recordings created by the AssistantPerformer
+        /// </summary>
+        public static string AlgorithmFolder(string scorePathname)
+        {
+            string folder = Path.GetDirectoryName(scorePathname);
+            folder = folder.Remove(folder.LastIndexOf(@"\"));
+            return folder;
+        }
 
-		public static string moritzAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Moritz";
-		public static string LocalMoritzPreferencesPath = moritzAppDataFolder + @"\Preferences.mzpf";
+        public static string moritzAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Moritz";
+        public static string LocalMoritzPreferencesPath = moritzAppDataFolder + @"\Preferences.mzpf";
 
-		public static string LocalMoritzFolderLocation = "D:";
-	    public static string LocalMoritzAudioFolder = @"D:\My Work\Programming\Moritz\Moritz\audio";
-		public static string LocalMoritzKrystalsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals";
-		public static string LocalMoritzExpansionFieldsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\expansion operators";
-		public static string LocalMoritzModulationOperatorsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\modulation operators";
-		public static string LocalMoritzKrystalsSVGFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\svg";
-		public static string LocalMoritzScoresFolder = LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
+        public static string LocalMoritzFolderLocation = "D:";
+        public static string LocalMoritzAudioFolder = @"D:\My Work\Programming\Moritz\Moritz\audio";
+        public static string LocalMoritzKrystalsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals";
+        public static string LocalMoritzExpansionFieldsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\expansion operators";
+        public static string LocalMoritzModulationOperatorsFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\modulation operators";
+        public static string LocalMoritzKrystalsSVGFolder = @"D:\My Work\Programming\Moritz\Moritz\krystals\svg";
+        public static string LocalMoritzScoresFolder = LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
 
-		public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
+        public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
 
 
-		/// <summary>
-		/// Adapted from CapXML Utilities.
-		/// Reads to the next start or end tag having a name which is in the parameter list.
-		/// When this function returns, XmlReader.Name is the name of the start or end tag found.
-		/// If none of the names in the parameter list is found, an exception is thrown with a diagnostic message.
-		/// </summary>
-		/// <param name="r">XmlReader</param>
-		/// <param name="possibleElements">Any number of strings, separated by commas</param>
-		public static void ReadToXmlElementTag(XmlReader r, params string[] possibleElements)
-		{
-			List<string> elementNames = new List<string>(possibleElements);
-			do
-			{
-				r.Read();
-			} while(!elementNames.Contains(r.Name) && !r.EOF);
-			if(r.EOF)
-			{
-				StringBuilder msg = new StringBuilder("Error reading Xml file:\n"
-					+ "None of the following elements could be found:\n");
-				foreach(string s in elementNames)
-					msg.Append(s.ToString() + "\n");
+        /// <summary>
+        /// Adapted from CapXML Utilities.
+        /// Reads to the next start or end tag having a name which is in the parameter list.
+        /// When this function returns, XmlReader.Name is the name of the start or end tag found.
+        /// If none of the names in the parameter list is found, an exception is thrown with a diagnostic message.
+        /// </summary>
+        /// <param name="r">XmlReader</param>
+        /// <param name="possibleElements">Any number of strings, separated by commas</param>
+        public static void ReadToXmlElementTag(XmlReader r, params string[] possibleElements)
+        {
+            List<string> elementNames = new List<string>(possibleElements);
+            do
+            {
+                r.Read();
+            } while(!elementNames.Contains(r.Name) && !r.EOF);
+            if(r.EOF)
+            {
+                StringBuilder msg = new StringBuilder("Error reading Xml file:\n"
+                    + "None of the following elements could be found:\n");
+                foreach(string s in elementNames)
+                    msg.Append(s.ToString() + "\n");
 
-				MessageBox.Show(msg.ToString(), "Title", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-				throw new ApplicationException(msg.ToString());
-			}
-		}
-		/// <summary>
-		/// This function is a replacement for XmlDocument.GetElementById(idStr), which
-		/// only works if there is a DTD for the XML file. So it won't work with inkscape's SVG.
-		/// See: https://docs.microsoft.com/en-us/dotnet/api/system.xml.xmldocument.getelementbyid?view=net-6.0
-		/// </summary>
-		/// <param name="svgDoc"></param>
-		/// <param name="idStr"></param>
-		/// <returns></returns>
-		public static XmlElement GetElementById(XmlDocument svgDoc, string tagName, string idStr)
-		{
-			var pathElems = svgDoc.GetElementsByTagName(tagName);
+                MessageBox.Show(msg.ToString(), "Title", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                throw new ApplicationException(msg.ToString());
+            }
+        }
+        /// <summary>
+        /// This function is a replacement for XmlDocument.GetElementById(idStr), which
+        /// only works if there is a DTD for the XML file. So it won't work with inkscape's SVG.
+        /// See: https://docs.microsoft.com/en-us/dotnet/api/system.xml.xmldocument.getelementbyid?view=net-6.0
+        /// </summary>
+        /// <param name="svgDoc"></param>
+        /// <param name="idStr"></param>
+        /// <returns></returns>
+        public static XmlElement GetElementById(XmlDocument svgDoc, string tagName, string idStr)
+        {
+            var pathElems = svgDoc.GetElementsByTagName(tagName);
 
-			XmlElement rvalElem = null;
+            XmlElement rvalElem = null;
 
-			foreach(XmlElement pathElem in pathElems)
-			{
-				var id = pathElem.GetAttribute("id");
+            foreach(XmlElement pathElem in pathElems)
+            {
+                var id = pathElem.GetAttribute("id");
 
-				if( !string.IsNullOrEmpty(id) && id == idStr)
+                if(!string.IsNullOrEmpty(id) && id == idStr)
                 {
-					rvalElem = pathElem;
-					break;
-				}
-			}
+                    rvalElem = pathElem;
+                    break;
+                }
+            }
 
-			return rvalElem;
-		}
+            return rvalElem;
+        }
 
-		/// <summary>
-		/// The current date. (Written to XML files.)
-		/// </summary>
-		public static string NowString
-		{
-			get
-			{
-				CultureInfo ci = new CultureInfo("en-US", false);
-				return DateTime.Today.ToString("dddd dd.MM.yyyy", ci.DateTimeFormat) + ", " + DateTime.Now.ToLongTimeString();
-			}
-		}
-		/// <summary>
-		/// The current time measured in milliseconds.
-		/// </summary>
-		public static int NowMilliseconds
-		{
-			get
-			{
-				return (int)DateTime.Now.Ticks / 10000;
-			}
-		}
-		/// <summary>
-		/// Returns the name of an enum field as a string, or (if the field has a Description Attribute)
-		/// its Description attribute.
-		/// </summary>
-		/// <example>
-		/// If enum Language is defined as follows:
-		/// 
-		/// 	public enum Language
-		/// 	{
-		///										Basic,
-		/// 		[Description("Kernigan")]   C,
-		/// 		[Description("Stroustrup")]	CPP,
-		/// 		[Description("Gosling")]	Java,
-		/// 		[Description("Helzberg")]	CSharp
-		/// 	}
-		/// 
-		///		string languageDescription = GetEnumDescription(Language.Basic);
-		/// sets languageDescription to "Basic"
-		/// 
-		///		string languageDescription = GetEnumDescription(Language.CPP);
-		/// sets languageDescription to "Stroustrup"
-		/// </example>
-		/// <param name="field">A field of any enum</param>
-		/// <returns>
-		/// If the enum field has no Description attribute, the field's name as a string.
-		/// If the enum field has a Description attribute, the value of that attribute.
-		/// </returns>
-		public static string GetEnumDescription(Enum field)
-		{
-			FieldInfo fieldInfo = field.GetType().GetField(field.ToString());
-			DescriptionAttribute[] attribs =
-				(DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
-			return (attribs.Length == 0 ? field.ToString() : attribs[0].Description);
-		}
+        /// <summary>
+        /// The current date. (Written to XML files.)
+        /// </summary>
+        public static string NowString
+        {
+            get
+            {
+                CultureInfo ci = new CultureInfo("en-US", false);
+                return DateTime.Today.ToString("dddd dd.MM.yyyy", ci.DateTimeFormat) + ", " + DateTime.Now.ToLongTimeString();
+            }
+        }
+        /// <summary>
+        /// The current time measured in milliseconds.
+        /// </summary>
+        public static int NowMilliseconds
+        {
+            get
+            {
+                return (int)DateTime.Now.Ticks / 10000;
+            }
+        }
+        /// <summary>
+        /// Returns the name of an enum field as a string, or (if the field has a Description Attribute)
+        /// its Description attribute.
+        /// </summary>
+        /// <example>
+        /// If enum Language is defined as follows:
+        /// 
+        /// 	public enum Language
+        /// 	{
+        ///										Basic,
+        /// 		[Description("Kernigan")]   C,
+        /// 		[Description("Stroustrup")]	CPP,
+        /// 		[Description("Gosling")]	Java,
+        /// 		[Description("Helzberg")]	CSharp
+        /// 	}
+        /// 
+        ///		string languageDescription = GetEnumDescription(Language.Basic);
+        /// sets languageDescription to "Basic"
+        /// 
+        ///		string languageDescription = GetEnumDescription(Language.CPP);
+        /// sets languageDescription to "Stroustrup"
+        /// </example>
+        /// <param name="field">A field of any enum</param>
+        /// <returns>
+        /// If the enum field has no Description attribute, the field's name as a string.
+        /// If the enum field has a Description attribute, the value of that attribute.
+        /// </returns>
+        public static string GetEnumDescription(Enum field)
+        {
+            FieldInfo fieldInfo = field.GetType().GetField(field.ToString());
+            DescriptionAttribute[] attribs =
+                (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return (attribs.Length == 0 ? field.ToString() : attribs[0].Description);
+        }
 
-		public static void SetToWhite(TextBox textBox)
-		{
-			if(textBox != null)
-			{
-				textBox.ForeColor = Color.Black;
-				textBox.BackColor = Color.White;
-			}
-		}
+        public static void SetToWhite(TextBox textBox)
+        {
+            if(textBox != null)
+            {
+                textBox.ForeColor = Color.Black;
+                textBox.BackColor = Color.White;
+            }
+        }
 
 
 
-		#region lists of lists of bytes
-		/// <summary>
-		/// Expects a string in which byte lists are separated by commas, and their components are separated by colons.
-		/// </summary>
-		/// <param name="text"></param>
-		public static List<List<byte>> StringToByteLists(string text)
-		{
-			string[] envelopes = text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-			List<List<byte>> envelopesAsByteLists = new List<List<byte>>();
-			foreach(string envelope in envelopes)
-			{
-				envelopesAsByteLists.Add(M.StringToByteList(envelope, ':'));
-			}
-			return envelopesAsByteLists;
-		}
-		#endregion
-		#region int lists
-		/// <summary>
-		/// If the textBox is disabled, this function does nothing.
-		/// SetDialogState sets the text box to an error state (usually by setting its background colour to pink) if:
-		///     textBox.Text is empty, or
-		///     textBox.Text contains anything other than numbers, commas and whitespace or
-		///     count != uint.MaxValue and there are not count values or the values are outside the given range.
-		/// </summary>
-		public static void LeaveIntRangeTextBox(TextBox textBox, bool canBeEmpty, uint count, int minVal, int maxVal,
-													SetDialogStateDelegate SetDialogState)
-		{
-			if(textBox.Enabled)
-			{
-				if(textBox.Text.Length > 0)
-				{
-					List<string> checkedIntStrings = GetCheckedIntStrings(textBox, count, minVal, maxVal);
-					if(checkedIntStrings != null)
-					{
-						StringBuilder sb = new StringBuilder();
-						foreach(string intString in checkedIntStrings)
-						{
-							sb.Append(",  " + intString);
-						}
-						sb.Remove(0, 3);
-						textBox.Text = sb.ToString();
-						SetDialogState(textBox, true);
-					}
-					else
-					{
-						SetDialogState(textBox, false);
-					}
-				}
-				else
-				{
-					if(canBeEmpty)
-						SetDialogState(textBox, true);
-					else
-						SetDialogState(textBox, false);
-				}
-			}
-		}
+        #region lists of lists of bytes
+        /// <summary>
+        /// Expects a string in which byte lists are separated by commas, and their components are separated by colons.
+        /// </summary>
+        /// <param name="text"></param>
+        public static List<List<byte>> StringToByteLists(string text)
+        {
+            string[] envelopes = text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            List<List<byte>> envelopesAsByteLists = new List<List<byte>>();
+            foreach(string envelope in envelopes)
+            {
+                envelopesAsByteLists.Add(M.StringToByteList(envelope, ':'));
+            }
+            return envelopesAsByteLists;
+        }
+        #endregion
+        #region int lists
+        /// <summary>
+        /// If the textBox is disabled, this function does nothing.
+        /// SetDialogState sets the text box to an error state (usually by setting its background colour to pink) if:
+        ///     textBox.Text is empty, or
+        ///     textBox.Text contains anything other than numbers, commas and whitespace or
+        ///     count != uint.MaxValue and there are not count values or the values are outside the given range.
+        /// </summary>
+        public static void LeaveIntRangeTextBox(TextBox textBox, bool canBeEmpty, uint count, int minVal, int maxVal,
+                                                    SetDialogStateDelegate SetDialogState)
+        {
+            if(textBox.Enabled)
+            {
+                if(textBox.Text.Length > 0)
+                {
+                    List<string> checkedIntStrings = GetCheckedIntStrings(textBox, count, minVal, maxVal);
+                    if(checkedIntStrings != null)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        foreach(string intString in checkedIntStrings)
+                        {
+                            sb.Append(",  " + intString);
+                        }
+                        sb.Remove(0, 3);
+                        textBox.Text = sb.ToString();
+                        SetDialogState(textBox, true);
+                    }
+                    else
+                    {
+                        SetDialogState(textBox, false);
+                    }
+                }
+                else
+                {
+                    if(canBeEmpty)
+                        SetDialogState(textBox, true);
+                    else
+                        SetDialogState(textBox, false);
+                }
+            }
+        }
 
-		/// <summary>
-		/// Returns null if
-		///     textBox.Text is empty, or
-		///     textBox.Text contains anything other than numbers, commas and whitespace or
-		///     count is not equal to uint.MaxValue and there are not count values or
-		///     the values are outside the given range.
-		/// </summary>
-		private static List<string> GetCheckedIntStrings(TextBox textBox, uint count, int minVal, int maxVal)
-		{
-			List<string> strings = new List<string>();
-			bool okay = true;
-			if(textBox.Text.Length > 0)
-			{
-				foreach(Char c in textBox.Text)
-				{
-					if(!(Char.IsDigit(c) || c == ',' || Char.IsWhiteSpace(c)))
-						okay = false;
-				}
-				if(okay)
-				{
-					try
-					{
-						List<int> ints = StringToIntList(textBox.Text, ',');
+        /// <summary>
+        /// Returns null if
+        ///     textBox.Text is empty, or
+        ///     textBox.Text contains anything other than numbers, commas and whitespace or
+        ///     count is not equal to uint.MaxValue and there are not count values or
+        ///     the values are outside the given range.
+        /// </summary>
+        private static List<string> GetCheckedIntStrings(TextBox textBox, uint count, int minVal, int maxVal)
+        {
+            List<string> strings = new List<string>();
+            bool okay = true;
+            if(textBox.Text.Length > 0)
+            {
+                foreach(Char c in textBox.Text)
+                {
+                    if(!(Char.IsDigit(c) || c == ',' || Char.IsWhiteSpace(c)))
+                        okay = false;
+                }
+                if(okay)
+                {
+                    try
+                    {
+                        List<int> ints = StringToIntList(textBox.Text, ',');
 
-						if(CheckIntList(ints, count, minVal, maxVal))
-						{
-							foreach(int i in ints)
-								strings.Add(i.ToString(M.En_USNumberFormat));
-						}
-					}
-					catch
-					{
-						// This can happen if StringToIntList(...) throws an exception
-						// -- which can happen if two numbers are separated by whitespace but no comma!)
-					}
-				}
-			}
+                        if(CheckIntList(ints, count, minVal, maxVal))
+                        {
+                            foreach(int i in ints)
+                                strings.Add(i.ToString(M.En_USNumberFormat));
+                        }
+                    }
+                    catch
+                    {
+                        // This can happen if StringToIntList(...) throws an exception
+                        // -- which can happen if two numbers are separated by whitespace but no comma!)
+                    }
+                }
+            }
 
-			if(strings.Count > 0)
-				return strings;
-			else return null;
-		}
-		/// <summary>
-		/// Returne false if
-		///     intList == null
-		///     count != uint.MaxValue && intList.Count != count
-		///     or any value is less than minVal, 
-		///     or any value is greater than maxval.
-		/// </summary>
-		private static bool CheckIntList(List<int> intList, uint count, int minVal, int maxVal)
-		{
-			bool OK = true;
-			if(intList == null || (count != uint.MaxValue && intList.Count != count))
-				OK = false;
-			else
-			{
-				foreach(int value in intList)
-				{
-					if(value < minVal || value > maxVal)
-					{
-						OK = false;
-						break;
-					}
-				}
-			}
-			return OK;
-		}
+            if(strings.Count > 0)
+                return strings;
+            else return null;
+        }
+        /// <summary>
+        /// Returne false if
+        ///     intList == null
+        ///     count != uint.MaxValue && intList.Count != count
+        ///     or any value is less than minVal, 
+        ///     or any value is greater than maxval.
+        /// </summary>
+        private static bool CheckIntList(List<int> intList, uint count, int minVal, int maxVal)
+        {
+            bool OK = true;
+            if(intList == null || (count != uint.MaxValue && intList.Count != count))
+                OK = false;
+            else
+            {
+                foreach(int value in intList)
+                {
+                    if(value < minVal || value > maxVal)
+                    {
+                        OK = false;
+                        break;
+                    }
+                }
+            }
+            return OK;
+        }
         /// <summary>
         /// Converts a string containing integers separated by whitespace and the character in arg2
         /// to the corresponding list of integers.
@@ -437,222 +437,222 @@ namespace Moritz.Globals
         /// Float values use the '.' character as decimal separator, and are separated by ','s.
         /// </summary>
         public static void LeaveFloatRangeTextBox(TextBox textBox, bool canBeEmpty, uint count, float minVal, float maxVal,
-															SetDialogStateDelegate SetDialogState)
-				{
-					if(textBox.Enabled)
-					{
-						if(textBox.Text.Length > 0)
-						{
-							List<string> checkedFloatStrings = GetCheckedFloatStrings(textBox, count, minVal, maxVal);
-							if(checkedFloatStrings != null)
-							{
-								StringBuilder sb = new StringBuilder();
-								foreach(string floatString in checkedFloatStrings)
-								{
-									sb.Append(",  " + floatString);
-								}
-								sb.Remove(0, 3);
-								textBox.Text = sb.ToString();
-								SetDialogState(textBox, true);
-							}
-							else
-							{
-								SetDialogState(textBox, false);
-							}
-						}
-						else
-						{
-							if(canBeEmpty)
-								SetDialogState(textBox, true);
-							else
-								SetDialogState(textBox, false);
-						}
-					}
-				}
-		/// <summary>
-		/// Returns null if textBox.Text is empty, or the contained values are outside the given range.
-		/// </summary>
-		private static List<string> GetCheckedFloatStrings(TextBox textBox, uint count, float minVal, float maxVal)
-		{
-			List<string> strings = new List<string>();
-			bool okay = true;
-			if(textBox.Text.Length > 0)
-			{
-				try
-				{
-					List<float> floats = M.StringToFloatList(textBox.Text, ',');
-					okay = CheckFloatList(floats, (int)count, minVal, maxVal);
-					if(okay)
-					{
-						foreach(float f in floats)
-							strings.Add(f.ToString(M.En_USNumberFormat));
-					}
-				}
-				catch
-				{
-					okay = false;
-				}
-			}
+                                                            SetDialogStateDelegate SetDialogState)
+        {
+            if(textBox.Enabled)
+            {
+                if(textBox.Text.Length > 0)
+                {
+                    List<string> checkedFloatStrings = GetCheckedFloatStrings(textBox, count, minVal, maxVal);
+                    if(checkedFloatStrings != null)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        foreach(string floatString in checkedFloatStrings)
+                        {
+                            sb.Append(",  " + floatString);
+                        }
+                        sb.Remove(0, 3);
+                        textBox.Text = sb.ToString();
+                        SetDialogState(textBox, true);
+                    }
+                    else
+                    {
+                        SetDialogState(textBox, false);
+                    }
+                }
+                else
+                {
+                    if(canBeEmpty)
+                        SetDialogState(textBox, true);
+                    else
+                        SetDialogState(textBox, false);
+                }
+            }
+        }
+        /// <summary>
+        /// Returns null if textBox.Text is empty, or the contained values are outside the given range.
+        /// </summary>
+        private static List<string> GetCheckedFloatStrings(TextBox textBox, uint count, float minVal, float maxVal)
+        {
+            List<string> strings = new List<string>();
+            bool okay = true;
+            if(textBox.Text.Length > 0)
+            {
+                try
+                {
+                    List<float> floats = M.StringToFloatList(textBox.Text, ',');
+                    okay = CheckFloatList(floats, (int)count, minVal, maxVal);
+                    if(okay)
+                    {
+                        foreach(float f in floats)
+                            strings.Add(f.ToString(M.En_USNumberFormat));
+                    }
+                }
+                catch
+                {
+                    okay = false;
+                }
+            }
 
-			if(strings.Count > 0)
-				return strings;
-			else
-				return null;
-		}
-		/// <summary>
-		/// Returne false if
-		///     count != float.MaxValue && floatList.Count != count
-		///     or any value is less than minVal, 
-		///     or any value is greater than maxval.
-		/// </summary>
-		private static bool CheckFloatList(List<float> floatList, int count, float minVal, float maxVal)
-		{
-			bool OK = true;
-			if(floatList == null || count != float.MaxValue && floatList.Count != count)
-				OK = false;
-			else
-			{
-				foreach(float value in floatList)
-				{
-					if(value < minVal || value > maxVal)
-					{
-						OK = false;
-						break;
-					}
-				}
-			}
-			return OK;
-		}
+            if(strings.Count > 0)
+                return strings;
+            else
+                return null;
+        }
+        /// <summary>
+        /// Returne false if
+        ///     count != float.MaxValue && floatList.Count != count
+        ///     or any value is less than minVal, 
+        ///     or any value is greater than maxval.
+        /// </summary>
+        private static bool CheckFloatList(List<float> floatList, int count, float minVal, float maxVal)
+        {
+            bool OK = true;
+            if(floatList == null || count != float.MaxValue && floatList.Count != count)
+                OK = false;
+            else
+            {
+                foreach(float value in floatList)
+                {
+                    if(value < minVal || value > maxVal)
+                    {
+                        OK = false;
+                        break;
+                    }
+                }
+            }
+            return OK;
+        }
 
-		/// <summary>
-		/// Converts a string containing integers separated by whitescape and the character in arg2
-		/// to the corresponding list of floats.
-		/// Throws an exception if the string contains anything other than 
-		/// positive or negative float values, the separator or white space.
-		/// </summary>
-		public static List<float> StringToFloatList(string s, char separator)
-		{
-			List<float> rval = new List<float>();
-			char[] delimiter = { separator };
-			string[] floats = s.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
-			try
-			{
-				foreach(string fl in floats)
-				{
-					string f = fl.Trim();
-					if(!string.IsNullOrEmpty(f))
-					{
-						rval.Add(float.Parse(f, M.En_USNumberFormat));
-					}
-				}
-			}
-			catch
-			{
-				throw new ApplicationException("Error in Moritz.Globals.StringToFloatList()");
-			}
-			return rval;
-		}
+        /// <summary>
+        /// Converts a string containing integers separated by whitescape and the character in arg2
+        /// to the corresponding list of floats.
+        /// Throws an exception if the string contains anything other than 
+        /// positive or negative float values, the separator or white space.
+        /// </summary>
+        public static List<float> StringToFloatList(string s, char separator)
+        {
+            List<float> rval = new List<float>();
+            char[] delimiter = { separator };
+            string[] floats = s.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+            try
+            {
+                foreach(string fl in floats)
+                {
+                    string f = fl.Trim();
+                    if(!string.IsNullOrEmpty(f))
+                    {
+                        rval.Add(float.Parse(f, M.En_USNumberFormat));
+                    }
+                }
+            }
+            catch
+            {
+                throw new ApplicationException("Error in Moritz.Globals.StringToFloatList()");
+            }
+            return rval;
+        }
 
-		#endregion float lists
+        #endregion float lists
 
-		/// <summary>
-		/// Converts a string containing byte values separated by whitescape and the character in arg2
-		/// to the corresponding list of bytes.
-		/// Calls StringToIntList() with the same parameters before converting the integers to bytes.
-		/// Throws an exception if the integer values are outside the range 0..127.
-		/// </summary>
-		public static List<byte> StringToByteList(string s, char separator)
-		{
-			List<int> rIntVal = StringToIntList(s, separator); // can throw an exception
-			List<byte> rval = new List<byte>();
-			foreach(int val in rIntVal)
-			{
-				if(val < 0 || val > 127)
-					throw (new ApplicationException("Value out of range in Moritz.Globals.StringToByteList()"));
-				rval.Add((byte)val);
-			}
-			return (rval);
-		}
-		/// <summary>
-		/// Converts a string containing 0s and 1s separated by the character in arg2
-		/// to the corresponding list of bools.
-		/// Calls StringToIntList() with the same parameters before converting the integers to bool.
-		/// Throws an exception if the integer values are outside the range 0..1.
-		/// </summary>
-		public static List<bool> StringToBoolList(string s, char separator)
-		{
-			List<int> rIntVal = StringToIntList(s, separator); // can throw an exception
-			List<bool> rval = new List<bool>();
-			foreach(int val in rIntVal)
-			{
-				if(val < 0 || val > 1)
-					throw (new ApplicationException("Value out of range in Moritz.Globals.StringToBoolList()"));
-				if(val == 1)
-					rval.Add(true);
-				else
-					rval.Add(false);
-			}
-			return (rval);
-		}
-		/// <summary>
-		/// Converts a string containing strings separated by whitespace and the character in arg2
-		/// to a list of trimmed strings. A string containing a single space character will not be trimmed.
-		/// </summary>
-		public static List<string> StringToStringList(string s, char separator)
-		{
-			char[] delimiter = { separator };
-			string[] strings = s.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+        /// <summary>
+        /// Converts a string containing byte values separated by whitescape and the character in arg2
+        /// to the corresponding list of bytes.
+        /// Calls StringToIntList() with the same parameters before converting the integers to bytes.
+        /// Throws an exception if the integer values are outside the range 0..127.
+        /// </summary>
+        public static List<byte> StringToByteList(string s, char separator)
+        {
+            List<int> rIntVal = StringToIntList(s, separator); // can throw an exception
+            List<byte> rval = new List<byte>();
+            foreach(int val in rIntVal)
+            {
+                if(val < 0 || val > 127)
+                    throw (new ApplicationException("Value out of range in Moritz.Globals.StringToByteList()"));
+                rval.Add((byte)val);
+            }
+            return (rval);
+        }
+        /// <summary>
+        /// Converts a string containing 0s and 1s separated by the character in arg2
+        /// to the corresponding list of bools.
+        /// Calls StringToIntList() with the same parameters before converting the integers to bool.
+        /// Throws an exception if the integer values are outside the range 0..1.
+        /// </summary>
+        public static List<bool> StringToBoolList(string s, char separator)
+        {
+            List<int> rIntVal = StringToIntList(s, separator); // can throw an exception
+            List<bool> rval = new List<bool>();
+            foreach(int val in rIntVal)
+            {
+                if(val < 0 || val > 1)
+                    throw (new ApplicationException("Value out of range in Moritz.Globals.StringToBoolList()"));
+                if(val == 1)
+                    rval.Add(true);
+                else
+                    rval.Add(false);
+            }
+            return (rval);
+        }
+        /// <summary>
+        /// Converts a string containing strings separated by whitespace and the character in arg2
+        /// to a list of trimmed strings. A string containing a single space character will not be trimmed.
+        /// </summary>
+        public static List<string> StringToStringList(string s, char separator)
+        {
+            char[] delimiter = { separator };
+            string[] strings = s.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
 
-			List<string> returnList = new List<string>();
-			foreach(string a in strings)
-			{
-				if(a == " ")
-				{
-					returnList.Add(" ");
-				}
-				else
-				{
-					returnList.Add(a.Trim());
-				}
-			}
-			return returnList;
-		}
-		/// <summary>
-		/// Converts the argument to a string of numbers separated by spaces
-		/// </summary>
-		public static string ByteListToString(IEnumerable<byte> byteList)
-		{
-			return ListToString<byte>(byteList, " ");
-		}
-		/// <summary>
-		/// Converts the argument to a string of numbers separated by the separator string
-		/// </summary>
-		public static string IntListToString(IEnumerable<int> intList, string separator)
-		{
-			return ListToString<int>(intList, separator);
-		}
+            List<string> returnList = new List<string>();
+            foreach(string a in strings)
+            {
+                if(a == " ")
+                {
+                    returnList.Add(" ");
+                }
+                else
+                {
+                    returnList.Add(a.Trim());
+                }
+            }
+            return returnList;
+        }
+        /// <summary>
+        /// Converts the argument to a string of numbers separated by spaces
+        /// </summary>
+        public static string ByteListToString(IEnumerable<byte> byteList)
+        {
+            return ListToString<byte>(byteList, " ");
+        }
+        /// <summary>
+        /// Converts the argument to a string of numbers separated by the separator string
+        /// </summary>
+        public static string IntListToString(IEnumerable<int> intList, string separator)
+        {
+            return ListToString<int>(intList, separator);
+        }
 
-		private static string ListToString<T>(IEnumerable<T> listOfT, string separator)
-		{
-			StringBuilder sb = new StringBuilder();
-			foreach(T t in listOfT)
-			{
-				sb.Append(separator);
-				sb.Append(t.ToString());
-			}
-			sb.Remove(0, separator.Length);
-			return sb.ToString();
-		}
+        private static string ListToString<T>(IEnumerable<T> listOfT, string separator)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach(T t in listOfT)
+            {
+                sb.Append(separator);
+                sb.Append(t.ToString());
+            }
+            sb.Remove(0, separator.Length);
+            return sb.ToString();
+        }
 
 
 
-		/// <summary>
-		/// This function divides total into divisor parts, returning a List of ints whose:
-		///     * Count is equal to divisor.
-		///     * sum is exactly equal to total
-		///     * members are as equal as possible. 
-		/// </summary>
-		public static List<int> IntDivisionSizes(int total, int divisor)
+        /// <summary>
+        /// This function divides total into divisor parts, returning a List of ints whose:
+        ///     * Count is equal to divisor.
+        ///     * sum is exactly equal to total
+        ///     * members are as equal as possible. 
+        /// </summary>
+        public static List<int> IntDivisionSizes(int total, int divisor)
         {
             List<int> relativeSizes = new List<int>();
             for(int i = 0; i < divisor; ++i)
@@ -694,15 +694,15 @@ namespace Moritz.Globals
             }
 
             int intSum = 0;
-			foreach(int i in intDivisionSizes)
-			{
-				//Debug.Assert(i >= 0);
-				if(i < 0)
-				{
-					throw new ApplicationException();
-				}
-				intSum += i;
-			}
+            foreach(int i in intDivisionSizes)
+            {
+                //Debug.Assert(i >= 0);
+                if(i < 0)
+                {
+                    throw new ApplicationException();
+                }
+                intSum += i;
+            }
             Debug.Assert(intSum <= total);
             if(intSum < total)
             {
@@ -731,25 +731,25 @@ namespace Moritz.Globals
             return (byte)rval;
         }
 
-		/// <summary>
-		/// Returns the argument as a byte coerced to the range 1..127.
-		/// </summary>
-		public static byte VelocityValue(int velocity)
-		{
-			velocity = (velocity >= 1) ? velocity : 1;
-			velocity = (velocity <= 127) ? velocity : 127;
-			return (byte)velocity;
-		}
+        /// <summary>
+        /// Returns the argument as a byte coerced to the range 1..127.
+        /// </summary>
+        public static byte VelocityValue(int velocity)
+        {
+            velocity = (velocity >= 1) ? velocity : 1;
+            velocity = (velocity <= 127) ? velocity : 127;
+            return (byte)velocity;
+        }
 
-		/// <summary>
-		/// A Debug.Assert that fails if the argument is outside the range 1..127.
-		/// </summary>
-		public static void AssertIsVelocityValue(int velocity)
-		{
-			Debug.Assert(velocity >= 1 && velocity <= 127);
-		}
+        /// <summary>
+        /// A Debug.Assert that fails if the argument is outside the range 1..127.
+        /// </summary>
+        public static void AssertIsVelocityValue(int velocity)
+        {
+            Debug.Assert(velocity >= 1 && velocity <= 127);
+        }
 
-		public static Color TextBoxErrorColor = Color.FromArgb(255, 220, 220);
+        public static Color TextBoxErrorColor = Color.FromArgb(255, 220, 220);
         public static Color GreenButtonColor = Color.FromArgb(215, 225, 215);
         public static Color LightGreenButtonColor = Color.FromArgb(205, 240, 205);
 
@@ -801,10 +801,10 @@ namespace Moritz.Globals
             { "Tabloid", new PaperSize(279F, 432F)},
         };
 
-		/// <summary>
-		/// Note that Moritz does not use M.Dynamic.ffff even though it is defined in CLicht.
-		/// </summary>
-		public enum Dynamic
+        /// <summary>
+        /// Note that Moritz does not use M.Dynamic.ffff even though it is defined in CLicht.
+        /// </summary>
+        public enum Dynamic
         {
             none, pppp, ppp, pp, p, mp, mf, f, ff, fff
         }
@@ -828,12 +828,12 @@ namespace Moritz.Globals
             { M.Dynamic.pppp, 15}
         };
 
-		/// <summary>
-		/// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
-		/// The value is a string containing the equivalent CLicht character.
-		/// Note that Moritz does not use M.Dynamic.ffff even though it is defined in CLicht.
-		/// </summary>
-		public static Dictionary<M.Dynamic, string> CLichtDynamicsCharacters = new Dictionary<M.Dynamic, string>()
+        /// <summary>
+        /// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
+        /// The value is a string containing the equivalent CLicht character.
+        /// Note that Moritz does not use M.Dynamic.ffff even though it is defined in CLicht.
+        /// </summary>
+        public static Dictionary<M.Dynamic, string> CLichtDynamicsCharacters = new Dictionary<M.Dynamic, string>()
         {
             { M.Dynamic.fff, "Ï"},
             { M.Dynamic.ff, "ƒ"},
@@ -844,7 +844,7 @@ namespace Moritz.Globals
             { M.Dynamic.pp, "π"},
             { M.Dynamic.ppp, "∏"},
             { M.Dynamic.pppp, "Ø"}
-        };  
+        };
 
         public readonly static Preferences Preferences;
         public readonly static IFormatProvider En_USNumberFormat;

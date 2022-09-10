@@ -1,7 +1,7 @@
+using Moritz.Spec;
+
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using Moritz.Spec;
 
 namespace Moritz.Midi
 {
@@ -22,7 +22,7 @@ namespace Moritz.Midi
                 PatchControl = new PatchControl(channel, (byte)bmcd.PatchIndex);
             }
 
-            ChordOn = new ChordOn(this);  
+            ChordOn = new ChordOn(this);
             SetChordOn(channel, bmcd.Pitches, bmcd.Velocities);
             if(bmcd.HasChordOff)
             {

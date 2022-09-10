@@ -1,36 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using Krystals5ObjectLibrary;
 
-using Krystals5ObjectLibrary;
 using Moritz.Palettes;
 using Moritz.Spec;
 using Moritz.Symbols;
 
+using System.Collections.Generic;
+using System.Diagnostics;
+
 namespace Moritz.Algorithm.Tombeau1
 {
-	public partial class Tombeau1Algorithm : CompositionAlgorithm
-	{
-		public Tombeau1Algorithm()
+    public partial class Tombeau1Algorithm : CompositionAlgorithm
+    {
+        public Tombeau1Algorithm()
             : base()
         {
             CheckParameters();
         }
 
         public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
-		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
+        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
         public override int NumberOfBars { get { return 50; } }
 
-		/// <summary>
-		/// See CompositionAlgorithm.DoAlgorithm()
-		/// </summary>
-		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
-		{
-			_krystals = krystals;
-			_palettes = palettes;
+        /// <summary>
+        /// See CompositionAlgorithm.DoAlgorithm()
+        /// </summary>
+        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        {
+            _krystals = krystals;
+            _palettes = palettes;
 
-			#region main comment (thoughts etc.)
-			/*********************************************************************************************
+            #region main comment (thoughts etc.)
+            /*********************************************************************************************
 			Think Nancarrow: Mechanical Piano music... outside the notation system... outside the management system...
 			Think Webern Piano Variations. Phrases, envelope counterpoint...
 			Think Study 1: background/foreground, depth.
@@ -125,15 +125,15 @@ namespace Moritz.Algorithm.Tombeau1
 					d) it should be possible to replace any MidiChordDef in a Chain by a MidiRestDef.
 
             ****************************************************************************/
-			#endregion main comment (thoughts etc.)
-			#region MoritzStatics functions
-			/***************************************************************************
+            #endregion main comment (thoughts etc.)
+            #region MoritzStatics functions
+            /***************************************************************************
             public static Moritz.Statics functions relating to pitch hierarchies and velocities:
                 GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
             ***************************************************************************/
-			#endregion MoritzStatics functions
-			#region Envelope functions
-			/***************************************************************************
+            #endregion MoritzStatics functions
+            #region Envelope functions
+            /***************************************************************************
             public Envelope functions that have been implemented:
                 constructors:
                 Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
@@ -148,9 +148,9 @@ namespace Moritz.Algorithm.Tombeau1
                 TimeWarp(List<int> originalMsPositions, double distortion)
                 GetValuePerMsPosition(List<int> msPositions) // Returns a dictionary in which: Key is one of the positions in msPositions, Value is the envelope value at that msPosition.
             ***************************************************************************/
-			#endregion Envelope functions
-			#region Mode functions
-			/***************************************************************************
+            #endregion Envelope functions
+            #region Mode functions
+            /***************************************************************************
             public Mode functions and properties that have been implemented:
                 (Mode is immutable)
                 constructor:
@@ -174,9 +174,9 @@ namespace Moritz.Algorithm.Tombeau1
                 List {get;} // a copy of the private list.
                 Count {get;}            
 			***************************************************************************/
-			#endregion Mode functions
-			#region MidiChordDef functions
-			/***************************************************************************            
+            #endregion Mode functions
+            #region MidiChordDef functions
+            /***************************************************************************            
             public MidiChordDef functions that have been implemented and are especially relevant to this project:
                 constructors:
                 SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
@@ -215,9 +215,9 @@ namespace Moritz.Algorithm.Tombeau1
 
                 Mode {get; set;} // The Mode can only be set (or changed) if all the pitches in the MidiChordDef are in the new Mode.
             ***************************************************************************/
-			#endregion MidiChordDef functions
-			#region Trk functions
-			/***************************************************************************            
+            #endregion MidiChordDef functions
+            #region Trk functions
+            /***************************************************************************            
             public Trk functions that have been implemented and are especially relevant to this project:
             constructors:
                 Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
@@ -302,9 +302,9 @@ namespace Moritz.Algorithm.Tombeau1
                 MasterVolume // Algorithms must set this value in the first Trk in each midiChannel in the score. (Default is null.)
 
             ***************************************************************************/
-			#endregion Trk functions
-			#region Seq functions
-			/***************************************************************************            
+            #endregion Trk functions
+            #region Seq functions
+            /***************************************************************************            
             public Seq functions that have been implemented and are especially relevant to this project:
                 constructors:
                 Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
@@ -340,9 +340,9 @@ namespace Moritz.Algorithm.Tombeau1
                 MidiChannelPerOutputVoice { get; }
 
             ***************************************************************************/
-			#endregion Seq functions
-			#region Block functions
-			/***************************************************************************            
+            #endregion Seq functions
+            #region Block functions
+            /***************************************************************************            
             public Block functions that have been implemented and are especially relevant to this project:
                 constructors:
                 Block(Seq seq, List<int> rightBarlineMsPositions)
@@ -370,201 +370,201 @@ namespace Moritz.Algorithm.Tombeau1
                 InputVoiceDefs { get; }
 
             ***************************************************************************/
-			#endregion Block functions
+            #endregion Block functions
 
-			Envelope centredEnvelope = _krystals[0].ToEnvelope(0, 127); // values distributed around 64, gradually becoming more eccentric
-			Envelope basedEnvelope = _krystals[1].ToEnvelope(0, 127); // values increase gradually from 0 to 127, becoming more eccentric. 
+            Envelope centredEnvelope = _krystals[0].ToEnvelope(0, 127); // values distributed around 64, gradually becoming more eccentric
+            Envelope basedEnvelope = _krystals[1].ToEnvelope(0, 127); // values increase gradually from 0 to 127, becoming more eccentric. 
 
-			/**********************************************/
+            /**********************************************/
 
-			List<IUniqueDef> trk0iuds = new List<IUniqueDef>();
-			for(int i = 0; i < 50; i++)
-			{
-				trk0iuds.Add(new MidiChordDef(new List<byte>() { 64 }, new List<byte>() { 64 }, 5000, true));
-			}
+            List<IUniqueDef> trk0iuds = new List<IUniqueDef>();
+            for(int i = 0; i < 50; i++)
+            {
+                trk0iuds.Add(new MidiChordDef(new List<byte>() { 64 }, new List<byte>() { 64 }, 5000, true));
+            }
 
-			Trk trk0 = new Trk(0, 0, trk0iuds);
-			Trk trk1 = new Trk(1, 0, new List<IUniqueDef>());
-			Trk trk2 = new Trk(2, 0, new List<IUniqueDef>());
-			Trk trk3 = new Trk(3, 0, new List<IUniqueDef>());
+            Trk trk0 = new Trk(0, 0, trk0iuds);
+            Trk trk1 = new Trk(1, 0, new List<IUniqueDef>());
+            Trk trk2 = new Trk(2, 0, new List<IUniqueDef>());
+            Trk trk3 = new Trk(3, 0, new List<IUniqueDef>());
 
-			var trks = new List<Trk>() { trk0, trk1, trk2, trk3 };
+            var trks = new List<Trk>() { trk0, trk1, trk2, trk3 };
 
-			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
+            Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
-			List<int> barlineMsPositions = GetBarlinePositions(trk0iuds);
+            List<int> barlineMsPositions = GetBarlinePositions(trk0iuds);
 
-			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
-			FinalizeMainSeq(mainSeq);
+            //Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
+            FinalizeMainSeq(mainSeq);
 
-			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
+            List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
-			return bars;
+            return bars;
         }
 
-		public override ScoreData SetScoreRegionsData(List<Bar> bars)
-		{
-			Dictionary<int, (int index, int msPosition)> msPosPerBarlineIndexDict = GetMsPosPerBarlineIndexDict(bars);
+        public override ScoreData SetScoreRegionsData(List<Bar> bars)
+        {
+            Dictionary<int, (int index, int msPosition)> msPosPerBarlineIndexDict = GetMsPosPerBarlineIndexDict(bars);
 
-			// Each barline is the left barline of the bar with the same index.
-			// The finalBarline has also been added to the Dictionary, so
-			// msPosPerBarlineIndexDict.Count is 1 + bars.Count.
-			var barline0 = msPosPerBarlineIndexDict[0];
-			var barline6 = msPosPerBarlineIndexDict[6];
-			var barline16 = msPosPerBarlineIndexDict[16];
-			var barline31 = msPosPerBarlineIndexDict[31];
-			var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
+            // Each barline is the left barline of the bar with the same index.
+            // The finalBarline has also been added to the Dictionary, so
+            // msPosPerBarlineIndexDict.Count is 1 + bars.Count.
+            var barline0 = msPosPerBarlineIndexDict[0];
+            var barline6 = msPosPerBarlineIndexDict[6];
+            var barline16 = msPosPerBarlineIndexDict[16];
+            var barline31 = msPosPerBarlineIndexDict[31];
+            var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
 
-			RegionDef rd1 = new RegionDef("A", barline0, barline6);
-			RegionDef rd2 = new RegionDef("B", barline6, barline31);
-			RegionDef rd3 = new RegionDef("C", barline6, barline16);
-			RegionDef rd4 = new RegionDef("D", barline31, finalBarline);
+            RegionDef rd1 = new RegionDef("A", barline0, barline6);
+            RegionDef rd2 = new RegionDef("B", barline6, barline31);
+            RegionDef rd3 = new RegionDef("C", barline6, barline16);
+            RegionDef rd4 = new RegionDef("D", barline31, finalBarline);
 
-			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };
+            List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };
 
-			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCAD");
+            RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCAD");
 
-			ScoreData scoreData = new ScoreData(regionSequence);
+            ScoreData scoreData = new ScoreData(regionSequence);
 
-			return scoreData;
-		}
+            return scoreData;
+        }
 
-		/// <summary>
-		/// Returns a dictionary containing (barlineIndex, (barlineIndex, barlineMsPosition)) KeyValuePairs.
-		/// Each barlineIndex is the index of the left barline of the bar with the same index, so the first KeyValuePair
-		/// is (0,(0,0)). The finalBarline is also added to the returned dictionary, so its Count is 1 + bars.Count.
-		/// The data for the final barline in the score is in the final entry.
-		/// </summary>
-		private Dictionary<int, (int index, int msPosition)> GetMsPosPerBarlineIndexDict(List<Bar> bars)
-		{
-			var rval = new Dictionary<int, (int index, int msPosition)>();
+        /// <summary>
+        /// Returns a dictionary containing (barlineIndex, (barlineIndex, barlineMsPosition)) KeyValuePairs.
+        /// Each barlineIndex is the index of the left barline of the bar with the same index, so the first KeyValuePair
+        /// is (0,(0,0)). The finalBarline is also added to the returned dictionary, so its Count is 1 + bars.Count.
+        /// The data for the final barline in the score is in the final entry.
+        /// </summary>
+        private Dictionary<int, (int index, int msPosition)> GetMsPosPerBarlineIndexDict(List<Bar> bars)
+        {
+            var rval = new Dictionary<int, (int index, int msPosition)>();
 
-			int barlineMsPos = 0;
-			int barsCount = bars.Count;
-			for(int i = 0; i < barsCount; ++i)
-			{
-				var tuple = (index: i, msPosition: barlineMsPos);
-				rval.Add(i, tuple);
-				barlineMsPos += bars[i].MsDuration;
-			}
-			rval.Add(barsCount, (index: barsCount, msPosition: barlineMsPos));
+            int barlineMsPos = 0;
+            int barsCount = bars.Count;
+            for(int i = 0; i < barsCount; ++i)
+            {
+                var tuple = (index: i, msPosition: barlineMsPos);
+                rval.Add(i, tuple);
+                barlineMsPos += bars[i].MsDuration;
+            }
+            rval.Add(barsCount, (index: barsCount, msPosition: barlineMsPos));
 
-			return rval;
-		}
+            return rval;
+        }
 
-		#region available Trk and ModeGrpTrk transformations
-		// Add();
-		// AddRange();
-		// AdjustChordMsDurations();
-		// AdjustExpression();
-		// AdjustVelocities();
-		// AdjustVelocitiesHairpin();
-		// AlignObjectAtIndex();
-		// CreateAccel();
-		// FindIndexAtMsPositionReFirstIUD();
-		// Insert();
-		// InsertRange();
-		// Permute();
-		// Remove();
-		// RemoveAt();
-		// RemoveBetweenMsPositions();
-		// RemoveRange();
-		// RemoveScorePitchWheelCommands();
-		// Replace();
-		// SetDurationsFromPitches();
-		// SetPanGliss(0, subT.MsDuration, 0, 127);
-		// SetPitchWheelDeviation();
-		// SetPitchWheelSliders();
-		// SetVelocitiesFromDurations();
-		// SetVelocityPerAbsolutePitch();
-		// TimeWarp();
-		// Translate();
-		// Transpose();
-		// TransposeStepsInModeGamut();
-		// TransposeToRootInModeGamut();
-		#endregion available Trk and ModeGrpTrk transformations
+        #region available Trk and ModeGrpTrk transformations
+        // Add();
+        // AddRange();
+        // AdjustChordMsDurations();
+        // AdjustExpression();
+        // AdjustVelocities();
+        // AdjustVelocitiesHairpin();
+        // AlignObjectAtIndex();
+        // CreateAccel();
+        // FindIndexAtMsPositionReFirstIUD();
+        // Insert();
+        // InsertRange();
+        // Permute();
+        // Remove();
+        // RemoveAt();
+        // RemoveBetweenMsPositions();
+        // RemoveRange();
+        // RemoveScorePitchWheelCommands();
+        // Replace();
+        // SetDurationsFromPitches();
+        // SetPanGliss(0, subT.MsDuration, 0, 127);
+        // SetPitchWheelDeviation();
+        // SetPitchWheelSliders();
+        // SetVelocitiesFromDurations();
+        // SetVelocityPerAbsolutePitch();
+        // TimeWarp();
+        // Translate();
+        // Transpose();
+        // TransposeStepsInModeGamut();
+        // TransposeToRootInModeGamut();
+        #endregion available Trk and ModeGrpTrk transformations
 
-		/// <summary>
-		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
-		/// The compulsory final barline (at the end of the final ModeSegment) IS included in the returned list.
-		/// There is a barline at the end of each voice1 modeSegment.
-		/// All the returned barline positions are unique, and in ascending order.
-		/// </summary>
-		private List<int> GetBarlinePositions(List<IUniqueDef> trk0iuds)
-		{
-			//var msValuesListList = voice1.GetMsValuesOfModeGrpTrks();
+        /// <summary>
+        /// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
+        /// The compulsory final barline (at the end of the final ModeSegment) IS included in the returned list.
+        /// There is a barline at the end of each voice1 modeSegment.
+        /// All the returned barline positions are unique, and in ascending order.
+        /// </summary>
+        private List<int> GetBarlinePositions(List<IUniqueDef> trk0iuds)
+        {
+            //var msValuesListList = voice1.GetMsValuesOfModeGrpTrks();
 
-			List<int> barlinePositions = new List<int>();
-			int currentPosition = 0;
-			foreach(IUniqueDef iud in trk0iuds)
-			{
-				currentPosition += iud.MsDuration;
-				barlinePositions.Add(currentPosition);
-			}
+            List<int> barlinePositions = new List<int>();
+            int currentPosition = 0;
+            foreach(IUniqueDef iud in trk0iuds)
+            {
+                currentPosition += iud.MsDuration;
+                barlinePositions.Add(currentPosition);
+            }
 
-			// add further barlines here, maybe using a list provided as an argument.
+            // add further barlines here, maybe using a list provided as an argument.
 
-			// old code:
-			//foreach(IReadOnlyList<MsValues> msValuesList in msValuesListList)
-			//{
-			//	foreach(MsValues msValues in msValuesList)
-			//	{
-			//		barlinePositions.Add(msValues.EndMsPosition);
-			//	}
-			//}
+            // old code:
+            //foreach(IReadOnlyList<MsValues> msValuesList in msValuesListList)
+            //{
+            //	foreach(MsValues msValues in msValuesList)
+            //	{
+            //		barlinePositions.Add(msValues.EndMsPosition);
+            //	}
+            //}
 
-			return barlinePositions;
-		}
+            return barlinePositions;
+        }
 
-		private void RemoveDuplicates(List<int> barlinePositions)
-		{
-			for(int i = barlinePositions.Count - 1; i > 0; --i)
-			{
-				int iPos = barlinePositions[i];
-				for(int j = i - 1; j >= 0; j--)
-				{
-					if(iPos == barlinePositions[j])
-					{
-						barlinePositions.RemoveAt(i);
-						break;
-					}
-				}
-			}
-		}
+        private void RemoveDuplicates(List<int> barlinePositions)
+        {
+            for(int i = barlinePositions.Count - 1; i > 0; --i)
+            {
+                int iPos = barlinePositions[i];
+                for(int j = i - 1; j >= 0; j--)
+                {
+                    if(iPos == barlinePositions[j])
+                    {
+                        barlinePositions.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
 
-		/// <summary>
-		/// Pad empty Trks with a single MidiRestDef.
-		/// Also, do other global changes that affect the whole piece here (accel., rit, transpositions etc.).
-		/// </summary>
-		private void FinalizeMainSeq(Seq mainSeq)
-		{
-			mainSeq.PadEmptyTrks();
-		}
+        /// <summary>
+        /// Pad empty Trks with a single MidiRestDef.
+        /// Also, do other global changes that affect the whole piece here (accel., rit, transpositions etc.).
+        /// </summary>
+        private void FinalizeMainSeq(Seq mainSeq)
+        {
+            mainSeq.PadEmptyTrks();
+        }
 
-		/// <summary>
-		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
-		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-		{
-			return null;
-		}
+        /// <summary>
+        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
+        /// </summary>
+        protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
+        {
+            return null;
+        }
 
-		#region private properties for use by Tombeau1Algorithm
-		#region envelopes
-		/// <summary>
-		/// If domain is null, the returned shape will come from the _sliderShapesLong list. 
-		/// </summary>
-		/// <param name="domain">null, or in range 2..7</param>
-		/// <param name="index"></param>
-		/// <returns></returns>
-		private IReadOnlyList<byte> SliderShape(int? domain, int index)
+        #region private properties for use by Tombeau1Algorithm
+        #region envelopes
+        /// <summary>
+        /// If domain is null, the returned shape will come from the _sliderShapesLong list. 
+        /// </summary>
+        /// <param name="domain">null, or in range 2..7</param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private IReadOnlyList<byte> SliderShape(int? domain, int index)
         {
             if(domain != null)
             {
                 Debug.Assert(domain > 1 && domain < 8);
             }
             IReadOnlyList<byte> rval = null;
-            switch (domain)
+            switch(domain)
             {
                 case 2:
                     Debug.Assert(index < _sliderShapes2.Count);

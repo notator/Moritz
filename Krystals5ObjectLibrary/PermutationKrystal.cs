@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Diagnostics;
-using System.Xml;
 using System.IO;
-using Moritz.Globals;
-using System.Linq;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace Krystals5ObjectLibrary
 {
@@ -81,11 +79,11 @@ namespace Krystals5ObjectLibrary
             _axisInputKrystal = new AxisInputKrystal(axisPath);
             _contourInputKrystal = new ContourInputKrystal(contourPath);
 
-           _permutationLevel = (uint)permutationLevel;
+            _permutationLevel = (uint)permutationLevel;
 
             // Throws an exception on failure.
             CheckInputs(_sourceInputKrystal, _axisInputKrystal.Level, _contourInputKrystal.Level, _permutationLevel);
- 
+
             _sortFirst = sortFirst;
 
             _permutationNodeList = GetPermutationNodeList();
@@ -98,7 +96,7 @@ namespace Krystals5ObjectLibrary
         #endregion
 
         private void CheckInputs(
-            PermutationSourceInputKrystal sourceKrystal, 
+            PermutationSourceInputKrystal sourceKrystal,
             uint axisLevel,
             uint contourLevel,
             uint permutationLevel)
@@ -181,7 +179,7 @@ namespace Krystals5ObjectLibrary
                 int moment = 0;
                 foreach(Strand strand in _sourceInputKrystal.Strands)
                 {
-                    nodeList.Add(new PermutationNode(axisList[moment],contourList[moment]));
+                    nodeList.Add(new PermutationNode(axisList[moment], contourList[moment]));
                     moment++;
                 }
             }
@@ -229,10 +227,10 @@ namespace Krystals5ObjectLibrary
 
             List<int> sourceMoments = new List<int>();
 
-            for(int i = 0; i < outerSuperStrands.Count; i++ )
+            for(int i = 0; i < outerSuperStrands.Count; i++)
             {
                 int density = outerSuperStrands[i].InnerSuperStrands.Count;
-                if( density == 1 )
+                if(density == 1)
                     sourceMoments.Add(outerSuperStrands[i].StrandObjs[0].OriginalMomentNumber);
                 else
                 {
@@ -469,7 +467,7 @@ namespace Krystals5ObjectLibrary
         }
         public int SourceStrandNumber
         {
-            get{ return _sourceStrandNumber;}
+            get { return _sourceStrandNumber; }
             set
             {
                 _sourceStrandNumber = value;
@@ -479,7 +477,7 @@ namespace Krystals5ObjectLibrary
         }
         public int Axis
         {
-            get{ return _axis;}
+            get { return _axis; }
             set
             {
                 _axis = value;

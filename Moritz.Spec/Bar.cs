@@ -1,51 +1,52 @@
-﻿using System;
+﻿using Krystals5ObjectLibrary;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Krystals5ObjectLibrary;
 
 namespace Moritz.Spec
 {
-	public class Bar : ITrksContainer
+    public class Bar : ITrksContainer
     {
-		public Bar()
-		{
-		}
-
-		/// <summary>
-		/// All constructors in this class are protected, so Bars can only be created by subclasses.
-		/// <para>A Bar contains a list of voiceDefs, that can be of either kind: Trk or InputVoiceDef. A Seq only contains Trks.
-		/// Bars do not contain barlines. They are implicit, at the beginning and end of the Bar. 
-		/// This constructor uses its arguments' voiceDefs directly, so, if the arguments need to be used again, pass a clone.</para>
-		/// <para>Seq.AssertConsistency and all inputVoiceDef.AssertConsistency functions must succeed (see their definitions).</para>
-		/// <para>The Bar's AbsMsPosition is set to the seq's AbsMsPosition. If initialClefPerChannel is not null, the initial ClefDef is
-		/// inserted at the beginning of each voice.</para>
-		/// <para>When complete, this constructor calls the bar.AssertConsistency() function (see that its documentation).</para>
-		/// </summary>
-		/// <param name="seq">Cannot be null, and must have Trks</param>
-		/// <param name="inputVoiceDefs">This list can be null or empty</param>
-		protected Bar(Seq seq, IReadOnlyList<InputVoiceDef> inputVoiceDefs )
+        public Bar()
         {
-			#region conditions
+        }
+
+        /// <summary>
+        /// All constructors in this class are protected, so Bars can only be created by subclasses.
+        /// <para>A Bar contains a list of voiceDefs, that can be of either kind: Trk or InputVoiceDef. A Seq only contains Trks.
+        /// Bars do not contain barlines. They are implicit, at the beginning and end of the Bar. 
+        /// This constructor uses its arguments' voiceDefs directly, so, if the arguments need to be used again, pass a clone.</para>
+        /// <para>Seq.AssertConsistency and all inputVoiceDef.AssertConsistency functions must succeed (see their definitions).</para>
+        /// <para>The Bar's AbsMsPosition is set to the seq's AbsMsPosition. If initialClefPerChannel is not null, the initial ClefDef is
+        /// inserted at the beginning of each voice.</para>
+        /// <para>When complete, this constructor calls the bar.AssertConsistency() function (see that its documentation).</para>
+        /// </summary>
+        /// <param name="seq">Cannot be null, and must have Trks</param>
+        /// <param name="inputVoiceDefs">This list can be null or empty</param>
+        protected Bar(Seq seq, IReadOnlyList<InputVoiceDef> inputVoiceDefs)
+        {
+            #region conditions
             seq.AssertConsistency();
-			if(inputVoiceDefs != null)
-			{
-				foreach(InputVoiceDef inputVoiceDef in inputVoiceDefs)
-				{
-					inputVoiceDef.AssertConsistency();
-				}
-			}
-			#endregion
+            if(inputVoiceDefs != null)
+            {
+                foreach(InputVoiceDef inputVoiceDef in inputVoiceDefs)
+                {
+                    inputVoiceDef.AssertConsistency();
+                }
+            }
+            #endregion
 
-			AbsMsPosition = seq.AbsMsPosition;
+            AbsMsPosition = seq.AbsMsPosition;
 
-			int clefIndex = 0;
-			int msDuration = seq.MsDuration;
-			foreach(Trk trk in seq.Trks)
+            int clefIndex = 0;
+            int msDuration = seq.MsDuration;
+            foreach(Trk trk in seq.Trks)
             {
                 trk.Container = this;
-				Debug.Assert(trk.MsDuration == msDuration); // cannot be 0 here.
+                Debug.Assert(trk.MsDuration == msDuration); // cannot be 0 here.
                 _voiceDefs.Add(trk);
-				clefIndex++;
+                clefIndex++;
             }
 
             if(inputVoiceDefs != null)
@@ -53,15 +54,15 @@ namespace Moritz.Spec
                 foreach(InputVoiceDef ivd in inputVoiceDefs)
                 {
                     ivd.Container = this;
-					Debug.Assert(ivd.MsDuration == msDuration);
-					_voiceDefs.Add(ivd);
+                    Debug.Assert(ivd.MsDuration == msDuration);
+                    _voiceDefs.Add(ivd);
                 }
             }
 
             AssertConsistency();
         }
 
-		public void Concat(Bar bar2)
+        public void Concat(Bar bar2)
         {
             Debug.Assert(_voiceDefs.Count == bar2._voiceDefs.Count);
 
@@ -90,56 +91,56 @@ namespace Moritz.Spec
         }
 
 
-		/// <summary>
-		/// Trk.AssertConsistency() is called on each VoiceDef that is a Trk.
-		/// InputVoiceDef.AssertConsistency() is called on each VoiceDef that is an InputVoiceDef.
-		/// Then the following checks ae also made:
-		/// <para>1. The first VoiceDef in a Bar must be a Trk.</para>
-		/// <para>2. All Trks must precede InputVoiceDefs (if any) in the _voiceDefs list.</para>
-		/// <para>3. All voiceDefs have the same MsDuration.</para>
-		/// <para>4. There may not be more than 4 InputVoiceDefs</para>
-		/// <para>5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef.</para>
-		/// </summary> 
-		public virtual void AssertConsistency()
+        /// <summary>
+        /// Trk.AssertConsistency() is called on each VoiceDef that is a Trk.
+        /// InputVoiceDef.AssertConsistency() is called on each VoiceDef that is an InputVoiceDef.
+        /// Then the following checks ae also made:
+        /// <para>1. The first VoiceDef in a Bar must be a Trk.</para>
+        /// <para>2. All Trks must precede InputVoiceDefs (if any) in the _voiceDefs list.</para>
+        /// <para>3. All voiceDefs have the same MsDuration.</para>
+        /// <para>4. There may not be more than 4 InputVoiceDefs</para>
+        /// <para>5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef.</para>
+        /// </summary> 
+        public virtual void AssertConsistency()
         {
-			#region trk and inputVoiceDef consistent in bar
-			foreach(VoiceDef voiceDef in _voiceDefs)
-			{
-				if(voiceDef is Trk trk)
-				{
-					trk.AssertConsistency();
-				}
-				else if(voiceDef is InputVoiceDef ivd)
-				{
-					ivd.AssertConsistency();
-				}
-				else
-				{
-					Debug.Assert(false, "Type error.");
-				}
-			}
-			#endregion
+            #region trk and inputVoiceDef consistent in bar
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                if(voiceDef is Trk trk)
+                {
+                    trk.AssertConsistency();
+                }
+                else if(voiceDef is InputVoiceDef ivd)
+                {
+                    ivd.AssertConsistency();
+                }
+                else
+                {
+                    Debug.Assert(false, "Type error.");
+                }
+            }
+            #endregion
 
-			int barMsDuration = MsDuration;
+            int barMsDuration = MsDuration;
 
-			#region 1. The first VoiceDef in a Bar must be a Trk.
-			Debug.Assert(_voiceDefs[0] is Trk, "The first VoiceDef in a Bar must be a Trk.");
-			#endregion
+            #region 1. The first VoiceDef in a Bar must be a Trk.
+            Debug.Assert(_voiceDefs[0] is Trk, "The first VoiceDef in a Bar must be a Trk.");
+            #endregion
 
-			#region 2. All Trks precede the InputVoiceDefs (if any) in the _voiceDefs list.
-			int nTrks = Trks.Count;
-			for(int i = nTrks; i < _voiceDefs.Count; i++)
-			{
-				Debug.Assert(_voiceDefs[i] is InputVoiceDef, "All Trks must precede InputVoiceDefs (if any) in the _voiceDefs list."); 
-			}
-			#endregion
+            #region 2. All Trks precede the InputVoiceDefs (if any) in the _voiceDefs list.
+            int nTrks = Trks.Count;
+            for(int i = nTrks; i < _voiceDefs.Count; i++)
+            {
+                Debug.Assert(_voiceDefs[i] is InputVoiceDef, "All Trks must precede InputVoiceDefs (if any) in the _voiceDefs list.");
+            }
+            #endregion
 
-			#region 3. All voiceDefs have the same MsDuration.
-			foreach(VoiceDef voiceDef in _voiceDefs)
-			{
-				Debug.Assert(voiceDef.MsDuration == barMsDuration, "All Trks in a block must have the same duration.");
-			}
-			#endregion
+            #region 3. All voiceDefs have the same MsDuration.
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                Debug.Assert(voiceDef.MsDuration == barMsDuration, "All Trks in a block must have the same duration.");
+            }
+            #endregion
 
             #region 4. There may not be more than 4 InputVoiceDefs
             int nInputVoiceDefs = 0;
@@ -151,33 +152,33 @@ namespace Moritz.Spec
                 }
             }
             Debug.Assert((nInputVoiceDefs <= 4), "There may not be more than 4 InputVoiceDefs.");
-			#endregion
+            #endregion
 
-			#region 5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef.
-			IReadOnlyList<Trk> trks = Trks;
-			bool startFound = false;
-			foreach(Trk trk in trks)
-			{
-				List<IUniqueDef> iuds = trk.UniqueDefs;
-				IUniqueDef firstIud = iuds[0];
-				if(firstIud is MidiChordDef || (iuds.Count > 1 && firstIud is ClefDef && iuds[1] is MidiChordDef))
-				{
-					startFound = true;
-					break;
-				} 				
-			}
-			Debug.Assert(startFound, "MidiChordDef not found at start.");
-			#endregion
-		}
+            #region 5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef.
+            IReadOnlyList<Trk> trks = Trks;
+            bool startFound = false;
+            foreach(Trk trk in trks)
+            {
+                List<IUniqueDef> iuds = trk.UniqueDefs;
+                IUniqueDef firstIud = iuds[0];
+                if(firstIud is MidiChordDef || (iuds.Count > 1 && firstIud is ClefDef && iuds[1] is MidiChordDef))
+                {
+                    startFound = true;
+                    break;
+                }
+            }
+            Debug.Assert(startFound, "MidiChordDef not found at start.");
+            #endregion
+        }
 
-		#region envelopes
-		/// <summary>
-		/// This function does not change the MsDuration of the Bar.
-		/// See Envelope.TimeWarp() for a description of the arguments.
-		/// </summary>
-		/// <param name="envelope"></param>
-		/// <param name="distortion"></param>
-		public void TimeWarp(Envelope envelope, double distortion)
+        #region envelopes
+        /// <summary>
+        /// This function does not change the MsDuration of the Bar.
+        /// See Envelope.TimeWarp() for a description of the arguments.
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="distortion"></param>
+        public void TimeWarp(Envelope envelope, double distortion)
         {
             AssertConsistency();
             int originalMsDuration = MsDuration;
@@ -282,7 +283,7 @@ namespace Moritz.Spec
         {
             get
             {
-				return _voiceDefs[0].MsDuration;
+                return _voiceDefs[0].MsDuration;
             }
             set
             {
@@ -304,10 +305,10 @@ namespace Moritz.Spec
                         }
                     }
                 }
-				foreach(VoiceDef voiceDef in _voiceDefs)
-				{
-					Debug.Assert(voiceDef.MsDuration == value);
-				}				
+                foreach(VoiceDef voiceDef in _voiceDefs)
+                {
+                    Debug.Assert(voiceDef.MsDuration == value);
+                }
             }
         }
 
@@ -321,9 +322,9 @@ namespace Moritz.Spec
             }
         }
 
-		private int _absMsPosition = 0;
+        private int _absMsPosition = 0;
 
-		public IReadOnlyList<Trk> Trks
+        public IReadOnlyList<Trk> Trks
         {
             get
             {
@@ -355,20 +356,20 @@ namespace Moritz.Spec
             }
         }
 
-		public override string ToString()
-		{
-			return $"AbsMsPosition={AbsMsPosition}, MsDuration={MsDuration}, nVoiceDefs={VoiceDefs.Count}";
-		}
+        public override string ToString()
+        {
+            return $"AbsMsPosition={AbsMsPosition}, MsDuration={MsDuration}, nVoiceDefs={VoiceDefs.Count}";
+        }
 
-		public List<VoiceDef> VoiceDefs
-		{
-			get => _voiceDefs;
-			set
-			{
-				_voiceDefs = value;
-				AssertConsistency();
-			}
-		}
+        public List<VoiceDef> VoiceDefs
+        {
+            get => _voiceDefs;
+            set
+            {
+                _voiceDefs = value;
+                AssertConsistency();
+            }
+        }
         protected List<VoiceDef> _voiceDefs = new List<VoiceDef>();
-	}
+    }
 }

@@ -1,9 +1,6 @@
 
 using System.Diagnostics;
 
-using Krystals5ObjectLibrary;
-using Moritz.Globals;
-
 namespace Moritz.Spec
 {
     ///<summary>

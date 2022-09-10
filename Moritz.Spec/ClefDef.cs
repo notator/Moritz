@@ -1,9 +1,6 @@
 using System;
 using System.Diagnostics;
 
-using Krystals5ObjectLibrary;
-using Moritz.Globals;
-
 namespace Moritz.Spec
 {
     ///<summary>
@@ -17,35 +14,35 @@ namespace Moritz.Spec
     ///</summary>
     public class ClefDef : IUniqueDef
     {
-		public ClefDef(string clefType, int msPositionReFirstIUD)
-			:base()
-		{
-			#region check args
-			if(String.Equals(clefType, "t") == false
-			&& String.Equals(clefType, "t1") == false
-			&& String.Equals(clefType, "t2") == false
-			&& String.Equals(clefType, "t3") == false
-			&& String.Equals(clefType, "b") == false
-			&& String.Equals(clefType, "b1") == false
-			&& String.Equals(clefType, "b2") == false
-			&& String.Equals(clefType, "b3") == false)
-			{
-				Debug.Assert(false, "Unknown clef type.");
-			}
-			#endregion
-
-			_id = "clefChange" + UniqueClefChangeIDNumber.ToString();
-			_clefType = clefType;
-			MsPositionReFirstUD = msPositionReFirstIUD;
-		}
-
-		#region IUniqueDef
-		public override string ToString()
+        public ClefDef(string clefType, int msPositionReFirstIUD)
+            : base()
         {
-            return ("ClefDef: MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " ClefType=" + _clefType );
+            #region check args
+            if(String.Equals(clefType, "t") == false
+            && String.Equals(clefType, "t1") == false
+            && String.Equals(clefType, "t2") == false
+            && String.Equals(clefType, "t3") == false
+            && String.Equals(clefType, "b") == false
+            && String.Equals(clefType, "b1") == false
+            && String.Equals(clefType, "b2") == false
+            && String.Equals(clefType, "b3") == false)
+            {
+                Debug.Assert(false, "Unknown clef type.");
+            }
+            #endregion
+
+            _id = "clefChange" + UniqueClefChangeIDNumber.ToString();
+            _clefType = clefType;
+            MsPositionReFirstUD = msPositionReFirstIUD;
         }
 
-        public void AdjustMsDuration(double factor) {}
+        #region IUniqueDef
+        public override string ToString()
+        {
+            return ("ClefDef: MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " ClefType=" + _clefType);
+        }
+
+        public void AdjustMsDuration(double factor) { }
 
         public object Clone()
         {
@@ -54,10 +51,10 @@ namespace Moritz.Spec
         }
 
         public int MsDuration { get { return 0; } set { throw new System.NotSupportedException(); } }
-		private int _msPositionReFirstIUD = -1;
-		/// <summary>
-		/// Care should be taken to ensure that ClefDefs always have the same msPosition as the following MidiChordDef or MidiRestDef
-		/// </summary>
+        private int _msPositionReFirstIUD = -1;
+        /// <summary>
+        /// Care should be taken to ensure that ClefDefs always have the same msPosition as the following MidiChordDef or MidiRestDef
+        /// </summary>
         public int MsPositionReFirstUD
         {
             get
@@ -66,10 +63,10 @@ namespace Moritz.Spec
                 return _msPositionReFirstIUD;
             }
             set
-			{
-				Debug.Assert(value >= 0);
-				_msPositionReFirstIUD = value;
-			}
+            {
+                Debug.Assert(value >= 0);
+                _msPositionReFirstIUD = value;
+            }
         }
         #endregion IUniqueDef
 

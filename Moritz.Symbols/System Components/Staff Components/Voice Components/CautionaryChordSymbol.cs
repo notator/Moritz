@@ -1,8 +1,7 @@
-using System;
-using System.Text;
-
-using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Xml;
+
+using System.Text;
 
 namespace Moritz.Symbols
 {
@@ -42,7 +41,7 @@ namespace Moritz.Symbols
 
         public float LeftBracketLeft = float.MaxValue;
         public float RightBracketRight = float.MinValue;
- 
+
         /// <summary>
         /// This value is set to false if this symbol is not
         /// the first chordSymbol in the voice in the final score.

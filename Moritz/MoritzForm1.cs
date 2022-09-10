@@ -1,10 +1,8 @@
+using Moritz.Composer;
+using Moritz.Globals;
+
 using System;
 using System.Windows.Forms;
-
-using Moritz.Globals;
-using Moritz.Composer;
-
-using Krystals5Application;
 
 namespace Moritz
 {
@@ -12,7 +10,7 @@ namespace Moritz
     {
         public MoritzForm1()
         {
-            InitializeComponent(); 
+            InitializeComponent();
         }
 
         #region Krystals Editor

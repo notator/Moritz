@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -73,7 +71,7 @@ namespace Krystals5ObjectLibrary
 
             char[] splitChar = { '.' };
             var svgInputFilenameComponents = SVGInputFilename.Split(splitChar);
-            
+
             Debug.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && DensityInputKrystalName.EndsWith(".krys"));
 
             int nEffectiveTrajectoryNodes = int.Parse(svgInputFilenameComponents[1]); // can be 1 (A constant: the first node in the trajectory path)
@@ -95,7 +93,7 @@ namespace Krystals5ObjectLibrary
 
             Strands = ExpandStrands(_trajectory.StrandsInput, _field.Values, expansionDistances);
 
-            Level = (uint) _trajectory.Level;
+            Level = (uint)_trajectory.Level;
 
             Name = GetUniqueName(K.KrystalType.path);
         }
@@ -120,7 +118,7 @@ namespace Krystals5ObjectLibrary
                 {
                     var focusPoint = focusPoints[focusIndex];
                     double distance = Math.Pow((double)(focusPoint.X - trajectoryPoint.X), 2) + Math.Pow((double)(focusPoint.Y - trajectoryPoint.Y), 2);
-                    distances.Add((uint) Math.Round((distance * scale)));
+                    distances.Add((uint)Math.Round((distance * scale)));
                 }
                 rval.Add(distances);
             }
@@ -159,13 +157,13 @@ namespace Krystals5ObjectLibrary
 
                 Strand strand = Expansion.ExpandStrand(level, density, trammel);
 
-                NumValues += (uint) density;
+                NumValues += (uint)density;
 
                 foreach(uint value in strand.Values)
                 {
                     MaxValue = (MaxValue > value) ? MaxValue : value;
                     MinValue = (MinValue < value) ? MinValue : value;
-                } 
+                }
 
                 rval.Add(strand);
             }

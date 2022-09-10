@@ -1,10 +1,10 @@
+using Moritz.Spec;
+using Moritz.Xml;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using Moritz.Xml;
-using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
@@ -25,7 +25,7 @@ namespace Moritz.Symbols
             Staff = staff;
         }
 
-		public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
+        public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
 
         /// <summary>
         /// Writes out an SVG Voice
@@ -36,90 +36,90 @@ namespace Moritz.Symbols
         {
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
-				NoteObject noteObject = NoteObjects[i];
-				InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
-				InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
+                NoteObject noteObject = NoteObjects[i];
+                InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
+                InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
                 CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
                 OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
                 OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
-				Clef clef = noteObject as Clef;
-				SmallClef smallClef = noteObject as SmallClef;
+                Clef clef = noteObject as Clef;
+                SmallClef smallClef = noteObject as SmallClef;
 
-				if(noteObject is Barline barline)
-				{
-					bool isLastNoteObject = (i == (NoteObjects.Count - 1));
-					float top = Staff.Metrics.StafflinesTop;
-					float bottom = Staff.Metrics.StafflinesBottom;
-					if(barline.IsVisible)
-					{
-						barline.WriteSVG(w, top, bottom, isLastNoteObject);
-					}
-					barline.WriteDrawObjectsSVG(w); 
-				}
-				else if(inputChordSymbol != null)
-				{
-					inputChordSymbol.WriteSVG(w);
-				}
-				else if(cautionaryChordSymbol != null)
-				{
-					cautionaryChordSymbol.WriteSVG(w);
-				}
-				else if(outputChordSymbol != null)
-				{
-					Debug.Assert(carryMsgsPerChannel != null);
-					outputChordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
-				}
-				else if(inputRestSymbol != null)
-				{
-					inputRestSymbol.WriteSVG(w);
-				}
-				else if(outputRestSymbol != null)
-				{
-					Debug.Assert(carryMsgsPerChannel != null);
-					outputRestSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
-				}
-				else if(clef != null) // clef
-				{
-					if(clef.Metrics != null)
-					{
-						// if this is the first barline, the staff name and (maybe) barnumber will be written.
-						bool isInput = (noteObject.Voice is InputVoice);
-						ClefMetrics cm = clef.Metrics as ClefMetrics;
-						clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY, isInput);
-					}
-				}
-				else if(smallClef != null)
-				{
-					if(smallClef.Metrics != null)
-					{
-						bool isInput = (noteObject.Voice is InputVoice);
-						SmallClefMetrics scm = smallClef.Metrics as SmallClefMetrics;
-						smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY, isInput);
-					}
-				}
-				else
-				{
-					throw new ApplicationException("Unknown noteObject type.");
-				}
-			}
-		}
+                if(noteObject is Barline barline)
+                {
+                    bool isLastNoteObject = (i == (NoteObjects.Count - 1));
+                    float top = Staff.Metrics.StafflinesTop;
+                    float bottom = Staff.Metrics.StafflinesBottom;
+                    if(barline.IsVisible)
+                    {
+                        barline.WriteSVG(w, top, bottom, isLastNoteObject);
+                    }
+                    barline.WriteDrawObjectsSVG(w);
+                }
+                else if(inputChordSymbol != null)
+                {
+                    inputChordSymbol.WriteSVG(w);
+                }
+                else if(cautionaryChordSymbol != null)
+                {
+                    cautionaryChordSymbol.WriteSVG(w);
+                }
+                else if(outputChordSymbol != null)
+                {
+                    Debug.Assert(carryMsgsPerChannel != null);
+                    outputChordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+                }
+                else if(inputRestSymbol != null)
+                {
+                    inputRestSymbol.WriteSVG(w);
+                }
+                else if(outputRestSymbol != null)
+                {
+                    Debug.Assert(carryMsgsPerChannel != null);
+                    outputRestSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+                }
+                else if(clef != null) // clef
+                {
+                    if(clef.Metrics != null)
+                    {
+                        // if this is the first barline, the staff name and (maybe) barnumber will be written.
+                        bool isInput = (noteObject.Voice is InputVoice);
+                        ClefMetrics cm = clef.Metrics as ClefMetrics;
+                        clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY, isInput);
+                    }
+                }
+                else if(smallClef != null)
+                {
+                    if(smallClef.Metrics != null)
+                    {
+                        bool isInput = (noteObject.Voice is InputVoice);
+                        SmallClefMetrics scm = smallClef.Metrics as SmallClefMetrics;
+                        smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY, isInput);
+                    }
+                }
+                else
+                {
+                    throw new ApplicationException("Unknown noteObject type.");
+                }
+            }
+        }
 
-		public bool ContainsAChordSymbol
-		{
-			get
-			{
-				bool containsAChordSymbol = false;
-				foreach(NoteObject noteObject in NoteObjects)
-				{
-					if(noteObject is ChordSymbol)
-					{
-						containsAChordSymbol = true;
-						break;
-					}
-				}
-				return containsAChordSymbol;
-			}
-		}
+        public bool ContainsAChordSymbol
+        {
+            get
+            {
+                bool containsAChordSymbol = false;
+                foreach(NoteObject noteObject in NoteObjects)
+                {
+                    if(noteObject is ChordSymbol)
+                    {
+                        containsAChordSymbol = true;
+                        break;
+                    }
+                }
+                return containsAChordSymbol;
+            }
+        }
 
         /// <summary>
         /// Returns the first barline to occur before any durationSymbols, or null if no such barline exists.
@@ -218,15 +218,15 @@ namespace Moritz.Symbols
 
             foreach(NoteObject noteObject in NoteObjects)
             {
-				ChordSymbol chord = noteObject as ChordSymbol;
-				RestSymbol rest = noteObject as RestSymbol;
+                ChordSymbol chord = noteObject as ChordSymbol;
+                RestSymbol rest = noteObject as RestSymbol;
                 Clef clef = noteObject as Clef;
                 Barline barline = noteObject as Barline;
 
-				if(noteObject is CautionaryChordSymbol cautionaryChord)
-					continue;
+                if(noteObject is CautionaryChordSymbol cautionaryChord)
+                    continue;
 
-				if(chord != null)
+                if(chord != null)
                 {
                     if(chord.DurationClass == DurationClass.cautionary
                     || chord.DurationClass == DurationClass.breve
@@ -246,12 +246,12 @@ namespace Moritz.Symbols
                     else
                     {
                         chordsBeamedTogether.Add(chord);
-						// chord.Stem.BeamContinues is the value of
-						// MidiChordDef.BeamContinues.
-						// This value is true by default, but can be set
-						// (in MidiChordDef) classes used by composition
-						// algorithms.
-						if(chord.Stem.BeamContinues)
+                        // chord.Stem.BeamContinues is the value of
+                        // MidiChordDef.BeamContinues.
+                        // This value is true by default, but can be set
+                        // (in MidiChordDef) classes used by composition
+                        // algorithms.
+                        if(chord.Stem.BeamContinues)
                             breakGroup = false;
                         else
                             breakGroup = true;
@@ -353,9 +353,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-					if(noteObject is AnchorageSymbol iHasDrawObjects)
-						yield return iHasDrawObjects;
-				}
+                    if(noteObject is AnchorageSymbol iHasDrawObjects)
+                        yield return iHasDrawObjects;
+                }
             }
         }
         public IEnumerable DurationSymbols
@@ -364,9 +364,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-					if(noteObject is DurationSymbol durationSymbol)
-						yield return durationSymbol;
-				}
+                    if(noteObject is DurationSymbol durationSymbol)
+                        yield return durationSymbol;
+                }
             }
         }
         public IEnumerable ChordSymbols
@@ -375,9 +375,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-					if(noteObject is ChordSymbol chordSymbol)
-						yield return chordSymbol;
-				}
+                    if(noteObject is ChordSymbol chordSymbol)
+                        yield return chordSymbol;
+                }
             }
         }
         public IEnumerable RestSymbols
@@ -386,9 +386,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-					if(noteObject is RestSymbol restSymbol)
-						yield return restSymbol;
-				}
+                    if(noteObject is RestSymbol restSymbol)
+                        yield return restSymbol;
+                }
             }
         }
 
@@ -430,24 +430,24 @@ namespace Moritz.Symbols
                 _firstDurationSymbol = value;
             }
         }
-		#endregion
+        #endregion
 
-		private int _midiChannel = int.MaxValue;
-		/// <summary>
-		/// A MidiChannel attribute is always written for every OutputVoice in the first system in a score.
-		/// No other OutputVoice MidiChannels are written.
-		/// InputVoice MidiChannel attributes are omitted altogether unless explicitly set (in an InputVoiceDef) by an algorithm.
-		/// If they are set, InputVoice MidiChannel attributes are also only written in the first system in the score.
-		/// </summary>
-		public int MidiChannel
-		{ 
-			get { return _midiChannel; } 
-			set
-			{
-				Debug.Assert(value >= 0 && value <= 15);
-				_midiChannel = value;
-			}
-		}
+        private int _midiChannel = int.MaxValue;
+        /// <summary>
+        /// A MidiChannel attribute is always written for every OutputVoice in the first system in a score.
+        /// No other OutputVoice MidiChannels are written.
+        /// InputVoice MidiChannel attributes are omitted altogether unless explicitly set (in an InputVoiceDef) by an algorithm.
+        /// If they are set, InputVoice MidiChannel attributes are also only written in the first system in the score.
+        /// </summary>
+        public int MidiChannel
+        {
+            get { return _midiChannel; }
+            set
+            {
+                Debug.Assert(value >= 0 && value <= 15);
+                _midiChannel = value;
+            }
+        }
 
         public VoiceDef VoiceDef = null;
 

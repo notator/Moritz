@@ -1,11 +1,5 @@
-
-using System;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Collections;
-
-using Krystals5ObjectLibrary;
-using Moritz.Globals;
+using System.Diagnostics;
 
 namespace Moritz.Spec
 {
@@ -43,48 +37,48 @@ namespace Moritz.Spec
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
             {
-                IUniqueDef clone = (IUniqueDef) iu.Clone();
+                IUniqueDef clone = (IUniqueDef)iu.Clone();
                 clonedLmdds.Add(clone);
             }
-			var ivd = new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds)
-			{
-				Container = this.Container
-			};
-			return ivd;
+            var ivd = new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds)
+            {
+                Container = this.Container
+            };
+            return ivd;
         }
-		#endregion constructors
+        #endregion constructors
 
-		/// <summary>
-		/// When this function is called, VoiceDef.AssertConsistency() is called (see documentation there), then
-		/// the following are checked:
-		/// 1. MidiChannels are in range [0..3]
-		/// 2. The Container is either null or a Bar.
-		/// 3. If the Container is null, the UniqueDefs can contain any combination of InputChordDef and InputRestDef.
-		///    If the Container is a Bar, the UniqueDefs can also contain ClefDef and CautionaryChordDef objects.
-		/// </summary>
-		public override void AssertConsistency()
+        /// <summary>
+        /// When this function is called, VoiceDef.AssertConsistency() is called (see documentation there), then
+        /// the following are checked:
+        /// 1. MidiChannels are in range [0..3]
+        /// 2. The Container is either null or a Bar.
+        /// 3. If the Container is null, the UniqueDefs can contain any combination of InputChordDef and InputRestDef.
+        ///    If the Container is a Bar, the UniqueDefs can also contain ClefDef and CautionaryChordDef objects.
+        /// </summary>
+        public override void AssertConsistency()
         {
-			base.AssertConsistency();
+            base.AssertConsistency();
 
-			Debug.Assert(MidiChannel >= 0 && MidiChannel <= 3);	 // max 4 input channels
+            Debug.Assert(MidiChannel >= 0 && MidiChannel <= 3);  // max 4 input channels
 
-			Debug.Assert(Container == null || Container is Bar);
+            Debug.Assert(Container == null || Container is Bar);
 
-			if(Container is Bar)
-			{
-				foreach(IUniqueDef iud in UniqueDefs)
-				{
-					Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
-				}
-			}
-			else // during construction
-			{
-				foreach(IUniqueDef iud in UniqueDefs)
-				{
-					Debug.Assert(iud is InputChordDef || iud is InputRestDef);
-				}
-			}
-		}
+            if(Container is Bar)
+            {
+                foreach(IUniqueDef iud in UniqueDefs)
+                {
+                    Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
+                }
+            }
+            else // during construction
+            {
+                foreach(IUniqueDef iud in UniqueDefs)
+                {
+                    Debug.Assert(iud is InputChordDef || iud is InputRestDef);
+                }
+            }
+        }
 
         #region Count changers
         /// <summary>
@@ -97,23 +91,23 @@ namespace Moritz.Spec
             Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
             _Add(iud);
         }
-		/// <summary>
-		/// Adds the argument to the end of this VoiceDef.
-		/// Sets the MsPositions of the appended UniqueDefs re the first iUniqueDef in the list.
-		/// This function automatically agglommerates rests.
-		/// </summary>
-		public override void AddRange(VoiceDef inputVoiceDef)
+        /// <summary>
+        /// Adds the argument to the end of this VoiceDef.
+        /// Sets the MsPositions of the appended UniqueDefs re the first iUniqueDef in the list.
+        /// This function automatically agglommerates rests.
+        /// </summary>
+        public override void AddRange(VoiceDef inputVoiceDef)
         {
             Debug.Assert(inputVoiceDef is InputVoiceDef);
             _AddRange(inputVoiceDef);
         }
 
-		/// <summary>
-		/// Adds the argument to the end of this VoiceDef.
-		/// Sets the MsPositions of the appended UniqueDefs.
-		/// This function automatically agglommerates rests.
-		/// </summary>
-		public void Concat(InputVoiceDef inputVoiceDef)
+        /// <summary>
+        /// Adds the argument to the end of this VoiceDef.
+        /// Sets the MsPositions of the appended UniqueDefs.
+        /// This function automatically agglommerates rests.
+        /// </summary>
+        public void Concat(InputVoiceDef inputVoiceDef)
         {
             int thisEndMsPositionReSeq = this.EndMsPositionReFirstIUD + this.MsPositionReContainer;
             if(inputVoiceDef.MsPositionReContainer > thisEndMsPositionReSeq)
@@ -139,7 +133,7 @@ namespace Moritz.Spec
         /// </summary>
         public void InsertRange(int index, InputVoiceDef voiceDef)
         {
-            _InsertRange(index, (VoiceDef) voiceDef);
+            _InsertRange(index, (VoiceDef)voiceDef);
         }
 
         /// <summary>
@@ -183,22 +177,22 @@ namespace Moritz.Spec
 
             for(int i = 0; i < lmdds.Count; ++i)
             {
-				if(lmdds[i] is InputRestDef umrd)
-				{
-					restStartMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD;
-					restEndMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD + lmdds[i].MsDuration;
+                if(lmdds[i] is InputRestDef umrd)
+                {
+                    restStartMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD;
+                    restEndMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD + lmdds[i].MsDuration;
 
-					if(startMsPos >= restStartMsPosReFirstIUD && endMsPos <= restEndMsPosReFirstIUD)
-					{
-						index = i;
-						break;
-					}
-					if(startMsPos < restStartMsPosReFirstIUD)
-					{
-						break;
-					}
-				}
-			}
+                    if(startMsPos >= restStartMsPosReFirstIUD && endMsPos <= restEndMsPosReFirstIUD)
+                    {
+                        index = i;
+                        break;
+                    }
+                    if(startMsPos < restStartMsPosReFirstIUD)
+                    {
+                        break;
+                    }
+                }
+            }
 
             return index;
         }

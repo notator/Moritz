@@ -1,15 +1,12 @@
-﻿using System;
-using System.Text;
-using System.Diagnostics;
+﻿using Moritz.Spec;
 
-using Moritz.Globals;
-using Moritz.Xml;
-using Moritz.Spec;
+using System;
+using System.Diagnostics;
 
 namespace Moritz.Symbols
 {
-	internal abstract class RestSymbol : DurationSymbol
-	{
+    internal abstract class RestSymbol : DurationSymbol
+    {
         public RestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, int minimumCrotchetDurationMS, float fontHeight)
             : base(voice, iumdd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontHeight)
         {
@@ -20,18 +17,18 @@ namespace Moritz.Symbols
             LocalCautionaryChordDef = iumdd as CautionaryChordDef;
         }
 
-		#region display attributes
+        #region display attributes
         /// <summary>
         /// If LocalizedCautionaryChordDef is set:
         /// a) this rest is used like any other rest when justifying systems, but
         /// b) it is not displayed, and does not affect the temporal positions or durations of any chords. 
         /// </summary>
         public CautionaryChordDef LocalCautionaryChordDef = null;
-		#endregion display attributes
-		#region verticalPos attributes
-		public bool Centered = false; // capella default
-		public int Shift_Gap = 0; // capella default
-		#endregion verticalPos attributes
+        #endregion display attributes
+        #region verticalPos attributes
+        public bool Centered = false; // capella default
+        public int Shift_Gap = 0; // capella default
+        #endregion verticalPos attributes
 
         /// <summary>
         /// Returns this.Metrics cast to RestMetrics.
@@ -51,7 +48,7 @@ namespace Moritz.Symbols
         public override int MsDuration
         {
             get { return _msDuration; }
-            set { _msDuration = value; } 
+            set { _msDuration = value; }
         }
-	}
+    }
 }

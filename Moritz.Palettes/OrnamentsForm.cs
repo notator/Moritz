@@ -1,12 +1,11 @@
-using System;
-using System.Windows.Forms;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Xml;
-
 using Moritz.Globals;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace Moritz.Palettes
 {
@@ -50,18 +49,18 @@ namespace Moritz.Palettes
             _allTextBoxes.AddRange(_allNonOrnamentTextBoxes);
             _allTextBoxes.AddRange(_12OrnamentTextBoxes);
 
-			NumBasicChordDefsTextBox_Leave(NumBasicChordDefsTextBox, null);
+            NumBasicChordDefsTextBox_Leave(NumBasicChordDefsTextBox, null);
             TouchAllTextBoxes();
         }
 
         private void ConnectBasicChordControl()
         {
-			_bcc = new BasicChordControl(SetDialogState)
-			{
-				Location = new Point(0, 25),
-				BorderStyle = BorderStyle.None
-			};
-			this.TopPanel.Controls.Add(_bcc);
+            _bcc = new BasicChordControl(SetDialogState)
+            {
+                Location = new Point(0, 25),
+                BorderStyle = BorderStyle.None
+            };
+            this.TopPanel.Controls.Add(_bcc);
             TopPanel.TabIndex = 0;
             _bcc.TabIndex = 1;
 
@@ -225,46 +224,46 @@ namespace Moritz.Palettes
 
         private List<TextBox> GetNonOrnamentTextBoxes()
         {
-			List<TextBox> textBoxes = new List<TextBox>
-			{
-				NumBasicChordDefsTextBox,
-				_bcc.DurationsTextBox,
-				_bcc.VelocitiesTextBox,
-				_bcc.MidiPitchesTextBox,
-				_bcc.ChordOffsTextBox,
-				_bcc.ChordDensitiesTextBox,
-				_bcc.RootInversionTextBox,
-				_bcc.InversionIndicesTextBox,
-				_bcc.VerticalVelocityFactorsTextBox,
-				BankIndicesTextBox,
-				PatchIndicesTextBox,
-				NumberOfOrnamentsTextBox
-			};
+            List<TextBox> textBoxes = new List<TextBox>
+            {
+                NumBasicChordDefsTextBox,
+                _bcc.DurationsTextBox,
+                _bcc.VelocitiesTextBox,
+                _bcc.MidiPitchesTextBox,
+                _bcc.ChordOffsTextBox,
+                _bcc.ChordDensitiesTextBox,
+                _bcc.RootInversionTextBox,
+                _bcc.InversionIndicesTextBox,
+                _bcc.VerticalVelocityFactorsTextBox,
+                BankIndicesTextBox,
+                PatchIndicesTextBox,
+                NumberOfOrnamentsTextBox
+            };
 
-			return textBoxes;
+            return textBoxes;
         }
 
         /************/
 
         private List<TextBox> Get12OrnamentTextBoxes()
         {
-			List<TextBox> textBoxes = new List<TextBox>
-			{
-				this.Ornament1TextBox,
-				this.Ornament2TextBox,
-				this.Ornament3TextBox,
-				this.Ornament4TextBox,
-				this.Ornament5TextBox,
-				this.Ornament6TextBox,
-				this.Ornament7TextBox,
-				this.Ornament8TextBox,
-				this.Ornament9TextBox,
-				this.Ornament10TextBox,
-				this.Ornament11TextBox,
-				this.Ornament12TextBox
-			};
+            List<TextBox> textBoxes = new List<TextBox>
+            {
+                this.Ornament1TextBox,
+                this.Ornament2TextBox,
+                this.Ornament3TextBox,
+                this.Ornament4TextBox,
+                this.Ornament5TextBox,
+                this.Ornament6TextBox,
+                this.Ornament7TextBox,
+                this.Ornament8TextBox,
+                this.Ornament9TextBox,
+                this.Ornament10TextBox,
+                this.Ornament11TextBox,
+                this.Ornament12TextBox
+            };
 
-			return textBoxes;
+            return textBoxes;
         }
 
         /************/
@@ -592,7 +591,7 @@ namespace Moritz.Palettes
             if(!_isLoading)
                 _assistantComposerForm.UpdateForChangedPaletteForm();
         }
-       #endregion
+        #endregion
 
         /************/
 
@@ -612,7 +611,7 @@ namespace Moritz.Palettes
         {
             ((Form)_assistantComposerForm).BringToFront();
         }
-        
+
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
             _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
@@ -622,8 +621,8 @@ namespace Moritz.Palettes
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
-            DialogResult result = 
-                MessageBox.Show("Are you sure you want to revert these ornament settings to the saved version?", "Revert?", 
+            DialogResult result =
+                MessageBox.Show("Are you sure you want to revert these ornament settings to the saved version?", "Revert?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if(result == System.Windows.Forms.DialogResult.Yes)

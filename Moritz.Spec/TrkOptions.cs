@@ -1,8 +1,8 @@
-using System.Diagnostics;
-
 using Moritz.Globals;
 using Moritz.Xml;
+
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Moritz.Spec
 {
@@ -35,218 +35,218 @@ namespace Moritz.Spec
     /// </summary>
     public sealed class TrkOptions
     {
-		public TrkOptions(TrkOption trkOption)
-		{
-			AddList(new List<TrkOption>() { trkOption });
-		}
+        public TrkOptions(TrkOption trkOption)
+        {
+            AddList(new List<TrkOption>() { trkOption });
+        }
 
-		public TrkOptions(List<TrkOption> optList)
-		{
-			AddList(optList);
-		}
+        public TrkOptions(List<TrkOption> optList)
+        {
+            AddList(optList);
+        }
 
         public void WriteSVG(SvgWriter w, bool writeScoreNamespace)
         {
-			if(writeScoreNamespace)
-			{
-				w.WriteStartElement("score", "trkOptions", null); 
-			}
-			else
-			{ 
-				w.WriteStartElement("trkOptions");
-			}
-			
-			if(_velocityOption != VelocityOption.inherit)
-			{
-				w.WriteAttributeString("velocity", _velocityOption.ToString());
-				if(_velocityOption != VelocityOption.undefined)
-				{ 
-					if(_minimumVelocity == null || _minimumVelocity < 1 || _minimumVelocity > 127)
-					{
-						Debug.Assert(false,
-							"If the VelocityOption is being used, then\n" +
-							"MinimumVelocity must be set to a value in range [1..127]");
-					}
-					w.WriteAttributeString("minVelocity", _minimumVelocity.ToString());
-				}		
-			}
+            if(writeScoreNamespace)
+            {
+                w.WriteStartElement("score", "trkOptions", null);
+            }
+            else
+            {
+                w.WriteStartElement("trkOptions");
+            }
 
-			if(PedalOption != PedalOption.inherit)
-			{
-				w.WriteAttributeString("pedal", PedalOption.ToString());
-			}
+            if(_velocityOption != VelocityOption.inherit)
+            {
+                w.WriteAttributeString("velocity", _velocityOption.ToString());
+                if(_velocityOption != VelocityOption.undefined)
+                {
+                    if(_minimumVelocity == null || _minimumVelocity < 1 || _minimumVelocity > 127)
+                    {
+                        Debug.Assert(false,
+                            "If the VelocityOption is being used, then\n" +
+                            "MinimumVelocity must be set to a value in range [1..127]");
+                    }
+                    w.WriteAttributeString("minVelocity", _minimumVelocity.ToString());
+                }
+            }
 
-			if(SpeedOption > 0)
-			{
-				w.WriteAttributeString("speed", SpeedOption.ToString(M.En_USNumberFormat));
-			}
+            if(PedalOption != PedalOption.inherit)
+            {
+                w.WriteAttributeString("pedal", PedalOption.ToString());
+            }
 
-			if(TrkOffOption != TrkOffOption.inherit)
-			{
-				w.WriteAttributeString("trkOff", TrkOffOption.ToString());
-			}
+            if(SpeedOption > 0)
+            {
+                w.WriteAttributeString("speed", SpeedOption.ToString(M.En_USNumberFormat));
+            }
+
+            if(TrkOffOption != TrkOffOption.inherit)
+            {
+                w.WriteAttributeString("trkOff", TrkOffOption.ToString());
+            }
 
             w.WriteEndElement(); // score:trkOptions
         }
 
-		public void AddList(List<TrkOption> optList)
-		{
-			foreach(TrkOption opt in optList)
-			{
-				if(opt is PedalControl pto)
-				{
-					Add(pto);
-				}
-				if(opt is SpeedControl sc)
-				{
-					Add(sc);
-				}
-				if(opt is TrkOffControl toto)
-				{
-					Add(toto);
-				}
-				if(opt is VelocityTrkOption vto)
-				{
-					Add(vto);
-				}
-			}
-		}
+        public void AddList(List<TrkOption> optList)
+        {
+            foreach(TrkOption opt in optList)
+            {
+                if(opt is PedalControl pto)
+                {
+                    Add(pto);
+                }
+                if(opt is SpeedControl sc)
+                {
+                    Add(sc);
+                }
+                if(opt is TrkOffControl toto)
+                {
+                    Add(toto);
+                }
+                if(opt is VelocityTrkOption vto)
+                {
+                    Add(vto);
+                }
+            }
+        }
 
-		public void Add(PedalControl pedalTrkOption)
-		{
-			_pedalOption = pedalTrkOption.PedalOption;
-		}
-		public void Add(SpeedControl speedControl)
-		{
-			_speedOption = speedControl.SpeedFactor;
-		}
-		public void Add(TrkOffControl trkOffTrkOption)
-		{
-			_trkOffOption = trkOffTrkOption.TrkOffOption;
-		}
-		public void Add(VelocityTrkOption velocityTrkOption)
-		{
-			_velocityOption = velocityTrkOption.VelocityOption;
-			_minimumVelocity = velocityTrkOption.MinimumVelocity;
-		}
+        public void Add(PedalControl pedalTrkOption)
+        {
+            _pedalOption = pedalTrkOption.PedalOption;
+        }
+        public void Add(SpeedControl speedControl)
+        {
+            _speedOption = speedControl.SpeedFactor;
+        }
+        public void Add(TrkOffControl trkOffTrkOption)
+        {
+            _trkOffOption = trkOffTrkOption.TrkOffOption;
+        }
+        public void Add(VelocityTrkOption velocityTrkOption)
+        {
+            _velocityOption = velocityTrkOption.VelocityOption;
+            _minimumVelocity = velocityTrkOption.MinimumVelocity;
+        }
 
-		/* 
+        /* 
 		 * These default values are not written to score files.
 		 */
-		public PedalOption PedalOption { get { return _pedalOption; } }
-		private PedalOption _pedalOption = PedalOption.inherit;
+        public PedalOption PedalOption { get { return _pedalOption; } }
+        private PedalOption _pedalOption = PedalOption.inherit;
 
-		public float SpeedOption { get { return _speedOption; } }
-		private float _speedOption = -1;
+        public float SpeedOption { get { return _speedOption; } }
+        private float _speedOption = -1;
 
-		public TrkOffOption TrkOffOption { get { return _trkOffOption; } }
-		private TrkOffOption _trkOffOption = TrkOffOption.inherit;
+        public TrkOffOption TrkOffOption { get { return _trkOffOption; } }
+        private TrkOffOption _trkOffOption = TrkOffOption.inherit;
 
-		public VelocityOption VelocityOption
-		{ 
-			get { return _velocityOption; }
-		}
+        public VelocityOption VelocityOption
+        {
+            get { return _velocityOption; }
+        }
         private VelocityOption _velocityOption = VelocityOption.inherit;
-		public byte? MinimumVelocity { get { return _minimumVelocity; } }
-		private byte? _minimumVelocity = null; // must be set if a velocity option is being used
+        public byte? MinimumVelocity { get { return _minimumVelocity; } }
+        private byte? _minimumVelocity = null; // must be set if a velocity option is being used
     }
 
-	public class TrkOption
-	{
-		protected TrkOption() { }
-	}
+    public class TrkOption
+    {
+        protected TrkOption() { }
+    }
 
-	public enum PedalOption
-	{
-		inherit,
-		undefined, // the trk will play as written in the score
-		holdLast, // remove noteOffs from trk's last moment that contains any, and don't send allNotesOff
-		holdAll, // remove all noteOff messages from the trk, and don't send allNotesOff
-		holdAllStop // like holdAll, but sends AllNotesOff when the trk stops (or is stopped)
-	};
-	public class PedalControl: TrkOption
-	{
-		public PedalControl(PedalOption pedalOption)
-		{
-			_pedalOption = pedalOption;
-		}
-		
-		public PedalOption PedalOption {get{return _pedalOption;}}
-		private readonly PedalOption _pedalOption;
-	}
+    public enum PedalOption
+    {
+        inherit,
+        undefined, // the trk will play as written in the score
+        holdLast, // remove noteOffs from trk's last moment that contains any, and don't send allNotesOff
+        holdAll, // remove all noteOff messages from the trk, and don't send allNotesOff
+        holdAllStop // like holdAll, but sends AllNotesOff when the trk stops (or is stopped)
+    };
+    public class PedalControl : TrkOption
+    {
+        public PedalControl(PedalOption pedalOption)
+        {
+            _pedalOption = pedalOption;
+        }
 
-	public class SpeedControl:TrkOption
-	{
-		/// <param name="speedFactor">A value greater than zero. Greater values mean greater speed.</param>
-		public SpeedControl(float speedFactor)
-		{
-			Debug.Assert(speedFactor > 0, "Error: speedFactor must be greater than zero.");
-			_speedFactor = speedFactor;
-		}
-		public float SpeedFactor { get { return _speedFactor; } }
-		private readonly float _speedFactor;
-	}
+        public PedalOption PedalOption { get { return _pedalOption; } }
+        private readonly PedalOption _pedalOption;
+    }
 
-	public enum TrkOffOption
-	{
-		inherit,
-		undefined, // the trk will ignore an incoming noteOff event, and play to its end (as written in the score).
-		stopChord, // stop when the current midiChord or midiRest completes
-		stopNow, // stop immediately, even inside a midiChord
-		fade // fade velocity to end of trk
-	};
-	public class TrkOffControl : TrkOption
-	{
-		public TrkOffControl(TrkOffOption trkOffOption)
-		{ 
-			_trkOffOption = trkOffOption;
-		}
+    public class SpeedControl : TrkOption
+    {
+        /// <param name="speedFactor">A value greater than zero. Greater values mean greater speed.</param>
+        public SpeedControl(float speedFactor)
+        {
+            Debug.Assert(speedFactor > 0, "Error: speedFactor must be greater than zero.");
+            _speedFactor = speedFactor;
+        }
+        public float SpeedFactor { get { return _speedFactor; } }
+        private readonly float _speedFactor;
+    }
 
-		public TrkOffOption TrkOffOption { get { return _trkOffOption; } }
-		private readonly TrkOffOption _trkOffOption;
-	}
+    public enum TrkOffOption
+    {
+        inherit,
+        undefined, // the trk will ignore an incoming noteOff event, and play to its end (as written in the score).
+        stopChord, // stop when the current midiChord or midiRest completes
+        stopNow, // stop immediately, even inside a midiChord
+        fade // fade velocity to end of trk
+    };
+    public class TrkOffControl : TrkOption
+    {
+        public TrkOffControl(TrkOffOption trkOffOption)
+        {
+            _trkOffOption = trkOffOption;
+        }
 
-	public enum VelocityOption
-	{
-		inherit,
-		undefined, // the velocity written in the score will be played.
-		scaled,
-		shared,
-		overridden
-	};
-	public class VelocityTrkOption :TrkOption
-	{
-		protected VelocityTrkOption(VelocityOption velocityOption, byte minVelocity)
-		{
-			Debug.Assert(minVelocity > 0 && minVelocity < 128);
-			_minVelocity = minVelocity;
-			_velocityOption = velocityOption;
-		}
+        public TrkOffOption TrkOffOption { get { return _trkOffOption; } }
+        private readonly TrkOffOption _trkOffOption;
+    }
 
-		public VelocityOption VelocityOption { get { return _velocityOption; } }
-		private readonly VelocityOption _velocityOption;
-		public byte MinimumVelocity { get { return _minVelocity; } }
-		private readonly byte _minVelocity;
-	}
-	public class VelocityScaledControl : VelocityTrkOption
-	{
-		public VelocityScaledControl(byte minVelocity)
-			: base(VelocityOption.scaled, minVelocity)
-		{
-		}
-	}
-	public class VelocitySharedControl : VelocityTrkOption
-	{
-		public VelocitySharedControl(byte minVelocity)
-			: base(VelocityOption.shared, minVelocity)
-		{
-		}
-	}
-	public class VelocityOverriddenControl : VelocityTrkOption
-	{
-		public VelocityOverriddenControl(byte minVelocity)
-			: base(VelocityOption.overridden, minVelocity)
-		{
-		}
-	}
+    public enum VelocityOption
+    {
+        inherit,
+        undefined, // the velocity written in the score will be played.
+        scaled,
+        shared,
+        overridden
+    };
+    public class VelocityTrkOption : TrkOption
+    {
+        protected VelocityTrkOption(VelocityOption velocityOption, byte minVelocity)
+        {
+            Debug.Assert(minVelocity > 0 && minVelocity < 128);
+            _minVelocity = minVelocity;
+            _velocityOption = velocityOption;
+        }
+
+        public VelocityOption VelocityOption { get { return _velocityOption; } }
+        private readonly VelocityOption _velocityOption;
+        public byte MinimumVelocity { get { return _minVelocity; } }
+        private readonly byte _minVelocity;
+    }
+    public class VelocityScaledControl : VelocityTrkOption
+    {
+        public VelocityScaledControl(byte minVelocity)
+            : base(VelocityOption.scaled, minVelocity)
+        {
+        }
+    }
+    public class VelocitySharedControl : VelocityTrkOption
+    {
+        public VelocitySharedControl(byte minVelocity)
+            : base(VelocityOption.shared, minVelocity)
+        {
+        }
+    }
+    public class VelocityOverriddenControl : VelocityTrkOption
+    {
+        public VelocityOverriddenControl(byte minVelocity)
+            : base(VelocityOption.overridden, minVelocity)
+        {
+        }
+    }
 }

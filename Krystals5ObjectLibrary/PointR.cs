@@ -26,12 +26,12 @@ namespace Krystals5ObjectLibrary
             newX = this.X + shiftVector.X;
             newY = this.Y + shiftVector.Y;
             this._radius = (float)Math.Sqrt((double)(newX * newX) + (newY * newY));
-            if (newX == 0f)
+            if(newX == 0f)
                 this._radians = 0f;
             else
             {
                 this._radians = (float)Math.Atan((double)(newY / newX));
-                if (newX < 0)
+                if(newX < 0)
                     this._radians += (float)Math.PI;
             }
         }

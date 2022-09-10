@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
-using System.Xml;
-using System.Diagnostics;
-using System.Threading;
-using System.IO;
-
-using Moritz.Globals;
+﻿using Moritz.Globals;
 using Moritz.Midi;
 using Moritz.Spec;
-using Moritz.Symbols;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Threading;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace Moritz.Palettes
 {
@@ -153,16 +152,16 @@ namespace Moritz.Palettes
         }
         private void CreateMidiChordFormButton(int x, int y, int i)
         {
-			Button b = new Button
-			{
-				Location = new System.Drawing.Point(x, y),
-				Size = new System.Drawing.Size(27, 24),
-				Tag = i,
-				//b.UseVisualStyleBackColor = false;
-				Text = (i + 1).ToString()
-			};
+            Button b = new Button
+            {
+                Location = new System.Drawing.Point(x, y),
+                Size = new System.Drawing.Size(27, 24),
+                Tag = i,
+                //b.UseVisualStyleBackColor = false;
+                Text = (i + 1).ToString()
+            };
 
-			b.MouseDown += new MouseEventHandler(PaletteChordFormButton_MouseDown);
+            b.MouseDown += new MouseEventHandler(PaletteChordFormButton_MouseDown);
 
             this.Controls.Add(b);
             _paletteChordFormButtons.Add(b);
@@ -170,28 +169,28 @@ namespace Moritz.Palettes
         }
         private void CreateMidiEventDemoButton(int x, int y, int i)
         {
-			Label label = new Label
-			{
-				ForeColor = System.Drawing.Color.RoyalBlue,
-				Location = new System.Drawing.Point(x + 1, y + 4),
-				Size = new System.Drawing.Size(26, 14),
-				Text = "rest"
-			};
+            Label label = new Label
+            {
+                ForeColor = System.Drawing.Color.RoyalBlue,
+                Location = new System.Drawing.Point(x + 1, y + 4),
+                Size = new System.Drawing.Size(26, 14),
+                Text = "rest"
+            };
 
-			this.Controls.Add(label);
+            this.Controls.Add(label);
             _restLabels.Add(label);
             label.SendToBack();
 
-			Button b = new Button
-			{
-				Location = new System.Drawing.Point(x, y),
-				Size = new System.Drawing.Size(27, 24),
-				//b.TabIndex = 82 + i;
-				Text = (i + 1).ToString(),
-				UseVisualStyleBackColor = true
-			};
+            Button b = new Button
+            {
+                Location = new System.Drawing.Point(x, y),
+                Size = new System.Drawing.Size(27, 24),
+                //b.TabIndex = 82 + i;
+                Text = (i + 1).ToString(),
+                UseVisualStyleBackColor = true
+            };
 
-			b.Click += new EventHandler(MidiEventDemoButton_Click);
+            b.Click += new EventHandler(MidiEventDemoButton_Click);
 
             this.Controls.Add(b);
             _midiEventDemoButtons.Add(b);
@@ -199,16 +198,16 @@ namespace Moritz.Palettes
         }
         private void CreateAudioSampleButton(int x, int y, int i)
         {
-			Button b = new Button
-			{
-				Location = new System.Drawing.Point(x, y),
-				Size = new System.Drawing.Size(27, 24),
-				Tag = new MoritzMediaPlayer(PlayerHasStopped), // the associated media player
-				Image = global::Moritz.Globals.Properties.Resources.noFile23x20,
-				UseVisualStyleBackColor = false
-			};
+            Button b = new Button
+            {
+                Location = new System.Drawing.Point(x, y),
+                Size = new System.Drawing.Size(27, 24),
+                Tag = new MoritzMediaPlayer(PlayerHasStopped), // the associated media player
+                Image = global::Moritz.Globals.Properties.Resources.noFile23x20,
+                UseVisualStyleBackColor = false
+            };
 
-			b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
+            b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
 
             this.Controls.Add(b);
             _audioSampleButtons.Add(b);
@@ -218,51 +217,51 @@ namespace Moritz.Palettes
         #region playMidiEvent
         private void MidiEventDemoButton_Click(object sender, EventArgs e)
         {
-			if(sender is Button button)
-			{
+            if(sender is Button button)
+            {
 
-				PaletteForm paletteForm = this._paletteForm as PaletteForm;
-				Palette palette = null;
-				IUniqueDef iud = null;
-				Sanford.Multimedia.Midi.OutputDevice outputDevice = M.Preferences.GetMidiOutputDevice(M.Preferences.PreferredOutputDevice);
-				int midiChannel = 0;
+                PaletteForm paletteForm = this._paletteForm as PaletteForm;
+                Palette palette = null;
+                IUniqueDef iud = null;
+                Sanford.Multimedia.Midi.OutputDevice outputDevice = M.Preferences.GetMidiOutputDevice(M.Preferences.PreferredOutputDevice);
+                int midiChannel = 0;
 
-				int index = int.Parse(button.Text) - 1;
-				if(index >= 0 && index < _midiEventDemoButtons.Count)
-				{
-					if(paletteForm != null)
-					{
-						palette = new Palette(paletteForm);
-						if(palette.IsPercussionPalette)
-						{
-							outputDevice = M.Preferences.GetMidiOutputDevice("Microsoft GS Wavetable Synth");
-							midiChannel = 9;
-						}
-					}
+                int index = int.Parse(button.Text) - 1;
+                if(index >= 0 && index < _midiEventDemoButtons.Count)
+                {
+                    if(paletteForm != null)
+                    {
+                        palette = new Palette(paletteForm);
+                        if(palette.IsPercussionPalette)
+                        {
+                            outputDevice = M.Preferences.GetMidiOutputDevice("Microsoft GS Wavetable Synth");
+                            midiChannel = 9;
+                        }
+                    }
 
-					iud = palette.GetIUniqueDef(index);
+                    iud = palette.GetIUniqueDef(index);
 
-					if(iud is MidiRestDef)
-					{
-						_midiEventDemoButtons[index].Hide();
-						this._restLabels[0].Select(); // just to deselect everything
-						Refresh(); // shows "rest" behind button
-						Thread.Sleep(iud.MsDuration);
-						_midiEventDemoButtons[index].Show();
-						Refresh();
-					}
-					else
-					{
-						_midiEventDemoButtons[index].Select();
-						Refresh();
-						MidiChordDef midiChordDef = iud as MidiChordDef;
-						Debug.Assert(midiChordDef != null);
-						MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
-						midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
-					}
-				}
-			}
-		}
+                    if(iud is MidiRestDef)
+                    {
+                        _midiEventDemoButtons[index].Hide();
+                        this._restLabels[0].Select(); // just to deselect everything
+                        Refresh(); // shows "rest" behind button
+                        Thread.Sleep(iud.MsDuration);
+                        _midiEventDemoButtons[index].Show();
+                        Refresh();
+                    }
+                    else
+                    {
+                        _midiEventDemoButtons[index].Select();
+                        Refresh();
+                        MidiChordDef midiChordDef = iud as MidiChordDef;
+                        Debug.Assert(midiChordDef != null);
+                        MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
+                        midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
+                    }
+                }
+            }
+        }
         #endregion
 
         private void PaletteChordFormButton_MouseDown(object sender, MouseEventArgs e)
@@ -272,19 +271,19 @@ namespace Moritz.Palettes
 
             if(button != null)
             {
-                _paletteForm.ShowPaletteChordForm((int) button.Tag);
+                _paletteForm.ShowPaletteChordForm((int)button.Tag);
             }
         }
 
         internal void AudioSampleButton_MouseDown(object sender, MouseEventArgs e)
         {
-			if(sender is Form thisForm)
-			{
-				StopCurrentMediaPlayer(); // a click on either the paletteForm or the paletteChordForm stops the performance
-				return;
-			}
+            if(sender is Form thisForm)
+            {
+                StopCurrentMediaPlayer(); // a click on either the paletteForm or the paletteChordForm stops the performance
+                return;
+            }
 
-			Button button = sender as Button;
+            Button button = sender as Button;
             Debug.Assert(button != null);
             MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
             Debug.Assert(player != null);

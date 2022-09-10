@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using Moritz.Globals;
 
-using Moritz.Globals;
+using System;
+using System.Windows.Forms;
 
 namespace Moritz.Composer
 {
@@ -16,7 +16,7 @@ namespace Moritz.Composer
         private void NameTextBox_Leave(object sender, EventArgs e)
         {
             NameTextBox.Text = NameTextBox.Text.Trim();
-            if(!String.IsNullOrEmpty(NameTextBox.Text) 
+            if(!String.IsNullOrEmpty(NameTextBox.Text)
             && DomainTextBox.BackColor != M.TextBoxErrorColor
             && !String.IsNullOrEmpty(DomainTextBox.Text))
             {

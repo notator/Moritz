@@ -1,7 +1,7 @@
+using Moritz.Globals;
+
 using System.Collections.Generic;
 using System.Diagnostics;
-using Krystals5ObjectLibrary;
-using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -15,12 +15,12 @@ namespace Moritz.Spec
         public CautionaryChordDef(IUniqueChordDef chordDef, int msPositionReFirstIUD, int msDuration)
         {
             NotatedMidiPitches = chordDef.NotatedMidiPitches;
-			if (chordDef is MidiChordDef midiChordDef)
-			{
-				NotatedMidiVelocities = chordDef.NotatedMidiVelocities;
-			}
+            if(chordDef is MidiChordDef midiChordDef)
+            {
+                NotatedMidiVelocities = chordDef.NotatedMidiVelocities;
+            }
 
-			MsPositionReFirstUD = msPositionReFirstIUD;
+            MsPositionReFirstUD = msPositionReFirstIUD;
             MsDuration = msDuration;
         }
 

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Moritz.Xml;
 
-using Moritz.Xml;
+using System;
+using System.Collections.Generic;
 
 namespace Moritz.Symbols
 {
@@ -40,7 +40,7 @@ namespace Moritz.Symbols
 
             public override void WriteSVG(SvgWriter w)
             {
-                throw new NotImplementedException(); 
+                throw new NotImplementedException();
             }
         }
 
@@ -51,10 +51,10 @@ namespace Moritz.Symbols
             foreach(string key in CLichtGlyphBoundingBoxesDictMM.Keys)
             {
                 GlyphBoundingBoxMM gbbMM = CLichtGlyphBoundingBoxesDictMM[key];
-                float top_1px = (float) gbbMM.mmTop * vScale;
-                float left_1px = (float) gbbMM.mmLeft * hScale;
-                float bottom_1px = (float) gbbMM.mmBottom * vScale;
-                float right_1px = (float) gbbMM.mmRight * hScale;
+                float top_1px = (float)gbbMM.mmTop * vScale;
+                float left_1px = (float)gbbMM.mmLeft * hScale;
+                float bottom_1px = (float)gbbMM.mmBottom * vScale;
+                float right_1px = (float)gbbMM.mmRight * hScale;
                 CLichtGlyphBoxMetric metrics_1px =
                    new CLichtGlyphBoxMetric(top_1px, right_1px, bottom_1px, left_1px);
                 CLichtGlyphBoundingBoxesDictPX.Add(key, metrics_1px);
@@ -64,10 +64,10 @@ namespace Moritz.Symbols
                 NoteheadStemPositionsMM nspMM = ClichtNoteheadStemPositionsDictMM[key];
                 NoteheadStemPositions_px nspPX = new NoteheadStemPositions_px()
                 {
-                    LeftStemX_px = (float) nspMM.mmLeftStemX * hScale,
-                    LeftStemY_px = (float) nspMM.mmLeftStemY * vScale,
-                    RightStemX_px = (float) nspMM.mmRightStemX * hScale,
-                    RightStemY_px = (float) nspMM.mmRightStemY * vScale
+                    LeftStemX_px = (float)nspMM.mmLeftStemX * hScale,
+                    LeftStemY_px = (float)nspMM.mmLeftStemY * vScale,
+                    RightStemX_px = (float)nspMM.mmRightStemX * hScale,
+                    RightStemY_px = (float)nspMM.mmRightStemY * vScale
                 };
                 ClichtNoteheadStemPositionsDictPX.Add(key, nspPX);
             }

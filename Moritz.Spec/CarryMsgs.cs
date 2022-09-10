@@ -1,9 +1,8 @@
-﻿using System.Xml;
+﻿using Moritz.Globals;
+
 using System.Collections.Generic;
 using System.Diagnostics;
-using System;
-
-using Moritz.Globals;
+using System.Xml;
 
 namespace Moritz.Spec
 {
@@ -63,7 +62,7 @@ namespace Moritz.Spec
         }
 
         public int Count { get { return _msgs.Count; } }
-        
+
 
         /// <summary>
         /// Checks that the new msg is a noteOff and has the same channel as existing msgs.

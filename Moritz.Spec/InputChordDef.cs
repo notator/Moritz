@@ -1,12 +1,9 @@
-using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Xml;
-using System.Text;
-
-using Krystals5ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Xml;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Moritz.Spec
 {
@@ -22,39 +19,39 @@ namespace Moritz.Spec
         public InputChordDef(int msPositionReFirstIUD, int msDuration, List<InputNoteDef> inputNoteDefs, M.Dynamic dynamic, TrkOptions trkOptions)
             : base(msDuration)
         {
-			#region check notated pitches and trkRef positions
-			int pitchBelow = -1;
-			foreach(InputNoteDef ind in inputNoteDefs)
-			{
-				Debug.Assert(ind.NotatedMidiPitch > pitchBelow);
-				pitchBelow = ind.NotatedMidiPitch;
+            #region check notated pitches and trkRef positions
+            int pitchBelow = -1;
+            foreach(InputNoteDef ind in inputNoteDefs)
+            {
+                Debug.Assert(ind.NotatedMidiPitch > pitchBelow);
+                pitchBelow = ind.NotatedMidiPitch;
 
-				if(ind.NoteOn != null && ind.NoteOn.SeqRef != null)
-				{
-					foreach(TrkRef trk in ind.NoteOn.SeqRef)
-					{ 
-						Debug.Assert(msPositionReFirstIUD <= trk.MsPosition);
-					}
-				}
-				if(ind.NoteOff != null && ind.NoteOff.SeqRef != null)
-				{
-					int minSeqPos = msPositionReFirstIUD + msDuration;
-					foreach(TrkRef trk in ind.NoteOff.SeqRef)
-					{
-						Debug.Assert(minSeqPos <= trk.MsPosition);
-					}
-				}
-				// Note that there is no corresponding check for ind.NoteOnTrkOffs and ind.NoteOffTrkOffs
-			}
-			#endregion
+                if(ind.NoteOn != null && ind.NoteOn.SeqRef != null)
+                {
+                    foreach(TrkRef trk in ind.NoteOn.SeqRef)
+                    {
+                        Debug.Assert(msPositionReFirstIUD <= trk.MsPosition);
+                    }
+                }
+                if(ind.NoteOff != null && ind.NoteOff.SeqRef != null)
+                {
+                    int minSeqPos = msPositionReFirstIUD + msDuration;
+                    foreach(TrkRef trk in ind.NoteOff.SeqRef)
+                    {
+                        Debug.Assert(minSeqPos <= trk.MsPosition);
+                    }
+                }
+                // Note that there is no corresponding check for ind.NoteOnTrkOffs and ind.NoteOffTrkOffs
+            }
+            #endregion
 
             _msPositionReFirstIUD = msPositionReFirstIUD;
-			_msDuration = msDuration;                                          
-			_inputNoteDefs = inputNoteDefs;
-			_lyric = null;
+            _msDuration = msDuration;
+            _inputNoteDefs = inputNoteDefs;
+            _lyric = null;
             _dynamic = (dynamic == M.Dynamic.none) ? null : M.CLichtDynamicsCharacters[dynamic];
-			_trkOptions = trkOptions;
-			_msDurationToNextBarline = null;
+            _trkOptions = trkOptions;
+            _msDurationToNextBarline = null;
         }
 
         /// <summary>
@@ -65,9 +62,9 @@ namespace Moritz.Spec
         /// </summary>
         public void Transpose(int interval)
         {
-			for(int i = 0; i < _inputNoteDefs.Count; ++i)
+            for(int i = 0; i < _inputNoteDefs.Count; ++i)
             {
-				_inputNoteDefs[i].NotatedMidiPitch = M.MidiValue(_inputNoteDefs[i].NotatedMidiPitch + interval);
+                _inputNoteDefs[i].NotatedMidiPitch = M.MidiValue(_inputNoteDefs[i].NotatedMidiPitch + interval);
             }
         }
 
@@ -92,24 +89,24 @@ namespace Moritz.Spec
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w)
         {
-			// we are inside a score:inputChord element
-			if(_ccSettings != null)
-			{
-				_ccSettings.WriteSVG(w);
-			}
+            // we are inside a score:inputChord element
+            if(_ccSettings != null)
+            {
+                _ccSettings.WriteSVG(w);
+            }
 
-			if(_trkOptions != null)
-			{
-				_trkOptions.WriteSVG(w, true);
-			}
+            if(_trkOptions != null)
+            {
+                _trkOptions.WriteSVG(w, true);
+            }
 
             w.WriteStartElement("score", "inputNotes", null);
-			
-			foreach(InputNoteDef ind in _inputNoteDefs)
-			{
-				ind.WriteSVG(w);
-			}
-			w.WriteEndElement(); // score:inputNotes
+
+            foreach(InputNoteDef ind in _inputNoteDefs)
+            {
+                ind.WriteSVG(w);
+            }
+            w.WriteEndElement(); // score:inputNotes
         }
 
         public override object Clone()
@@ -127,13 +124,13 @@ namespace Moritz.Spec
         private string _dynamic = null;
 
         public TrkOptions TrkOptions { get { return _trkOptions; } set { _trkOptions = value; } }
-		private TrkOptions _trkOptions = null;
+        private TrkOptions _trkOptions = null;
 
-		public CCSettings CCSettings { get { return _ccSettings; } set { _ccSettings = value; } }
-		private CCSettings _ccSettings = null;
+        public CCSettings CCSettings { get { return _ccSettings; } set { _ccSettings = value; } }
+        private CCSettings _ccSettings = null;
 
-		public List<InputNoteDef> InputNoteDefs { get {return _inputNoteDefs; }}
-		private List<InputNoteDef> _inputNoteDefs = new List<InputNoteDef>();
+        public List<InputNoteDef> InputNoteDefs { get { return _inputNoteDefs; } }
+        private List<InputNoteDef> _inputNoteDefs = new List<InputNoteDef>();
 
         public List<byte> NotatedMidiPitches
         {

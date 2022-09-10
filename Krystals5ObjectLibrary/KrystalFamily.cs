@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
 
 namespace Krystals5ObjectLibrary
 {
@@ -33,7 +30,7 @@ namespace Krystals5ObjectLibrary
     public class Dependency
     {
         public string Name;
-        
+
         public string Input1;
         public string Input2;
         public string Input3;

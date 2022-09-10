@@ -1,9 +1,10 @@
+using Krystals5ObjectLibrary;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Krystals5ObjectLibrary;
 
 namespace Krystals5ControlLibrary
 {
@@ -49,9 +50,9 @@ namespace Krystals5ControlLibrary
 
         public void SetControl()
         {
-            if (_editingOutputPoints)
+            if(_editingOutputPoints)
             {
-                if (_editingFixedPoints)
+                if(_editingFixedPoints)
                 {
                     TitleText = "Fixed Ouput Points";
                     CountLabelText = "            Count:";
@@ -64,7 +65,7 @@ namespace Krystals5ControlLibrary
             }
             else // editing input (=expansion) points
             {
-                if (_editingFixedPoints)
+                if(_editingFixedPoints)
                 {
                     TitleText = "Fixed Input Points";
                     CountLabelText = "            Count:";
@@ -82,7 +83,7 @@ namespace Krystals5ControlLibrary
         }
         private void SetValueControls()
         {
-            if (_editingFixedPoints)
+            if(_editingFixedPoints)
             {
                 CountValueLabel.Visible = true;
                 StartMomentUIntControl.Visible = false;
@@ -107,10 +108,10 @@ namespace Krystals5ControlLibrary
             PointGroup pGroup = new PointGroup();
             pGroup.Shape = (K.PointGroupShape)ShapeComboBox.SelectedIndex;
 
-            if (_editingFixedPoints)
+            if(_editingFixedPoints)
             {
                 pGroup.Value = K.GetUIntList(FixedPointsValuesUIntSeqControl.Sequence.ToString());
-                pGroup.Count = (uint) pGroup.Value.Count; // the number of values in the Value string
+                pGroup.Count = (uint)pGroup.Value.Count; // the number of values in the Value string
             }
             else
             {
@@ -124,7 +125,7 @@ namespace Krystals5ControlLibrary
             pGroup.FromRadius = float.Parse(FromRadiusFloatControl.Float.ToString());
             pGroup.FromAngle = float.Parse(FromAngleFloatControl.Float.ToString());
 
-            if (pGroup.Shape == K.PointGroupShape.circle)
+            if(pGroup.Shape == K.PointGroupShape.circle)
             {
                 pGroup.ToRadius = float.Parse(CircleToRadiusValueLabel.Text);
                 pGroup.ToAngle = float.Parse(CircleToAngleValueLabel.Text);
@@ -144,7 +145,7 @@ namespace Krystals5ControlLibrary
         }
         public void SetPointGroup(PointGroup pg)
         {
-            if (pg == null) // disable this control
+            if(pg == null) // disable this control
             {
                 this.Enabled = false;
                 // some objects are rendered black even when this control is disabled,
@@ -164,9 +165,9 @@ namespace Krystals5ControlLibrary
 
                 this.ShapeComboBox.SelectedIndex = (int)pg.Shape;
 
-                if (_editingFixedPoints)
+                if(_editingFixedPoints)
                 {
-                    FixedPointsValuesUIntSeqControl.Sequence = new StringBuilder( K.GetStringOfUnsignedInts(pg.Value));
+                    FixedPointsValuesUIntSeqControl.Sequence = new StringBuilder(K.GetStringOfUnsignedInts(pg.Value));
                     CountValueLabel.Text = pg.Value.Count.ToString();
                 }
                 else
@@ -176,7 +177,7 @@ namespace Krystals5ControlLibrary
                 }
                 FromRadiusFloatControl.Float = new StringBuilder(pg.FromRadius.ToString());
                 FromAngleFloatControl.Float = new StringBuilder(pg.FromAngle.ToString());
-                if (ShapeComboBox.SelectedIndex == (int)K.PointGroupShape.circle)
+                if(ShapeComboBox.SelectedIndex == (int)K.PointGroupShape.circle)
                 {
                     CircleToRadiusValueLabel.Visible = true;
                     CircleToAngleValueLabel.Visible = true;
@@ -203,7 +204,7 @@ namespace Krystals5ControlLibrary
         }
         public List<uint> GetValue()
         {
-            if (_editingFixedPoints)
+            if(_editingFixedPoints)
                 return (K.GetUIntList(FixedPointsValuesUIntSeqControl.Sequence.ToString()));
             else
                 return (K.GetUIntList(PlanetValueUIntControl.UnsignedInteger.ToString()));
@@ -225,12 +226,12 @@ namespace Krystals5ControlLibrary
         }
         private void ShapeComboBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
+            if(e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
                 UpdatePointGroupParameters();
         }
         private void ColorComboBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
+            if(e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
                 UpdatePointGroupParameters();
         }
         private void ColorComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -253,8 +254,8 @@ namespace Krystals5ControlLibrary
         /// If this flag has not been set, the function GetPointGroupParameters() throws an exception.
         /// </summary>
         public bool Busy
-        { 
-            get { return _busy; } 
+        {
+            get { return _busy; }
             set { _busy = value; }
         }
         #endregion Properties
@@ -273,7 +274,7 @@ namespace Krystals5ControlLibrary
         public PointGroupParametersChangedHandler UpdateFieldEditor;
         private void UpdatePointGroupParameters() // called by subordinate controls as their delegate
         {
-            if (UpdateFieldEditor != null)
+            if(UpdateFieldEditor != null)
                 UpdateFieldEditor(); // delegated to the FieldEditor (this control's container)
         }
         #endregion Delegates
@@ -281,12 +282,12 @@ namespace Krystals5ControlLibrary
         private void GetShape(object sender, EventArgs e)
         {
             ComboBox cb = sender as ComboBox;
-            if (cb.SelectedIndex == -1)
+            if(cb.SelectedIndex == -1)
                 cb.SelectedIndex = 0;
         }
         private void ShapeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ShapeComboBox.SelectedIndex == (int)K.PointGroupShape.circle)
+            if(ShapeComboBox.SelectedIndex == (int)K.PointGroupShape.circle)
             {
                 CircleToRadiusValueLabel.Visible = true;
                 CircleToAngleValueLabel.Visible = true;
@@ -304,19 +305,19 @@ namespace Krystals5ControlLibrary
         private void GetStartMoment(object sender, EventArgs e)
         {
             UnsignedIntControl uic = sender as UnsignedIntControl;
-            if (uic.UnsignedInteger.Length == 0)
+            if(uic.UnsignedInteger.Length == 0)
                 uic.UnsignedInteger = new StringBuilder("0");
         }
         private void GetFloat(object sender, EventArgs e)
         {
             FloatControl fc = sender as FloatControl;
-            if (fc.Float.Length == 0)
+            if(fc.Float.Length == 0)
                 fc.Float = new StringBuilder("0");
-            if (ShapeComboBox.SelectedIndex == (int)K.PointGroupShape.circle)
+            if(ShapeComboBox.SelectedIndex == (int)K.PointGroupShape.circle)
             {
-                if (fc.Tag.ToString() == "FromRadiusControlTag")
+                if(fc.Tag.ToString() == "FromRadiusControlTag")
                     CircleToRadiusValueLabel.Text = fc.Float.ToString();
-                if (fc.Tag.ToString() == "FromAngleControlTag")
+                if(fc.Tag.ToString() == "FromAngleControlTag")
                 {
                     float fval = float.Parse(fc.Float.ToString());
                     fval += 360f;
@@ -328,7 +329,7 @@ namespace Krystals5ControlLibrary
         {
             string val = FixedPointsValuesUIntSeqControl.Sequence.ToString();
             string[] values = val.Split(' ', '\r', '\n');
-            if (values[0].Equals(""))
+            if(values[0].Equals(""))
                 CountValueLabel.Text = "0";
             else CountValueLabel.Text = values.Length.ToString();
         }
@@ -339,7 +340,7 @@ namespace Krystals5ControlLibrary
             SamplePanel.Visible = false;
             ShapeComboBox.SelectedIndex = 0;
             StartMomentUIntControl.UnsignedInteger = new StringBuilder("0");
-            if (_editingFixedPoints)
+            if(_editingFixedPoints)
                 FixedPointsValuesUIntSeqControl.Sequence = new StringBuilder("0");
             else PlanetValueUIntControl.UnsignedInteger = new StringBuilder("0");
             FromRadiusFloatControl.Float = new StringBuilder("0");
@@ -357,7 +358,7 @@ namespace Krystals5ControlLibrary
         /// </summary>
         private void DrawSamplePanel()
         {
-            if (_sg != null)
+            if(_sg != null)
             {
                 _sg.Clear(Color.White);
                 float _inputDotOffset = ((_inputDotSize - 1) / 2) + 0.5f;
@@ -368,12 +369,12 @@ namespace Krystals5ControlLibrary
                 float lineHeight = 8f;
                 GetTheDotPen();
                 GetTheLinePen();
-                for (float d = 0; d < 4; d++)
+                for(float d = 0; d < 4; d++)
                 {
                     float lineX = lineOriginX + d * distance;
-                    if (!_editingFixedPoints && d < 3) // connecting lines are only drawn for planets
+                    if(!_editingFixedPoints && d < 3) // connecting lines are only drawn for planets
                         _sg.DrawLine(_theLinePen, lineX, lineHeight, lineX + distance, lineHeight);
-                    if (_editingOutputPoints)	// output points
+                    if(_editingOutputPoints)	// output points
                     {
                         _sg.FillEllipse(_theOutputFillBrush, lineOriginX + (d * distance) - _outputDotOffset, lineHeight - _outputDotOffset, _outputDotSize, _outputDotSize);
                         _sg.DrawEllipse(_theDotPen, lineOriginX + (d * distance) - _outputDotOffset, lineHeight - _outputDotOffset, _outputDotSize, _outputDotSize);
@@ -393,7 +394,7 @@ namespace Krystals5ControlLibrary
         public Pen TheLinePen { get { return _theLinePen; } }
         private void GetTheDotPen()
         {
-            switch (ColorComboBox.SelectedIndex)
+            switch(ColorComboBox.SelectedIndex)
             {
                 case 0: _theDotPen.Brush = Brushes.Black; break;
                 case 1: _theDotPen.Brush = Brushes.Red; break;
@@ -407,7 +408,7 @@ namespace Krystals5ControlLibrary
         }
         private void GetTheLinePen()
         {
-            switch (ColorComboBox.SelectedIndex)
+            switch(ColorComboBox.SelectedIndex)
             {
                 case 0: _theLinePen.Brush = Brushes.Gray; break;
                 case 1: _theLinePen.Brush = Brushes.OrangeRed; break;
@@ -426,7 +427,7 @@ namespace Krystals5ControlLibrary
         /// begins working with the PointGroupParameters. The flag must be reset to false when the event handler
         /// is finished.
         /// </summary>
-        private bool _busy; 
+        private bool _busy;
         private Graphics _sg; // the Graphics object for the Samples Panel
         private bool _editingOutputPoints;
         private bool _editingFixedPoints;

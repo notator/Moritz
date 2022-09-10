@@ -8,7 +8,6 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml;
 
 namespace Krystals5ObjectLibrary
 {
@@ -107,7 +106,7 @@ namespace Krystals5ObjectLibrary
         private void DeleteKrystalButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(_krystalChildrenTreeView.SelectedNode.Nodes.Count == 0);
-            
+
             var selectedNode = _krystalChildrenTreeView.SelectedNode;
             string krystalToDelete = selectedNode.Text;
 
@@ -124,7 +123,7 @@ namespace Krystals5ObjectLibrary
                 _krystalChildrenTreeView.EndUpdate();
                 this.SetForKrystal(null);
                 SetDeleteKrystalButtonVisible = false;
-                
+
             }
         }
 
@@ -314,9 +313,9 @@ namespace Krystals5ObjectLibrary
                 block.Add(K.GetHexString(strand.Values));
 
                 nextClock[nextClock.Length - 1] += strand.Values.Count;
-                for(int i = nextClock.Length - 1; i >= strand.Level ; i--)
+                for(int i = nextClock.Length - 1; i >= strand.Level; i--)
                 {
-                    nextClock[i-1] += 1;
+                    nextClock[i - 1] += 1;
                 }
                 if(kLevel > 4 && strand.Level > 1 && strand.Level <= kLevel - 2)
                 {
@@ -423,7 +422,7 @@ namespace Krystals5ObjectLibrary
                 clockString = clockString.Remove(0, colonIndex);
                 sectionString = K.GetStringOfUnsignedInts(section, '.') + ' ';
             }
-            var rval = new List<string> {sectionString + clockString};
+            var rval = new List<string> { sectionString + clockString };
 
             foreach(var sbLine in sbLines)
             {

@@ -1,10 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Xml;
+
+using System.Collections.Generic;
 
 namespace Moritz.Symbols
 {
@@ -20,7 +17,7 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> unused)
         {
-			w.SvgStartGroup(CSSObjectClass.inputVoice.ToString());
+            w.SvgStartGroup(CSSObjectClass.inputVoice.ToString());
 
             if(MidiChannel >= 0 && MidiChannel <= 15)
             {
@@ -39,9 +36,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject no in this.NoteObjects)
                 {
-					if(no is InputChordSymbol inputChordSymbol)
-						yield return inputChordSymbol;
-				}
+                    if(no is InputChordSymbol inputChordSymbol)
+                        yield return inputChordSymbol;
+                }
             }
         }
 

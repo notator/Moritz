@@ -74,7 +74,7 @@ namespace Krystals5Application
         }
         private void HandleExpansionEditorEvents(object sender, ExpansionEditorEventArgs e)
         {
-            switch (e.Message)
+            switch(e.Message)
             {
                 case ExpansionEditorMessage.New:
                     NewExpansionKrystal();
@@ -92,7 +92,7 @@ namespace Krystals5Application
                 editor.EventHandler += new ExpansionEditor.ExpansionEditorEventhandler(HandleExpansionEditorEvents);
                 editor.Show();
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -102,7 +102,7 @@ namespace Krystals5Application
             try
             {
                 string expansionKrystalFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.expansion);
-                if (expansionKrystalFilepath.Length > 0)
+                if(expansionKrystalFilepath.Length > 0)
                 {
                     ExpansionKrystal outputKrystal = new ExpansionKrystal(expansionKrystalFilepath);
 
@@ -111,7 +111,7 @@ namespace Krystals5Application
                     editor.Show();
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -124,7 +124,7 @@ namespace Krystals5Application
 
         private void HandleModulationEditorEvents(object sender, ModulationEditorEventArgs e)
         {
-            switch (e.Message)
+            switch(e.Message)
             {
                 case ModulationEditorMessage.New:
                     NewModulatedKrystal();
@@ -155,11 +155,11 @@ namespace Krystals5Application
                                                    kd.YInputFilepath,
                                                    kd.ModulatorFilepath);
 
-					ModulationEditor editor = new ModulationEditor(mKrystal)
-					{
-						EventHandler = new ModulationEditor.ModulationEditorEventHandler(HandleModulationEditorEvents)
-					};
-					editor.Show();
+                    ModulationEditor editor = new ModulationEditor(mKrystal)
+                    {
+                        EventHandler = new ModulationEditor.ModulationEditorEventHandler(HandleModulationEditorEvents)
+                    };
+                    editor.Show();
                 }
             }
         }
@@ -168,18 +168,18 @@ namespace Krystals5Application
             try
             {
                 string modulatedKrystalFilepath = K.GetFilepathFromOpenFileDialog(K.DialogFilterIndex.modulation);
-                if (modulatedKrystalFilepath.Length > 0)
+                if(modulatedKrystalFilepath.Length > 0)
                 {
                     ModulationKrystal outputKrystal = new ModulationKrystal(modulatedKrystalFilepath);
 
-					ModulationEditor editor = new ModulationEditor(outputKrystal)
-					{
-						EventHandler = new ModulationEditor.ModulationEditorEventHandler(HandleModulationEditorEvents)
-					};
-					editor.Show();
+                    ModulationEditor editor = new ModulationEditor(outputKrystal)
+                    {
+                        EventHandler = new ModulationEditor.ModulationEditorEventHandler(HandleModulationEditorEvents)
+                    };
+                    editor.Show();
                 }
             }
-            catch (ApplicationException ae)
+            catch(ApplicationException ae)
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -283,7 +283,7 @@ namespace Krystals5Application
         /// <returns></returns>
         private Dictionary<string, string> SaveExpandersWithNewNames()
         {
-            var expandersNamesDict = new Dictionary<string,string> ();
+            var expandersNamesDict = new Dictionary<string, string>();
             var expanderFilePaths = Directory.EnumerateFiles(M.LocalMoritzExpansionFieldsFolder, "e*.kexp");
             List<string> sortedExpanderFilePaths = expanderFilePaths.ToList();
             sortedExpanderFilePaths.Sort();

@@ -43,7 +43,7 @@ namespace Krystals5ObjectLibrary
             {
                 nodes = new List<SvgNode>() { svgPath.Nodes[0] };
             }
-                
+
             int nodesLevel = GetNodesLevel(densityInputKrystal, nodes.Count);
             var nodeIndex = -1;
 

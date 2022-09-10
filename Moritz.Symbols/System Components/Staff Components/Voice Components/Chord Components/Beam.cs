@@ -3,8 +3,8 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	public abstract class Beam
-	{
+    public abstract class Beam
+    {
         /// <summary>
         /// Creates a horizontal Beam whose top edge is at 0F.
         /// </summary>
@@ -46,7 +46,7 @@ namespace Moritz.Symbols
             {
                 dy = gap * nGaps;
             }
-            dy += outerLeftY - _leftTopY ;
+            dy += outerLeftY - _leftTopY;
             MoveYs(dy, dy);
         }
 
@@ -138,27 +138,27 @@ namespace Moritz.Symbols
         }
     }
 
-	/**********************************************************************************************/
-	public interface IBeamStub
-	{
-		DurationClass DurationClass { get; }
+    /**********************************************************************************************/
+    public interface IBeamStub
+    {
+        DurationClass DurationClass { get; }
         void ShearBeamStub(float shearAxis, float tanAlpha, float stemX);
     }
 
-	internal class SemiquaverBeamStub : SemiquaverBeam, IBeamStub
-	{
-		public SemiquaverBeamStub(float left, float right)
-			: base(left, right)
-		{
-		}
+    internal class SemiquaverBeamStub : SemiquaverBeam, IBeamStub
+    {
+        public SemiquaverBeamStub(float left, float right)
+            : base(left, right)
+        {
+        }
 
-		public void ShearBeamStub(float shearAxis, float tanAlpha, float stemX)
-		{
-			base.ShearStub(shearAxis, tanAlpha, stemX);
-		}
+        public void ShearBeamStub(float shearAxis, float tanAlpha, float stemX)
+        {
+            base.ShearStub(shearAxis, tanAlpha, stemX);
+        }
 
-		public DurationClass DurationClass { get { return DurationClass.semiquaver; } }
-	}
+        public DurationClass DurationClass { get { return DurationClass.semiquaver; } }
+    }
     internal class ThreeFlagsBeamStub : ThreeFlagsBeam, IBeamStub
     {
         public ThreeFlagsBeamStub(float left, float right)
@@ -171,8 +171,8 @@ namespace Moritz.Symbols
             base.ShearStub(shearAxis, tanAlpha, stemX);
         }
 
-		public DurationClass DurationClass { get { return DurationClass.threeFlags; } }
-	}
+        public DurationClass DurationClass { get { return DurationClass.threeFlags; } }
+    }
     internal class FourFlagsBeamStub : FourFlagsBeam, IBeamStub
     {
         public FourFlagsBeamStub(float left, float right)
@@ -185,8 +185,8 @@ namespace Moritz.Symbols
             base.ShearStub(shearAxis, tanAlpha, stemX);
         }
 
-		public DurationClass DurationClass { get { return DurationClass.fourFlags; } }
-	}
+        public DurationClass DurationClass { get { return DurationClass.fourFlags; } }
+    }
     internal class FiveFlagsBeamStub : FiveFlagsBeam, IBeamStub
     {
         public FiveFlagsBeamStub(float left, float right)
@@ -199,6 +199,6 @@ namespace Moritz.Symbols
             base.ShearStub(shearAxis, tanAlpha, stemX);
         }
 
-		public DurationClass DurationClass { get { return DurationClass.fiveFlags; } }
-	}
+        public DurationClass DurationClass { get { return DurationClass.fiveFlags; } }
+    }
 }

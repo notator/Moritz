@@ -1,13 +1,11 @@
-﻿using System.Windows.Forms;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System.Drawing;
-
-using Moritz.Globals;
+using System.Windows.Forms;
 
 namespace Moritz.Palettes
 {
-    public enum SavedState {unconfirmed, confirmed, saved};
+    public enum SavedState { unconfirmed, confirmed, saved };
 
     public class FormStateFunctions
     {
@@ -53,29 +51,29 @@ namespace Moritz.Palettes
             switch(state)
             {
                 case SavedState.saved:
-                    {
-                        if(text.EndsWith(UnconfirmedStr))
-                            text = text.Remove(text.Length - UnconfirmedStr.Length);
-                        if(text.EndsWith(ConfirmedStr))
-                            text = text.Remove(text.Length - ConfirmedStr.Length);
-                        break;
-                    }
+                {
+                    if(text.EndsWith(UnconfirmedStr))
+                        text = text.Remove(text.Length - UnconfirmedStr.Length);
+                    if(text.EndsWith(ConfirmedStr))
+                        text = text.Remove(text.Length - ConfirmedStr.Length);
+                    break;
+                }
                 case SavedState.confirmed:
-                    {
-                        if(text.EndsWith(UnconfirmedStr))
-                            text = text.Remove(text.Length - UnconfirmedStr.Length);
-                        if(!text.EndsWith(ConfirmedStr))
-                            text = text + ConfirmedStr;
-                        break;
-                    }
+                {
+                    if(text.EndsWith(UnconfirmedStr))
+                        text = text.Remove(text.Length - UnconfirmedStr.Length);
+                    if(!text.EndsWith(ConfirmedStr))
+                        text = text + ConfirmedStr;
+                    break;
+                }
                 case SavedState.unconfirmed:
-                    {
-                        if(text.EndsWith(ConfirmedStr))
-                            text = text.Remove(text.Length - ConfirmedStr.Length);
-                        if(!text.EndsWith(UnconfirmedStr))
-                            text = text + UnconfirmedStr;
-                        break;
-                    }
+                {
+                    if(text.EndsWith(ConfirmedStr))
+                        text = text.Remove(text.Length - ConfirmedStr.Length);
+                    if(!text.EndsWith(UnconfirmedStr))
+                        text = text + UnconfirmedStr;
+                    break;
+                }
             }
             return text;
         }

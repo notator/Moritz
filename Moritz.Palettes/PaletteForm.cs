@@ -1,13 +1,14 @@
+using Krystals5ObjectLibrary;
+
+using Moritz.Globals;
+
 using System;
-using System.Windows.Forms;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
+using System.Windows.Forms;
 using System.Xml;
-
-using Krystals5ObjectLibrary;
-using Moritz.Globals;
 
 namespace Moritz.Palettes
 {
@@ -112,11 +113,11 @@ namespace Moritz.Palettes
 
         private void ConnectBasicChordControl()
         {
-			_bcc = new BasicChordControl(SetDialogState)
-			{
-				Location = new Point(22, 14)
-			};
-			Controls.Add(_bcc);
+            _bcc = new BasicChordControl(SetDialogState)
+            {
+                Location = new Point(22, 14)
+            };
+            Controls.Add(_bcc);
             _bcc.TabIndex = 5;
         }
         private void ConnectPaletteButtonsControl(int domain, string audioFolder)
@@ -135,7 +136,7 @@ namespace Moritz.Palettes
         {
             if(_ornamentsForm != null)
             {
-                DialogResult result = MessageBox.Show("Do you really want to replace the existing ornament settings?", "Warning", 
+                DialogResult result = MessageBox.Show("Do you really want to replace the existing ornament settings?", "Warning",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
                 if(result == DialogResult.Yes)
                 {
@@ -229,7 +230,7 @@ namespace Moritz.Palettes
             {
                 OrnamentNumbersTextBox_Leave(OrnamentNumbersTextBox, null);
                 MinMsDurationsTextBox_Leave(MinMsDurationsTextBox, null);
-            } 
+            }
         }
 
         protected void PaletteForm_Click(object sender, EventArgs e)
@@ -342,8 +343,8 @@ namespace Moritz.Palettes
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
             Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
-            DialogResult result = 
-                MessageBox.Show("Are you sure you want to revert this palette and its ornaments to the saved version?", "Revert?", 
+            DialogResult result =
+                MessageBox.Show("Are you sure you want to revert this palette and its ornaments to the saved version?", "Revert?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if(result == System.Windows.Forms.DialogResult.Yes)
@@ -392,7 +393,7 @@ namespace Moritz.Palettes
                                     _fsf.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
                                     break;
                                 }
-                                
+
                             }
                             M.ReadToXmlElementTag(r, "palette", "moritzKrystalScore");
                         }
@@ -405,7 +406,7 @@ namespace Moritz.Palettes
                 {
                     string msg = "Exception message:\n\n" + ex.Message;
                     MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                } 
+                }
             }
         }
 
@@ -434,7 +435,7 @@ namespace Moritz.Palettes
             DialogResult result = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
             if(result == DialogResult.No)
                 return;
-            
+
             DeleteOrnamentsForm();
         }
 
@@ -498,7 +499,7 @@ namespace Moritz.Palettes
             else
             {
                 MidiInstrumentsHelpButton.Text = "MIDI Instruments";
-                MidiInstrumentsHelpButton.Click -= PercussionInstrHelpButton_Click; 
+                MidiInstrumentsHelpButton.Click -= PercussionInstrHelpButton_Click;
                 MidiInstrumentsHelpButton.Click += MidiInstrumentsHelpButton_Click;
             }
 
@@ -523,7 +524,7 @@ namespace Moritz.Palettes
             CloseMIDIInstrumentsHelpForm();
             CloseMIDIPercussionHelpForm();
 
-            if(_percussionInstrHelpForm  == null)
+            if(_percussionInstrHelpForm == null)
             {
                 _percussionInstrHelpForm = new MIDIPercussionHelpForm(CloseMIDIPercussionHelpForm);
                 _percussionInstrHelpForm.Show();
@@ -596,28 +597,28 @@ namespace Moritz.Palettes
 
         private List<TextBox> GetAllTextBoxes()
         {
-			List<TextBox> allTextBoxes = new List<TextBox>
-			{
-				_bcc.ChordDensitiesTextBox,
-				_bcc.DurationsTextBox,
-				_bcc.MidiPitchesTextBox,
-				_bcc.VelocitiesTextBox,
-				_bcc.ChordOffsTextBox,
-				_bcc.RootInversionTextBox,
-				_bcc.InversionIndicesTextBox,
-				_bcc.VerticalVelocityFactorsTextBox,
+            List<TextBox> allTextBoxes = new List<TextBox>
+            {
+                _bcc.ChordDensitiesTextBox,
+                _bcc.DurationsTextBox,
+                _bcc.MidiPitchesTextBox,
+                _bcc.VelocitiesTextBox,
+                _bcc.ChordOffsTextBox,
+                _bcc.RootInversionTextBox,
+                _bcc.InversionIndicesTextBox,
+                _bcc.VerticalVelocityFactorsTextBox,
 
-				BankIndicesTextBox,
-				PatchIndicesTextBox,
-				PitchwheelDeviationsTextBox,
-				PitchwheelEnvelopesTextBox,
-				PanEnvelopesTextBox,
-				ModulationWheelEnvelopesTextBox,
-				ExpressionEnvelopesTextBox,
-				OrnamentNumbersTextBox,
-				MinMsDurationsTextBox
-			};
-			return allTextBoxes;
+                BankIndicesTextBox,
+                PatchIndicesTextBox,
+                PitchwheelDeviationsTextBox,
+                PitchwheelEnvelopesTextBox,
+                PanEnvelopesTextBox,
+                ModulationWheelEnvelopesTextBox,
+                ExpressionEnvelopesTextBox,
+                OrnamentNumbersTextBox,
+                MinMsDurationsTextBox
+            };
+            return allTextBoxes;
         }
 
         private void EnableMainParameters()
@@ -911,7 +912,7 @@ namespace Moritz.Palettes
         public List<string> GetCheckedIntStrings(string text, int count, int minVal, int maxVal, char separator)
         {
             List<string> strings = new List<string>();
-            
+
             if(text.Length > 0)
             {
                 List<int> ints = null;
@@ -945,7 +946,7 @@ namespace Moritz.Palettes
                 else
                     _paletteButtonsControl.Enabled = true;
             }
-            
+
             SetSettingsHaveChanged();
         }
 
@@ -1156,7 +1157,7 @@ namespace Moritz.Palettes
             #endregion
 
             M.ReadToXmlElementTag(r, "basicChord");
-            while(r.Name == "basicChord" || r.Name == "bankIndices" || r.Name == "patchIndices" 
+            while(r.Name == "basicChord" || r.Name == "bankIndices" || r.Name == "patchIndices"
                 || r.Name == "repeats" || r.Name == "pitchwheelDeviations"
                 || r.Name == "pitchwheelEnvelopes" || r.Name == "panEnvelopes"
                 || r.Name == "modulationWheelEnvelopes" || r.Name == "expressionEnvelopes"

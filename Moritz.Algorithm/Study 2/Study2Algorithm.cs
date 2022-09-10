@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using Krystals5ObjectLibrary;
 
-using Krystals5ObjectLibrary;
-using Moritz.Algorithm;
 using Moritz.Palettes;
 using Moritz.Spec;
+
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Moritz.Algorithm.Study2
 {
@@ -32,66 +31,66 @@ namespace Moritz.Algorithm.Study2
             List<Trk> sequentialMainStaffBars = WriteMainStaff();
             List<Trk> sequentialStaff2Bars = WriteOtherStaff(2, sequentialMainStaffBars);
             List<Trk> sequentialStaff1Bars = WriteOtherStaff(1, sequentialMainStaffBars);
-            Debug.Assert((sequentialMainStaffBars.Count == sequentialStaff2Bars.Count) 
+            Debug.Assert((sequentialMainStaffBars.Count == sequentialStaff2Bars.Count)
                       && (sequentialMainStaffBars.Count == sequentialStaff1Bars.Count));
 
-			List<int> barlineMsPositions = GetBarlinePositions(sequentialMainStaffBars);
+            List<int> barlineMsPositions = GetBarlinePositions(sequentialMainStaffBars);
 
-			Trk mainTrk1 = GetMainTrk(sequentialStaff1Bars);
-			Trk mainTrk2 = GetMainTrk(sequentialStaff2Bars);
-			Trk mainTrk3 = GetMainTrk(sequentialMainStaffBars);
+            Trk mainTrk1 = GetMainTrk(sequentialStaff1Bars);
+            Trk mainTrk2 = GetMainTrk(sequentialStaff2Bars);
+            Trk mainTrk3 = GetMainTrk(sequentialMainStaffBars);
 
 
-			List<Trk> trks = new List<Trk>()
-				{
-					mainTrk1,
-					mainTrk2,
-					mainTrk3
-				};
+            List<Trk> trks = new List<Trk>()
+                {
+                    mainTrk1,
+                    mainTrk2,
+                    mainTrk3
+                };
 
-			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
+            Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
-			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
+            List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
-			return bars;
+            return bars;
         }
 
-		/// <summary>
-		/// Returns the concatenation of the argument Trks, with rests agglommerated.
-		/// </summary>
-		/// <param name="trkSequence"></param>
-		/// <returns></returns>
-		private Trk GetMainTrk(List<Trk> trkSequence)
-		{
-			Trk mainTrk = new Trk(trkSequence[0].MidiChannel);
-			foreach(Trk trk in trkSequence)
-			{
-				mainTrk.AddRange(trk); // agglommerates rests
-			}
-			return mainTrk;
-		}
+        /// <summary>
+        /// Returns the concatenation of the argument Trks, with rests agglommerated.
+        /// </summary>
+        /// <param name="trkSequence"></param>
+        /// <returns></returns>
+        private Trk GetMainTrk(List<Trk> trkSequence)
+        {
+            Trk mainTrk = new Trk(trkSequence[0].MidiChannel);
+            foreach(Trk trk in trkSequence)
+            {
+                mainTrk.AddRange(trk); // agglommerates rests
+            }
+            return mainTrk;
+        }
 
-		private List<int> GetBarlinePositions(List<Trk> sequentialStaff1Bars)
-		{
-			var barlinePositions = new List<int>();
-			int msPos = 0;
-			foreach(Trk trk in sequentialStaff1Bars)
-			{
-				msPos += trk.MsDuration;
-				barlinePositions.Add(msPos);
-			}
-			return barlinePositions;
-		}
+        private List<int> GetBarlinePositions(List<Trk> sequentialStaff1Bars)
+        {
+            var barlinePositions = new List<int>();
+            int msPos = 0;
+            foreach(Trk trk in sequentialStaff1Bars)
+            {
+                msPos += trk.MsDuration;
+                barlinePositions.Add(msPos);
+            }
+            return barlinePositions;
+        }
 
-		/// <summary>
-		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
-		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-		{
-			return null;
-		}
+        /// <summary>
+        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
+        /// </summary>
+        protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
+        {
+            return null;
+        }
 
-		private List<Trk> WriteMainStaff()
+        private List<Trk> WriteMainStaff()
         {
             List<Trk> consecutiveBars = new List<Trk>();
             List<List<int>> dcValuesPerTopStaffBar = _krystals[0].GetValues(_krystals[0].Level);
@@ -122,15 +121,15 @@ namespace Moritz.Algorithm.Study2
         private List<Trk> WriteOtherStaff(int staffNumber, List<Trk> topStaffBars)
         {
             List<Trk> consecutiveBars = new List<Trk>();
-			Krystal krystal = _krystals[(staffNumber == 2) ? 1 : 2];
+            Krystal krystal = _krystals[(staffNumber == 2) ? 1 : 2];
             Palette palette = _palettes[(staffNumber == 2) ? 1 : 2];
             List<List<int>> strandValuesList = krystal.GetValues(krystal.Level);
             Debug.Assert(topStaffBars.Count == strandValuesList.Count);
 
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
-                Trk topStaffTrk =  topStaffBars[barIndex];
-				Trk newTrk = new Trk((staffNumber == 2) ? 1 : 0, 0, new List<IUniqueDef>());
+                Trk topStaffTrk = topStaffBars[barIndex];
+                Trk newTrk = new Trk((staffNumber == 2) ? 1 : 0, 0, new List<IUniqueDef>());
                 int currentMsPositionReFirstIUD = topStaffTrk.UniqueDefs[0].MsPositionReFirstUD;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
@@ -141,7 +140,7 @@ namespace Moritz.Algorithm.Study2
                     IUniqueDef noteDef = palette.GetIUniqueDef(value - 1);
                     noteDef.MsDuration = lowerStaffMsDurations[valueIndex];
                     noteDef.MsPositionReFirstUD = currentMsPositionReFirstIUD;
-                    currentMsPositionReFirstIUD += noteDef.MsDuration; 
+                    currentMsPositionReFirstIUD += noteDef.MsDuration;
                     newTrk.UniqueDefs.Add(noteDef);
                 }
 

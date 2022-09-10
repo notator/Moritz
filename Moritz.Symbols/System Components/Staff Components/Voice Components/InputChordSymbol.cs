@@ -1,11 +1,10 @@
-using System.Text;
-using System.Collections.Generic;
-
-using System.Diagnostics;
-
 using Moritz.Globals;
-using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Xml;
+
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 
 namespace Moritz.Symbols
 {
@@ -37,7 +36,7 @@ namespace Moritz.Symbols
         /// used by CautionaryInputChordSymbol
         /// </summary>
         public InputChordSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice,  msDuration, absMsPosition, minimumCrotchetDurationMS, fontSize, false)
+            : base(voice, msDuration, absMsPosition, minimumCrotchetDurationMS, fontSize, false)
         {
 
         }
@@ -98,12 +97,12 @@ namespace Moritz.Symbols
 
             Debug.Assert(_msDuration > 0);
 
-			w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
             w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
             _inputChordDef.WriteSVG(w);
 
-			w.SvgStartGroup(CSSObjectClass.graphics.ToString());
+            w.SvgStartGroup(CSSObjectClass.graphics.ToString());
             ChordMetrics.WriteSVG(w);
             w.SvgEndGroup();
 

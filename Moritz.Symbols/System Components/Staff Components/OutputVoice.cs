@@ -1,11 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-using Moritz.Midi;
-using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Xml;
+
+using System.Collections.Generic;
 
 namespace Moritz.Symbols
 {
@@ -17,9 +13,9 @@ namespace Moritz.Symbols
             MidiChannel = midiChannel;
         }
 
-		public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
-			w.SvgStartGroup(CSSObjectClass.voice.ToString());
+            w.SvgStartGroup(CSSObjectClass.voice.ToString());
 
             base.WriteSVG(w, carryMsgsPerChannel);
             w.SvgEndGroup(); // outputVoice

@@ -25,7 +25,7 @@ namespace Krystals5ObjectLibrary
             using(XmlReader r = XmlReader.Create(filepath))
             {
                 K.ReadToXmlElementTag(r, "expansion"); // check that this is an expansion (the other checks have been done in base()
-                for(int attr = 0 ; attr < r.AttributeCount ; attr++)
+                for(int attr = 0; attr < r.AttributeCount; attr++)
                 {
                     r.MoveToAttribute(attr);
                     switch(r.Name)
@@ -106,7 +106,7 @@ namespace Krystals5ObjectLibrary
             }
             Expand();
 
-            Name = GetUniqueName(K.KrystalType.exp); 
+            Name = GetUniqueName(K.KrystalType.exp);
         }
 
         #endregion
@@ -243,5 +243,5 @@ namespace Krystals5ObjectLibrary
         public string PointsInputFilename { get; set; }
         public string ExpanderFilename { get; set; }
     }
- }
+}
 

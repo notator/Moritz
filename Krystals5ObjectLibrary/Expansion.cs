@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace Krystals5ObjectLibrary
 {
@@ -80,7 +80,7 @@ namespace Krystals5ObjectLibrary
                 // iPointPosition == null if the current input point is not a planet
                 // If the current input point is a planet, calculate distances to the fixed output points.
                 if(iPointPosition != null && fixedOutputPointGroups.Count > 0)
-                    CalculateInputPlanetDistances(distances, iPointIndex, (PointF) iPointPosition, fixedOutputPointGroups);
+                    CalculateInputPlanetDistances(distances, iPointIndex, (PointF)iPointPosition, fixedOutputPointGroups);
 
                 if(outputPlanets.Count > 0)
                 {   // If there are output planets, it is necessary to calculate their distances from the input point
@@ -89,7 +89,7 @@ namespace Krystals5ObjectLibrary
                     if(iPointPosition == null)
                         throw new ApplicationException("Error finding the position of an input point.");
                     // There are output planets, so calculate their distances from the (planet or fixed)input point.
-                    CalculateOutputPlanetsDistances(momentIndex, distances, iPointIndex, (PointF) iPointPosition, outputPlanets);
+                    CalculateOutputPlanetsDistances(momentIndex, distances, iPointIndex, (PointF)iPointPosition, outputPlanets);
                 }
                 #endregion calculate distances for planets where necessary
 
@@ -106,30 +106,30 @@ namespace Krystals5ObjectLibrary
 
         private void ContourStrands(List<StrandNode> contouredStrandNodeList, List<Strand> strands)
         {
-            Debug.Assert(contouredStrandNodeList.Count ==  strands.Count);
+            Debug.Assert(contouredStrandNodeList.Count == strands.Count);
 
             List<uint> tempList = new List<uint>();
             int[] contour;
-            for(int strandIndex = 0 ; strandIndex < _strands.Count ; strandIndex++)
+            for(int strandIndex = 0; strandIndex < _strands.Count; strandIndex++)
             {
-				if(contouredStrandNodeList[strandIndex] is ContouredStrandNode contouredStrandNode
-					&& contouredStrandNode.StrandDensity > 1
-					&& contouredStrandNode.StrandDensity <= 7)
-				{
-					int density = contouredStrandNode.StrandDensity;
-					contour = K.Contour(density, contouredStrandNode.strandContour, contouredStrandNode.strandAxis);
-					_strands[strandIndex].Values.Sort();
-					tempList.Clear();
-					for(int j = 0; j < density; j++)
-					{
-						tempList.Add(_strands[strandIndex].Values[contour[j] - 1]);
-					}
-					for(int j = 0; j < density; j++)
-					{
-						_strands[strandIndex].Values[j] = tempList[j];
-					}
-				}
-			}
+                if(contouredStrandNodeList[strandIndex] is ContouredStrandNode contouredStrandNode
+                    && contouredStrandNode.StrandDensity > 1
+                    && contouredStrandNode.StrandDensity <= 7)
+                {
+                    int density = contouredStrandNode.StrandDensity;
+                    contour = K.Contour(density, contouredStrandNode.strandContour, contouredStrandNode.strandAxis);
+                    _strands[strandIndex].Values.Sort();
+                    tempList.Clear();
+                    for(int j = 0; j < density; j++)
+                    {
+                        tempList.Add(_strands[strandIndex].Values[contour[j] - 1]);
+                    }
+                    for(int j = 0; j < density; j++)
+                    {
+                        _strands[strandIndex].Values[j] = tempList[j];
+                    }
+                }
+            }
         }
 
         #region public properties
@@ -149,15 +149,15 @@ namespace Krystals5ObjectLibrary
         private void CalculateFixedDistances(uint[,] distances, List<PointGroup> inputPGs, List<PointGroup> outputPGs)
         {
             foreach(PointGroup ipg in inputPGs)
-                for(int iindex = 0 ; iindex < ipg.Count ; iindex++)
+                for(int iindex = 0; iindex < ipg.Count; iindex++)
                 {
-                    int iPointValue = (int) ipg.Value[iindex];
+                    int iPointValue = (int)ipg.Value[iindex];
                     int iPointIndex = iPointValue - 1;
                     PointF iPointPosition = ipg.WindowsPixelCoordinates[iindex];
                     foreach(PointGroup opg in outputPGs)
-                        for(int oindex = 0 ; oindex < opg.Count ; oindex++)
+                        for(int oindex = 0; oindex < opg.Count; oindex++)
                         {
-                            int oPointValue = (int) opg.Value[oindex];
+                            int oPointValue = (int)opg.Value[oindex];
                             int oPointIndex = oPointValue - 1;
                             PointF oPointPosition = opg.WindowsPixelCoordinates[oindex];
                             distances[iPointIndex, oPointIndex] = SquaredDistance(iPointPosition, oPointPosition);
@@ -196,7 +196,7 @@ namespace Krystals5ObjectLibrary
                 foreach(PointGroup pg in planet.Subpaths)
                 {
                     if(momentIndex >= pg.Count)
-                        momentIndex -= (int) pg.Count;
+                        momentIndex -= (int)pg.Count;
                     else
                     {
                         position = pg.WindowsPixelCoordinates[momentIndex];
@@ -249,9 +249,9 @@ namespace Krystals5ObjectLibrary
                                                     List<PointGroup> fixedOutputPointGroups)
         {
             foreach(PointGroup opg in fixedOutputPointGroups)
-                for(int oindex = 0 ; oindex < opg.Count ; oindex++)
+                for(int oindex = 0; oindex < opg.Count; oindex++)
                 {
-                    int oPointIndex = (int) opg.Value[oindex] - 1;
+                    int oPointIndex = (int)opg.Value[oindex] - 1;
                     PointF oPointPosition = opg.WindowsPixelCoordinates[oindex];
                     distances[iPlanetIndex, oPointIndex]
                         = SquaredDistance(iPlanetPosition, oPointPosition);
@@ -269,7 +269,7 @@ namespace Krystals5ObjectLibrary
             bool found = false;
             foreach(PointGroup pg in fixedInputPointGroups)
             {
-                for(int i = 0 ; i < pg.Count ; i++)
+                for(int i = 0; i < pg.Count; i++)
                 {
                     if(iPointValue == pg.Value[i])
                     {
@@ -312,8 +312,8 @@ namespace Krystals5ObjectLibrary
                 if(oPosition == null)
                     throw new ApplicationException("Error finding the position of an output planet.");
 
-                distances[iPointIndex, (int) oPlanet.Value - 1]
-                        = SquaredDistance(iPointPosition, (PointF) oPosition);
+                distances[iPointIndex, (int)oPlanet.Value - 1]
+                        = SquaredDistance(iPointPosition, (PointF)oPosition);
             }
         }
         /// <summary>
@@ -328,7 +328,7 @@ namespace Krystals5ObjectLibrary
             float x = inP.X - outP.X;
             float y = inP.Y - outP.Y;
             float result = ((x * x) + (y * y));
-            uint uintResult = (uint) result;
+            uint uintResult = (uint)result;
             float diff = result - uintResult;
             if(diff >= 0.5f)
                 uintResult++;
@@ -336,11 +336,11 @@ namespace Krystals5ObjectLibrary
         }
         public static Strand ExpandStrand(int level, int density, List<TrammelMark> trammel)
         {
-            Strand strand = new Strand((uint) level);
+            Strand strand = new Strand((uint)level);
             SortedList<uint, TrammelMark> expansion = new SortedList<uint, TrammelMark>();
 
             // First add each trammel mark's distance to its current position...
-            for(int i = 0 ; i < trammel.Count ; i++)
+            for(int i = 0; i < trammel.Count; i++)
             {
                 trammel[i].Position += trammel[i].Distance;
                 uint positionKey = trammel[i].PositionKey;
@@ -350,10 +350,10 @@ namespace Krystals5ObjectLibrary
             }
 
             // Now construct the strand.
-            for(int i = 0 ; i < density ; i++)
+            for(int i = 0; i < density; i++)
             {
                 TrammelMark tm = expansion.Values[0];
-                strand.Values.Add((uint) tm.Value);
+                strand.Values.Add((uint)tm.Value);
                 expansion.RemoveAt(0);
                 tm.Position += tm.Distance;
                 uint positionKey = tm.PositionKey;
@@ -366,7 +366,7 @@ namespace Krystals5ObjectLibrary
             // Now reset the trammel so that the smallest trammel mark position is 0.
             // First, remove unused distances...
             expansion.Clear();
-            for(int i = 0 ; i < trammel.Count ; i++)
+            for(int i = 0; i < trammel.Count; i++)
             {
                 trammel[i].Position -= trammel[i].Distance;
                 uint positionKey = trammel[i].PositionKey;

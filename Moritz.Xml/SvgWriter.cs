@@ -1,10 +1,8 @@
-﻿using System;
-using System.Xml;
-using System.Text;
-using System.Diagnostics;
-using System.Collections.Generic;
+﻿using Moritz.Globals;
 
-using Moritz.Globals;
+using System;
+using System.Text;
+using System.Xml;
 
 namespace Moritz.Xml
 {
@@ -52,24 +50,24 @@ namespace Moritz.Xml
             _w.WriteEndElement();
         }
 
-		/// <summary>
-		/// Writes an SVG "line" element
-		/// </summary>
-		/// <param name="styleName">the line's CSS style name</param>
-		/// <param name="x1"></param>
-		/// <param name="y1"></param>
-		/// <param name="x2"></param>
-		/// <param name="y2"></param>
-		public void SvgLine(CSSObjectClass cssClass, float x1, float y1, float x2, float y2)
-		{
-			_w.WriteStartElement("line");
-		    _w.WriteAttributeString("class", cssClass.ToString());
-			_w.WriteAttributeString("x1", M.FloatToShortString(x1));
-			_w.WriteAttributeString("y1", M.FloatToShortString(y1));
-			_w.WriteAttributeString("x2", M.FloatToShortString(x2));
+        /// <summary>
+        /// Writes an SVG "line" element
+        /// </summary>
+        /// <param name="styleName">the line's CSS style name</param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        public void SvgLine(CSSObjectClass cssClass, float x1, float y1, float x2, float y2)
+        {
+            _w.WriteStartElement("line");
+            _w.WriteAttributeString("class", cssClass.ToString());
+            _w.WriteAttributeString("x1", M.FloatToShortString(x1));
+            _w.WriteAttributeString("y1", M.FloatToShortString(y1));
+            _w.WriteAttributeString("x2", M.FloatToShortString(x2));
             _w.WriteAttributeString("y2", M.FloatToShortString(y2));
             _w.WriteEndElement(); //line
-		}
+        }
 
         /// <summary>
         /// Writes an SVG "rect" element having a class that has a CSS definiton elsewhere.
@@ -82,51 +80,51 @@ namespace Moritz.Xml
         public void SvgRect(CSSObjectClass cssClass, float left, float top, float width, float height)
         {
             _w.WriteStartElement("rect");
-			_w.WriteAttributeString("class", cssClass.ToString());
-			_w.WriteAttributeString("x", M.FloatToShortString(left));
+            _w.WriteAttributeString("class", cssClass.ToString());
+            _w.WriteAttributeString("x", M.FloatToShortString(left));
             _w.WriteAttributeString("y", M.FloatToShortString(top));
             _w.WriteAttributeString("width", M.FloatToShortString(width));
             _w.WriteAttributeString("height", M.FloatToShortString(height));
             _w.WriteEndElement(); // rect
         }
 
-		/// <summary>
-		/// Writes an SVG "circle" element having a class that has a CSS definiton elsewhere.
-		/// </summary>
-		/// <param name="type">Not written if null or empty</param>
-		/// <param name="cx"></param>
-		/// <param name="cy"></param>
-		/// <param name="r"></param>
-		public void SvgCircle(CSSObjectClass cssClass, float cx, float cy, float r)
-		{
-			WriteStartElement("circle");
-			_w.WriteAttributeString("class", cssClass.ToString());
-			WriteAttributeString("cx", M.FloatToShortString(cx));
-			WriteAttributeString("cy", M.FloatToShortString(cy));
-			WriteAttributeString("r", M.FloatToShortString(r));
+        /// <summary>
+        /// Writes an SVG "circle" element having a class that has a CSS definiton elsewhere.
+        /// </summary>
+        /// <param name="type">Not written if null or empty</param>
+        /// <param name="cx"></param>
+        /// <param name="cy"></param>
+        /// <param name="r"></param>
+        public void SvgCircle(CSSObjectClass cssClass, float cx, float cy, float r)
+        {
+            WriteStartElement("circle");
+            _w.WriteAttributeString("class", cssClass.ToString());
+            WriteAttributeString("cx", M.FloatToShortString(cx));
+            WriteAttributeString("cy", M.FloatToShortString(cy));
+            WriteAttributeString("r", M.FloatToShortString(r));
 
-			WriteEndElement(); // circle
-		}
+            WriteEndElement(); // circle
+        }
 
-		/// <summary>
-		/// Writes an SVG "ellipse" element having a class that has a CSS definiton elsewhere.
-		/// </summary>
-		/// <param name="type">Not written if null or empty</param>
-		/// <param name="cx"></param>
-		/// <param name="cy"></param>
-		/// <param name="rx"></param>
-		/// <param name="ry"></param>
-		public void SvgEllipse(CSSObjectClass cssClass, float cx, float cy, float rx, float ry)
-		{
-			WriteStartElement("ellipse");
-			WriteAttributeString("class", cssClass.ToString());
-			WriteAttributeString("cx", M.FloatToShortString(cx));
-			WriteAttributeString("cy", M.FloatToShortString(cy));
-			WriteAttributeString("rx", M.FloatToShortString(rx));
-			WriteAttributeString("ry", M.FloatToShortString(ry));
+        /// <summary>
+        /// Writes an SVG "ellipse" element having a class that has a CSS definiton elsewhere.
+        /// </summary>
+        /// <param name="type">Not written if null or empty</param>
+        /// <param name="cx"></param>
+        /// <param name="cy"></param>
+        /// <param name="rx"></param>
+        /// <param name="ry"></param>
+        public void SvgEllipse(CSSObjectClass cssClass, float cx, float cy, float rx, float ry)
+        {
+            WriteStartElement("ellipse");
+            WriteAttributeString("class", cssClass.ToString());
+            WriteAttributeString("cx", M.FloatToShortString(cx));
+            WriteAttributeString("cy", M.FloatToShortString(cy));
+            WriteAttributeString("rx", M.FloatToShortString(rx));
+            WriteAttributeString("ry", M.FloatToShortString(ry));
 
-			WriteEndElement(); // ellipse
-		}
+            WriteEndElement(); // ellipse
+        }
 
         /// <summary>
         /// A square bracket
@@ -154,7 +152,7 @@ namespace Moritz.Xml
             _w.WriteAttributeString("d", d.ToString());
             _w.WriteEndElement(); // path
         }
- 
+
         /// <summary>
         /// Draws a vertical parallelogram of class "beam" (with black fill and stroke) or "opaqueBeam".
         /// </summary>
@@ -190,44 +188,44 @@ namespace Moritz.Xml
             _w.WriteEndElement(); // path
         }
 
-		public void SvgText(CSSObjectClass cssClass, string text, float x, float y)
-		{
-			_w.WriteStartElement("text");
-			_w.WriteAttributeString("class", cssClass.ToString());
-			_w.WriteAttributeString("x", M.FloatToShortString(x));
-			_w.WriteAttributeString("y", M.FloatToShortString(y));
-			_w.WriteString(text);
-			_w.WriteEndElement(); // text
-		}
+        public void SvgText(CSSObjectClass cssClass, string text, float x, float y)
+        {
+            _w.WriteStartElement("text");
+            _w.WriteAttributeString("class", cssClass.ToString());
+            _w.WriteAttributeString("x", M.FloatToShortString(x));
+            _w.WriteAttributeString("y", M.FloatToShortString(y));
+            _w.WriteString(text);
+            _w.WriteEndElement(); // text
+        }
 
-		// Currently used only by HeadMetrics (to write coloured noteheads).
-		public void SvgText(CSSObjectClass cssObjectClass, CSSColorClass cssColorClass, string text, float x, float y)
-		{
-			string classesString = cssObjectClass.ToString();
-			if(cssColorClass != CSSColorClass.none && cssColorClass != CSSColorClass.black)
-			{
-				classesString = string.Concat(classesString, " ", cssColorClass.ToString());
-			};
+        // Currently used only by HeadMetrics (to write coloured noteheads).
+        public void SvgText(CSSObjectClass cssObjectClass, CSSColorClass cssColorClass, string text, float x, float y)
+        {
+            string classesString = cssObjectClass.ToString();
+            if(cssColorClass != CSSColorClass.none && cssColorClass != CSSColorClass.black)
+            {
+                classesString = string.Concat(classesString, " ", cssColorClass.ToString());
+            };
 
-			_w.WriteStartElement("text");
-			if(!String.IsNullOrEmpty(classesString))
-			{
-				_w.WriteAttributeString("class", classesString);
-			}
-			_w.WriteAttributeString("x", M.FloatToShortString(x));
-			_w.WriteAttributeString("y", M.FloatToShortString(y));
-			_w.WriteString(text);
-			_w.WriteEndElement(); // text
-		}
+            _w.WriteStartElement("text");
+            if(!String.IsNullOrEmpty(classesString))
+            {
+                _w.WriteAttributeString("class", classesString);
+            }
+            _w.WriteAttributeString("x", M.FloatToShortString(x));
+            _w.WriteAttributeString("y", M.FloatToShortString(y));
+            _w.WriteString(text);
+            _w.WriteEndElement(); // text
+        }
 
-		/// <summary>
-		/// Writes an SVG "use" element, overriding its x- and y-coordinates.
-		/// </summary>
-		/// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
-		/// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
-		/// <param name="y">This element's y-coordinate.</param>
-		/// <param name="idOfObjectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
-		public void SvgUseXY(CSSObjectClass cssClass, string idOfObjectToUse, float x, float y)
+        /// <summary>
+        /// Writes an SVG "use" element, overriding its x- and y-coordinates.
+        /// </summary>
+        /// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
+        /// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
+        /// <param name="y">This element's y-coordinate.</param>
+        /// <param name="idOfObjectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
+        public void SvgUseXY(CSSObjectClass cssClass, string idOfObjectToUse, float x, float y)
         {
             _w.WriteStartElement("use");
             _w.WriteAttributeString("class", cssClass.ToString());
@@ -250,7 +248,7 @@ namespace Moritz.Xml
         /// </summary>
         public void WriteFlagBlock(StringBuilder type, int nFlags, bool rightFlag, float fontHeight)
         {
-            string id = type.ToString();       
+            string id = type.ToString();
             string x1 = "0";
             string x2 = "0";
             string x3 = M.FloatToShortString(0.31809F * fontHeight);
@@ -285,5 +283,5 @@ namespace Moritz.Xml
 
             _w.WriteEndElement();
         }
-	}
+    }
 }

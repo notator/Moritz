@@ -1,17 +1,16 @@
+using Moritz.Xml;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using Moritz.Globals;
-using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
     public abstract class ChordSymbol : DurationSymbol
     {
         public ChordSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDurationMS, float fontSize, bool beamContinues)
-            : base(voice,  msDuration, absMsPosition, minimumCrotchetDurationMS, fontSize)
-        {            
+            : base(voice, msDuration, absMsPosition, minimumCrotchetDurationMS, fontSize)
+        {
             // note that all chord symbols have a stem! 
             // Even cautionary, semibreves and breves need a stem direction in order to set chord Metrics correctly.
             Stem = new Stem(this, beamContinues);
@@ -401,9 +400,9 @@ namespace Moritz.Symbols
             float localOverlap = 0F;
             foreach(AnchorageSymbol previousAS in previousNOM.AnchorageSymbols)
             {
-				//if(this is Study2b2ChordSymbol)
-				//	localOverlap = Metrics.OverlapWidth(previousAS);
-				//else
+                //if(this is Study2b2ChordSymbol)
+                //	localOverlap = Metrics.OverlapWidth(previousAS);
+                //else
                 localOverlap = ChordMetrics.OverlapWidth(previousAS);
 
                 overlap = overlap > localOverlap ? overlap : localOverlap;
@@ -428,11 +427,11 @@ namespace Moritz.Symbols
         {
             get
             {
-				if(!(Metrics is ChordMetrics chordMetrics))
-				{
-					throw new ApplicationException();
-				}
-				return chordMetrics;
+                if(!(Metrics is ChordMetrics chordMetrics))
+                {
+                    throw new ApplicationException();
+                }
+                return chordMetrics;
             }
         }
         public Stem Stem = null; // defaults

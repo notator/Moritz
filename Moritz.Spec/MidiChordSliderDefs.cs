@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Xml;
-using System.Diagnostics;
-
-using Krystals5ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Xml;
+
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Moritz.Spec
 {
@@ -82,17 +80,17 @@ namespace Moritz.Spec
         {
             if(ctlValues == null || ctlValues.Count == 0)
             {
-				ctlValues = new List<byte>
-				{
-					(byte)defaultCtlState
-				};
-			}
+                ctlValues = new List<byte>
+                {
+                    (byte)defaultCtlState
+                };
+            }
             return ctlValues;
         }
 
         private bool DoWriteControl(List<byte> ctlValues, byte currentCtlState)
         {
-            if(ctlValues != null && ((ctlValues.Count == 1 && ctlValues[0] != currentCtlState) || ctlValues.Count > 1 ))
+            if(ctlValues != null && ((ctlValues.Count == 1 && ctlValues[0] != currentCtlState) || ctlValues.Count > 1))
             {
                 return true;
             }
@@ -158,7 +156,7 @@ namespace Moritz.Spec
 
             for(int i = rD2s.Count - 1; i > 0; --i)
             {
-                if(rD2s[i] == rD2s[i-1])
+                if(rD2s[i] == rD2s[i - 1])
                 {
                     msDurs[i - 1] += msDurs[i];
                     msDurs.RemoveAt(i);
@@ -221,7 +219,7 @@ namespace Moritz.Spec
         private List<int> GetMsDurs(int count, int msDuration)
         {
             var msDurs = new List<int>();
-            switch (count)
+            switch(count)
             {
                 case 1:
                     msDurs.Add(msDuration);

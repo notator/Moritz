@@ -18,8 +18,8 @@ namespace Krystals5ObjectLibrary
     /// </summary>
     public static class K
     {
-		static K() // cribbed from CapXML.Utilities
-		{
+        static K() // cribbed from CapXML.Utilities
+        {
             CultureInfo ci = new CultureInfo("en-US", false);
             _numberFormat = ci.NumberFormat;
             _dateTimeFormat = ci.DateTimeFormat;
@@ -28,33 +28,33 @@ namespace Krystals5ObjectLibrary
             ExpansionOperatorsFolder = M.LocalMoritzExpansionFieldsFolder;
             ModulationOperatorsFolder = M.LocalMoritzModulationOperatorsFolder;
             // The Schemas location is a programmer's preference. The user need not bother with it.
-			MoritzXmlSchemasFolder = M.OnlineXMLSchemasFolder;
+            MoritzXmlSchemasFolder = M.OnlineXMLSchemasFolder;
             KrystalsSVGFolder = M.LocalMoritzKrystalsSVGFolder;
         }
 
-		public static Krystal LoadKrystal(string pathname)
-		{
-			Krystal krystal = null;
+        public static Krystal LoadKrystal(string pathname)
+        {
+            Krystal krystal = null;
             string filename = Path.GetFileName(pathname);
             if(IsConstantKrystalFilename(filename))
-				krystal = new ConstantKrystal(pathname);
+                krystal = new ConstantKrystal(pathname);
             else if(IsLineKrystalFilename(filename))
-				krystal = new LineKrystal(pathname);
+                krystal = new LineKrystal(pathname);
             else if(IsExpansionKrystalFilename(filename))
                 krystal = new ExpansionKrystal(pathname);
             else if(IsModulationKrystalFilename(filename))
-				krystal = new ModulationKrystal(pathname);
+                krystal = new ModulationKrystal(pathname);
             else if(IsPermutationKrystalFilename(filename))
                 krystal = new PermutationKrystal(pathname);
-                
-			else
-			{
-				string msg = pathname + "\r\n\r\n is not a known type of krystal.";
-				MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}
 
-			return krystal;
-		}
+            else
+            {
+                string msg = pathname + "\r\n\r\n is not a known type of krystal.";
+                MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+
+            return krystal;
+        }
 
         public static Krystal GetKrystal(string krystalFileName)
         {
@@ -83,25 +83,25 @@ namespace Krystals5ObjectLibrary
         /// <returns></returns>
         public static int[] Contour(int density, int contourNumberMod12, int axisNumberMod12)
         {
-            Debug.Assert( density > 0 && density <= 7
+            Debug.Assert(density > 0 && density <= 7
                 && contourNumberMod12 > 0 && contourNumberMod12 <= 12
                 && axisNumberMod12 > 0 && axisNumberMod12 <= 12);
 
             #region contours
             // These arrays are the contours those used for 'beyond the symbolic' - notebook July 1986
-            int[, ,] dom2Contours = new int[,,] 
+            int[,,] dom2Contours = new int[,,]
             {
                 {{1,2},{2,1}},
                 {{2,1},{1,2}}
             };
-            int[, ,] dom3Contours = new int[,,] 
+            int[,,] dom3Contours = new int[,,]
             {
                 {{1,2,3},{2,1,3},{3,2,1},{3,1,2}},
                 {{2,1,3},{1,2,3},{3,1,2},{3,2,1}},
                 {{3,2,1},{2,3,1},{1,2,3},{1,3,2}},
                 {{2,3,1},{3,2,1},{1,3,2},{1,2,3}}
             };
-            int[, ,] dom4Contours = new int[,,] 
+            int[,,] dom4Contours = new int[,,]
             {
                 {{1,2,3,4},{2,1,3,4},{4,2,1,3},{4,3,2,1},{4,3,1,2},{3,1,2,4}},
                 {{2,1,3,4},{1,2,3,4},{4,1,2,3},{4,3,1,2},{4,3,2,1},{3,2,1,4}},
@@ -110,7 +110,7 @@ namespace Krystals5ObjectLibrary
                 {{3,4,2,1},{4,3,2,1},{1,4,3,2},{1,2,4,3},{1,2,3,4},{2,3,4,1}},
                 {{2,3,1,4},{3,2,1,4},{4,3,2,1},{4,1,3,2},{4,1,2,3},{1,2,3,4}},
             };
-            int[, ,] dom5Contours = new int[,,] 
+            int[,,] dom5Contours = new int[,,]
             {
                 {{1,2,3,4,5},{2,1,3,4,5},{4,2,1,3,5},{5,4,2,1,3},{5,4,3,2,1},{5,4,3,1,2},{5,3,1,2,4},{3,1,2,4,5}},
                 {{2,1,3,4,5},{1,2,3,4,5},{4,1,2,3,5},{5,4,1,2,3},{5,4,3,1,2},{5,4,3,2,1},{5,3,2,1,4},{3,2,1,4,5}},
@@ -121,7 +121,7 @@ namespace Krystals5ObjectLibrary
                 {{3,4,2,5,1},{4,3,2,5,1},{5,4,3,2,1},{1,5,4,3,2},{1,5,2,4,3},{1,5,2,3,4},{1,2,3,4,5},{2,3,4,5,1}},
                 {{2,3,1,4,5},{3,2,1,4,5},{4,3,2,1,5},{5,4,3,2,1},{5,4,1,3,2},{5,4,1,2,3},{5,1,2,3,4},{1,2,3,4,5}}
             };
-            int[, ,] dom6Contours = new int[,,] 
+            int[,,] dom6Contours = new int[,,]
             {
                 {{1,2,3,4,5,6},{2,1,3,4,5,6},{4,2,1,3,5,6},{6,4,2,1,3,5},{6,5,4,2,1,3},  {6,5,4,3,2,1},{6,5,4,3,1,2},{6,5,3,1,2,4},{5,3,1,2,4,6},{3,1,2,4,5,6}},
                 {{2,1,3,4,5,6},{1,2,3,4,5,6},{4,1,2,3,5,6},{6,4,1,2,3,5},{6,5,4,1,2,3},  {6,5,4,3,1,2},{6,5,4,3,2,1},{6,5,3,2,1,4},{5,3,2,1,4,6},{3,2,1,4,5,6}},
@@ -134,7 +134,7 @@ namespace Krystals5ObjectLibrary
                 {{3,4,2,5,1,6},{4,3,2,5,1,6},{5,4,3,2,1,6},{6,5,4,3,2,1},{6,1,5,4,3,2},  {6,1,5,2,4,3},{6,1,5,2,3,4},{6,1,2,3,4,5},{1,2,3,4,5,6},{2,3,4,5,1,6}},
                 {{2,3,1,4,5,6},{3,2,1,4,5,6},{4,3,2,1,5,6},{6,4,3,2,1,5},{6,5,4,3,2,1},  {6,5,4,1,3,2},{6,5,4,1,2,3},{6,5,1,2,3,4},{5,1,2,3,4,6},{1,2,3,4,5,6}}
             };
-            int[, ,] dom7Contours = new int[,,] 
+            int[,,] dom7Contours = new int[,,]
             {
                 {{1,2,3,4,5,6,7},{2,1,3,4,5,6,7},{4,2,1,3,5,6,7},{6,4,2,1,3,5,7},{7,6,4,2,1,3,5},{7,6,5,4,2,1,3},  {7,6,5,4,3,2,1},{7,6,5,4,3,1,2},{7,6,5,3,1,2,4},{7,5,3,1,2,4,6},{5,3,1,2,4,6,7},{3,1,2,4,5,6,7}},
                 {{2,1,3,4,5,6,7},{1,2,3,4,5,6,7},{4,1,2,3,5,6,7},{6,4,1,2,3,5,7},{7,6,4,1,2,3,5},{7,6,5,4,1,2,3},  {7,6,5,4,3,1,2},{7,6,5,4,3,2,1},{7,6,5,3,2,1,4},{7,5,3,2,1,4,6},{5,3,2,1,4,6,7},{3,2,1,4,5,6,7}},
@@ -149,7 +149,7 @@ namespace Krystals5ObjectLibrary
                 {{3,4,2,5,1,6,7},{4,3,2,5,1,6,7},{5,4,3,2,1,6,7},{6,5,4,3,2,1,7},{7,6,5,4,3,2,1},{7,6,1,5,4,3,2},  {7,6,1,5,2,4,3},{7,6,1,5,2,3,4},{7,6,1,2,3,4,5},{7,1,2,3,4,5,6},{1,2,3,4,5,6,7},{2,3,4,5,1,6,7}},
                 {{2,3,1,4,5,6,7},{3,2,1,4,5,6,7},{4,3,2,1,5,6,7},{6,4,3,2,1,5,7},{7,6,4,3,2,1,5},{7,6,5,4,3,2,1},  {7,6,5,4,1,3,2},{7,6,5,4,1,2,3},{7,6,5,1,2,3,4},{7,5,1,2,3,4,6},{5,1,2,3,4,6,7},{1,2,3,4,5,6,7}}
             };
-            int[][, ,] contours = new int[6][, ,];
+            int[][,,] contours = new int[6][,,];
             contours[0] = dom2Contours;
             contours[1] = dom3Contours;
             contours[2] = dom4Contours;
@@ -167,7 +167,7 @@ namespace Krystals5ObjectLibrary
                 {1,2,3,4,5,6,7,8,9,10,11,12}
             };
             #endregion
-            int[] contour = { 0, 0, 0, 0, 0, 0, 0 }; 
+            int[] contour = { 0, 0, 0, 0, 0, 0, 0 };
             if(density == 1)
             {
                 contour[0] = 1;
@@ -396,10 +396,10 @@ namespace Krystals5ObjectLibrary
 
         public static void RebuildKrystalFamily()
         {
-        //    KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
-        //    kFamily.Rebuild();
-        //    MessageBox.Show("All krystals have been successfully recreated",
-        //        "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //    KrystalFamily kFamily = new KrystalFamily(K.KrystalsFolder);
+            //    kFamily.Rebuild();
+            //    MessageBox.Show("All krystals have been successfully recreated",
+            //        "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -413,7 +413,7 @@ namespace Krystals5ObjectLibrary
         /// 1 if krystalName1 is greater than krystalname2.
         /// </returns>
         public static int CompareKrystalNames(string krystalName1, string krystalName2)
-		{
+        {
             if(!IsKrystalFilename(krystalName1) || !IsKrystalFilename(krystalName2))
             {
                 throw new ApplicationException("Argument to K:CompareKrystalNames() was not a krystal file name");
@@ -456,15 +456,15 @@ namespace Krystals5ObjectLibrary
                 }
             }
 
-			return rval;
-		}
+            return rval;
+        }
 
         private static int? CompareExpanderIndices(int? expanderIndex1, int? expanderIndex2)
         {
             int? rval = null;
             if(expanderIndex1 != null && expanderIndex2 != null)
             {
-                if( expanderIndex1 == expanderIndex2)
+                if(expanderIndex1 == expanderIndex2)
                 {
                     rval = 0;
                 }
@@ -514,7 +514,7 @@ namespace Krystals5ObjectLibrary
                         rval = 1;
                         break;
                     }
-                }   
+                }
             }
 
             return rval;
@@ -530,8 +530,8 @@ namespace Krystals5ObjectLibrary
             Enum.TryParse(type2, out KrystalType t2);
 
             int rval = 0; // assume the types are equal
-            
-            if(t1 < t2) 
+
+            if(t1 < t2)
             {
                 rval = -1;
             }
@@ -540,9 +540,9 @@ namespace Krystals5ObjectLibrary
                 rval = 1;
             }
             return rval;
-        }        
+        }
 
-        private static void GetNameInfo(string krystalName, out int domain, out string[] shapeComponents, out int? expanderIndex, out int index, out string type )
+        private static void GetNameInfo(string krystalName, out int domain, out string[] shapeComponents, out int? expanderIndex, out int index, out string type)
         {
             var dot = new char[] { '.' };
             var underscore = new char[] { '_' };
@@ -718,13 +718,13 @@ namespace Krystals5ObjectLibrary
             do
             {
                 r.Read();
-            } while (!elementNames.Contains(r.Name) && !r.EOF);
-            if (r.EOF)
+            } while(!elementNames.Contains(r.Name) && !r.EOF);
+            if(r.EOF)
             {
                 StringBuilder msg = new StringBuilder("Error reading Xml file:\n"
                     + "None of the following elements could be found:\n");
                 foreach(string s in elementNames)
-                    msg.Append( s.ToString() + "\n");
+                    msg.Append(s.ToString() + "\n");
                 throw new ApplicationException(msg.ToString());
             }
         }
@@ -838,14 +838,14 @@ namespace Krystals5ObjectLibrary
         public static string GetStringOfUnsignedInts(List<int> intList)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (int i in intList)
+            foreach(int i in intList)
             {
-                if (i < 0)
+                if(i < 0)
                     throw new ApplicationException("Attempt to store a negative number in a string of unsigned integers.");
                 sb.Append(i);
                 sb.Append(" ");
             }
-            if (intList.Count > 0)
+            if(intList.Count > 0)
                 sb.Remove(sb.Length - 1, 1); // remove the final space
             return sb.ToString();
         }
@@ -856,10 +856,10 @@ namespace Krystals5ObjectLibrary
         /// <returns>the string</returns>
         public static string GetStringOfUnsignedInts(uint[] uintArray)
         {
-            if (uintArray.Length > 0)
+            if(uintArray.Length > 0)
             {
                 List<uint> uintList = new List<uint>();
-                for (int i = 0; i < uintArray.Length; i++)
+                for(int i = 0; i < uintArray.Length; i++)
                     uintList.Add(uintArray[i]);
                 return GetStringOfUnsignedInts(uintList);
             }
@@ -872,43 +872,43 @@ namespace Krystals5ObjectLibrary
 		/// <param name="str">The string to be converted</param>
 		/// <returns>a List of unsigned integers</returns>
 		public static List<uint> GetUIntList(string str)
-		{
-			List<uint> values = new List<uint>(); 
-			
-			str = str.Trim();	// removes white space from begin and end of the string
-			if( str.Length > 0 )
-			{
-				StringBuilder s = new StringBuilder();
-				bool inSeparator = false;
+        {
+            List<uint> values = new List<uint>();
 
-				// convert internal separators (spaces, newlines, tabs etc) to single spaces
-				foreach( Char c in str )
-				{
-					if( Char.IsDigit(c) )
-					{
-						s.Append(c);
-						inSeparator = false;
-					}
-					else if( Char.IsWhiteSpace(c) || Char.IsControl(c) )
-					{
-						if( !inSeparator )
-						{
-							s.Append(' ');
-							inSeparator = true;
-						}
-					}
-					else throw new ApplicationException("Illegal character in list of unsigned integer values.");
-				}
+            str = str.Trim();   // removes white space from begin and end of the string
+            if(str.Length > 0)
+            {
+                StringBuilder s = new StringBuilder();
+                bool inSeparator = false;
 
-				str = s.ToString();
-				string[] valueStrings = str.Split(' ');
+                // convert internal separators (spaces, newlines, tabs etc) to single spaces
+                foreach(Char c in str)
+                {
+                    if(Char.IsDigit(c))
+                    {
+                        s.Append(c);
+                        inSeparator = false;
+                    }
+                    else if(Char.IsWhiteSpace(c) || Char.IsControl(c))
+                    {
+                        if(!inSeparator)
+                        {
+                            s.Append(' ');
+                            inSeparator = true;
+                        }
+                    }
+                    else throw new ApplicationException("Illegal character in list of unsigned integer values.");
+                }
 
-				foreach( string valStr in valueStrings )
-					values.Add(uint.Parse(valStr));
-			}
+                str = s.ToString();
+                string[] valueStrings = str.Split(' ');
 
-			return values;
-		}
+                foreach(string valStr in valueStrings)
+                    values.Add(uint.Parse(valStr));
+            }
+
+            return values;
+        }
         /// <summary>
         /// Convert a float to a string using the static en-US number format.
         /// This function is used when writing XML files.
@@ -927,7 +927,7 @@ namespace Krystals5ObjectLibrary
         /// <returns></returns>
         public static float StringToFloat(string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if(string.IsNullOrEmpty(value))
                 return 0.0f;
             else
                 return (float)Convert.ToDouble(value, _numberFormat);
@@ -1049,7 +1049,7 @@ namespace Krystals5ObjectLibrary
 
         public static string Now
         {
-            get { return DateTime.Today.ToString("dddd dd.MM.yyyy", _dateTimeFormat) + ", " + DateTime.Now.ToLongTimeString();}
+            get { return DateTime.Today.ToString("dddd dd.MM.yyyy", _dateTimeFormat) + ", " + DateTime.Now.ToLongTimeString(); }
         }
 
         #region public variables
@@ -1168,4 +1168,4 @@ namespace Krystals5ObjectLibrary
         private static readonly DateTimeFormatInfo _dateTimeFormat;
         #endregion private variables
     }
- }
+}

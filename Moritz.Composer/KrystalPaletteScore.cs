@@ -1,10 +1,10 @@
-using System.Collections.Generic;
-
 using Krystals5ObjectLibrary;
 
 using Moritz.Algorithm;
 using Moritz.Palettes;
 using Moritz.Symbols;
+
+using System.Collections.Generic;
 
 namespace Moritz.Composer
 {

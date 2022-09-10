@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -108,8 +107,8 @@ namespace Krystals5ObjectLibrary
 
     }
 
-	public class KrystalChildrenTreeView : TreeView
-	{
+    public class KrystalChildrenTreeView : TreeView
+    {
         public KrystalChildrenTreeView(KrystalFamily krystalFamily, int? domainFilter, List<int> shapeListFilter)
         {
             bool DisplayCompatibleShape(KrystalChildrenNode node, List<int> filter)
@@ -142,7 +141,7 @@ namespace Krystals5ObjectLibrary
 
                 int domain = K.GetDomainFromFirstComponent(node.Text);
 
-                return (domain <= (int) filter);
+                return (domain <= (int)filter);
             }
 
             TreeNode constantRoot, lineRoot, expansionRoot, modulationRoot, permutationRoot, pathRoot;
@@ -233,7 +232,7 @@ namespace Krystals5ObjectLibrary
             else
             {
                 int returnValue = nodes.Count;
-                for(int index = 0 ; index < nodes.Count ; index++)
+                for(int index = 0; index < nodes.Count; index++)
                 {
                     if(K.CompareKrystalNames(krystalName, nodes[index].Text) < 0)
                     {
@@ -244,5 +243,5 @@ namespace Krystals5ObjectLibrary
                 return returnValue;
             }
         }
-	}
+    }
 }

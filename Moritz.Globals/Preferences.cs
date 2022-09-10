@@ -1,55 +1,54 @@
+using Moritz.Globals.IODevices;
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using System.Xml;
-using System.IO;
-using System.Text;
-using System.Diagnostics;
-
-using Moritz.Globals.IODevices;
 
 namespace Moritz.Globals
 {
-	public sealed class Preferences : IDisposable
-	{
+    public sealed class Preferences : IDisposable
+    {
         public Preferences()
         {
-			string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-			string moritzAppDataFolder = appData + @"\Moritz";
-			// C:\Users\James\AppData\Roaming\Moritz
-			M.CreateDirectoryIfItDoesNotExist(moritzAppDataFolder);
+            string moritzAppDataFolder = appData + @"\Moritz";
+            // C:\Users\James\AppData\Roaming\Moritz
+            M.CreateDirectoryIfItDoesNotExist(moritzAppDataFolder);
 
             #region read prefs
-			if(!File.Exists(M.LocalMoritzPreferencesPath))
+            if(!File.Exists(M.LocalMoritzPreferencesPath))
             {
-				LocalMoritzFolderLocation = "C://Documents";
+                LocalMoritzFolderLocation = "C://Documents";
                 PreferredOutputDevice = "";
 
                 Save();
 
-				string msg = "A preferences file could not be found at\n" +
-							"\t" + M.LocalMoritzPreferencesPath + ".\n\n" +
-							"A new one has been created with default values.";
-				MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                string msg = "A preferences file could not be found at\n" +
+                            "\t" + M.LocalMoritzPreferencesPath + ".\n\n" +
+                            "A new one has been created with default values.";
+                MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-  
-			try
-			{
-				using(XmlReader r = XmlReader.Create(M.LocalMoritzPreferencesPath))
-				{
-					M.ReadToXmlElementTag(r, "moritzPreferences"); // check that this is a moritz preferences file
 
-					M.ReadToXmlElementTag(r, "localMoritzFolderLocation");
-					LocalMoritzFolderLocation = r.ReadElementContentAsString();
+            try
+            {
+                using(XmlReader r = XmlReader.Create(M.LocalMoritzPreferencesPath))
+                {
+                    M.ReadToXmlElementTag(r, "moritzPreferences"); // check that this is a moritz preferences file
+
+                    M.ReadToXmlElementTag(r, "localMoritzFolderLocation");
+                    LocalMoritzFolderLocation = r.ReadElementContentAsString();
                     M.ReadToXmlElementTag(r, "preferredOutputDevice");
                     PreferredOutputDevice = r.ReadElementContentAsString();
-				}
-			}
-			catch
-			{
-                string msg = "Error reading preferences file"; 
-				MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch
+            {
+                string msg = "Error reading preferences file";
+                MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             #endregion
 
@@ -101,82 +100,82 @@ namespace Moritz.Globals
             return success;
         }
 
-		public void Save()
-		{
-			XmlWriterSettings settings = new XmlWriterSettings
-			{
-				Indent = true,
-				IndentChars = ("\t"),
-				CloseOutput = true
-			}; // not disposable
-			using(XmlWriter w = XmlWriter.Create(M.LocalMoritzPreferencesPath, settings))
-			{
-				w.WriteStartDocument();
-				w.WriteComment("file created: " + M.NowString);
+        public void Save()
+        {
+            XmlWriterSettings settings = new XmlWriterSettings
+            {
+                Indent = true,
+                IndentChars = ("\t"),
+                CloseOutput = true
+            }; // not disposable
+            using(XmlWriter w = XmlWriter.Create(M.LocalMoritzPreferencesPath, settings))
+            {
+                w.WriteStartDocument();
+                w.WriteComment("file created: " + M.NowString);
 
-				w.WriteStartElement("moritzPreferences");
-				w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-				w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + @"\moritzPreferences.xsd");
+                w.WriteStartElement("moritzPreferences");
+                w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
+                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + @"\moritzPreferences.xsd");
 
-				w.WriteStartElement("localMoritzFolderLocation");
-				w.WriteString(LocalMoritzFolderLocation);
-				w.WriteEndElement();
+                w.WriteStartElement("localMoritzFolderLocation");
+                w.WriteString(LocalMoritzFolderLocation);
+                w.WriteEndElement();
 
                 w.WriteStartElement("preferredOutputDevice");
                 w.WriteString(PreferredOutputDevice);
                 w.WriteEndElement();
 
-				w.WriteEndElement(); // closes the moritzPreferences element
+                w.WriteEndElement(); // closes the moritzPreferences element
 
-				w.Close(); // close unnecessary because of the using statement?
-			}
-		}
+                w.Close(); // close unnecessary because of the using statement?
+            }
+        }
 
         #region IDisposable pattern
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-		private void Dispose(bool disposing)
-		{
-			if(!disposed)
-			{
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        private void Dispose(bool disposing)
+        {
+            if(!disposed)
+            {
                 foreach(string key in MultimediaMidiOutputDevices.Keys)
                 {
                     MultimediaMidiOutputDevices[key].Dispose();
                 }
                 MultimediaMidiOutputDevices.Clear();
 
-				if(disposing)
-				{
- 				}
-			}
-			disposed = true;
-			//base.Dispose(disposing);
-		}
+                if(disposing)
+                {
+                }
+            }
+            disposed = true;
+            //base.Dispose(disposing);
+        }
 
-		private bool disposed = false;
+        private bool disposed = false;
 
-		#endregion IDisposable pattern
+        #endregion IDisposable pattern
 
 
-		
-		public string LocalMoritzFolderLocation = null;
-		public string PreferredOutputDevice = null;
 
-		#region local folders
-		//public string LocalMoritzAudioFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\audio"; } }
-		//public string LocalMoritzKrystalsFolder	{ get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals"; } }
-		//public string LocalMoritzExpansionFieldsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\expansion operators"; } }
-		//public string LocalMoritzModulationOperatorsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\modulation operators"; } }
-		//public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores"; } }
-		#endregion local folders
-		#region online folders
-		//public string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
-		#endregion online folders
+        public string LocalMoritzFolderLocation = null;
+        public string PreferredOutputDevice = null;
 
-		/// <summary>
+        #region local folders
+        //public string LocalMoritzAudioFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\audio"; } }
+        //public string LocalMoritzKrystalsFolder	{ get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals"; } }
+        //public string LocalMoritzExpansionFieldsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\expansion operators"; } }
+        //public string LocalMoritzModulationOperatorsFolder { get { return @"D:\My Work\Programming\Moritz\Moritz\krystals\krystals\modulation operators"; } }
+        //public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores"; } }
+        #endregion local folders
+        #region online folders
+        //public string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
+        #endregion online folders
+
+        /// <summary>
         /// The following field is not saved in the preferences file
         /// </summary>
         public string CurrentOutputDeviceName = null;
@@ -194,7 +193,7 @@ namespace Moritz.Globals
 
         public Sanford.Multimedia.Midi.OutputDevice CurrentMultimediaMidiOutputDevice
         {
-            get 
+            get
             {
                 if(MultimediaMidiOutputDevices.Count == 0 || String.IsNullOrEmpty(CurrentOutputDeviceName))
                 {

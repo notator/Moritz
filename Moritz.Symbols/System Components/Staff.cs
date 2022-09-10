@@ -1,9 +1,8 @@
+using Moritz.Spec;
+using Moritz.Xml;
+
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using Moritz.Globals;
-using Moritz.Xml;
-using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
@@ -14,16 +13,16 @@ namespace Moritz.Symbols
             SVGSystem = svgSystem;
             Staffname = staffName;
             Debug.Assert(numberOfStafflines > 0);
-            NumberOfStafflines = numberOfStafflines; 
+            NumberOfStafflines = numberOfStafflines;
             Gap = gap;
             StafflineStemStrokeWidth = stafflineStemStrokeWidth;
         }
 
-		/// <summary>
-		/// carryMsgsPerChannel is null for InputStaves.
-		/// </summary>
-		public virtual void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
-        {            
+        /// <summary>
+        /// carryMsgsPerChannel is null for InputStaves.
+        /// </summary>
+        public virtual void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
+        {
             w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
             CSSObjectClass stafflinesClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStafflines : CSSObjectClass.stafflines;
@@ -33,17 +32,17 @@ namespace Moritz.Symbols
             float stafflineY = this.Metrics.StafflinesTop;
             for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
             {
-				w.SvgLine(stafflineClass, this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
+                w.SvgLine(stafflineClass, this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
 
                 if(staffLineIndex < (NumberOfStafflines - 1))
                     stafflineY += Gap;
             }
             w.SvgEndGroup();
- 
-			int voiceNumber = 1;
+
+            int voiceNumber = 1;
             foreach(Voice voice in Voices)
             {
-				voice.WriteSVG(w, systemNumber, staffNumber, voiceNumber++, carryMsgsPerChannel);
+                voice.WriteSVG(w, systemNumber, staffNumber, voiceNumber++, carryMsgsPerChannel);
             }
         }
 
@@ -59,7 +58,7 @@ namespace Moritz.Symbols
         /// If the chordSymbol has no heads (as in Study2b2), nothing happens.
         /// </summary>
         public NoteObjectMoment FinalizeAccidentals(NoteObjectMoment previousStaffMoment)
-        {          
+        {
             foreach(NoteObjectMoment thisStaffMoment in this.ChordSymbolMoments)
             {
                 if(previousStaffMoment != null)
@@ -199,7 +198,7 @@ namespace Moritz.Symbols
             Debug.Assert(Voices.Count == 2);
             AdjustRestRestCollisions();
             AdjustRestsForVerticalChordCollisions(0);
-            AdjustRestsForVerticalChordCollisions(1);       
+            AdjustRestsForVerticalChordCollisions(1);
         }
         private void AdjustRestRestCollisions()
         {
@@ -227,7 +226,7 @@ namespace Moritz.Symbols
                                 while(verticalOverlap > 0)
                                 {
                                     float newMinBottom = upperRestMetrics.Bottom - verticalOverlap;
-                                    
+
                                     if(upperRestMetrics.Bottom > newMinBottom)
                                     {
                                         if(moveBottomRest)
@@ -482,7 +481,7 @@ namespace Moritz.Symbols
                 }
             }
         }
-        
+
         /// <summary>
         /// Adjusts the heights of stem tips and beamBlocks in staves which have 2 voices.
         /// Only adjusts stems of chords belonging to beamBlocks.
@@ -586,9 +585,9 @@ namespace Moritz.Symbols
 
             // position 1: if there is no vertical overlap between the chords, deltaX is 0
             if(verticalChordOverlap > 0F)
-            {  
+            {
                 // position 2: hairline left of upper noteheads
-                float testDeltaX = - (stemThickness * 2F);
+                float testDeltaX = -(stemThickness * 2F);
                 if(NoNoteheadCollisions(testDeltaX + iota, upperHM, lowerHM))
                 {
                     deltaX = testDeltaX;
@@ -698,10 +697,10 @@ namespace Moritz.Symbols
         private bool HasSidewaysShiftedNotehead(List<HeadMetrics> topDownHeadMetrics)
         {
             bool hasLeftShiftedNotehead = false;
-            
+
             if(topDownHeadMetrics.Count > 1)
             {
-                float leftLimit = 
+                float leftLimit =
                     topDownHeadMetrics[0].Left - ((topDownHeadMetrics[0].Right - topDownHeadMetrics[0].Left) / 4F);
 
                 for(int i = 1; i < topDownHeadMetrics.Count; ++i)

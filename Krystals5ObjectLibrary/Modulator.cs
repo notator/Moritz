@@ -55,7 +55,7 @@ namespace Krystals5ObjectLibrary
                 _name = Path.GetFileName(filepath); ;
                 K.ReadToXmlElementTag(r, "modulator"); // check that this is a modulator
                 K.ReadToXmlElementTag(r, "array");
-                for(int i = 0 ; i < 2 ; i++)
+                for(int i = 0; i < 2; i++)
                 {
                     r.MoveToAttribute(i);
                     switch(r.Name)
@@ -76,9 +76,9 @@ namespace Krystals5ObjectLibrary
                 }
                 _array = new int[_xDim, _yDim];
                 int valueIndex = 0;
-                for(int y = 0 ; y < _yDim ; y++)
-                    for(int x = 0 ; x < _xDim ; x++)
-                        _array[x, y] = (int) valueList[valueIndex++];
+                for(int y = 0; y < _yDim; y++)
+                    for(int x = 0; x < _xDim; x++)
+                        _array[x, y] = (int)valueList[valueIndex++];
             }
         }
         public Modulator(int xDim, int yDim)
@@ -113,11 +113,11 @@ namespace Krystals5ObjectLibrary
                     var existingModulator = new Modulator(existingPath);
                     bool isIdentical = true;
                     bool checkNextModulator = false;
-                    for(int x = 0;  x < _xDim; x++)
+                    for(int x = 0; x < _xDim; x++)
                     {
                         for(int y = 0; y < _yDim; y++)
                         {
-                            if(existingModulator.Array[x,y] != Array[x,y])
+                            if(existingModulator.Array[x, y] != Array[x, y])
                             {
                                 isIdentical = false;
                                 checkNextModulator = true;
@@ -184,7 +184,7 @@ namespace Krystals5ObjectLibrary
         private IEnumerable<string> GetSimilarModulatorPaths(string nameRoot)
         {
             var dirPath = M.LocalMoritzModulationOperatorsFolder;
-            
+
             var searchString = nameRoot + "*" + K.ModulatorFilenameSuffix;
             var modulatorPaths = Directory.EnumerateFiles(dirPath, searchString);
 
@@ -198,17 +198,17 @@ namespace Krystals5ObjectLibrary
         /// <returns></returns>
         public int CompareTo(object other)
         {
-			if(!(other is Modulator otherModulator))
-				throw new ArgumentException();
+            if(!(other is Modulator otherModulator))
+                throw new ArgumentException();
 
-			bool modulatorsAreEquivalent = false;
+            bool modulatorsAreEquivalent = false;
             if(this.XDim == otherModulator.XDim
             && this.YDim == otherModulator.YDim)
             {
                 modulatorsAreEquivalent = true;
-                for(int x = 0 ; x < this.XDim ; x++)
+                for(int x = 0; x < this.XDim; x++)
                 {
-                    for(int y = 0 ; y < this.YDim ; y++)
+                    for(int y = 0; y < this.YDim; y++)
                     {
                         if(this.Array[x, y] != otherModulator.Array[x, y])
                         {
@@ -269,10 +269,10 @@ namespace Krystals5ObjectLibrary
             {
                 StringBuilder s = new StringBuilder();
                 string introTabs = "\n\t\t\t\t";
-                for(int y = 0 ; y < _yDim ; y++)
+                for(int y = 0; y < _yDim; y++)
                 {
                     s.Append(introTabs);
-                    for(int x = 0 ; x < _xDim ; x++)
+                    for(int x = 0; x < _xDim; x++)
                     {
                         s.Append(_array[x, y].ToString());
                         s.Append("\t");
@@ -287,8 +287,8 @@ namespace Krystals5ObjectLibrary
             get
             {
                 int maxValue = 0;
-                for(int y = 0 ; y < _yDim ; y++)
-                    for(int x = 0 ; x < _xDim ; x++)
+                for(int y = 0; y < _yDim; y++)
+                    for(int x = 0; x < _xDim; x++)
                         maxValue = maxValue < _array[x, y] ? _array[x, y] : maxValue;
                 return maxValue;
             }

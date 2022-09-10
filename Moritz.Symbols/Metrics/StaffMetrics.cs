@@ -25,21 +25,21 @@ namespace Moritz.Symbols
             _stafflinesBottom += dy;
         }
 
-		//public override void ResetBoundary()
-		//{
-		//	base.ResetBoundary();
-		//}
+        //public override void ResetBoundary()
+        //{
+        //	base.ResetBoundary();
+        //}
 
-		private void ExpandMetrics(Metrics metrics)
-		{
-			if(metrics != null)
-			{
-				_top = _top < metrics.Top ? _top : metrics.Top;
-				_right = _right > metrics.Right ? _right : metrics.Right;
-				_bottom = _bottom > metrics.Bottom ? _bottom : metrics.Bottom;
-				_left = _left < metrics.Left ? _left : metrics.Left;
-			}
-		}
+        private void ExpandMetrics(Metrics metrics)
+        {
+            if(metrics != null)
+            {
+                _top = _top < metrics.Top ? _top : metrics.Top;
+                _right = _right > metrics.Right ? _right : metrics.Right;
+                _bottom = _bottom > metrics.Bottom ? _bottom : metrics.Bottom;
+                _left = _left < metrics.Left ? _left : metrics.Left;
+            }
+        }
 
         public float StafflinesTop { get { return _stafflinesTop; } }
         private float _stafflinesTop = 0F;

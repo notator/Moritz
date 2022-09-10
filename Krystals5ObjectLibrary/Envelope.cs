@@ -5,8 +5,8 @@ using System.Linq;
 
 namespace Krystals5ObjectLibrary
 {
-	public class Envelope : ICloneable
-	{
+    public class Envelope : ICloneable
+    {
         #region constructors
         /// <summary> 
         /// An envelope is a list of integral values that are greater than or equal to 0, and less than
@@ -93,7 +93,7 @@ namespace Krystals5ObjectLibrary
 
         public object Clone()
         {
-            Envelope clone = new Envelope(_original, _domain, _domain, _original.Count );
+            Envelope clone = new Envelope(_original, _domain, _domain, _original.Count);
             return clone;
         }
 
@@ -146,15 +146,15 @@ namespace Krystals5ObjectLibrary
 
             List<int> newMsPositions = new List<int>();
 
-             #region Create newIntMsDurations: a list containing the new msDurations
+            #region Create newIntMsDurations: a list containing the new msDurations
             List<int> spreadEnvelope = Spread(_original, originalMsPositions.Count - 1);
             List<double> newDoubleMsDurations = new List<double>();
-            double rootDistortion = Math.Pow(distortion, (((double)1) / _domain));             
+            double rootDistortion = Math.Pow(distortion, (((double)1) / _domain));
             double newDoubleTotalDuration = 0;
             for(int i = 1; i < originalMsPositions.Count; ++i)
             {
                 int originalDuration = originalMsPositions[i] - originalMsPositions[i - 1];
-                int b = spreadEnvelope[i-1];
+                int b = spreadEnvelope[i - 1];
                 double localFactor = Math.Pow(rootDistortion, b);
                 double newDuration = originalDuration * localFactor;
                 newDoubleMsDurations.Add(newDuration);

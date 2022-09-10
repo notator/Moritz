@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace Moritz.Midi
 {
@@ -94,7 +94,7 @@ namespace Moritz.Midi
         /// Creates MidiSliderTime objects and adds them to MidiSliderTimes list so as to create a slide from 
         /// currentValue to endValue from msStartPosition up to (but not including) msEndPosition. 
         /// </summary>
-        protected void SetMidiChordSlider(ChordSliderType chordSliderType, int channel, int currentMsPosition, int endMsPosition, 
+        protected void SetMidiChordSlider(ChordSliderType chordSliderType, int channel, int currentMsPosition, int endMsPosition,
             byte currentValue, byte endValue)
         {
             Debug.Assert(endMsPosition >= currentMsPosition);
@@ -127,7 +127,7 @@ namespace Moritz.Midi
                             new MidiSliderTime(new ModulationWheel(channel, (byte)floatCurrentValue, ControlContinuation.NoChange), sleepTime);
                         break;
                     case ChordSliderType.Expression:
-                        midiSliderTime = 
+                        midiSliderTime =
                             new MidiSliderTime(new Expression(channel, (byte)floatCurrentValue, ControlContinuation.NoChange), sleepTime);
                         break;
                     default:

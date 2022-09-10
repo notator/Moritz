@@ -1,8 +1,8 @@
+using Moritz.Xml;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
@@ -910,38 +910,38 @@ namespace Moritz.Symbols
             }
             Debug.Assert(qBeam != null);
 
-			List<HLine> outerEdge = new List<HLine>();
-			float hlineY = 0F;
-			if(_stemDirection == VerticalDir.up)
-				hlineY = qBeam.LeftTopY;
-			else
-				hlineY = qBeam.LeftTopY + _beamThickness;
+            List<HLine> outerEdge = new List<HLine>();
+            float hlineY = 0F;
+            if(_stemDirection == VerticalDir.up)
+                hlineY = qBeam.LeftTopY;
+            else
+                hlineY = qBeam.LeftTopY + _beamThickness;
 
-			float heightDiff = qBeam.LeftTopY - qBeam.RightTopY;
-			//float heightDiff = qBeam.RightTopY - qBeam.LeftTopY;
-			float stepHeight = (_beamThickness * 0.2F);
-			int nSteps = (int) Math.Round(heightDiff / stepHeight);
-			if(nSteps == 0)
-			{
-				outerEdge.Add(new HLine(_left, _right, hlineY));
-			}
-			else
-			{
-				if(nSteps < 0)
-					nSteps *= -1;
-				stepHeight = heightDiff / nSteps;
+            float heightDiff = qBeam.LeftTopY - qBeam.RightTopY;
+            //float heightDiff = qBeam.RightTopY - qBeam.LeftTopY;
+            float stepHeight = (_beamThickness * 0.2F);
+            int nSteps = (int)Math.Round(heightDiff / stepHeight);
+            if(nSteps == 0)
+            {
+                outerEdge.Add(new HLine(_left, _right, hlineY));
+            }
+            else
+            {
+                if(nSteps < 0)
+                    nSteps *= -1;
+                stepHeight = heightDiff / nSteps;
 
-				float stepWidth = (_right - _left) / nSteps;
-				float left = _left;
-				float tanAlpha = stepHeight / stepWidth;
+                float stepWidth = (_right - _left) / nSteps;
+                float left = _left;
+                float tanAlpha = stepHeight / stepWidth;
 
-				for(int i = 0; i < nSteps; i++)
-				{
-					outerEdge.Add(new HLine(left, left + stepWidth, hlineY));
-					left += stepWidth;
-					hlineY -= (stepWidth * tanAlpha);
-				}
-			}
+                for(int i = 0; i < nSteps; i++)
+                {
+                    outerEdge.Add(new HLine(left, left + stepWidth, hlineY));
+                    left += stepWidth;
+                    hlineY -= (stepWidth * tanAlpha);
+                }
+            }
 
             return outerEdge;
         }
@@ -1113,7 +1113,7 @@ namespace Moritz.Symbols
                         topLeft = beam.LeftTopY - _beamThickness;
                         topRight = beam.RightTopY - _beamThickness;
                     }
-                    
+
                     w.SvgBeam(beam.LeftX, beam.RightX, topLeft, topRight, _beamThickness * 1.5F, true, isInput);
                 }
                 w.SvgBeam(beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, false, isInput);

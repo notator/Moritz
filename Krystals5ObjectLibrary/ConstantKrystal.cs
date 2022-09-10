@@ -1,11 +1,6 @@
-using Moritz.Globals;
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -41,11 +36,11 @@ namespace Krystals5ObjectLibrary
             Level = 0;
             MinValue = MaxValue = value;
             NumValues = 1;
-			List<uint> valueList = new List<uint>
-			{
-				value
-			};
-			Strand strand = new Strand(0, valueList);
+            List<uint> valueList = new List<uint>
+            {
+                value
+            };
+            Strand strand = new Strand(0, valueList);
             Strands = new List<Strand>() { strand };
         }
         #region overridden functions

@@ -1,9 +1,6 @@
 
 using System;
 
-using Krystals5ObjectLibrary;
-using Moritz.Globals;
-
 namespace Moritz.Spec
 {
     public abstract class DurationDef : ICloneable
@@ -13,10 +10,10 @@ namespace Moritz.Spec
             _msDuration = msDuration;
         }
 
-		/// <summary>
-		/// This is always a deep clone.
-		/// </summary>
-		/// <returns>A deep clone</returns>
+        /// <summary>
+        /// This is always a deep clone.
+        /// </summary>
+        /// <returns>A deep clone</returns>
         public abstract object Clone();
 
         public virtual int MsDuration { get { return _msDuration; } set { _msDuration = value; } }

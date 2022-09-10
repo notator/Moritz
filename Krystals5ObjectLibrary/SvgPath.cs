@@ -155,7 +155,7 @@ namespace Krystals5ObjectLibrary
                 case "c":
                     pointFList = GetThreePointFs(components, ref index);
                     currentSvgNode.outControlPoint = new PointF(currentSvgNode.position.X + pointFList[0].X, currentSvgNode.position.Y + pointFList[0].Y);
-                    pointF = new PointF(currentSvgNode.position.X + pointFList[2].X, currentSvgNode.position.Y + pointFList[2].Y); 
+                    pointF = new PointF(currentSvgNode.position.X + pointFList[2].X, currentSvgNode.position.Y + pointFList[2].Y);
                     currentSvgNode = new SvgNode(new PointF(currentSvgNode.position.X + pointFList[1].X, currentSvgNode.position.Y + pointFList[1].Y), pointF, pointF);
                     break;
                 case "L":

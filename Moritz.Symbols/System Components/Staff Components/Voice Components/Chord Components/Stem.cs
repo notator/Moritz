@@ -3,8 +3,8 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	public class Stem
-	{
+    public class Stem
+    {
         public Stem(ChordSymbol chordSymbol, bool beamContinues)
         {
             Chord = chordSymbol;
@@ -19,8 +19,8 @@ namespace Moritz.Symbols
 
         public readonly ChordSymbol Chord;
 
-		public VerticalDir Direction = VerticalDir.none;
+        public VerticalDir Direction = VerticalDir.none;
         public bool BeamContinues = true;
         public bool Draw = true; // set to false for cautionary chords
-	}
+    }
 }

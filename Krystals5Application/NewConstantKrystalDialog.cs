@@ -34,9 +34,9 @@ namespace Krystals5Application
         #endregion Events
         #region Properties
         public string ConstantKrystalValue
-        { 
+        {
             get { return _constantKrystalValue; }
-            set 
+            set
             {
                 UnsignedIntControl1.UnsignedInteger = new StringBuilder(value);
                 _constantKrystalValue = UnsignedIntControl1.UnsignedInteger.ToString();

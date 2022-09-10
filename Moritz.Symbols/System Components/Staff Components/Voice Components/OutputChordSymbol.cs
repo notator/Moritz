@@ -1,10 +1,11 @@
-using System.Text;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Xml;
+
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 
 namespace Moritz.Symbols
 {
@@ -19,17 +20,17 @@ namespace Moritz.Symbols
 
             SetNoteheadPitchesAndVelocities(umcd.NotatedMidiPitches, umcd.NotatedMidiVelocities);
 
-            if(! String.IsNullOrEmpty(umcd.OrnamentText))
+            if(!String.IsNullOrEmpty(umcd.OrnamentText))
             {
-				// if umcd.OrnamentText is null or empty, there will be no ornamentString DrawObject
-				string ornamentString = String.Concat('~', umcd.OrnamentText);   
-				OrnamentText ornamentText = new OrnamentText(this, ornamentString, pageFormat.OrnamentFontHeight);
-				DrawObjects.Add(ornamentText);
+                // if umcd.OrnamentText is null or empty, there will be no ornamentString DrawObject
+                string ornamentString = String.Concat('~', umcd.OrnamentText);
+                OrnamentText ornamentText = new OrnamentText(this, ornamentString, pageFormat.OrnamentFontHeight);
+                DrawObjects.Add(ornamentText);
             }
 
             if(umcd.Lyric != null)
             {
-				LyricText lyric = new LyricText(this, umcd.Lyric, FontHeight);
+                LyricText lyric = new LyricText(this, umcd.Lyric, FontHeight);
                 DrawObjects.Add(lyric);
             }
         }
@@ -58,7 +59,7 @@ namespace Moritz.Symbols
         public void SetNoteheadPitchesAndVelocities(List<byte> midiPitches, List<byte> midiVelocities)
         {
             #region check inputs
-             Debug.Assert(midiPitches.Count == midiVelocities.Count);
+            Debug.Assert(midiPitches.Count == midiVelocities.Count);
             int previousPitch = -1;
             foreach(int midiPitch in midiPitches)
             {
@@ -104,7 +105,7 @@ namespace Moritz.Symbols
                 int velocity = head.MidiVelocity;
                 if(velocity > M.MaxMidiVelocity[M.Dynamic.ff])
                 {
-                    head.ColorClass = CSSColorClass.fffColor;    
+                    head.ColorClass = CSSColorClass.fffColor;
                 }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.f])
                 {
@@ -113,31 +114,31 @@ namespace Moritz.Symbols
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.mf])
                 {
                     head.ColorClass = CSSColorClass.fColor;
-				}
+                }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.mp])
                 {
                     head.ColorClass = CSSColorClass.mfColor;
-				}
+                }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.p])
                 {
                     head.ColorClass = CSSColorClass.mpColor;
-				}
+                }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.pp])
                 {
                     head.ColorClass = CSSColorClass.pColor;
-				}
+                }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.ppp])
                 {
                     head.ColorClass = CSSColorClass.ppColor;
-				}
+                }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.pppp])
                 {
                     head.ColorClass = CSSColorClass.pppColor;
-				}
+                }
                 else // > 0 
                 {
                     head.ColorClass = CSSColorClass.ppppColor;
-				}
+                }
             }
         }
 
@@ -155,9 +156,9 @@ namespace Moritz.Symbols
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
-			w.SvgStartGroup(CSSObjectClass.chord.ToString()); // "chord"
-			w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
-            
+            w.SvgStartGroup(CSSObjectClass.chord.ToString()); // "chord"
+            w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
+
             _midiChordDef.WriteSVG(w, channel, carryMsgs);
 
             w.SvgStartGroup(CSSObjectClass.graphics.ToString());

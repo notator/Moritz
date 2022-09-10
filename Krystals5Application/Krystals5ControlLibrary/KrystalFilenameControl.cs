@@ -26,7 +26,7 @@ namespace Krystals5ControlLibrary
         private void TextBox_Leave(object sender, EventArgs e)
         {
             TextBox tb = sender as TextBox;
-            if( !GetAndValidateKrystalFileName(tb.Text) )
+            if(!GetAndValidateKrystalFileName(tb.Text))
             {
                 tb.Text = _filename.ToString();
                 string msg = "The file name contained illegal characters, which have now been removed.";
@@ -39,12 +39,12 @@ namespace Krystals5ControlLibrary
         private bool GetAndValidateKrystalFileName(string text)
         {
             bool returnValue = true;
-            if( _filename.Length > 0 )
+            if(_filename.Length > 0)
                 _filename.Remove(0, _filename.Length);
 
-            foreach( char c in text )
+            foreach(char c in text)
             {
-                if( Char.IsLetter(c) || Char.IsNumber(c) || "-_".Contains(c.ToString()) )
+                if(Char.IsLetter(c) || Char.IsNumber(c) || "-_".Contains(c.ToString()))
                     _filename.Append(c);
                 else returnValue = false;
             }

@@ -1,12 +1,11 @@
-using System;
-using System.Text;
-
 using Moritz.Xml;
+
+using System;
 
 namespace Moritz.Symbols
 {
-	public class Clef : NoteObject
-	{
+    public class Clef : NoteObject
+    {
         /// <summary>
         /// Creates a new clef, of the type described, belonging to the given voice.
         /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
@@ -31,69 +30,69 @@ namespace Moritz.Symbols
         /// </summary>
         public void WriteSVG(SvgWriter w, ClefID clefOrSmallClefID, float originX, float originY, bool isInput)
         {
-            CSSObjectClass clefClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;                    
+            CSSObjectClass clefClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;
             w.SvgUseXY(clefClass, clefOrSmallClefID.ToString(), originX, originY);
         }
 
         public override string ToString()
-		{
-			return "Clef: " + _clefType;
-		}
+        {
+            return "Clef: " + _clefType;
+        }
 
-		public string ClefType
-		{
-			get { return _clefType; }
-			set
-			{
+        public string ClefType
+        {
+            get { return _clefType; }
+            set
+            {
                 _clefType = value;
-			}
-		}
-		public ColorString CapellaColor = new ColorString("000000");
+            }
+        }
+        public ColorString CapellaColor = new ColorString("000000");
 
-		protected string _clefType;
-	}
+        protected string _clefType;
+    }
 
-	/// <summary>
-	/// A SmallClef is a small clef symbol placed anywhere on a staff except at the beginning.
-	/// </summary>
-	public class SmallClef : Clef
-	{
-		public SmallClef(Voice voice, string clefType, int absMsPosition, PageFormat pageFormat)
-			: base(voice, clefType, pageFormat.MusicFontHeight * pageFormat.SmallSizeFactor)
-		{
-			_absMsPosition = absMsPosition;
-			_isVisible = true;
-		}
+    /// <summary>
+    /// A SmallClef is a small clef symbol placed anywhere on a staff except at the beginning.
+    /// </summary>
+    public class SmallClef : Clef
+    {
+        public SmallClef(Voice voice, string clefType, int absMsPosition, PageFormat pageFormat)
+            : base(voice, clefType, pageFormat.MusicFontHeight * pageFormat.SmallSizeFactor)
+        {
+            _absMsPosition = absMsPosition;
+            _isVisible = true;
+        }
 
-		public override string ToString() => "SmallClef: " + _clefType + " absMsPos=" + _absMsPosition;
+        public override string ToString() => "SmallClef: " + _clefType + " absMsPos=" + _absMsPosition;
 
-		public int AbsMsPosition { get { return _absMsPosition; } }
-		private readonly int _absMsPosition;
+        public int AbsMsPosition { get { return _absMsPosition; } }
+        private readonly int _absMsPosition;
 
-		public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
-		private bool _isVisible;
-	}
+        public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
+        private bool _isVisible;
+    }
 
 
-	/// <summary>
-	/// An InvisibleSmallClef is a small, invisible clef symbol in the lower voice on a staff,
-	/// at an absMsPosition of an ordinary SmallClef in the top voice.
-	/// </summary>
-	public class InvisibleSmallClef : Clef
-	{
-		public InvisibleSmallClef(Voice voice, string clefType, int absMsPosition)
-			: base(voice, clefType, 0.01F)
-		{
-			_absMsPosition = absMsPosition;
-			_isVisible = true;
-		}
+    /// <summary>
+    /// An InvisibleSmallClef is a small, invisible clef symbol in the lower voice on a staff,
+    /// at an absMsPosition of an ordinary SmallClef in the top voice.
+    /// </summary>
+    public class InvisibleSmallClef : Clef
+    {
+        public InvisibleSmallClef(Voice voice, string clefType, int absMsPosition)
+            : base(voice, clefType, 0.01F)
+        {
+            _absMsPosition = absMsPosition;
+            _isVisible = true;
+        }
 
-		public override string ToString() => "InvisibleSmallClef: " + _clefType + " absMsPos=" + _absMsPosition;
+        public override string ToString() => "InvisibleSmallClef: " + _clefType + " absMsPos=" + _absMsPosition;
 
-		public int AbsMsPosition { get { return _absMsPosition; } }
-		private readonly int _absMsPosition;
+        public int AbsMsPosition { get { return _absMsPosition; } }
+        private readonly int _absMsPosition;
 
-		public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
-		private bool _isVisible;
-	}
+        public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
+        private bool _isVisible;
+    }
 }

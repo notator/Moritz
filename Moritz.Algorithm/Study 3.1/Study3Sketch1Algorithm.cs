@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Krystals5ObjectLibrary;
 
-using Krystals5ObjectLibrary;
 using Moritz.Palettes;
 using Moritz.Spec;
+
+using System.Collections.Generic;
 
 namespace Moritz.Algorithm.Study3Sketch1
 {
@@ -44,63 +44,63 @@ namespace Moritz.Algorithm.Study3Sketch1
             approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 10500);
             approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + bars345Seq.MsDuration);
 
-			Seq mainSeq = bar1Seq;
+            Seq mainSeq = bar1Seq;
             mainSeq.Concat(bar2Seq);
             mainSeq.Concat(bars345Seq);
 
-			List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, null, approximateBarlineMsPositions);
+            List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, null, approximateBarlineMsPositions);
 
-			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
+            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
 
-			List<List<SortedDictionary<int, string>>> lyricsPerBar = GetLyricsPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
+            List<List<SortedDictionary<int, string>>> lyricsPerBar = GetLyricsPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
 
-			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, clefChangesPerBar, lyricsPerBar);
+            List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, clefChangesPerBar, lyricsPerBar);
 
-			return bars;
+            return bars;
         }
 
-		/// <summary>
-		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
-		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-		{
-			return null;
-		}
+        /// <summary>
+        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
+        /// </summary>
+        protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
+        {
+            return null;
+        }
 
-		/// <summary>
-		/// Lyrics can be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
-		/// provides the possibility of adding them all in one place.
-		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index of the MidiChordDef or InputChordDef in the bar to which the associated
-		/// lyric string will be attached. The index is of MidiChordDefs or InputChordDefs only, beginning with 0 for
-		/// the first MidiChordDef or InptChordDef in the bar.
-		/// Lyrics that are attached to top voices on a staff will, like dynamics, be automatically placed above the staff.
-		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars, int nVoicesPerBar)
-		{
-			//var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
-			
-			//SortedDictionary<int, string> bar2VoiceDef1 = lyricsPerBar[1][0]; // Bar 2 Voice 1.
-			//bar2VoiceDef1.Add(9, "lyric9");
-			//bar2VoiceDef1.Add(8, "lyric8");
-			//bar2VoiceDef1.Add(6, "lyric6");
-			//bar2VoiceDef1.Add(4, "lyric4");
-			//bar2VoiceDef1.Add(2, "lyric2");
-			
-			//SortedDictionary<int, string> bar2VoiceDef2 = lyricsPerBar[1][1]; // Bar 2 Voice 2.
-			//bar2VoiceDef2.Add(9, "lyric9a");
-			//bar2VoiceDef2.Add(8, "lyric8a");
-			//bar2VoiceDef2.Add(6, "lyric6a");
-			//bar2VoiceDef2.Add(4, "lyric4a");
-			//bar2VoiceDef2.Add(2, "lyric2a");
+        /// <summary>
+        /// Lyrics can be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
+        /// provides the possibility of adding them all in one place.
+        /// This function returns null or a SortedDictionary per VoiceDef in each bar.
+        /// The dictionary contains the index of the MidiChordDef or InputChordDef in the bar to which the associated
+        /// lyric string will be attached. The index is of MidiChordDefs or InputChordDefs only, beginning with 0 for
+        /// the first MidiChordDef or InptChordDef in the bar.
+        /// Lyrics that are attached to top voices on a staff will, like dynamics, be automatically placed above the staff.
+        /// </summary>
+        protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars, int nVoicesPerBar)
+        {
+            //var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
 
-			//return lyricsPerBar;
+            //SortedDictionary<int, string> bar2VoiceDef1 = lyricsPerBar[1][0]; // Bar 2 Voice 1.
+            //bar2VoiceDef1.Add(9, "lyric9");
+            //bar2VoiceDef1.Add(8, "lyric8");
+            //bar2VoiceDef1.Add(6, "lyric6");
+            //bar2VoiceDef1.Add(4, "lyric4");
+            //bar2VoiceDef1.Add(2, "lyric2");
 
-			return null;
-		}
+            //SortedDictionary<int, string> bar2VoiceDef2 = lyricsPerBar[1][1]; // Bar 2 Voice 2.
+            //bar2VoiceDef2.Add(9, "lyric9a");
+            //bar2VoiceDef2.Add(8, "lyric8a");
+            //bar2VoiceDef2.Add(6, "lyric6a");
+            //bar2VoiceDef2.Add(4, "lyric4a");
+            //bar2VoiceDef2.Add(2, "lyric2a");
 
-		#region CreateBar1Seq()
-		private Seq CreateBar1Seq()
+            //return lyricsPerBar;
+
+            return null;
+        }
+
+        #region CreateBar1Seq()
+        private Seq CreateBar1Seq()
         {
             List<Trk> bar = new List<Trk>();
 
@@ -143,8 +143,8 @@ namespace Moritz.Algorithm.Study3Sketch1
         {
             List<Trk> bar = new List<Trk>();
 
-			byte channel = (byte)(_palettes.Count - 1);
-			foreach(Palette palette in _palettes)
+            byte channel = (byte)(_palettes.Count - 1);
+            foreach(Palette palette in _palettes)
             {
                 Trk trk = palette.NewTrk(channel);
                 trk.MsPositionReContainer = 0;

@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-
-using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Xml;
+
+using System.Collections.Generic;
 
 namespace Moritz.Symbols
 {

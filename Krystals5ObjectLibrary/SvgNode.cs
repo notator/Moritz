@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Xml;
 
 namespace Krystals5ObjectLibrary
 {
@@ -15,7 +14,7 @@ namespace Krystals5ObjectLibrary
         // (Moving a node never moves another Node!)
         public SvgNode(PointF inControlPoint, PointF outControlPoint, PointF position)
         {
-            this.inControlPoint = new PointF(inControlPoint.X, inControlPoint.Y) ;
+            this.inControlPoint = new PointF(inControlPoint.X, inControlPoint.Y);
             this.outControlPoint = new PointF(outControlPoint.X, outControlPoint.Y);
             this.position = new PointF(position.X, position.Y);
         }

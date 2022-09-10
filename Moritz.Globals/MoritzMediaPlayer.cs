@@ -1,5 +1,6 @@
 ﻿
 using System.Windows.Forms;
+
 using WMPLib; // needs a reference to WMPLib in Solution Explorer. WMPLib can be found in the COM libs. 
 
 namespace Moritz.Globals

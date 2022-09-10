@@ -54,7 +54,7 @@ namespace Krystals5ControlLibrary
         {
             TextBox tb = sender as TextBox;
             _illegalCharacter = false;
-            if (tb.Text.Length > 0)
+            if(tb.Text.Length > 0)
             {
                 _uInt.Append(tb.Text);
                 RemoveIllegalCharacters();
@@ -62,14 +62,14 @@ namespace Krystals5ControlLibrary
                 _uInt.Remove(0, _uInt.Length);
             }
 
-            if (_illegalCharacter)
+            if(_illegalCharacter)
             {
                 string msg = "The cell contained illegal characters, which have now been removed.";
                 MessageBox.Show(msg, "Value error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 tb.BringToFront();
             }
 
-            if (EventHandler != null)
+            if(EventHandler != null)
                 EventHandler(this, new SUICEventArgs(SUICMessage.ValueChanged)); // delegate
         }
         /// <summary>
@@ -81,8 +81,8 @@ namespace Krystals5ControlLibrary
         private void TextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             TextBox_Leave(sender, e);
-            if (EventHandler != null)
-                switch (e.KeyData)
+            if(EventHandler != null)
+                switch(e.KeyData)
                 {
                     case Keys.Return:
                         EventHandler(this, new SUICEventArgs(SUICMessage.Return)); // delegate
@@ -110,7 +110,7 @@ namespace Krystals5ControlLibrary
         {
             get { return base.Text; }
             set
-            { 
+            {
                 base.Text = value;
                 TextBox_Leave(this, new EventArgs());
             }
@@ -120,21 +120,21 @@ namespace Krystals5ControlLibrary
         private void RemoveIllegalCharacters()
         {
             StringBuilder tempUInt = new StringBuilder();
-            for (int i = 0; i < _uInt.Length; i++)
+            for(int i = 0; i < _uInt.Length; i++)
             {
-                if (Char.IsNumber(_uInt[i]))
+                if(Char.IsNumber(_uInt[i]))
                     tempUInt.Append(_uInt[i]);
                 else _illegalCharacter = true;
             }
             int j = 0;
             _uInt.Remove(0, _uInt.Length);
-            while (tempUInt.Length > j && tempUInt[j] == '0') // remove leading zeros
+            while(tempUInt.Length > j && tempUInt[j] == '0') // remove leading zeros
                 j++;
-            if (j == tempUInt.Length)
+            if(j == tempUInt.Length)
                 _uInt.Append("0");
             else
-            while (j < tempUInt.Length)
-                _uInt.Append(tempUInt[j++]);
+                while(j < tempUInt.Length)
+                    _uInt.Append(tempUInt[j++]);
         }
         #endregion private functions
         #region private variables

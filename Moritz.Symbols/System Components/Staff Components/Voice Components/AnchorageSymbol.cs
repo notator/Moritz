@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Moritz.Globals;
 
-using Moritz.Globals;
+using System;
+using System.Collections.Generic;
 
 namespace Moritz.Symbols
 {
@@ -20,13 +20,13 @@ namespace Moritz.Symbols
         {
         }
 
-		public List<DrawObject> DrawObjects { get; set; } = new List<DrawObject>();
+        public List<DrawObject> DrawObjects { get; set; } = new List<DrawObject>();
 
-		/// <summary>
-		/// This field is set to true (while creating a MidiScore for performance) if a specific
-		/// dynamic has been attached to this anchorageSymbol..
-		/// </summary>
-		public bool HasExplicitDynamic = false;
+        /// <summary>
+        /// This field is set to true (while creating a MidiScore for performance) if a specific
+        /// dynamic has been attached to this anchorageSymbol..
+        /// </summary>
+        public bool HasExplicitDynamic = false;
 
         public void AddDynamic(byte midiVelocity, byte currentVelocity)
         {

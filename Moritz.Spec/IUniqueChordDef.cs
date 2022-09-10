@@ -1,9 +1,6 @@
 
 using System.Collections.Generic;
 
-using Krystals5ObjectLibrary;
-using Moritz.Globals;
-
 namespace Moritz.Spec
 {
     ///<summary>
@@ -13,7 +10,7 @@ namespace Moritz.Spec
     ///     InputChordDef
     ///     CautionaryChordDef
     ///</summary>
-    public interface IUniqueChordDef: IUniqueDef
+    public interface IUniqueChordDef : IUniqueDef
     {
         /// <summary>
         /// Transpose by the number of semitones given in the argument.

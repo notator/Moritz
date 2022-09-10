@@ -1,7 +1,4 @@
-﻿using Moritz.Globals;
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Xml;

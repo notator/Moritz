@@ -1,26 +1,24 @@
-﻿using System;
-using System.Text;
-using System.Diagnostics;
-
-using Moritz.Globals;
-using Moritz.Xml;
+﻿using Moritz.Globals;
 using Moritz.Spec;
-using System.Collections.Generic;
+using Moritz.Xml;
+
+using System;
+using System.Diagnostics;
 
 namespace Moritz.Symbols
 {
     internal class OutputRestSymbol : RestSymbol
-	{
+    {
         public OutputRestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, PageFormat pageFormat)
-			: base(voice, iumdd, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight)
+            : base(voice, iumdd, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight)
         {
             if(iumdd is MidiRestDef mrd)
             {
                 _midiRestDef = mrd;
             }
 
-			// This needs testing!!
-			if(iumdd is CautionaryChordDef ccd)
+            // This needs testing!!
+            if(iumdd is CautionaryChordDef ccd)
             {
                 Console.WriteLine("rest is CautionaryChordDef!");
                 LocalCautionaryChordDef = ccd;
@@ -42,7 +40,7 @@ namespace Moritz.Symbols
             {
                 Debug.Assert(_msDuration > 0);
 
-				w.SvgStartGroup(CSSObjectClass.rest.ToString()); // "rest"
+                w.SvgStartGroup(CSSObjectClass.rest.ToString()); // "rest"
 
                 w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 
@@ -57,8 +55,8 @@ namespace Moritz.Symbols
             }
         }
 
-		public override string ToString() => "outputRest " + InfoString;
+        public override string ToString() => "outputRest " + InfoString;
 
-		MidiRestDef _midiRestDef = null;
+        MidiRestDef _midiRestDef = null;
     }
 }

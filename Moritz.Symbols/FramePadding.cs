@@ -3,8 +3,8 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	public class FramePadding
-	{
+    public class FramePadding
+    {
         public FramePadding(TextFrameType frameType, float paddingTop, float paddingRight, float paddingBottom, float paddingLeft)
         {
             FrameType = frameType;
@@ -14,10 +14,10 @@ namespace Moritz.Symbols
             Left = paddingLeft;
         }
 
-		public TextFrameType FrameType { get; }
-		public float Top { get; }
-		public float Right { get; }
-		public float Bottom { get; }
-		public float Left { get; }
-	}
+        public TextFrameType FrameType { get; }
+        public float Top { get; }
+        public float Right { get; }
+        public float Bottom { get; }
+        public float Left { get; }
+    }
 }

@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using Krystals5ObjectLibrary;
 
-using Krystals5ObjectLibrary;
-using Moritz.Algorithm;
-using Moritz.Palettes;
-using Moritz.Symbols;
 using Moritz.Globals;
+using Moritz.Palettes;
 using Moritz.Spec;
-using System;
+
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Moritz.Algorithm.Study3Sketch2
 {
@@ -24,7 +22,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         }
 
         public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
-        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return new List<int>() { 0 }; } }  
+        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return new List<int>() { 0 }; } }
         public override int NumberOfBars { get { return 5; } }
 
         /// <summary>
@@ -35,11 +33,11 @@ namespace Moritz.Algorithm.Study3Sketch2
             _krystals = krystals;
             _palettes = palettes;
 
-			Seq bar1Seq = CreateBar1Seq();
-			Seq bar2Seq = CreateBar2Seq();
-			Seq bars345Seq = bar2Seq.Clone();
+            Seq bar1Seq = CreateBar1Seq();
+            Seq bar2Seq = CreateBar2Seq();
+            Seq bars345Seq = bar2Seq.Clone();
 
-			/****************************************************************************************
+            /****************************************************************************************
 			* This score is liable to be recompiled when other things change in the SVG-MIDI file format,
 			* so its default version should be kept simple.
 			* The default CC settings are set in the first InputChordDef in bar 1, but setting trkOptions
@@ -48,9 +46,9 @@ namespace Moritz.Algorithm.Study3Sketch2
 			* the following functions, and the comment at the top of TrkOptions.cs.
 			*****************************************************************************************/
 
-			InputVoiceDef bar1InputVoiceDef = GetBar1InputVoiceDef(bar1Seq);
+            InputVoiceDef bar1InputVoiceDef = GetBar1InputVoiceDef(bar1Seq);
             SetTrackCCSettings(bar1InputVoiceDef);
-			SetBar1PerformanceOptions(bar1InputVoiceDef);
+            SetBar1PerformanceOptions(bar1InputVoiceDef);
 
             InputVoiceDef bar2InputVoiceDef = GetBar2InputVoiceDef(bar2Seq);
             SetBar2NoteOnNoteOffControls(bar2InputVoiceDef);
@@ -58,110 +56,110 @@ namespace Moritz.Algorithm.Study3Sketch2
             InputVoiceDef bars345InputVoiceDef = GetBar345InputVoiceDef(bars345Seq);
             SetBar345PerformanceOptions(bars345InputVoiceDef);
 
-			var approximateBarlineMsPositions = new List<double>
-			{
-				bar1InputVoiceDef.MsDuration,
-				bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration,
-				bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + 5950,
-				bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + 10500,
-				bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + bars345InputVoiceDef.MsDuration
-			};
+            var approximateBarlineMsPositions = new List<double>
+            {
+                bar1InputVoiceDef.MsDuration,
+                bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration,
+                bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + 5950,
+                bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + 10500,
+                bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + bars345InputVoiceDef.MsDuration
+            };
 
-			InputVoiceDef ivd = bar1InputVoiceDef;
+            InputVoiceDef ivd = bar1InputVoiceDef;
             ivd.Concat(bar2InputVoiceDef);
             ivd.Concat(bars345InputVoiceDef);
 
-			Seq mainSeq = bar1Seq;
-			mainSeq.Concat(bar2Seq);
-			mainSeq.Concat(bars345Seq);
+            Seq mainSeq = bar1Seq;
+            mainSeq.Concat(bar2Seq);
+            mainSeq.Concat(bars345Seq);
 
-			List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, new List<InputVoiceDef>() { ivd }, approximateBarlineMsPositions);
+            List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, new List<InputVoiceDef>() { ivd }, approximateBarlineMsPositions);
 
-			List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>() { ivd };
+            List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>() { ivd };
 
-			List<Bar> bars = GetBars(mainSeq, inputVoiceDefs, barlineMsPositions, null, null);
+            List<Bar> bars = GetBars(mainSeq, inputVoiceDefs, barlineMsPositions, null, null);
 
-			return bars;
+            return bars;
         }
 
-		/// <summary>
-		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
-		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-		{
-			return null;
-		}
-
-		private InputVoiceDef GetBar1InputVoiceDef(Seq bar1Seq)
+        /// <summary>
+        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
+        /// </summary>
+        protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
         {
-			InputVoiceDef ivd = new InputVoiceDef(0, 0, new List<IUniqueDef>())
-			{
-				MsPositionReContainer = bar1Seq.AbsMsPosition
-			};
+            return null;
+        }
 
-			Trk trk7 = bar1Seq.Trks[7];
+        private InputVoiceDef GetBar1InputVoiceDef(Seq bar1Seq)
+        {
+            InputVoiceDef ivd = new InputVoiceDef(0, 0, new List<IUniqueDef>())
+            {
+                MsPositionReContainer = bar1Seq.AbsMsPosition
+            };
+
+            Trk trk7 = bar1Seq.Trks[7];
 
             foreach(IUniqueDef tIud in trk7)
             {
-				MidiChordDef chordDef = tIud as MidiChordDef;
-				if(tIud is MidiRestDef restDef)
-				{
-					InputRestDef iRestDef = new InputRestDef(restDef.MsPositionReFirstUD, restDef.MsDuration);
-					ivd.Add(iRestDef);
-				}
-				else if(chordDef != null)
-				{
-					List<TrkRef> trkRefs = new List<TrkRef>();
-					TrkOptions trkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
-					for(int tIndex = 0; tIndex < bar1Seq.Trks.Count; ++tIndex)
-					{
-						trkRefs.Add(new TrkRef(tIndex, bar1Seq.AbsMsPosition + chordDef.MsPositionReFirstUD, 1, trkOptions));
-					}
-					SeqRef seqRef = new SeqRef(trkRefs, null);
-					NoteOn noteOn = new NoteOn(seqRef);
-					List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>();
-					foreach(byte notatedMidiPitch in chordDef.NotatedMidiPitches)
-					{
-						inputNoteDefs.Add(new InputNoteDef((byte)(notatedMidiPitch + 36), noteOn, null));
-					}
-					InputChordDef icd = new InputChordDef(tIud.MsPositionReFirstUD, tIud.MsDuration, inputNoteDefs, M.Dynamic.none, null);
-					ivd.Add(icd);
-				}
-			}
+                MidiChordDef chordDef = tIud as MidiChordDef;
+                if(tIud is MidiRestDef restDef)
+                {
+                    InputRestDef iRestDef = new InputRestDef(restDef.MsPositionReFirstUD, restDef.MsDuration);
+                    ivd.Add(iRestDef);
+                }
+                else if(chordDef != null)
+                {
+                    List<TrkRef> trkRefs = new List<TrkRef>();
+                    TrkOptions trkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
+                    for(int tIndex = 0; tIndex < bar1Seq.Trks.Count; ++tIndex)
+                    {
+                        trkRefs.Add(new TrkRef(tIndex, bar1Seq.AbsMsPosition + chordDef.MsPositionReFirstUD, 1, trkOptions));
+                    }
+                    SeqRef seqRef = new SeqRef(trkRefs, null);
+                    NoteOn noteOn = new NoteOn(seqRef);
+                    List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>();
+                    foreach(byte notatedMidiPitch in chordDef.NotatedMidiPitches)
+                    {
+                        inputNoteDefs.Add(new InputNoteDef((byte)(notatedMidiPitch + 36), noteOn, null));
+                    }
+                    InputChordDef icd = new InputChordDef(tIud.MsPositionReFirstUD, tIud.MsDuration, inputNoteDefs, M.Dynamic.none, null);
+                    ivd.Add(icd);
+                }
+            }
 
             return ivd;
         }
 
         private InputVoiceDef GetBar2InputVoiceDef(Seq bar2Seq)
         {
-			InputVoiceDef ivd = new InputVoiceDef(0, 0, new List<IUniqueDef>())
-			{
-				MsPositionReContainer = bar2Seq.AbsMsPosition
-			};
-
-			int inputChordDefMsDurations = 0;
-			for(int trkIndex = bar2Seq.Trks.Count - 1; trkIndex >= 0; --trkIndex)
+            InputVoiceDef ivd = new InputVoiceDef(0, 0, new List<IUniqueDef>())
             {
-				Trk trk = bar2Seq.Trks[trkIndex];
+                MsPositionReContainer = bar2Seq.AbsMsPosition
+            };
 
-				MidiChordDef firstMidiChordDef = null;
+            int inputChordDefMsDurations = 0;
+            for(int trkIndex = bar2Seq.Trks.Count - 1; trkIndex >= 0; --trkIndex)
+            {
+                Trk trk = bar2Seq.Trks[trkIndex];
+
+                MidiChordDef firstMidiChordDef = null;
                 TrkOptions trkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
                 foreach(IUniqueDef iud in trk.UniqueDefs)
                 {
                     firstMidiChordDef = iud as MidiChordDef;
                     if(firstMidiChordDef != null)
                     {
-						List<TrkRef> trkRefs = new List<TrkRef>
-						{
-							new TrkRef((byte)trk.MidiChannel, bar2Seq.AbsMsPosition + firstMidiChordDef.MsPositionReFirstUD, 12, trkOptions)
-						};
-						SeqRef seqRef = new SeqRef(trkRefs, null);
+                        List<TrkRef> trkRefs = new List<TrkRef>
+                        {
+                            new TrkRef((byte)trk.MidiChannel, bar2Seq.AbsMsPosition + firstMidiChordDef.MsPositionReFirstUD, 12, trkOptions)
+                        };
+                        SeqRef seqRef = new SeqRef(trkRefs, null);
                         NoteOn noteOn = new NoteOn(seqRef);
-						List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>
-						{
-							new InputNoteDef((byte)65, noteOn, null)
-						};
-						InputChordDef icd = new InputChordDef(firstMidiChordDef.MsPositionReFirstUD, 1500, inputNoteDefs, M.Dynamic.none, null);
+                        List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>
+                        {
+                            new InputNoteDef((byte)65, noteOn, null)
+                        };
+                        InputChordDef icd = new InputChordDef(firstMidiChordDef.MsPositionReFirstUD, 1500, inputNoteDefs, M.Dynamic.none, null);
                         ivd.Add(icd);
                         inputChordDefMsDurations += icd.MsDuration;
                         break;
@@ -284,8 +282,8 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             List<Trk> bar = new List<Trk>();
 
-			byte channel = (byte)(_palettes.Count - 1);
-			int endBarlineMsPos = 0;
+            byte channel = (byte)(_palettes.Count - 1);
+            int endBarlineMsPos = 0;
             foreach(Palette palette in _palettes)
             {
                 Trk trk = new Trk(channel, 0, new List<IUniqueDef>());
@@ -327,8 +325,8 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             List<Trk> bar = new List<Trk>();
 
-			byte channel = (byte)(_palettes.Count - 1);
-			foreach(Palette palette in _palettes)
+            byte channel = (byte)(_palettes.Count - 1);
+            foreach(Palette palette in _palettes)
             {
                 Trk trk = palette.NewTrk(channel);
                 trk.MsPositionReContainer = 0;

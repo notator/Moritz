@@ -49,11 +49,11 @@ namespace Moritz.Symbols
             #endregion conditions;
 
             Dictionary<float, HLine> lines = new Dictionary<float, HLine>();
-			List<float> allXs = new List<float>
-			{
-				Left
-			};
-			allXs.AddRange(Xs);
+            List<float> allXs = new List<float>
+            {
+                Left
+            };
+            allXs.AddRange(Xs);
             allXs.Add(Right);
             for(int i = 1; i < allXs.Count; ++i)
             {
@@ -80,7 +80,7 @@ namespace Moritz.Symbols
         }
 
         public abstract float YatX(float X);
- 
+
         /// <summary>
         /// returns the y-coordinate of this BottomEdge at X.
         /// If X greater than or equal to the leftX of an HLine, and less than the rightX of the same HLine,
@@ -120,10 +120,10 @@ namespace Moritz.Symbols
                     }
                 }
             }
-             Debug.Assert(y != float.MaxValue);
+            Debug.Assert(y != float.MaxValue);
             return y;
         }
-        
+
         /// <summary>
         /// Adds either the top or the bottom of the metrics object to this horizontal edge,
         /// depending on whether this is a top or bottom edge.
@@ -146,26 +146,26 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
-					Clef clef = noteObject as Clef;
+                    Clef clef = noteObject as Clef;
 
-					if(noteObject is OutputChordSymbol chordSymbol)
-					{
-						chordSymbol.ChordMetrics.AddToEdge(this);
-					}
-					else if(clef != null && clef.ClefType != "n")
-					{
-						Add(clef.Metrics);
-					}
-					else
-					{
-						Add(noteObject.Metrics);
-					}
+                    if(noteObject is OutputChordSymbol chordSymbol)
+                    {
+                        chordSymbol.ChordMetrics.AddToEdge(this);
+                    }
+                    else if(clef != null && clef.ClefType != "n")
+                    {
+                        Add(clef.Metrics);
+                    }
+                    else
+                    {
+                        Add(noteObject.Metrics);
+                    }
 
-					if(noteObject is Barline barline)
-					{
-						barline.AddMetricsToEdge(this);						
-					}
-				}
+                    if(noteObject is Barline barline)
+                    {
+                        barline.AddMetricsToEdge(this);
+                    }
+                }
             }
         }
 

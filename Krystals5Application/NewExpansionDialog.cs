@@ -58,7 +58,7 @@ namespace Krystals5Application
             char[] dot = new char[] { '.' };
             var densityFilename = Path.GetFileName(_densityInputFilepath);
             var expanderFilename = Path.GetFileName(_expanderFilepath);
-            
+
             int inputDomain = K.GetDomainFromFirstComponent(expanderFilename);
             List<int> shapeListFilter = K.GetShapeFromKrystalName(densityFilename);
 
@@ -91,7 +91,7 @@ namespace Krystals5Application
             // DialogResult = DialogResult.OK is set in the designer
             _densityInputFilepath = "";
             _pointsInputFilepath = "";
-            _expanderFilepath = "";            
+            _expanderFilepath = "";
         }
         private void ExpandBtn_Click(object sender, EventArgs e)
         {

@@ -1,18 +1,19 @@
-using System;
-using System.Windows.Forms;
-using System.IO;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Xml;
-using System.Text.RegularExpressions;
-
 using Krystals5ObjectLibrary;
-using Moritz.Globals;
-using Moritz.Symbols;
-using Moritz.Palettes;
+
 using Moritz.Algorithm;
+using Moritz.Globals;
+using Moritz.Palettes;
+using Moritz.Symbols;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace Moritz.Composer
 {
@@ -36,8 +37,8 @@ namespace Moritz.Composer
             _settingsFolderPath = Path.GetDirectoryName(settingsPath);
             _scoreTitle = Path.GetFileNameWithoutExtension(settingsPath);
 
-			this.Text = _settingsFolderPath.Substring(_settingsFolderPath.LastIndexOf('\\') + 1);
-			this.QuitAssistantComposerButton.Text = "Quit algorithm:  " + _scoreTitle;
+            this.Text = _settingsFolderPath.Substring(_settingsFolderPath.LastIndexOf('\\') + 1);
+            this.QuitAssistantComposerButton.Text = "Quit algorithm:  " + _scoreTitle;
 
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
 
@@ -45,13 +46,13 @@ namespace Moritz.Composer
 
             Debug.Assert(_algorithm != null);
 
-			_outputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerOutputVoice);
-			if(_algorithm.MidiChannelPerInputVoice != null)
-			{
-				_inputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerInputVoice);
-			}
+            _outputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerOutputVoice);
+            if(_algorithm.MidiChannelPerInputVoice != null)
+            {
+                _inputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerInputVoice);
+            }
 
-			GetSelectedSettings();
+            GetSelectedSettings();
 
             if(VoiceIndicesPerStaffTextBox.Text == "")
             {
@@ -60,26 +61,26 @@ namespace Moritz.Composer
         }
         #region called from ctor
 
-		private List<TextBox> GetAllTextBoxes()
+        private List<TextBox> GetAllTextBoxes()
         {
-			List<TextBox> textBoxes = new List<TextBox>
-			{
-				MinimumGapsBetweenStavesTextBox,
-				MinimumGapsBetweenSystemsTextBox,
-				MinimumCrotchetDurationTextBox,
+            List<TextBox> textBoxes = new List<TextBox>
+            {
+                MinimumGapsBetweenStavesTextBox,
+                MinimumGapsBetweenSystemsTextBox,
+                MinimumCrotchetDurationTextBox,
 
-				VoiceIndicesPerStaffTextBox,
-				ClefsPerStaffTextBox,
-				StafflinesPerStaffTextBox,
-				StaffGroupsTextBox,
+                VoiceIndicesPerStaffTextBox,
+                ClefsPerStaffTextBox,
+                StafflinesPerStaffTextBox,
+                StaffGroupsTextBox,
 
 
-				LongStaffNamesTextBox,
-				ShortStaffNamesTextBox,
+                LongStaffNamesTextBox,
+                ShortStaffNamesTextBox,
 
-				SystemStartBarsTextBox
-			};
-			return textBoxes;
+                SystemStartBarsTextBox
+            };
+            return textBoxes;
         }
         private void ClearListBoxes()
         {
@@ -132,7 +133,7 @@ namespace Moritz.Composer
         #endregion DeselectAll
         private List<byte> GetVoiceIndices(IReadOnlyList<int> MidiChannelIndexPerVoice)
         {
-			Debug.Assert(MidiChannelIndexPerVoice != null);
+            Debug.Assert(MidiChannelIndexPerVoice != null);
 
             List<byte> rval = new List<byte>();
             for(byte i = 0; i < MidiChannelIndexPerVoice.Count; ++i)
@@ -143,7 +144,7 @@ namespace Moritz.Composer
         }
         private void GetSelectedSettings()
         {
-			LoadSettings();
+            LoadSettings();
 
             SetVoiceIndicesHelpLabel(_algorithm.MidiChannelPerOutputVoice, _algorithm.MidiChannelPerInputVoice);
             SetSystemStartBarsHelpLabel(_algorithm.NumberOfBars);
@@ -157,19 +158,19 @@ namespace Moritz.Composer
         private void SetVoiceIndicesHelpLabel(IReadOnlyList<int> midiChannelIndexPerOutputVoice, IReadOnlyList<int> midiChannelIndexPerInputVoice)
         {
             Debug.Assert(midiChannelIndexPerOutputVoice.Count > 0);
-			StringBuilder sb = new StringBuilder();
-			foreach(var channel in midiChannelIndexPerOutputVoice)
-			{
-				sb.Append(", ");
-				sb.Append(channel.ToString());
-			}
-			sb.Remove(0, 2);
-			
+            StringBuilder sb = new StringBuilder();
+            foreach(var channel in midiChannelIndexPerOutputVoice)
+            {
+                sb.Append(", ");
+                sb.Append(channel.ToString());
+            }
+            sb.Remove(0, 2);
+
             if(midiChannelIndexPerInputVoice != null && midiChannelIndexPerInputVoice.Count > 0)
             {
                 sb.Append(" | ");
                 StringBuilder ivsb = new StringBuilder();
-				foreach(var channel in midiChannelIndexPerInputVoice)
+                foreach(var channel in midiChannelIndexPerInputVoice)
                 {
                     ivsb.Append(", ");
                     ivsb.Append(channel.ToString());
@@ -279,28 +280,28 @@ namespace Moritz.Composer
         }
         private void DoSelectionColor(object sender, DrawItemEventArgs e)
         {
-			Graphics g = e.Graphics;
+            Graphics g = e.Graphics;
 
-			if(sender is ListBox listBox && listBox.Items.Count > e.Index)
-			{
-				string text = listBox.Items[e.Index].ToString();
-				Point textOrigin = new Point(e.Bounds.Left, e.Bounds.Top);
+            if(sender is ListBox listBox && listBox.Items.Count > e.Index)
+            {
+                string text = listBox.Items[e.Index].ToString();
+                Point textOrigin = new Point(e.Bounds.Left, e.Bounds.Top);
 
-				e.DrawBackground();
+                e.DrawBackground();
 
-				if(listBox.SelectedIndex == e.Index)
-				{
-					g.FillRectangle(_systemHighlightBrush, e.Bounds);
-					g.DrawString(text, e.Font, _whiteBrush, textOrigin);
-				}
-				else
-				{
-					g.FillRectangle(_whiteBrush, e.Bounds);
-					g.DrawString(text, e.Font, _blackBrush, textOrigin);
-				}
-				e.DrawFocusRectangle();
-			}
-		}
+                if(listBox.SelectedIndex == e.Index)
+                {
+                    g.FillRectangle(_systemHighlightBrush, e.Bounds);
+                    g.DrawString(text, e.Font, _whiteBrush, textOrigin);
+                }
+                else
+                {
+                    g.FillRectangle(_whiteBrush, e.Bounds);
+                    g.DrawString(text, e.Font, _blackBrush, textOrigin);
+                }
+                e.DrawFocusRectangle();
+            }
+        }
         #endregion control helpers
 
         #region AssistantComposer form state
@@ -365,7 +366,7 @@ namespace Moritz.Composer
             }
             else if(ThereAreConfirmedPalettes())
             {
-                _fsf.SetGroupBoxState(PalettesGroupBox, SavedState.confirmed);              
+                _fsf.SetGroupBoxState(PalettesGroupBox, SavedState.confirmed);
                 RevertPalettesListButton.Enabled = true;
             }
             else // all palettes are saved
@@ -533,7 +534,7 @@ namespace Moritz.Composer
             catch(Exception ex)
             {
                 string msg = "Exception message:\n\n" + ex.Message;
-				MessageBox.Show(msg, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(msg, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion GroupBox confirm and revert buttons
@@ -546,7 +547,7 @@ namespace Moritz.Composer
         {
             Debug.Assert(_fsf.ConfirmedFormsExist());
             _fsf.ShowConfirmedForms();
-        }   
+        }
         #region SaveSettingsCreateScore button
         public void SaveSettingsCreateScoreButton_Click(object sender, EventArgs e)
         {
@@ -586,7 +587,7 @@ namespace Moritz.Composer
 
                 LoadSettings(); // clears existing settings
 
-                ReshowForms(dimensionsAndMetadataFormLocation, visiblePaletteFormLocations, visibleOrnamentFormLocations);             
+                ReshowForms(dimensionsAndMetadataFormLocation, visiblePaletteFormLocations, visibleOrnamentFormLocations);
             }
         }
         #region helpers
@@ -678,14 +679,14 @@ namespace Moritz.Composer
         private void QuitMoritzButton_Click(object sender, EventArgs e)
         {
             if(DiscardAnyChanges())
-            { 
+            {
                 //_moritzForm1.Close();
             }
         }
         private void QuitAssistantComposerButton_Click(object sender, EventArgs e)
         {
             if(DiscardAnyChanges())
-            { 
+            {
                 _moritzForm1.CloseAssistantComposer();
             }
         }
@@ -955,14 +956,14 @@ namespace Moritz.Composer
                     error = true;
                 }
             }
-			foreach(List<byte> staffMIDIChannels in outputMIDIChannelsPerStaff)
-			{
-				// a percussion channel must have its own staff.
-				if(staffMIDIChannels.Contains((byte) 9) && staffMIDIChannels.Count > 1)
-				{
-					error = true;
-				}
-			}
+            foreach(List<byte> staffMIDIChannels in outputMIDIChannelsPerStaff)
+            {
+                // a percussion channel must have its own staff.
+                if(staffMIDIChannels.Contains((byte)9) && staffMIDIChannels.Count > 1)
+                {
+                    error = true;
+                }
+            }
             if(!error && outInStrings.Length > 1 && !string.IsNullOrEmpty(outInStrings[1]))
             {
                 try
@@ -975,28 +976,28 @@ namespace Moritz.Composer
                 }
             }
 
-			if(outputMIDIChannelsPerStaff.Count == 0)
-			{
-				error = true;
-			}
-			if(!error && inputMIDIChannelsPerStaff.Count == 0 && _inputMIDIChannels != null)
-			{
-				error = true;
-			}
-			if(!error && outputMIDIChannelsPerStaff.Count > 0)
+            if(outputMIDIChannelsPerStaff.Count == 0)
+            {
+                error = true;
+            }
+            if(!error && inputMIDIChannelsPerStaff.Count == 0 && _inputMIDIChannels != null)
+            {
+                error = true;
+            }
+            if(!error && outputMIDIChannelsPerStaff.Count > 0)
             {
                 error = CheckMIDIChannelIndices(outputMIDIChannelsPerStaff, _outputMIDIChannels);
             }
-			if(!error && inputMIDIChannelsPerStaff.Count > 0)
-			{
-				if(_inputMIDIChannels == null)
-				{
-					error = true;
-				}
-				else
-				{
-					error = CheckMIDIChannelIndices(inputMIDIChannelsPerStaff, _inputMIDIChannels);
-				}
+            if(!error && inputMIDIChannelsPerStaff.Count > 0)
+            {
+                if(_inputMIDIChannels == null)
+                {
+                    error = true;
+                }
+                else
+                {
+                    error = CheckMIDIChannelIndices(inputMIDIChannelsPerStaff, _inputMIDIChannels);
+                }
             }
 
             if(error)
@@ -1017,41 +1018,41 @@ namespace Moritz.Composer
 
         private bool CheckMIDIChannelIndices(List<List<byte>> midiChannelsPerStaff, List<byte> availableMIDIChannels)
         {
-			Debug.Assert(availableMIDIChannels != null);
+            Debug.Assert(availableMIDIChannels != null);
 
             bool error = false;
-			var flatMIDIChannels = new List<byte>();
-			#region get flat indices
-			foreach(List<byte> midiChannels in midiChannelsPerStaff)
-			{
-				if(midiChannels.Count == 0 || midiChannels.Count > 2)
-				{
-					error = true;
-					break;
-				}
-				foreach(var index in midiChannels)
-				{
-					flatMIDIChannels.Add(index);
-				}
-			}
-			#endregion
-			if(error == false)
-			{ 
-				if(error == false && flatMIDIChannels.Count != availableMIDIChannels.Count)
-				{
-					error = true;
-				}
-				else
-				{
-					for(var i = 0; i < availableMIDIChannels.Count; ++i)
-					{
-						if(flatMIDIChannels[i] != availableMIDIChannels[i])
-						{
-							error = true;
-							break;
-						}
-					}
-				}
+            var flatMIDIChannels = new List<byte>();
+            #region get flat indices
+            foreach(List<byte> midiChannels in midiChannelsPerStaff)
+            {
+                if(midiChannels.Count == 0 || midiChannels.Count > 2)
+                {
+                    error = true;
+                    break;
+                }
+                foreach(var index in midiChannels)
+                {
+                    flatMIDIChannels.Add(index);
+                }
+            }
+            #endregion
+            if(error == false)
+            {
+                if(error == false && flatMIDIChannels.Count != availableMIDIChannels.Count)
+                {
+                    error = true;
+                }
+                else
+                {
+                    for(var i = 0; i < availableMIDIChannels.Count; ++i)
+                    {
+                        if(flatMIDIChannels[i] != availableMIDIChannels[i])
+                        {
+                            error = true;
+                            break;
+                        }
+                    }
+                }
             }
             return error;
         }
@@ -1084,7 +1085,7 @@ namespace Moritz.Composer
                 }
             }
 
-            if(okay && trimmedClefs.Count == _numberOfStaves  && _numberOfStaves > 0)
+            if(okay && trimmedClefs.Count == _numberOfStaves && _numberOfStaves > 0)
             {
                 ClefsPerStaffTextBox.Text = NormalizedText(trimmedClefs);
                 M.SetTextBoxErrorColorIfNotOkay(ClefsPerStaffTextBox, true);
@@ -1140,10 +1141,10 @@ namespace Moritz.Composer
                 {
                     sum += (int)b;
                 }
-				if(sum != _numberOfStaves)
-				{
-					M.SetTextBoxErrorColorIfNotOkay(StaffGroupsTextBox, false);
-				}
+                if(sum != _numberOfStaves)
+                {
+                    M.SetTextBoxErrorColorIfNotOkay(StaffGroupsTextBox, false);
+                }
             }
             SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
         }
@@ -1153,14 +1154,14 @@ namespace Moritz.Composer
             List<string> trimmedNames = new List<string>();
             foreach(string name in names)
             {
-				if(name == " ")
-				{
-					trimmedNames.Add(" ");
-				}
-				else
-				{
-					trimmedNames.Add(name.Trim());
-				}
+                if(name == " ")
+                {
+                    trimmedNames.Add(" ");
+                }
+                else
+                {
+                    trimmedNames.Add(name.Trim());
+                }
             }
             if(trimmedNames.Count == _numberOfStaves && _numberOfStaves > 0)
             {
@@ -1366,9 +1367,9 @@ namespace Moritz.Composer
             if(_numberOfStaves == 1)
             {
                 this.ClefsPerStaffHelpLabel.Text = "1 clef\n" +
-												   "available clefs: " + clefsSB.ToString();
+                                                   "available clefs: " + clefsSB.ToString();
                 this.StafflinesPerStaffHelpLabel.Text = "1 integer\n" +
-													"standard clefs must have 5 lines";
+                                                    "standard clefs must have 5 lines";
                 this.StaffGroupsHelpLabel.Text = "must be 1";
                 this.LongStaffNamesHelpLabel.Text = "1 name (for first system)";
                 this.ShortStaffNamesHelpLabel.Text = "1 name (for other systems)";
@@ -1376,11 +1377,11 @@ namespace Moritz.Composer
             else
             {
                 this.ClefsPerStaffHelpLabel.Text = _numberOfStaves.ToString() + " clefs separated by commas.\n" +
-													"available clefs: " + clefsSB.ToString();
+                                                    "available clefs: " + clefsSB.ToString();
                 this.StafflinesPerStaffHelpLabel.Text = _numberOfStaves.ToString() + " integers separated by commas.\n" +
-													"standard clefs must have 5 lines";
+                                                    "standard clefs must have 5 lines";
                 this.StaffGroupsHelpLabel.Text = "integers (whose total is " + _numberOfStaves.ToString() + ")\n" +
-												"staff groups cannot contain both\ninput and output staves.";
+                                                "staff groups cannot contain both\ninput and output staves.";
                 this.LongStaffNamesHelpLabel.Text = _numberOfStaves.ToString() + " names (for first system)";
                 this.ShortStaffNamesHelpLabel.Text = _numberOfStaves.ToString() + " names (for other systems)";
             }
@@ -1393,54 +1394,54 @@ namespace Moritz.Composer
             this.LongStaffNamesHelpLabel.Text = "";
             this.ShortStaffNamesHelpLabel.Text = "";
         }
-		#endregion
-		private void VoiceIndicesPerStaffHelp_MouseClick(object sender, MouseEventArgs e)
-		{
-			if(e.Button == System.Windows.Forms.MouseButtons.Right)
-			{
-				string mainText =
-				"Each entry in all input fields in this dialog must be given in top to\n" +
-				"bottom order of the staff and voice layout.\n\n" +
+        #endregion
+        private void VoiceIndicesPerStaffHelp_MouseClick(object sender, MouseEventArgs e)
+        {
+            if(e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                string mainText =
+                "Each entry in all input fields in this dialog must be given in top to\n" +
+                "bottom order of the staff and voice layout.\n\n" +
 
-				"The string entered in this input field controls the number of voices per\n" +
-				"staff (maximum 2) and hence staves per system.\n" +
-				"The help text above this field shows the midi channels created by the\n" +
-				"algorithm, in the order they will appear (top to bottom) in each system\n" +
-				"of the score. All these channels must be present in the input string, in\n" +
-				"the order given in the help text. (There are no 'invisible' channels.)\n" +
-				"The input string can have either one or two parts. The first controls\n" +
-				"the output voices, the second controls the input voices. If present,\n" +
-				"input voices are separated from output voices by a '|' character in the\n" +
-				"help text. If present in the help text, the '|' must also be included in\n" +
-				"the input string.\n\n" +
+                "The string entered in this input field controls the number of voices per\n" +
+                "staff (maximum 2) and hence staves per system.\n" +
+                "The help text above this field shows the midi channels created by the\n" +
+                "algorithm, in the order they will appear (top to bottom) in each system\n" +
+                "of the score. All these channels must be present in the input string, in\n" +
+                "the order given in the help text. (There are no 'invisible' channels.)\n" +
+                "The input string can have either one or two parts. The first controls\n" +
+                "the output voices, the second controls the input voices. If present,\n" +
+                "input voices are separated from output voices by a '|' character in the\n" +
+                "help text. If present in the help text, the '|' must also be included in\n" +
+                "the input string.\n\n" +
 
-				"There can be either one or two voices per (output or input) staff.\n" +
-				"Voices on the same staff are separated by a ':' character.\n" +
-				"Staves are separated by a ',' character. White space is ignored.\n\n" +
+                "There can be either one or two voices per (output or input) staff.\n" +
+                "Voices on the same staff are separated by a ':' character.\n" +
+                "Staves are separated by a ',' character. White space is ignored.\n\n" +
 
-				"The percussion channel (output channel index 9):\n" +
-				"If an algorithm creates a track having midi channel 9 (the percussion\n" +
-				"channel), it can do so at any track (=voice) index. Other tracks will be\n" +
-				"given unique midi channels in ascending order, starting with midi\n" +
-				"channel 0 at the top of each system. The percussion track (channel 9)\n" +
-				"must be the only track (=voice) on its staff.\n\n" +
+                "The percussion channel (output channel index 9):\n" +
+                "If an algorithm creates a track having midi channel 9 (the percussion\n" +
+                "channel), it can do so at any track (=voice) index. Other tracks will be\n" +
+                "given unique midi channels in ascending order, starting with midi\n" +
+                "channel 0 at the top of each system. The percussion track (channel 9)\n" +
+                "must be the only track (=voice) on its staff.\n\n" +
 
-				"Input voices:\n" +
-				"1. Currently, Moritz only supports the use of midi input channels 0\n" +
-				"    and 1. (These channels could be sent by a single, split keyboard.)\n" +
-				"2. Each input midi channel can be assiged to one or two voices\n" +
-				"3. Each input staff can have one or two voices, but these voices must\n" +
-				"    have the same midi input channel.\n" +
-				"4. At load time, the Assistant Performer agglomerates input voices\n" +
-				"    having the same midi input channel into a single input sequence.\n";
+                "Input voices:\n" +
+                "1. Currently, Moritz only supports the use of midi input channels 0\n" +
+                "    and 1. (These channels could be sent by a single, split keyboard.)\n" +
+                "2. Each input midi channel can be assiged to one or two voices\n" +
+                "3. Each input staff can have one or two voices, but these voices must\n" +
+                "    have the same midi input channel.\n" +
+                "4. At load time, the Assistant Performer agglomerates input voices\n" +
+                "    having the same midi input channel into a single input sequence.\n";
 
-				MessageBox.Show(mainText, "Help for the 'voices per staff' input field", MessageBoxButtons.OK);
-			}
-		}
-		#endregion notation groupBox
+                MessageBox.Show(mainText, "Help for the 'voices per staff' input field", MessageBoxButtons.OK);
+            }
+        }
+        #endregion notation groupBox
 
-		#region krystals groupBox
-		private void KrystalsListBox_SelectedIndexChanged(object sender, EventArgs e)
+        #region krystals groupBox
+        private void KrystalsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if(KrystalsListBox.SelectedIndex >= 0)
             {
@@ -1505,21 +1506,21 @@ namespace Moritz.Composer
         }
         private void ShowSelectedKrystalButton_Click(object sender, EventArgs e)
         {
-			if(this.KrystalsListBox.SelectedItem is Krystal krystal)
-			{
-				_krystalBrowser = new KrystalsBrowser();
-				_krystalBrowser.Show();
-			}
-		}
+            if(this.KrystalsListBox.SelectedItem is Krystal krystal)
+            {
+                _krystalBrowser = new KrystalsBrowser();
+                _krystalBrowser.Show();
+            }
+        }
         private void RemoveSelectedKrystalButton_Click(object sender, EventArgs e)
         {
             if(KrystalsListBox.SelectedIndex >= 0)
             {
                 Krystal selectedKrystal = KrystalsListBox.SelectedItem as Krystal;
-                string msg = "The krystal\n\n     " + selectedKrystal.Name + 
-					"\n\nwill be removed from this score.\n" +
-					"It will not be deleted from the main krystals folder.\n\n" +
-					"Proceed?\n\n";
+                string msg = "The krystal\n\n     " + selectedKrystal.Name +
+                    "\n\nwill be removed from this score.\n" +
+                    "It will not be deleted from the main krystals folder.\n\n" +
+                    "Proceed?\n\n";
                 DialogResult proceed = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if(proceed == DialogResult.Yes)
                 {
@@ -1535,11 +1536,11 @@ namespace Moritz.Composer
                 List<Krystal> allKrystals = new List<Krystal>();
                 foreach(object o in KrystalsListBox.Items)
                 {
-					if(o is Krystal krystal)
-					{
-						allKrystals.Add(krystal);
-					}
-				}
+                    if(o is Krystal krystal)
+                    {
+                        allKrystals.Add(krystal);
+                    }
+                }
                 return allKrystals;
             }
         }
@@ -1621,7 +1622,7 @@ namespace Moritz.Composer
             {
                 string toDelete = PalettesListBox.Items[selectedIndex].ToString();
                 string msg = toDelete + " will be deleted completely.\n\n" +
-					"Proceed?\n\n";
+                    "Proceed?\n\n";
                 DialogResult proceed = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if(proceed == DialogResult.Yes)
                 {
@@ -1898,15 +1899,15 @@ namespace Moritz.Composer
 
             M.CreateDirectoryIfItDoesNotExist(this._settingsFolderPath);
 
-			#region do the save
-			XmlWriterSettings settings = new XmlWriterSettings
-			{
-				Indent = true,
-				IndentChars = ("\t"),
-				NewLineOnAttributes = true,
-				CloseOutput = false
-			};
-			using(XmlWriter w = XmlWriter.Create(_settingsPath, settings))
+            #region do the save
+            XmlWriterSettings settings = new XmlWriterSettings
+            {
+                Indent = true,
+                IndentChars = ("\t"),
+                NewLineOnAttributes = true,
+                CloseOutput = false
+            };
+            using(XmlWriter w = XmlWriter.Create(_settingsPath, settings))
             {
                 w.WriteStartDocument();
                 w.WriteComment("file created: " + M.NowString);
@@ -1921,7 +1922,7 @@ namespace Moritz.Composer
                 WriteKrystals(w);
                 WritePalettes(w);
                 w.WriteEndElement(); // closes the moritzKrystalScore element
-				// the XmlWriter is closed automatically at the end of this using clause.
+                                     // the XmlWriter is closed automatically at the end of this using clause.
             }
             #endregion do the save
         }
@@ -1964,13 +1965,13 @@ namespace Moritz.Composer
 
                 foreach(object o in KrystalsListBox.Items)
                 {
-					if(o is Krystal krystal)
-					{
-						w.WriteStartElement("krystal");
-						w.WriteAttributeString("name", krystal.Name);
-						w.WriteEndElement();// krystal
-					}
-				}
+                    if(o is Krystal krystal)
+                    {
+                        w.WriteStartElement("krystal");
+                        w.WriteAttributeString("name", krystal.Name);
+                        w.WriteEndElement();// krystal
+                    }
+                }
                 w.WriteEndElement(); // krystals
             }
             SetGroupBoxIsSaved(KrystalsGroupBox, ConfirmKrystalsListButton, RevertKrystalsListButton,
@@ -2001,8 +2002,8 @@ namespace Moritz.Composer
         /// </summary>
         private void CreateSVGScore()
         {
-			GetKrystalsAndPalettes(out List<Krystal> krystals, out List<Palette> palettes);
-			PageFormat pageFormat = GetPageFormat();
+            GetKrystalsAndPalettes(out List<Krystal> krystals, out List<Palette> palettes);
+            PageFormat pageFormat = GetPageFormat();
 
             // These need clearing between creating different scores in one Moritz run.
             Metrics.ClearUsedCSSClasses();
@@ -2021,7 +2022,7 @@ namespace Moritz.Composer
             if(score != null && score.Systems.Count > 0)
             {
                 score.SaveMultiPageScore();
-				score.SaveSingleSVGScore();
+                score.SaveSingleSVGScore();
                 // Opens the multi-page score in the program which is set by the system to open .svg files.
                 global::System.Diagnostics.Process.Start(score.FilePath);
             }
@@ -2075,9 +2076,9 @@ namespace Moritz.Composer
         private void SetTitleSizeAndPosition(PageFormat pageFormat)
         {
             DimensionsAndMetadataForm damf = _dimensionsAndMetadataForm;
-			pageFormat.Page1Title = damf.Page1Title;
-			pageFormat.Page1Author = damf.Page1Author;
-			pageFormat.Page1TitleHeight = damf.TitleHeight * pageFormat.ViewBoxMagnification;
+            pageFormat.Page1Title = damf.Page1Title;
+            pageFormat.Page1Author = damf.Page1Author;
+            pageFormat.Page1TitleHeight = damf.TitleHeight * pageFormat.ViewBoxMagnification;
             pageFormat.Page1AuthorHeight = damf.AuthorHeight * pageFormat.ViewBoxMagnification;
             pageFormat.Page1TitleY = damf.TitleY * pageFormat.ViewBoxMagnification;
         }
@@ -2107,7 +2108,7 @@ namespace Moritz.Composer
                     pageFormat.ChordSymbolType = "coloredVelocities";
                     break;
             }
-            
+
             pageFormat.MinimumCrotchetDuration = int.Parse(this.MinimumCrotchetDurationTextBox.Text);
             pageFormat.BeamsCrossBarlines = this.BeamsCrossBarlinesCheckBox.Checked;
 
@@ -2119,10 +2120,10 @@ namespace Moritz.Composer
 
             pageFormat.OutputMIDIChannelsPerStaff = _outputMIDIChannelsPerStaff; // one channels list per output staff
             pageFormat.InputMIDIChannelsPerStaff = _inputMIDIChannelsPerStaff; // one channels list per input staff
-			pageFormat.ClefPerStaff = M.StringToStringList(this.ClefsPerStaffTextBox.Text, ',');
-			pageFormat.InitialClefPerMIDIChannel = GetClefPerMIDIChannel(pageFormat);
+            pageFormat.ClefPerStaff = M.StringToStringList(this.ClefsPerStaffTextBox.Text, ',');
+            pageFormat.InitialClefPerMIDIChannel = GetClefPerMIDIChannel(pageFormat);
 
-			pageFormat.StafflinesPerStaff = M.StringToIntList(this.StafflinesPerStaffTextBox.Text, ',');
+            pageFormat.StafflinesPerStaff = M.StringToIntList(this.StafflinesPerStaffTextBox.Text, ',');
             pageFormat.StaffGroups = M.StringToIntList(this.StaffGroupsTextBox.Text, ',');
 
             pageFormat.LongStaffNames = M.StringToStringList(this.LongStaffNamesTextBox.Text, ',');
@@ -2130,66 +2131,66 @@ namespace Moritz.Composer
             pageFormat.SystemStartBars = M.StringToIntList(SystemStartBarsTextBox.Text, ',');
         }
 
-		/// <summary>
-		/// Returns a clef for each VoiceDef (=MIDI Channel) in the system.
-		/// The pageFormat.ClefsList has one clef per staff. Each staff can have either one or two VoiceDefs. 
-		/// </summary>
-		public List<string> GetClefPerMIDIChannel(PageFormat pageFormat)
-		{
-			List<string> clefPerMidiChannel = new List<string>();
-			int staffIndex = 0;
-			for (; staffIndex < pageFormat.OutputMIDIChannelsPerStaff.Count; staffIndex++)
-			{
-				string clef = pageFormat.ClefPerStaff[staffIndex];
-				clefPerMidiChannel.Add(clef);
-				if (pageFormat.OutputMIDIChannelsPerStaff[staffIndex].Count > 1)
-				{
-					Debug.Assert(pageFormat.OutputMIDIChannelsPerStaff[index: staffIndex].Count == 2);
-					clefPerMidiChannel.Add(clef);
-				}
-			}
-			Debug.Assert(pageFormat.InputMIDIChannelsPerStaff.Count < 3);
-			int endIndex = staffIndex + pageFormat.InputMIDIChannelsPerStaff.Count;
-			for (; staffIndex < endIndex; staffIndex++)
-			{
-				string clef = pageFormat.ClefPerStaff[staffIndex];
-				clefPerMidiChannel.Add(clef);
-			}
+        /// <summary>
+        /// Returns a clef for each VoiceDef (=MIDI Channel) in the system.
+        /// The pageFormat.ClefsList has one clef per staff. Each staff can have either one or two VoiceDefs. 
+        /// </summary>
+        public List<string> GetClefPerMIDIChannel(PageFormat pageFormat)
+        {
+            List<string> clefPerMidiChannel = new List<string>();
+            int staffIndex = 0;
+            for(; staffIndex < pageFormat.OutputMIDIChannelsPerStaff.Count; staffIndex++)
+            {
+                string clef = pageFormat.ClefPerStaff[staffIndex];
+                clefPerMidiChannel.Add(clef);
+                if(pageFormat.OutputMIDIChannelsPerStaff[staffIndex].Count > 1)
+                {
+                    Debug.Assert(pageFormat.OutputMIDIChannelsPerStaff[index: staffIndex].Count == 2);
+                    clefPerMidiChannel.Add(clef);
+                }
+            }
+            Debug.Assert(pageFormat.InputMIDIChannelsPerStaff.Count < 3);
+            int endIndex = staffIndex + pageFormat.InputMIDIChannelsPerStaff.Count;
+            for(; staffIndex < endIndex; staffIndex++)
+            {
+                string clef = pageFormat.ClefPerStaff[staffIndex];
+                clefPerMidiChannel.Add(clef);
+            }
 
-			return clefPerMidiChannel;
-		}
+            return clefPerMidiChannel;
+        }
 
-		public List<List<string>> GetClefListPerVoicePerInputStaff(PageFormat pageFormat)
-		{
-			return GetClefListPerVoicePerStaff(pageFormat, pageFormat.InputMIDIChannelsPerStaff, pageFormat.OutputMIDIChannelsPerStaff.Count);
-		}
+        public List<List<string>> GetClefListPerVoicePerInputStaff(PageFormat pageFormat)
+        {
+            return GetClefListPerVoicePerStaff(pageFormat, pageFormat.InputMIDIChannelsPerStaff, pageFormat.OutputMIDIChannelsPerStaff.Count);
+        }
 
-		public List<List<string>> GetClefListPerVoicePerStaff(PageFormat pageFormat, List<List<byte>> midiChannelsPerStaff, int initialStaffIndex)
-		{ 
-			List<List<string>> clefListPerVoicePerStaff = new List<List<string>>();
-			int startIndex = initialStaffIndex;
-			int endIndex = midiChannelsPerStaff.Count + initialStaffIndex;
-			for (int staffIndex = startIndex; staffIndex < endIndex; staffIndex++)
-			{
-				List<string> clefList = new List<string>();
-				clefListPerVoicePerStaff.Add(clefList);
-				string clef = pageFormat.ClefPerStaff[staffIndex];
-				for (int n = midiChannelsPerStaff[staffIndex].Count; n > 0; --n)
-				{
-					clefList.Add(clef);
-				}
-			}
+        public List<List<string>> GetClefListPerVoicePerStaff(PageFormat pageFormat, List<List<byte>> midiChannelsPerStaff, int initialStaffIndex)
+        {
+            List<List<string>> clefListPerVoicePerStaff = new List<List<string>>();
+            int startIndex = initialStaffIndex;
+            int endIndex = midiChannelsPerStaff.Count + initialStaffIndex;
+            for(int staffIndex = startIndex; staffIndex < endIndex; staffIndex++)
+            {
+                List<string> clefList = new List<string>();
+                clefListPerVoicePerStaff.Add(clefList);
+                string clef = pageFormat.ClefPerStaff[staffIndex];
+                for(int n = midiChannelsPerStaff[staffIndex].Count; n > 0; --n)
+                {
+                    clefList.Add(clef);
+                }
+            }
 
-			return clefListPerVoicePerStaff;
-		}
+            return clefListPerVoicePerStaff;
+        }
 
-		#endregion helpers
-		#endregion
-		#endregion create score
+        #endregion helpers
+        #endregion
+        #endregion create score
 
-		#region private variables
-		#region Brushes
-		SolidBrush _systemHighlightBrush = new SolidBrush(SystemColors.Highlight);
+        #region private variables
+        #region Brushes
+        SolidBrush _systemHighlightBrush = new SolidBrush(SystemColors.Highlight);
         SolidBrush _whiteBrush = new SolidBrush(Color.White);
         SolidBrush _blackBrush = new SolidBrush(Color.Black);
         #endregion Brushes
@@ -2218,17 +2219,17 @@ namespace Moritz.Composer
         #endregion editing
         #region score creation
         CompositionAlgorithm _algorithm = null;
-		private List<byte> _outputMIDIChannels = null;
-		private List<byte> _inputMIDIChannels = null;
-		private List<List<byte>> _outputMIDIChannelsPerStaff = null; // always set in VoiceIndicesPerStaffTextBox_Leave (cannot be empty)
+        private List<byte> _outputMIDIChannels = null;
+        private List<byte> _inputMIDIChannels = null;
+        private List<List<byte>> _outputMIDIChannelsPerStaff = null; // always set in VoiceIndicesPerStaffTextBox_Leave (cannot be empty)
         private List<List<byte>> _inputMIDIChannelsPerStaff = null; // always set in VoiceIndicesPerStaffTextBox_Leave (can be empty)
         private int _numberOfStaves
         {
             get
             {
-				Debug.Assert(_outputMIDIChannelsPerStaff != null && _outputMIDIChannelsPerStaff.Count > 0 && _inputMIDIChannelsPerStaff != null);
-				var nStaves = _outputMIDIChannelsPerStaff.Count + _inputMIDIChannelsPerStaff.Count; // _inputVoiceIndicesPerStaff.Count can be 0.
-				return nStaves;
+                Debug.Assert(_outputMIDIChannelsPerStaff != null && _outputMIDIChannelsPerStaff.Count > 0 && _inputMIDIChannelsPerStaff != null);
+                var nStaves = _outputMIDIChannelsPerStaff.Count + _inputMIDIChannelsPerStaff.Count; // _inputVoiceIndicesPerStaff.Count can be 0.
+                return nStaves;
             }
         }
         public PageFormat PageFormat = null;

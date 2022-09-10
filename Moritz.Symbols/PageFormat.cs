@@ -16,11 +16,11 @@ namespace Moritz.Symbols
 
         #region paper size
         public float Right { get { return RightVBPX; } }
-        public float Bottom 
-        { 
-            get 
-            { 
-                int nGaps = (int)( BottomVBPX / Gap);
+        public float Bottom
+        {
+            get
+            {
+                int nGaps = (int)(BottomVBPX / Gap);
                 return nGaps * Gap;
             }
         }
@@ -33,11 +33,11 @@ namespace Moritz.Symbols
         public int BottomVBPX = 0;
         public readonly float HorizontalPixelsPerMillimeter = 3.4037F; // on my computer (December 2010).
         public readonly float VerticalPixelsPerMillimeter = 2.9464F; // on my computer (December 2010).
-		#endregion
+        #endregion
 
-		#region page 1 titles
-		public string Page1Title;
-		public string Page1Author;
+        #region page 1 titles
+        public string Page1Title;
+        public string Page1Author;
         public float Page1ScreenTitleY { get { return Page1TitleY / ViewBoxMagnification; } }
         public float Page1TitleHeight;
         public float Page1AuthorHeight;
@@ -92,9 +92,9 @@ namespace Moritz.Symbols
         public float DefaultDistanceBetweenSystems;
         public List<List<byte>> OutputMIDIChannelsPerStaff = null;
         public List<List<byte>> InputMIDIChannelsPerStaff = null;
-		public List<string> ClefPerStaff = null;
-		public List<string> InitialClefPerMIDIChannel = null;
-		public List<int> StafflinesPerStaff = null;
+        public List<string> ClefPerStaff = null;
+        public List<string> InitialClefPerMIDIChannel = null;
+        public List<int> StafflinesPerStaff = null;
         public List<int> StaffGroups = null;
         public List<string> LongStaffNames = null;
         public List<string> ShortStaffNames = null;
@@ -116,28 +116,28 @@ namespace Moritz.Symbols
         /// Arial (new 26.06.2017)
         public float TimeStampFontHeight { get { return Gap * 2.25F; } }
         public float StaffNameFontHeight { get { return Gap * 2.2F; } }
-		public float BarNumberNumberFontHeight { get { return Gap * 1.9992F; } }
-		public float RegionInfoStringFontHeight { get { return Gap * 3F; } }
-		public float LyricFontHeight { get { return Gap * 1.96F; } }
+        public float BarNumberNumberFontHeight { get { return Gap * 1.9992F; } }
+        public float RegionInfoStringFontHeight { get { return Gap * 3F; } }
+        public float LyricFontHeight { get { return Gap * 1.96F; } }
         public float ClefOctaveNumberHeight { get { return Gap * 2.6264F; } }
         public float ClefXFontHeight { get { return Gap * 1.568F; } }
-		/// Open Sans, Open Sans Condensed (new 26.06.2017)
-		public float OrnamentFontHeight { get { return Gap * 2.156F; } }
-		/// CLicht (new 26.06.2017)
-		public float DynamicFontHeight { get { return MusicFontHeight * 0.75F; } }
+        /// Open Sans, Open Sans Condensed (new 26.06.2017)
+        public float OrnamentFontHeight { get { return Gap * 2.156F; } }
+        /// CLicht (new 26.06.2017)
+        public float DynamicFontHeight { get { return MusicFontHeight * 0.75F; } }
         #endregion
 
         #region stroke widths
         public float StafflineStemStrokeWidth;
         public float NormalBarlineStrokeWidth { get { return StafflineStemStrokeWidth * 2F; } }
-		public float ThinBarlineStrokeWidth { get { return NormalBarlineStrokeWidth / 2; } } // a component of double barlines.
-		public float ThickBarlineStrokeWidth { get { return NormalBarlineStrokeWidth * 2; } } // a component of double barlines.
-		public float NoteheadExtenderStrokeWidth { get { return StafflineStemStrokeWidth * 3.4F; } }
-		public float BarNumberFrameStrokeWidth { get { return StafflineStemStrokeWidth * 1.2F; } }
-		public float RegionInfoFrameStrokeWidth { get { return BarNumberFrameStrokeWidth * 1.5F; } }
-		#endregion
+        public float ThinBarlineStrokeWidth { get { return NormalBarlineStrokeWidth / 2; } } // a component of double barlines.
+        public float ThickBarlineStrokeWidth { get { return NormalBarlineStrokeWidth * 2; } } // a component of double barlines.
+        public float NoteheadExtenderStrokeWidth { get { return StafflineStemStrokeWidth * 3.4F; } }
+        public float BarNumberFrameStrokeWidth { get { return StafflineStemStrokeWidth * 1.2F; } }
+        public float RegionInfoFrameStrokeWidth { get { return BarNumberFrameStrokeWidth * 1.5F; } }
+        #endregion
 
-		public float InputSizeFactor { get { return 1.5F; } }
+        public float InputSizeFactor { get { return 1.5F; } }
         public float BeamThickness { get { return Gap * 0.42F; } }
 
         #endregion

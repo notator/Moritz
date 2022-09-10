@@ -26,7 +26,7 @@ namespace Krystals5ControlLibrary
         {
             TextBox tb = sender as TextBox;
             _illegalCharacter = false;
-            if (tb.Text.Length > 0)
+            if(tb.Text.Length > 0)
             {
                 _uInt.Append(tb.Text);
                 RemoveIllegalCharacters();
@@ -46,43 +46,43 @@ namespace Krystals5ControlLibrary
         public UintControlReturnKeyHandler updateContainer;
         private void UIntTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
+            if(e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
             {
                 UIntTextBox_Leave(sender, e);
-                if (updateContainer != null)
+                if(updateContainer != null)
                     updateContainer(); // tells the containing object to update
             }
         }
         #endregion Delegate for handling return key
         #endregion Events
         #region Properties
-		public StringBuilder UnsignedInteger
-		{
-			get { return new StringBuilder(UIntTextBox.Text); }
-			set { UIntTextBox.Text = value.ToString(); } // used by PointGroupParameters to set a value of zero in an empty box
-		}
+        public StringBuilder UnsignedInteger
+        {
+            get { return new StringBuilder(UIntTextBox.Text); }
+            set { UIntTextBox.Text = value.ToString(); } // used by PointGroupParameters to set a value of zero in an empty box
+        }
 
-		public uint Value
-		{
-			get { return uint.Parse(UIntTextBox.Text); }
-			set { UIntTextBox.Text = value.ToString(); }
-		}
-		#endregion Properties
+        public uint Value
+        {
+            get { return uint.Parse(UIntTextBox.Text); }
+            set { UIntTextBox.Text = value.ToString(); }
+        }
+        #endregion Properties
         #region private functions
         private void RemoveIllegalCharacters()
         {
             StringBuilder tempUInt = new StringBuilder();
-            for (int i = 0; i < _uInt.Length; i++)
+            for(int i = 0; i < _uInt.Length; i++)
             {
-                if (Char.IsNumber(_uInt[i]))
+                if(Char.IsNumber(_uInt[i]))
                     tempUInt.Append(_uInt[i]);
                 else _illegalCharacter = true;
             }
             int j = 0;
             _uInt.Remove(0, _uInt.Length);
-			while( tempUInt.Length > j && tempUInt[j] == "0"[0] ) // remove leading zeros
+            while(tempUInt.Length > j && tempUInt[j] == "0"[0]) // remove leading zeros
                 j++;
-            while( j < tempUInt.Length )
+            while(j < tempUInt.Length)
             {
                 _uInt.Append(tempUInt[j]);
                 j++;

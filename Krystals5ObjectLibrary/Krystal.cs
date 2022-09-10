@@ -279,10 +279,10 @@ namespace Krystals5ObjectLibrary
         /// <returns></returns>
         public int CompareTo(object other)
         {
-			if(!(other is Krystal otherKrystal))
-				throw new ArgumentException();
+            if(!(other is Krystal otherKrystal))
+                throw new ArgumentException();
 
-			bool contentIsIdentical = false;
+            bool contentIsIdentical = false;
             if(this.Shape == otherKrystal.Shape
             && this.Strands.Count == otherKrystal.Strands.Count
             && this.Level == otherKrystal.Level
@@ -356,44 +356,44 @@ namespace Krystals5ObjectLibrary
             return isPermutableAtLevel;
         }
 
-		/// <summary>
-		/// Returns the flat krystal values, spread over the range [minEnvValue..maxEnvValue],
-		/// as an Envelope.
-		/// </summary>
-		/// <param name="minEnvValue"></param>
-		/// <param name="maxEnvValue"></param>
-		/// <returns></returns>
-		public Envelope ToEnvelope(int minEnvValue, int maxEnvValue)
-		{
-			List<int> substituteValues = new List<int>();
-			double incr = ((double)(maxEnvValue - minEnvValue)) / (MaxValue - MinValue);
-			for(int i = (int)MinValue; i < (MaxValue + 1); i++)
-			{
-				substituteValues.Add((int) Math.Round(minEnvValue + (incr * (i - 1))));
-			}
+        /// <summary>
+        /// Returns the flat krystal values, spread over the range [minEnvValue..maxEnvValue],
+        /// as an Envelope.
+        /// </summary>
+        /// <param name="minEnvValue"></param>
+        /// <param name="maxEnvValue"></param>
+        /// <returns></returns>
+        public Envelope ToEnvelope(int minEnvValue, int maxEnvValue)
+        {
+            List<int> substituteValues = new List<int>();
+            double incr = ((double)(maxEnvValue - minEnvValue)) / (MaxValue - MinValue);
+            for(int i = (int)MinValue; i < (MaxValue + 1); i++)
+            {
+                substituteValues.Add((int)Math.Round(minEnvValue + (incr * (i - 1))));
+            }
 
-			List<int> kValues = GetValues(1)[0];
+            List<int> kValues = GetValues(1)[0];
 
-			for(int i = 0; i < kValues.Count; i++)
-			{
-				kValues[i] = substituteValues[kValues[i] - 1];
-			}
+            for(int i = 0; i < kValues.Count; i++)
+            {
+                kValues[i] = substituteValues[kValues[i] - 1];
+            }
 
-			Envelope envelope = new Envelope(kValues, maxEnvValue, maxEnvValue, kValues.Count);
+            Envelope envelope = new Envelope(kValues, maxEnvValue, maxEnvValue, kValues.Count);
 
-			return envelope;
-		}
-		#endregion public functions
-		#region protected functions
+            return envelope;
+        }
+        #endregion public functions
+        #region protected functions
         protected XmlWriter BeginSaveKrystal()
         {
-			XmlWriterSettings settings = new XmlWriterSettings
-			{
-				Indent = true,
-				IndentChars = ("\t"),
-				CloseOutput = true
-			};
-			string namePath = K.KrystalsFolder + @"\" + Name;
+            XmlWriterSettings settings = new XmlWriterSettings
+            {
+                Indent = true,
+                IndentChars = ("\t"),
+                CloseOutput = true
+            };
+            string namePath = K.KrystalsFolder + @"\" + Name;
             XmlWriter w = XmlWriter.Create(namePath, settings);
             w.WriteStartDocument();
             w.WriteComment("created: " + K.Now);
@@ -468,7 +468,7 @@ namespace Krystals5ObjectLibrary
 
             List<List<int>> returnList = new List<List<int>>();
             int[] shapeArray = ShapeArray;
-            int nInternalLists = shapeArray[level-1];
+            int nInternalLists = shapeArray[level - 1];
             for(int i = 0; i < nInternalLists; i++)
             {
                 List<int> internalList = new List<int>();

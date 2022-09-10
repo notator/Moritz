@@ -1,14 +1,14 @@
-using System.Text;
-using System.Diagnostics;
-
 using Moritz.Xml;
+
+using System.Diagnostics;
+using System.Text;
 
 namespace Moritz.Symbols
 {
     /// <summary>
     /// DurationSymbols are NoteObjects which have a logical width (and symbolize a duration)
     /// </summary>
-    public abstract class DurationSymbol : AnchorageSymbol 
+    public abstract class DurationSymbol : AnchorageSymbol
     {
         /// <summary>
         /// Used by the Assistant Composer
@@ -75,10 +75,10 @@ namespace Moritz.Symbols
         }
         protected int _absMsPosition = 0;
 
-        public virtual int MsDuration 
-        { 
+        public virtual int MsDuration
+        {
             get { return _msDuration; }
-            set { Debug.Assert(false, "This property should only be set when agglomerating RestSymbols."); } 
+            set { Debug.Assert(false, "This property should only be set when agglomerating RestSymbols."); }
         }
         protected int _msDuration = 0;
 

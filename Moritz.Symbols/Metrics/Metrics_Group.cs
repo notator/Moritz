@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using Moritz.Xml;
 
-using Moritz.Globals;
-using Moritz.Xml;
+using System.Collections.Generic;
 
 namespace Moritz.Symbols
 {
@@ -13,7 +8,7 @@ namespace Moritz.Symbols
     /// The base class for just SystemMetrics and StaffMetrics
     /// </summary>
 	public class GroupMetrics : Metrics
-	{
+    {
         public GroupMetrics(CSSObjectClass cssGroupClass)
             : base(cssGroupClass)
         {
@@ -26,45 +21,45 @@ namespace Moritz.Symbols
         /// </summary>
         /// <param name="metrics"></param>
         public virtual void Add(Metrics metrics)
-		{
-			MetricsList.Add(metrics);
-			ResetBoundary();
-		}
+        {
+            MetricsList.Add(metrics);
+            ResetBoundary();
+        }
 
-		public void ResetBoundary()
-		{
-			_top = float.MaxValue;
-			_right = float.MinValue;
-			_bottom = float.MinValue;
-			_left = float.MaxValue;
-			foreach(Metrics metrics in MetricsList)
-			{
-				_top = _top < metrics.Top ? _top : metrics.Top;
-				_right = _right > metrics.Right ? _right : metrics.Right;
-				_bottom = _bottom > metrics.Bottom ? _bottom : metrics.Bottom;
-				_left = _left < metrics.Left ? _left : metrics.Left;
-			}
-		}
+        public void ResetBoundary()
+        {
+            _top = float.MaxValue;
+            _right = float.MinValue;
+            _bottom = float.MinValue;
+            _left = float.MaxValue;
+            foreach(Metrics metrics in MetricsList)
+            {
+                _top = _top < metrics.Top ? _top : metrics.Top;
+                _right = _right > metrics.Right ? _right : metrics.Right;
+                _bottom = _bottom > metrics.Bottom ? _bottom : metrics.Bottom;
+                _left = _left < metrics.Left ? _left : metrics.Left;
+            }
+        }
 
-		public override void Move(float dx, float dy)
-		{
-			base.Move(dx, dy);
-			foreach(Metrics metrics in MetricsList)
-			{
-				metrics.Move(dx, dy);
-			}
-		}
+        public override void Move(float dx, float dy)
+        {
+            base.Move(dx, dy);
+            foreach(Metrics metrics in MetricsList)
+            {
+                metrics.Move(dx, dy);
+            }
+        }
 
-		public override void WriteSVG(SvgWriter w)
-		{
-			w.SvgStartGroup(CSSObjectClass.ToString());
-			foreach(Metrics metrics in MetricsList)
-			{
-				metrics.WriteSVG(w);
-			}
-			w.SvgEndGroup();
-		}
+        public override void WriteSVG(SvgWriter w)
+        {
+            w.SvgStartGroup(CSSObjectClass.ToString());
+            foreach(Metrics metrics in MetricsList)
+            {
+                metrics.WriteSVG(w);
+            }
+            w.SvgEndGroup();
+        }
 
-		public readonly List<Metrics> MetricsList = new List<Metrics>();
-	}
+        public readonly List<Metrics> MetricsList = new List<Metrics>();
+    }
 }

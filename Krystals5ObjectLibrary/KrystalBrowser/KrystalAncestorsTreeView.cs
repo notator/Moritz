@@ -3,10 +3,10 @@ using System.Windows.Forms;
 
 namespace Krystals5ObjectLibrary
 {
-	internal class AncestorsNode : TreeNode
-	{
-		public AncestorsNode(string name, KrystalFamily krystalFamily)
-		{
+    internal class AncestorsNode : TreeNode
+    {
+        public AncestorsNode(string name, KrystalFamily krystalFamily)
+        {
             List<Dependency> dependencyList = krystalFamily.DependencyList;
             var nameColors = krystalFamily.NameColors;
 
@@ -20,15 +20,15 @@ namespace Krystals5ObjectLibrary
                 AncestorsNode densityNode = new AncestorsNode(dependency.Input1, krystalFamily);
                 densityNode.Text = densityNode.Text.Insert(0, "d: ");
                 densityNode.ForeColor = krystalFamily.GetNameColor(dependency.Input1);
-                this.Nodes.Add((TreeNode) densityNode);
+                this.Nodes.Add((TreeNode)densityNode);
                 AncestorsNode pointsNode = new AncestorsNode(dependency.Input2, krystalFamily);
                 pointsNode.Text = pointsNode.Text.Insert(0, "p: ");
                 pointsNode.ForeColor = krystalFamily.GetNameColor(dependency.Input2);
-                this.Nodes.Add((TreeNode) pointsNode);
+                this.Nodes.Add((TreeNode)pointsNode);
                 AncestorsNode fieldNode = new AncestorsNode(dependency.Field, krystalFamily);
                 fieldNode.Text = fieldNode.Text.Insert(0, "e: ");
                 fieldNode.ForeColor = krystalFamily.GetNameColor(dependency.Field);
-                this.Nodes.Add((TreeNode) fieldNode);
+                this.Nodes.Add((TreeNode)fieldNode);
             }
             else if(K.IsModulationKrystalFilename(Text))
             {
@@ -61,12 +61,12 @@ namespace Krystals5ObjectLibrary
                 this.Nodes.Add((TreeNode)contourNode);
             }
 
-		}
+        }
     }
 
 
-	public class KrystalAncestorsTreeView : TreeView
-	{
+    public class KrystalAncestorsTreeView : TreeView
+    {
         public KrystalAncestorsTreeView(Krystal krystal, KrystalFamily krystalFamily)
         {
             this.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -95,9 +95,9 @@ namespace Krystals5ObjectLibrary
                 rootNode = new AncestorsNode("", krystalFamily);
             }
 
-			this.Nodes.Add(rootNode);
-			this.EndUpdate();
-			this.ExpandAll();
-		}
-	}
+            this.Nodes.Add(rootNode);
+            this.EndUpdate();
+            this.ExpandAll();
+        }
+    }
 }

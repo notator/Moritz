@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-
-using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Xml;
+
+using System.Collections.Generic;
 
 namespace Moritz.Symbols
 {
@@ -18,15 +17,15 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
-			w.SvgStartGroup(CSSObjectClass.staff.ToString()); // "staff"
+            w.SvgStartGroup(CSSObjectClass.staff.ToString()); // "staff"
 
-			// if this.Metrics != null, the staff is invisible (but MIDI info is still written).
-			if(this.Metrics == null)
-			{
-				w.WriteAttributeString("score", "invisible", null, "invisible");
-			}
+            // if this.Metrics != null, the staff is invisible (but MIDI info is still written).
+            if(this.Metrics == null)
+            {
+                w.WriteAttributeString("score", "invisible", null, "invisible");
+            }
 
-			base.WriteSVG(w, systemNumber, staffNumber, carryMsgsPerChannel);
+            base.WriteSVG(w, systemNumber, staffNumber, carryMsgsPerChannel);
 
             w.SvgEndGroup(); // outputStaff
         }

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Moritz.Globals;
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Xml;
-using System.Diagnostics;
-using System.Drawing;
-
-using Moritz.Globals;
 
 namespace Moritz.Palettes
 {

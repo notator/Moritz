@@ -22,9 +22,9 @@ namespace Moritz.Symbols
         public override void Add(Metrics metrics)
         {
             base.Add(metrics);
-			if(metrics is StaffMetrics staffMetrics)
-				SetTopAndBottomMetrics(staffMetrics);
-		}
+            if(metrics is StaffMetrics staffMetrics)
+                SetTopAndBottomMetrics(staffMetrics);
+        }
 
         private void SetTopAndBottomMetrics(StaffMetrics staffMetrics)
         {

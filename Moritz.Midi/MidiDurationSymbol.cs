@@ -1,8 +1,9 @@
+using Moritz.Globals;
+
+using Sanford.Multimedia.Midi;
+
 using System;
 using System.Collections.Generic;
-
-using Moritz.Globals;
-using Sanford.Multimedia.Midi;
 
 namespace Moritz.Midi
 {
@@ -36,8 +37,8 @@ namespace Moritz.Midi
 
         protected long _performedDuration = -1;
 
-        public int MsDuration 
-        { 
+        public int MsDuration
+        {
             get { return _msDuration; }
             set
             {
@@ -45,7 +46,7 @@ namespace Moritz.Midi
             }
         }
         public int MsPosition
-        { 
+        {
             get { return _msPosition; }
             set
             {

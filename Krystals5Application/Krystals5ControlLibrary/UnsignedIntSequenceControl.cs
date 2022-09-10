@@ -28,12 +28,12 @@ namespace Krystals5ControlLibrary
         {
             TextBox tb = sender as TextBox;
             _illegalCharacter = false;
-            if (tb.Text.Length > 0)
+            if(tb.Text.Length > 0)
             {
                 _sequence.Append(tb.Text);
                 RemoveIllegalCharactersAndRedundantSpacesFromSequence();
                 tb.Text = _sequence.ToString();
-                _sequence.Remove(0,_sequence.Length);
+                _sequence.Remove(0, _sequence.Length);
             }
 
             if(_illegalCharacter)
@@ -49,10 +49,10 @@ namespace Krystals5ControlLibrary
         public UnsignedIntSeqControlReturnKeyHandler updateContainer;
         private void UIntSeqTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
+            if(e.KeyData == Keys.Return || e.KeyData == Keys.Enter)
             {
                 UIntSeqTextBox_Leave(sender, e);
-                if (updateContainer != null)
+                if(updateContainer != null)
                     updateContainer(); // calls an event handler in the containing object
             }
 
@@ -74,30 +74,30 @@ namespace Krystals5ControlLibrary
         {
             StringBuilder tempSeq = new StringBuilder();
             char c;
-            for (int i = 0; i < _sequence.Length; i++)
+            for(int i = 0; i < _sequence.Length; i++)
             {
                 c = _sequence[i];
-                if (Char.IsNumber(c) || c.Equals(" "[0]))
+                if(Char.IsNumber(c) || c.Equals(" "[0]))
                     tempSeq.Append(c);
                 else _illegalCharacter = true;
             }
 
-			if( tempSeq.Length > 0 )
-				while( tempSeq[0] == " "[0] )
-					tempSeq.Remove(0, 1);
-			if( tempSeq.Length > 0 )
-				while( tempSeq[tempSeq.Length - 1] == " "[0] )
-					tempSeq.Remove(tempSeq.Length - 1, 1);
+            if(tempSeq.Length > 0)
+                while(tempSeq[0] == " "[0])
+                    tempSeq.Remove(0, 1);
+            if(tempSeq.Length > 0)
+                while(tempSeq[tempSeq.Length - 1] == " "[0])
+                    tempSeq.Remove(tempSeq.Length - 1, 1);
 
-            if (tempSeq.Length < 2)
+            if(tempSeq.Length < 2)
                 _sequence = tempSeq;
             else // remove multiple spaces
             {
                 _sequence.Length = 0;
                 _sequence.Append(tempSeq[0]);
-                for (int ti = 1, si = 0; ti < tempSeq.Length; ti++)
+                for(int ti = 1, si = 0; ti < tempSeq.Length; ti++)
                 {
-                    if ((_sequence[si] != " "[0])
+                    if((_sequence[si] != " "[0])
                     || (_sequence[si] == " "[0] && tempSeq[ti] != " "[0]))
                     {
                         _sequence.Append(tempSeq[ti]);

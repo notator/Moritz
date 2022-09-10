@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Moritz.Globals;
+using Moritz.Midi;
+using Moritz.Spec;
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using System.Diagnostics;
-
-using Moritz.Spec;
-using Moritz.Globals;
-using Moritz.Midi;
 
 namespace Moritz.Palettes
 {
@@ -147,15 +147,15 @@ namespace Moritz.Palettes
 
         private void CreateAudioSampleButton(int x, int y, int i)
         {
-			Button b = new Button
-			{
-				Location = new System.Drawing.Point(x, y),
-				Size = new System.Drawing.Size(27, 24),
-				Image = _paletteForm.PaletteButtonsControl.AudioSampleButtons[i].Image,
-				UseVisualStyleBackColor = false
-			};
+            Button b = new Button
+            {
+                Location = new System.Drawing.Point(x, y),
+                Size = new System.Drawing.Size(27, 24),
+                Image = _paletteForm.PaletteButtonsControl.AudioSampleButtons[i].Image,
+                UseVisualStyleBackColor = false
+            };
 
-			b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
+            b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
 
             this.Controls.Add(b);
             _audioSampleButtons.Add(b);
@@ -329,18 +329,18 @@ namespace Moritz.Palettes
                 VelocityTextBox.Text = _savedVelocityTextBoxText;
                 BaseMidiPitchTextBox.Text = _savedBaseMidiPitchTextBoxText;
                 ChordOffTextBox.Text = _savedChordOffTextBoxText;
-                ChordDensityTextBox.Text =_savedChordDensityTextBoxText;
-                InversionIndexTextBox.Text =_savedInversionIndexTextBoxText;
-                VerticalVelocityFactorTextBox.Text =_savedVerticalVelocityFactorTextBoxText;
-                BankIndexTextBox.Text =_savedBankIndexTextBoxText;
-                PatchIndexTextBox.Text =_savedPatchIndexTextBoxText;
-                PitchwheelDeviationTextBox.Text =_savedPitchwheelDeviationTextBoxText;
-                PitchwheelEnvelopeTextBox.Text =_savedPitchwheelEnvelopeTextBoxText;
-                PanEnvelopeTextBox.Text =_savedPanEnvelopeTextBoxText;
-                ModulationWheelEnvelopeTextBox.Text =_savedModulationWheelEnvelopeTextBoxText;
-                ExpressionEnvelopeTextBox.Text =_savedExpressionEnvelopeTextBoxText;
-                OrnamentNumberTextBox.Text =_savedOrnamentNumberTextBoxText;
-                MinMsDurationTextBox.Text =_savedMinMsDurationTextBoxText;
+                ChordDensityTextBox.Text = _savedChordDensityTextBoxText;
+                InversionIndexTextBox.Text = _savedInversionIndexTextBoxText;
+                VerticalVelocityFactorTextBox.Text = _savedVerticalVelocityFactorTextBoxText;
+                BankIndexTextBox.Text = _savedBankIndexTextBoxText;
+                PatchIndexTextBox.Text = _savedPatchIndexTextBoxText;
+                PitchwheelDeviationTextBox.Text = _savedPitchwheelDeviationTextBoxText;
+                PitchwheelEnvelopeTextBox.Text = _savedPitchwheelEnvelopeTextBoxText;
+                PanEnvelopeTextBox.Text = _savedPanEnvelopeTextBoxText;
+                ModulationWheelEnvelopeTextBox.Text = _savedModulationWheelEnvelopeTextBoxText;
+                ExpressionEnvelopeTextBox.Text = _savedExpressionEnvelopeTextBoxText;
+                OrnamentNumberTextBox.Text = _savedOrnamentNumberTextBoxText;
+                MinMsDurationTextBox.Text = _savedMinMsDurationTextBoxText;
 
                 TouchAllTextBoxes();
 
@@ -397,27 +397,27 @@ namespace Moritz.Palettes
         }
         private List<TextBox> AllTextBoxes()
         {
-			List<TextBox> allTextBoxes = new List<TextBox>
-			{
-				this.DurationTextBox,
-				this.VelocityTextBox,
-				this.BaseMidiPitchTextBox,
-				this.ChordOffTextBox,
-				this.ChordDensityTextBox,
-				this.InversionIndexTextBox,
-				this.VerticalVelocityFactorTextBox,
-				this.BankIndexTextBox,
-				this.PatchIndexTextBox,
-				this.PitchwheelDeviationTextBox,
-				this.PitchwheelEnvelopeTextBox,
-				this.PanEnvelopeTextBox,
-				this.ModulationWheelEnvelopeTextBox,
-				this.ExpressionEnvelopeTextBox,
-				this.OrnamentNumberTextBox,
-				this.MinMsDurationTextBox
-			};
+            List<TextBox> allTextBoxes = new List<TextBox>
+            {
+                this.DurationTextBox,
+                this.VelocityTextBox,
+                this.BaseMidiPitchTextBox,
+                this.ChordOffTextBox,
+                this.ChordDensityTextBox,
+                this.InversionIndexTextBox,
+                this.VerticalVelocityFactorTextBox,
+                this.BankIndexTextBox,
+                this.PatchIndexTextBox,
+                this.PitchwheelDeviationTextBox,
+                this.PitchwheelEnvelopeTextBox,
+                this.PanEnvelopeTextBox,
+                this.ModulationWheelEnvelopeTextBox,
+                this.ExpressionEnvelopeTextBox,
+                this.OrnamentNumberTextBox,
+                this.MinMsDurationTextBox
+            };
 
-			return allTextBoxes;
+            return allTextBoxes;
         }
 
         private void SaveAndCloseButton_Click(object sender, EventArgs e)
@@ -460,7 +460,7 @@ namespace Moritz.Palettes
                 {
                     _paletteForm.OrnamentNumbersTextBox.Text = ornamentNumberSBs[0].ToString() + this.OrnamentNumberTextBox.Text + ornamentNumberSBs[2].ToString();
                 }
-                
+
                 _paletteForm.MinMsDurationsTextBox.Text = minMsDurationsSBs[0].ToString() + this.MinMsDurationTextBox.Text + minMsDurationsSBs[2].ToString();
 
                 _paletteForm.SetSettingsHaveChanged();
@@ -700,30 +700,30 @@ namespace Moritz.Palettes
             {
                 Button midiEventDemoButton = sender as Button;
                 DurationDef durationDef = GetDurationDef();
-				MidiRestDef restDef = durationDef as MidiRestDef;
+                MidiRestDef restDef = durationDef as MidiRestDef;
 
-				if(durationDef is MidiChordDef midiChordDef)
-				{
-					int midiChannel = 0;
-					Sanford.Multimedia.Midi.OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
-					if(_paletteForm.IsPercussionPalette)
-					{
-						midiChannel = 9;
-						outputDevice = M.Preferences.GetMidiOutputDevice("Microsoft GS Wavetable Synth");
-					}
-					MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
-					midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
-				}
-				else
-				{
-					midiEventDemoButton.Hide();
-					Refresh(); // shows "rest" behind button
-					Debug.Assert(restDef != null);
-					Thread.Sleep(restDef.MsDuration);
-					midiEventDemoButton.Show();
-					Refresh();
-				}
-			}
+                if(durationDef is MidiChordDef midiChordDef)
+                {
+                    int midiChannel = 0;
+                    Sanford.Multimedia.Midi.OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
+                    if(_paletteForm.IsPercussionPalette)
+                    {
+                        midiChannel = 9;
+                        outputDevice = M.Preferences.GetMidiOutputDevice("Microsoft GS Wavetable Synth");
+                    }
+                    MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
+                    midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
+                }
+                else
+                {
+                    midiEventDemoButton.Hide();
+                    Refresh(); // shows "rest" behind button
+                    Debug.Assert(restDef != null);
+                    Thread.Sleep(restDef.MsDuration);
+                    midiEventDemoButton.Show();
+                    Refresh();
+                }
+            }
         }
 
         /// <summary>
@@ -776,7 +776,7 @@ namespace Moritz.Palettes
         List<StringBuilder> expressionEnvelopeSBs;
         List<StringBuilder> ornamentNumberSBs;
         List<StringBuilder> minMsDurationsSBs;
-        
+
         PaletteForm _paletteForm;
         BasicChordControl _bcc;
         int _midiChordIndex;

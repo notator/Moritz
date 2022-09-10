@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 
@@ -99,42 +99,42 @@ namespace Moritz.Symbols
             float minBarlineOriginX = float.MaxValue;
             foreach(NoteObject noteObject in _noteObjects)
             {
-				if(noteObject is Barline b && b.Metrics != null && b.Metrics.OriginX < minBarlineOriginX)
-					minBarlineOriginX = b.Metrics.OriginX;
-			}
+                if(noteObject is Barline b && b.Metrics != null && b.Metrics.OriginX < minBarlineOriginX)
+                    minBarlineOriginX = b.Metrics.OriginX;
+            }
             for(int index = 0; index < _noteObjects.Count; index++)
             {
-				ChordSymbol chordSymbol = _noteObjects[index] as ChordSymbol;
-				if(_noteObjects[index] is Barline barline && barline.Metrics != null)
-				{
-					Debug.Assert(AlignmentX == 0F);
-					if(index > 0)
-					{
-						if(_noteObjects[index - 1] is Clef clef)
-							clef.Metrics.Move(minBarlineOriginX - barline.Metrics.OriginX, 0);
-					}
-					barline.Metrics.Move(minBarlineOriginX - barline.Metrics.OriginX, 0);
-				}
-				else if(chordSymbol != null && chordSymbol.Metrics != null)
-				{
-					if(index > 0)
-					{
-						if(_noteObjects[index - 1] is SmallClef smallClef)
-							smallClef.Metrics.Move(chordSymbol.Metrics.Left - smallClef.Metrics.Right + gap, 0);
-					}
-				}
-			}
+                ChordSymbol chordSymbol = _noteObjects[index] as ChordSymbol;
+                if(_noteObjects[index] is Barline barline && barline.Metrics != null)
+                {
+                    Debug.Assert(AlignmentX == 0F);
+                    if(index > 0)
+                    {
+                        if(_noteObjects[index - 1] is Clef clef)
+                            clef.Metrics.Move(minBarlineOriginX - barline.Metrics.OriginX, 0);
+                    }
+                    barline.Metrics.Move(minBarlineOriginX - barline.Metrics.OriginX, 0);
+                }
+                else if(chordSymbol != null && chordSymbol.Metrics != null)
+                {
+                    if(index > 0)
+                    {
+                        if(_noteObjects[index - 1] is SmallClef smallClef)
+                            smallClef.Metrics.Move(chordSymbol.Metrics.Left - smallClef.Metrics.Right + gap, 0);
+                    }
+                }
+            }
         }
 
 
         private void AddNoteObject(NoteObject noteObject)
         {
-			if(noteObject is DurationSymbol durationSymbol && _noteObjects.Count > 0)
-			{
-				Debug.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
-				Debug.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
-			}
-			if(noteObject is Clef)
+            if(noteObject is DurationSymbol durationSymbol && _noteObjects.Count > 0)
+            {
+                Debug.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
+                Debug.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
+            }
+            if(noteObject is Clef)
             {
 
             }
@@ -177,9 +177,9 @@ namespace Moritz.Symbols
 
         public void Add(NoteObject noteObject)
         {
-			if(noteObject is DurationSymbol durationSymbol && _absMsPosition != durationSymbol.AbsMsPosition)
-				throw new InvalidOperationException("Attempt to add a non-synchronous DurationSymbol to a MomentSymbol.");
-			_noteObjects.Add(noteObject);
+            if(noteObject is DurationSymbol durationSymbol && _absMsPosition != durationSymbol.AbsMsPosition)
+                throw new InvalidOperationException("Attempt to add a non-synchronous DurationSymbol to a MomentSymbol.");
+            _noteObjects.Add(noteObject);
         }
 
         public IEnumerable AnchorageSymbols
@@ -188,9 +188,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in _noteObjects)
                 {
-					if(noteObject is AnchorageSymbol anchorageSymbol)
-						yield return anchorageSymbol;
-				}
+                    if(noteObject is AnchorageSymbol anchorageSymbol)
+                        yield return anchorageSymbol;
+                }
             }
         }
 

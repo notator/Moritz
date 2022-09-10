@@ -28,7 +28,7 @@ namespace Krystals5ObjectLibrary
             }
 
             public List<StrandObj> StrandObjs { get { return _strandObjs; } }
-            private readonly List<StrandObj> _strandObjs  = new List<StrandObj>();
+            private readonly List<StrandObj> _strandObjs = new List<StrandObj>();
             // The level of the first strand (before this SuperStrand is permuted).
             public uint TopLevel { get { return _topLevel; } }
             protected uint _topLevel = 0;
@@ -47,7 +47,7 @@ namespace Krystals5ObjectLibrary
             {
                 Debug.Assert(StrandObjs.Count > 0);
                 _topLevel = StrandObjs[0].Strand.Level;
- 
+
                 InnerSuperStrand innerSuperStrand = new InnerSuperStrand();
                 _innerSuperStrands.Clear();
                 uint containedLevel = _permutationLevel + 2;
@@ -72,7 +72,7 @@ namespace Krystals5ObjectLibrary
             /// <summary>
             /// Returns the original moment number of each strand in the permuted InnerSuperStrands.
             /// </summary>
-            public List<int> PermutedSourceMoments( bool sortFirst, int[] contour)
+            public List<int> PermutedSourceMoments(bool sortFirst, int[] contour)
             {
                 if(sortFirst)
                 {
@@ -142,11 +142,11 @@ namespace Krystals5ObjectLibrary
                 {
                     if(i == 0)
                         break; // all contour int[]s have length == 7, with the final, unused positions set to zero
-                    sorted.Add(_innerSuperStrands[i-1]);
+                    sorted.Add(_innerSuperStrands[i - 1]);
                 }
 
                 // Now restore the level structure.
-                for(int i = 0; i < sorted.Count ; i++)
+                for(int i = 0; i < sorted.Count; i++)
                 {
                     sorted[i].StrandObjs[0].Strand.Level = igsLevels[i];
                 }
@@ -157,19 +157,19 @@ namespace Krystals5ObjectLibrary
             public List<InnerSuperStrand> InnerSuperStrands { get { return _innerSuperStrands; } }
             public uint PermutationLevel { get { return _permutationLevel; } }
             private readonly uint _permutationLevel = 0;
-            private List<InnerSuperStrand> _innerSuperStrands  = new List<InnerSuperStrand>();
+            private List<InnerSuperStrand> _innerSuperStrands = new List<InnerSuperStrand>();
         }
 
         private class InnerSuperStrand : SuperStrand
         {
-            public InnerSuperStrand() : base() {}
- 
+            public InnerSuperStrand() : base() { }
+
             public void SetNumberOfValues(uint topLevel)
             {
                 _numberOfValues = StrandObjs[0].Strand.Values.Count;
                 for(int i = 1; i < StrandObjs.Count; i++)
                 {
-                    Debug.Assert(topLevel < StrandObjs[i].Strand.Level); 
+                    Debug.Assert(topLevel < StrandObjs[i].Strand.Level);
                     _numberOfValues += StrandObjs[i].Strand.Values.Count;
                 }
             }
@@ -178,5 +178,5 @@ namespace Krystals5ObjectLibrary
             private int _numberOfValues = 0;
         }
     }
- }
+}
 
