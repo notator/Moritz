@@ -8,8 +8,8 @@
     <ProjectGuid>{383E2844-41A4-488F-A683-D3EAE9AF4AF5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Krystals4ObjectLibrary</RootNamespace>
-    <AssemblyName>Krystals4ObjectLibrary</AssemblyName>
+    <RootNamespace>Krystals5ObjectLibrary</RootNamespace>
+    <AssemblyName>Krystals5ObjectLibrary</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>

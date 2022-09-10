@@ -139,10 +139,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals5ObjectLibrary.csproj">
-      <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
-      <Name>Krystals5ObjectLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
       <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
       <Name>Moritz.Globals</Name>
