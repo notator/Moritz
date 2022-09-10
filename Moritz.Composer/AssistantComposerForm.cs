@@ -13,7 +13,6 @@ using Moritz.Globals;
 using Moritz.Symbols;
 using Moritz.Palettes;
 using Moritz.Algorithm;
-using Moritz.Krystals;
 
 namespace Moritz.Composer
 {
@@ -1466,7 +1465,7 @@ namespace Moritz.Composer
             Krystal selectedKrystal = null;
             if(KrystalsListBox.SelectedIndex >= 0)
                 selectedKrystal = KrystalsListBox.SelectedItem as Krystal;
-            Moritz.Krystals.KrystalsBrowser krystalBrowser = new Moritz.Krystals.KrystalsBrowser("All krystals", selectedKrystal, SetKrystal);
+            KrystalsBrowser krystalBrowser = new KrystalsBrowser("All krystals", selectedKrystal, SetKrystal);
             krystalBrowser.Show();
             // the krystalBrowser calls SetKrystal() as a delegate just before it closes.
         }

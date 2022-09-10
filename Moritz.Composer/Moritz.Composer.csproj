@@ -87,6 +87,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Krystals5ObjectLibrary\Krystals5ObjectLibrary.csproj">
+      <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
+      <Name>Krystals5ObjectLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Moritz.Algorithm\Moritz.Algorithm.csproj">
       <Project>{539a2302-1db3-4eda-879c-81a1624a24a0}</Project>
       <Name>Moritz.Algorithm</Name>
