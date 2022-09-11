@@ -58,10 +58,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Krystals4ObjectLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Krystals4ObjectLibrary\bin\Debug\Krystals4ObjectLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -287,6 +283,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Krystals5ObjectLibrary\Krystals5ObjectLibrary.csproj">
+      <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
+      <Name>Krystals5ObjectLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
       <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
       <Name>Moritz.Globals</Name>
