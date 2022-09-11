@@ -6,9 +6,9 @@ using System.Text;
 
 namespace DeleteUnusedDuplicateKrystalsApp
 {
-    public partial class Form1 : Form
+    public partial class UtilitiesForm1 : Form
     {
-        public Form1()
+        public UtilitiesForm1()
         {
             InitializeComponent();
         }
@@ -17,41 +17,54 @@ namespace DeleteUnusedDuplicateKrystalsApp
         private void DeleteUnusedDuplicateKrystalsButton_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Delete all unused duplicate Krystals?\n\n" +
-                "A backup of the original krystals folder will be created\nin a new, parallel \"_MorizBackup\" folder.",
+                "If unused duplicate krystals are found in the krystals\n" +
+                "folder, a backup of that folder will first be created\n" +
+                "in a new, parallel \"_MorizBackup\" folder.",
                 "Delete Unused Duplicate Krystals", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
             if(result == DialogResult.OK)
             {
-                List<string> deletedFiles = new List<string>();
-                string backupDirectoryName = "";
+                List<string> filesToDelete = new List<string>();
+                
                 try
                 {
-                    this.Cursor = Cursors.WaitCursor;
-                    backupDirectoryName = K.CopyDirectoryToMoritzBackup(_krystalsFolder);
-                    deletedFiles.AddRange(RemoveDuplicates(Directory.EnumerateFiles(_krystalsFolder, "*.constant.krys")));
-                    deletedFiles.AddRange(RemoveDuplicates(Directory.EnumerateFiles(_krystalsFolder, "*.line.krys")));
-                    deletedFiles.AddRange(RemoveDuplicates(Directory.EnumerateFiles(_krystalsFolder, "*.exp.krys")));
-                    deletedFiles.AddRange(RemoveDuplicates(Directory.EnumerateFiles(_krystalsFolder, "*.mod.krys")));
-                    deletedFiles.AddRange(RemoveDuplicates(Directory.EnumerateFiles(_krystalsFolder, "*.perm.krys")));
-                    deletedFiles.AddRange(RemoveDuplicates(Directory.EnumerateFiles(_krystalsFolder, "*.path.krys")));
+                    Cursor.Current = Cursors.WaitCursor; // Note that the wait cursor is only displayed when over UtilitiesForm1
+
+                    filesToDelete.AddRange(FindFilesToDelete(Directory.EnumerateFiles(_krystalsFolder, "*.constant.krys")));
+                    filesToDelete.AddRange(FindFilesToDelete(Directory.EnumerateFiles(_krystalsFolder, "*.line.krys")));
+                    filesToDelete.AddRange(FindFilesToDelete(Directory.EnumerateFiles(_krystalsFolder, "*.exp.krys")));
+                    filesToDelete.AddRange(FindFilesToDelete(Directory.EnumerateFiles(_krystalsFolder, "*.mod.krys")));
+                    filesToDelete.AddRange(FindFilesToDelete(Directory.EnumerateFiles(_krystalsFolder, "*.perm.krys")));
+                    filesToDelete.AddRange(FindFilesToDelete(Directory.EnumerateFiles(_krystalsFolder, "*.path.krys")));
                 }
                 finally
                 {
-                    this.Cursor = Cursors.Default;
-                    StringBuilder msgStrB = new StringBuilder();
-                    msgStrB.Append("The following unused, duplicate krystals have been deleted:\n\n");
-                    foreach(var filename in deletedFiles)
+                    Cursor.Current = Cursors.Default;
+                    StringBuilder msgStrB = new();
+                    if(filesToDelete.Count == 0)
                     {
-                        msgStrB.Append(filename + "\n");
+                        MessageBox.Show("No unused duplicate krystals were found", "Result", MessageBoxButtons.OK);
                     }
-                    msgStrB.Append($"\nA backup of the original krystals folder has been created in\n    {backupDirectoryName}");
-                    MessageBox.Show(msgStrB.ToString(), "Deleted", MessageBoxButtons.OK);
+                    else
+                    {
+                        string backupDirectoryName = K.CopyDirectoryToMoritzBackup(_krystalsFolder);
+                        msgStrB.Append("The following unused, duplicate krystals have been deleted:\n\n");
+                        foreach(var filename in filesToDelete)
+                        {
+                            msgStrB.Append(filename + "\n");
+                            var deletePath = _krystalsFolder + @"//" + filename;
+                            File.Delete(deletePath);
+                        }
+                        msgStrB.Append($"\nA backup of the original krystals folder has been created in\n    {backupDirectoryName}");
+                        MessageBox.Show(msgStrB.ToString(), "Deleted Krystals", MessageBoxButtons.OK);
+                    }
                 }
             }
         }
 
-        private List<string> RemoveDuplicates(IEnumerable<string> iEnumKrystalPaths)
+        private List<string> FindFilesToDelete(IEnumerable<string> iEnumKrystalPaths)
         {
-            List<string> deletedFiles = new List<string>();
+            List<string> filesToDelete = new List<string>();
 
             if(iEnumKrystalPaths.Count<string>() > 1)
             {
@@ -76,13 +89,12 @@ namespace DeleteUnusedDuplicateKrystalsApp
                         foreach(var node in nodesToDelete)
                         {
                             string krystalPath = _krystalsFolder + "//" + node.Text;
-                            deletedFiles.Add(node.Text);
-                            File.Delete(krystalPath);
+                            filesToDelete.Add(node.Text);
                         }
                     }
                 }
             }
-            return deletedFiles;
+            return filesToDelete;
         }
 
         private static List<TreeNode> GetNodesToDelete(TreeNode rootNode, List<string> listOfDuplicates)
