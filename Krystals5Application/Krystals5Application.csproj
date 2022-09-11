@@ -73,11 +73,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutKrystals4.cs">
+    <Compile Include="AboutKrystals5.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutKrystals4.Designer.cs">
-      <DependentUpon>AboutKrystals4.cs</DependentUpon>
+    <Compile Include="AboutKrystals5.Designer.cs">
+      <DependentUpon>AboutKrystals5.cs</DependentUpon>
     </Compile>
     <Compile Include="ExpansionEditor.cs">
       <SubType>Form</SubType>
@@ -174,8 +174,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AboutKrystals4.resx">
-      <DependentUpon>AboutKrystals4.cs</DependentUpon>
+    <EmbeddedResource Include="AboutKrystals5.resx">
+      <DependentUpon>AboutKrystals5.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ExpansionEditor.resx">
