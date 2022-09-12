@@ -34,10 +34,6 @@ namespace Krystals5Application
             this.NewModKrysButton = new System.Windows.Forms.Button();
             this.NewPathKrysButton = new System.Windows.Forms.Button();
             this.OpenKrystalsBrowserButton = new System.Windows.Forms.Button();
-            this.SaveKrystalsWithNewNamesButton = new System.Windows.Forms.Button();
-            this.archivePanel = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.archivelabel = new System.Windows.Forms.Label();
             this.GlobalPanel = new System.Windows.Forms.Panel();
             this.globalTextlabel = new System.Windows.Forms.Label();
             this.globalLabel = new System.Windows.Forms.Label();
@@ -50,7 +46,6 @@ namespace Krystals5Application
             this.newLabel = new System.Windows.Forms.Label();
             this.AboutButton = new System.Windows.Forms.Button();
             this.QuitButton = new System.Windows.Forms.Button();
-            this.archivePanel.SuspendLayout();
             this.GlobalPanel.SuspendLayout();
             this.editorsPanel.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -115,49 +110,6 @@ namespace Krystals5Application
             this.OpenKrystalsBrowserButton.TabIndex = 6;
             this.OpenKrystalsBrowserButton.Text = "open krystals browser";
             this.OpenKrystalsBrowserButton.Click += new System.EventHandler(this.OpenKrystalsBrowserButton_Click);
-            // 
-            // SaveKrystalsWithNewNamesButton
-            // 
-            this.SaveKrystalsWithNewNamesButton.Enabled = false;
-            this.SaveKrystalsWithNewNamesButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.SaveKrystalsWithNewNamesButton.Location = new System.Drawing.Point(14, 49);
-            this.SaveKrystalsWithNewNamesButton.Name = "SaveKrystalsWithNewNamesButton";
-            this.SaveKrystalsWithNewNamesButton.Size = new System.Drawing.Size(160, 42);
-            this.SaveKrystalsWithNewNamesButton.TabIndex = 7;
-            this.SaveKrystalsWithNewNamesButton.Text = "save krystals with new names";
-            this.SaveKrystalsWithNewNamesButton.Click += new System.EventHandler(this.SaveKrystalsWithNewNamesButton_Click);
-            // 
-            // archivePanel
-            // 
-            this.archivePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.archivePanel.Controls.Add(this.label1);
-            this.archivePanel.Controls.Add(this.archivelabel);
-            this.archivePanel.Controls.Add(this.SaveKrystalsWithNewNamesButton);
-            this.archivePanel.Location = new System.Drawing.Point(12, 442);
-            this.archivePanel.Name = "archivePanel";
-            this.archivePanel.Size = new System.Drawing.Size(400, 106);
-            this.archivePanel.TabIndex = 8;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 25);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(373, 15);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "These functions exist in the code-base, but should not be run again.";
-            // 
-            // archivelabel
-            // 
-            this.archivelabel.AutoSize = true;
-            this.archivelabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.archivelabel.ForeColor = System.Drawing.Color.IndianRed;
-            this.archivelabel.Location = new System.Drawing.Point(12, 9);
-            this.archivelabel.Name = "archivelabel";
-            this.archivelabel.Size = new System.Drawing.Size(58, 16);
-            this.archivelabel.TabIndex = 8;
-            this.archivelabel.Text = "Archive :\r\n";
             // 
             // GlobalPanel
             // 
@@ -281,7 +233,8 @@ namespace Krystals5Application
             // 
             // QuitButton
             // 
-            this.QuitButton.Location = new System.Drawing.Point(337, 554);
+            this.QuitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.QuitButton.Location = new System.Drawing.Point(337, 447);
             this.QuitButton.Name = "QuitButton";
             this.QuitButton.Size = new System.Drawing.Size(75, 23);
             this.QuitButton.TabIndex = 13;
@@ -294,19 +247,16 @@ namespace Krystals5Application
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(424, 583);
+            this.ClientSize = new System.Drawing.Size(424, 479);
             this.ControlBox = false;
             this.Controls.Add(this.QuitButton);
             this.Controls.Add(this.AboutButton);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.editorsPanel);
             this.Controls.Add(this.GlobalPanel);
-            this.Controls.Add(this.archivePanel);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Krystals 5.0";
-            this.archivePanel.ResumeLayout(false);
-            this.archivePanel.PerformLayout();
             this.GlobalPanel.ResumeLayout(false);
             this.GlobalPanel.PerformLayout();
             this.editorsPanel.ResumeLayout(false);
@@ -324,10 +274,6 @@ namespace Krystals5Application
         private System.Windows.Forms.Button NewModKrysButton;
         private System.Windows.Forms.Button NewPathKrysButton;
         private System.Windows.Forms.Button OpenKrystalsBrowserButton;
-        private System.Windows.Forms.Button SaveKrystalsWithNewNamesButton;
-        private System.Windows.Forms.Panel archivePanel;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label archivelabel;
         private System.Windows.Forms.Panel GlobalPanel;
         private System.Windows.Forms.Label globalTextlabel;
         private System.Windows.Forms.Label globalLabel;
