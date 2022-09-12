@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B58590D2-2722-46F5-AD2B-292929DE1B12}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Krystals5ControlLibrary</RootNamespace>
+    <AssemblyName>Krystals5ControlLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FloatControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FloatControl.Designer.cs">
+      <DependentUpon>FloatControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="KrystalFilenameControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="KrystalFilenameControl.Designer.cs">
+      <DependentUpon>KrystalFilenameControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PointGroupParameters.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PointGroupParameters.Designer.cs">
+      <DependentUpon>PointGroupParameters.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleUintControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UIntControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UIntControl.Designer.cs">
+      <DependentUpon>UIntControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UIntTable.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UIntTable.Designer.cs">
+      <DependentUpon>UIntTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UnsignedIntSequenceControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UnsignedIntSequenceControl.Designer.cs">
+      <DependentUpon>UnsignedIntSequenceControl.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FloatControl.resx">
+      <DependentUpon>FloatControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KrystalFilenameControl.resx">
+      <DependentUpon>KrystalFilenameControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PointGroupParameters.resx">
+      <DependentUpon>PointGroupParameters.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UIntControl.resx">
+      <DependentUpon>UIntControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UIntTable.resx">
+      <DependentUpon>UIntTable.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UnsignedIntSequenceControl.resx">
+      <DependentUpon>UnsignedIntSequenceControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Krystals5ObjectLibrary\Krystals5ObjectLibrary.csproj">
+      <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
+      <Name>Krystals5ObjectLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

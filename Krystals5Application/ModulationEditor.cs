@@ -47,7 +47,8 @@ namespace Krystals5Application
             _modulationTreeView = new ModulationTreeView(TreeView, _outputKrystal);
 
             _uintTable = new UIntTable(_modulator.XDim, _modulator.YDim,
-                                        outputKrystal.XInputKrystal, outputKrystal.YInputKrystal);
+                                        outputKrystal.XInputKrystal.MissingAbsoluteValues, outputKrystal.YInputKrystal.MissingAbsoluteValues,
+                                        outputKrystal.XInputKrystal.MaxValue, outputKrystal.YInputKrystal.MaxValue);
 
             this.splitContainer.Panel2.Controls.Add(_uintTable);
 

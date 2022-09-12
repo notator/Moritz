@@ -46,6 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Envelope.cs" />
+    <Compile Include="Gamete.cs" />
+    <Compile Include="Planet.cs" />
+    <Compile Include="PointGroup.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="ConstantKrystal.cs" />
     <Compile Include="InputKrystal.cs" />

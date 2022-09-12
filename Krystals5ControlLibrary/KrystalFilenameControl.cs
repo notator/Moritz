@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace Krystals5ControlLibrary
 {
-    internal partial class KrystalFilenameControl : UserControl
+    public partial class KrystalFilenameControl : UserControl
     {
         public KrystalFilenameControl()
         {

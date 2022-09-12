@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace Krystals5ControlLibrary
 {
-    internal partial class UnsignedIntControl : UserControl
+    public partial class UnsignedIntControl : UserControl
     {
         public UnsignedIntControl()
         {

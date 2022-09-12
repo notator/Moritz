@@ -87,45 +87,6 @@
     <Compile Include="NewPathExpansionDialog.Designer.cs">
       <DependentUpon>NewPathExpansionDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Krystals5ControlLibrary\FloatControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\FloatControl.Designer.cs">
-      <DependentUpon>FloatControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\KrystalFilenameControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\KrystalFilenameControl.Designer.cs">
-      <DependentUpon>KrystalFilenameControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\PointGroupParameters.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\PointGroupParameters.Designer.cs">
-      <DependentUpon>PointGroupParameters.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\SimpleUintControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\UIntControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\UIntControl.Designer.cs">
-      <DependentUpon>UIntControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\UIntTable.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\UIntTable.Designer.cs">
-      <DependentUpon>UIntTable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\UnsignedIntSequenceControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Krystals5ControlLibrary\UnsignedIntSequenceControl.Designer.cs">
-      <DependentUpon>UnsignedIntSequenceControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -176,30 +137,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ExpansionEditor.resx">
       <DependentUpon>ExpansionEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Krystals5ControlLibrary\FloatControl.resx">
-      <DependentUpon>FloatControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Krystals5ControlLibrary\KrystalFilenameControl.resx">
-      <DependentUpon>KrystalFilenameControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Krystals5ControlLibrary\PointGroupParameters.resx">
-      <DependentUpon>PointGroupParameters.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Krystals5ControlLibrary\UIntControl.resx">
-      <DependentUpon>UIntControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Krystals5ControlLibrary\UIntTable.resx">
-      <DependentUpon>UIntTable.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Krystals5ControlLibrary\UnsignedIntSequenceControl.resx">
-      <DependentUpon>UnsignedIntSequenceControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="MainWindow.resx">
@@ -283,6 +220,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Krystals5ControlLibrary\Krystals5ControlLibrary.csproj">
+      <Project>{b58590d2-2722-46f5-ad2b-292929de1b12}</Project>
+      <Name>Krystals5ControlLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Krystals5ObjectLibrary\Krystals5ObjectLibrary.csproj">
       <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
       <Name>Krystals5ObjectLibrary</Name>

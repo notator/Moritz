@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace Krystals5ControlLibrary
 {
-    internal partial class FloatControl : UserControl
+    public partial class FloatControl : UserControl
     {
         public FloatControl()
         {

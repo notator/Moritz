@@ -1,5 +1,3 @@
-using Krystals5ObjectLibrary;
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,17 +5,22 @@ using System.Windows.Forms;
 
 namespace Krystals5ControlLibrary
 {
-    internal partial class UIntTable : UserControl
+    public partial class UIntTable : UserControl
     {
         public UIntTable(int xDim, int yDim,
-            ModulationInputKrystal xInputKrystal, ModulationInputKrystal yInputKrystal)
+            //ModulationInputKrystal xInputKrystal, ModulationInputKrystal yInputKrystal)
+            List<int> missingXValues, List<int> missingYValues,
+            uint maxXValue, uint maxYValue)
         {
             InitializeComponent();
 
-            _missingXValues = xInputKrystal.MissingAbsoluteValues;
-            _missingYValues = yInputKrystal.MissingAbsoluteValues;
+            //_missingXValues = xInputKrystal.MissingAbsoluteValues;
+            //_missingYValues = yInputKrystal.MissingAbsoluteValues;
+            _missingXValues = missingXValues;
+            _missingYValues = missingYValues;
 
-            if((xDim < xInputKrystal.MaxValue) || (yDim < yInputKrystal.MaxValue))
+            //if((xDim < xInputKrystal.MaxValue) || (yDim < yInputKrystal.MaxValue))
+            if((xDim < maxXValue) || (yDim < maxYValue))
             {
                 string msg = "Table size exceeded."
                     + "\nThe maximum number of rows is " + yDim.ToString()
@@ -25,11 +28,18 @@ namespace Krystals5ControlLibrary
                 throw new ApplicationException(msg);
             }
 
-            if(xDim > xInputKrystal.MaxValue)
-                for(int i = (int)xInputKrystal.MaxValue + 1; i <= xDim; i++)
+            //if(xDim > xInputKrystal.MaxValue)
+            //    for(int i = (int)xInputKrystal.MaxValue + 1; i <= xDim; i++)
+            //        _missingXValues.Add(i);
+            //if(yDim > yInputKrystal.MaxValue)
+            //    for(int i = (int)yInputKrystal.MaxValue + 1; i <= yDim; i++)
+            //        _missingYValues.Add(i);
+
+            if(xDim > maxXValue)
+                for(int i = (int)maxXValue + 1; i <= xDim; i++)
                     _missingXValues.Add(i);
-            if(yDim > yInputKrystal.MaxValue)
-                for(int i = (int)yInputKrystal.MaxValue + 1; i <= yDim; i++)
+            if(yDim > maxYValue)
+                for(int i = (int)maxYValue + 1; i <= yDim; i++)
                     _missingYValues.Add(i);
 
             this.SuspendLayout();

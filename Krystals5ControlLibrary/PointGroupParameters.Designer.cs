@@ -1,6 +1,8 @@
+using Krystals5ObjectLibrary;
+
 namespace Krystals5ControlLibrary
 {
-    partial class PointGroupParameters
+    public partial class PointGroupParameters
     {
         /// <summary> 
         /// Required designer variable.
@@ -13,7 +15,7 @@ namespace Krystals5ControlLibrary
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if(disposing)
             {
                 _theDotPen.Dispose();
                 _theLinePen.Dispose();
@@ -447,24 +449,24 @@ namespace Krystals5ControlLibrary
         private System.Windows.Forms.Label ToRadiusLabel;
         private System.Windows.Forms.Label ShiftRadiusLabel;
         private System.Windows.Forms.Label FromAngleLabel;
-		private System.Windows.Forms.Label ShapeLabel;
-		private System.Windows.Forms.Label FixedPointsValuesLabel;
-		private System.Windows.Forms.Label PlanetValueLabel;
-		private System.Windows.Forms.CheckBox VisibleCheckBox;
-		private System.Windows.Forms.Panel SamplePanel;
-		private System.Windows.Forms.ComboBox ColorComboBox;
-		private System.Windows.Forms.Label CountValueLabel;
-		private System.Windows.Forms.Label CircleToRadiusValueLabel;
-		private UnsignedIntControl PlanetValueUIntControl;
-		private UnsignedIntSeqControl FixedPointsValuesUIntSeqControl;
-		private FloatControl ShiftAngleFloatControl;
-		private FloatControl ShiftRadiusFloatControl;
-		private FloatControl RotationFloatControl;
-		private FloatControl ToAngleFloatControl;
-		private FloatControl ToRadiusFloatControl;
-		private FloatControl FromRadiusFloatControl;
-		private FloatControl FromAngleFloatControl;
-		private UnsignedIntControl StartMomentUIntControl;
-		private System.Windows.Forms.Label CircleToAngleValueLabel;
+        private System.Windows.Forms.Label ShapeLabel;
+        private System.Windows.Forms.Label FixedPointsValuesLabel;
+        private System.Windows.Forms.Label PlanetValueLabel;
+        private System.Windows.Forms.CheckBox VisibleCheckBox;
+        private System.Windows.Forms.Panel SamplePanel;
+        private System.Windows.Forms.ComboBox ColorComboBox;
+        private System.Windows.Forms.Label CountValueLabel;
+        private System.Windows.Forms.Label CircleToRadiusValueLabel;
+        private UnsignedIntControl PlanetValueUIntControl;
+        private UnsignedIntSeqControl FixedPointsValuesUIntSeqControl;
+        private FloatControl ShiftAngleFloatControl;
+        private FloatControl ShiftRadiusFloatControl;
+        private FloatControl RotationFloatControl;
+        private FloatControl ToAngleFloatControl;
+        private FloatControl ToRadiusFloatControl;
+        private FloatControl FromRadiusFloatControl;
+        private FloatControl FromAngleFloatControl;
+        private UnsignedIntControl StartMomentUIntControl;
+        private System.Windows.Forms.Label CircleToAngleValueLabel;
     }
 }

@@ -1,14 +1,14 @@
-using Krystals5ObjectLibrary;
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
+using Krystals5ObjectLibrary;
+
 namespace Krystals5ControlLibrary
 {
-    internal partial class PointGroupParameters : UserControl
+    public partial class PointGroupParameters : UserControl
     {
         public PointGroupParameters()
         {
