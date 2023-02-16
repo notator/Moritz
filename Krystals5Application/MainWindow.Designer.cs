@@ -46,6 +46,7 @@ namespace Krystals5Application
             this.newLabel = new System.Windows.Forms.Label();
             this.AboutButton = new System.Windows.Forms.Button();
             this.QuitButton = new System.Windows.Forms.Button();
+            this.OpenExpanderEditorButton = new System.Windows.Forms.Button();
             this.GlobalPanel.SuspendLayout();
             this.editorsPanel.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -114,6 +115,7 @@ namespace Krystals5Application
             // GlobalPanel
             // 
             this.GlobalPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.GlobalPanel.Controls.Add(this.OpenExpanderEditorButton);
             this.GlobalPanel.Controls.Add(this.globalTextlabel);
             this.GlobalPanel.Controls.Add(this.globalLabel);
             this.GlobalPanel.Controls.Add(this.OpenKrystalsBrowserButton);
@@ -242,6 +244,16 @@ namespace Krystals5Application
             this.QuitButton.UseVisualStyleBackColor = true;
             this.QuitButton.Click += new System.EventHandler(this.QuitButton_Click);
             // 
+            // OpenExpanderEditorButton
+            // 
+            this.OpenExpanderEditorButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.OpenExpanderEditorButton.Location = new System.Drawing.Point(217, 51);
+            this.OpenExpanderEditorButton.Name = "OpenExpanderEditorButton";
+            this.OpenExpanderEditorButton.Size = new System.Drawing.Size(160, 42);
+            this.OpenExpanderEditorButton.TabIndex = 11;
+            this.OpenExpanderEditorButton.Text = "open expander editor";
+            this.OpenExpanderEditorButton.Click += new System.EventHandler(this.OpenExpansionKrystalInExpanderEditor_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -286,6 +298,7 @@ namespace Krystals5Application
         private System.Windows.Forms.Button NewPermutedKrystalButton;
         private System.Windows.Forms.Button AboutButton;
         private System.Windows.Forms.Button QuitButton;
+        private System.Windows.Forms.Button OpenExpanderEditorButton;
     }
 }
 

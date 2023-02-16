@@ -72,6 +72,11 @@ namespace Krystals5Application
                 kd.Close();
             }
         }
+
+        private void OpenExpansionKrystalInExpanderEditor_Click(object sender, EventArgs e)
+        {
+            OpenExpansionKrystalInExpanderEditor();
+        }
         private void HandleExpansionEditorEvents(object sender, ExpansionEditorEventArgs e)
         {
             switch(e.Message)
@@ -80,7 +85,7 @@ namespace Krystals5Application
                     NewExpansionKrystal();
                     break;
                 case ExpansionEditorMessage.Open:
-                    OpenExpansionKrystal();
+                    OpenExpansionKrystalInExpanderEditor();
                     break;
             }
         }
@@ -88,7 +93,7 @@ namespace Krystals5Application
         {
             try
             {
-                ExpansionEditor editor = new ExpansionEditor(KrystalBrowser);
+                ExpansionEditor editor = new  ExpansionEditor(KrystalBrowser);
                 editor.EventHandler += new ExpansionEditor.ExpansionEditorEventhandler(HandleExpansionEditorEvents);
                 editor.Show();
             }
@@ -97,7 +102,7 @@ namespace Krystals5Application
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-        private void OpenExpansionKrystal()
+        private void OpenExpansionKrystalInExpanderEditor()
         {
             try
             {
@@ -243,5 +248,7 @@ namespace Krystals5Application
 
         private readonly string _krystalsFolder = M.LocalMoritzKrystalsFolder;
         private KrystalsBrowser KrystalBrowser = null;
+
+
     }
 }
