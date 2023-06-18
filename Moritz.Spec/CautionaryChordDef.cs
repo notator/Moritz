@@ -15,7 +15,7 @@ namespace Moritz.Spec
         public CautionaryChordDef(IUniqueChordDef chordDef, int msPositionReFirstIUD, int msDuration)
         {
             NotatedMidiPitches = chordDef.NotatedMidiPitches;
-            if(chordDef is MidiChordDef)
+            if(chordDef is MidiChordDef midiChordDef)
             {
                 NotatedMidiVelocities = chordDef.NotatedMidiVelocities;
             }
