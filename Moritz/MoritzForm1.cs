@@ -70,11 +70,6 @@ namespace Moritz
             this.Close();
         }
 
-        private void EnableDeviceComboBoxesAndPreferences(bool enable)
-        {
-            this.PreferencesButton.Enabled = enable;
-        }
-
         /// <summary>
         /// MoritzForm1 can be closed by a subsidiary Form, for example when
         /// quitting from the AssistantComposer.
