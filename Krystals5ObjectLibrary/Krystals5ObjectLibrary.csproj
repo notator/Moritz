@@ -93,6 +93,7 @@
       <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
@@ -105,6 +106,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
+      <Name>Moritz.Globals</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

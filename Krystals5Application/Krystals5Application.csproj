@@ -230,7 +230,7 @@
       <Name>Krystals5ObjectLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
-      <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
+      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
   </ItemGroup>
