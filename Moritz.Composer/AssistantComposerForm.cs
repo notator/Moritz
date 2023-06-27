@@ -680,7 +680,7 @@ namespace Moritz.Composer
         {
             if(DiscardAnyChanges())
             {
-                //_moritzForm1.Close();
+                _moritzForm1.Close();
             }
         }
         private void QuitAssistantComposerButton_Click(object sender, EventArgs e)
