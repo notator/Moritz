@@ -7,6 +7,7 @@ using Moritz.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Moritz.Algorithm
 {
@@ -160,6 +161,8 @@ namespace Moritz.Algorithm
         /// </summary>
         /// <returns></returns>
         public abstract int NumberOfBars { get; }
+
+        public virtual IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>();} }
 
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
@@ -318,7 +321,31 @@ namespace Moritz.Algorithm
             }
             return barlineMsPositions;
         }
+ 
+        /// <summary>
+        /// Returns a list of (index, msPosition) KeyValuePairs.
+        /// These are the (index, msPosition) of the barlines at which regions begin, and the (index, msPosition) of the final barline.
+        /// The first KeyValuePair is (0,0), the last is the (index, msPosition) for the final barline in the score.
+        /// The number of entries in the returned list is therefore 1 + bars.Count.
+        /// </summary>
+        protected List<(int index, int msPosition)> GetRegionBarlineIndexMsPosList(List<Bar> bars)
+        {
+            var rval = new List<(int index, int msPosition)>();
 
+            int barlineMsPos = 0;
+            int barsCount = bars.Count;
+            for(int i = 0; i < barsCount; ++i)
+            {
+                if(RegionStartBarIndices.Contains(i))
+                {
+                    rval.Add((index: i, msPosition: barlineMsPos));
+                }
+                barlineMsPos += bars[i].MsDuration;
+            }
+            rval.Add((index: barsCount, msPosition: barlineMsPos));
+
+            return rval;
+        }
         private int NearestAbsUIDEndMsPosition(List<VoiceDef> voiceDefs, double approxAbsMsPosition)
         {
             int nearestAbsUIDEndMsPosition = 0;

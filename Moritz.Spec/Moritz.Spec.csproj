@@ -52,6 +52,8 @@
     <Compile Include="Bar.cs" />
     <Compile Include="CarryMsgs.cs" />
     <Compile Include="FortePitchClassSet.cs" />
+    <Compile Include="Gamut.cs" />
+    <Compile Include="GamutVector.cs" />
     <Compile Include="ModeProximity.cs" />
     <Compile Include="MidiMsg.cs" />
     <Compile Include="MidiRestDef.cs" />
@@ -65,6 +67,8 @@
     <Compile Include="MsValues.cs" />
     <Compile Include="NoteTrigger.cs" />
     <Compile Include="InputRestDef.cs" />
+    <Compile Include="PitchWeight.cs" />
+    <Compile Include="PitchWeightVector.cs" />
     <Compile Include="Seq.cs" />
     <Compile Include="SeqRef.cs" />
     <Compile Include="CautionaryChordDef.cs" />

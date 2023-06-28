@@ -44,6 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
+    <Compile Include="Study4\GetStudy4GamutVector.cs" />
+    <Compile Include="Study4\GetTrksAndBarlines.cs" />
+    <Compile Include="Study4\Study4Algorithm.cs" />
+    <Compile Include="Study4\Study4Tests.cs" />
     <Compile Include="ThreeCrashes\ThreeCrashes.cs" />
     <Compile Include="ErratumMusical\ErratumMusical.cs" />
     <Compile Include="Pianola Music\PianolaMusicAlgorithm.cs" />
@@ -52,6 +56,8 @@
     <Compile Include="Study 2\Study2Algorithm.cs" />
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
+    <Compile Include="Tombeau 1\GetAllPermutations.cs" />
+    <Compile Include="Tombeau 1\GetTrksAndBarlines.cs" />
     <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>

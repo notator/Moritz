@@ -555,6 +555,79 @@ namespace Moritz.Globals
 
         #endregion float lists
 
+
+        /// <summary>
+        /// Used to populate the Inversions lists
+        /// </summary>
+        private class IntervalPositionDistance
+        {
+            public IntervalPositionDistance(byte value, int position)
+            {
+                Value = value;
+                Position = (float)position;
+            }
+            public readonly byte Value;
+            public readonly float Position;
+            public float Distance = 0;
+        }
+
+        private static int Compare(IntervalPositionDistance ipd1, IntervalPositionDistance ipd2)
+        {
+            int rval = 0;
+            if(ipd1.Distance > ipd2.Distance)
+                rval = 1;
+            else if(ipd1.Distance == ipd2.Distance)
+                rval = 0;
+            else if(ipd1.Distance < ipd2.Distance)
+                rval = -1;
+            return rval;
+        }
+        
+        /// <summary>
+         /// Returns a list of byteLists whose first byteList is inversion0.
+         /// If inversion0 is null or inversion0.Count == 0, the returned list of intlists is empty, otherwise
+         /// If inversion0.Count == 1, the contained byteList is simply inversion0, otherwise
+         /// The returned list of byteLists has a Count of (n-1)*2, where n is the Count of inversion0.
+         /// </summary>
+         /// <param name="inversion0"></param>
+         /// <returns></returns>
+        public static List<List<byte>> GetLinearMatrix(List<byte> inversion0)
+        {
+            List<List<byte>> inversions = new List<List<byte>>();
+            if(inversion0 != null && inversion0.Count != 0)
+            {
+                if(inversion0.Count == 1)
+                    inversions.Add(inversion0);
+                else
+                {
+
+                    List<IntervalPositionDistance> ipdList = new List<IntervalPositionDistance>();
+                    for(byte i = 0; i < inversion0.Count; i++)
+                    {
+                        IntervalPositionDistance ipd = new IntervalPositionDistance(inversion0[i], i);
+                        ipdList.Add(ipd);
+                    }
+                    // ipdList is a now representaion of the field, now calculate the interval hierarchy per inversion
+                    for(float pos = 0.25F; pos < (float)inversion0.Count - 1; pos += 0.5F)
+                    {
+                        List<IntervalPositionDistance> newIpdList = new List<IntervalPositionDistance>(ipdList);
+                        foreach(IntervalPositionDistance ipd in newIpdList)
+                        {
+                            ipd.Distance = ipd.Position - pos;
+                            ipd.Distance = ipd.Distance > 0 ? ipd.Distance : ipd.Distance * -1;
+                        }
+                        newIpdList.Sort(Compare);
+                        List<byte> intervalList = new List<byte>();
+                        foreach(IntervalPositionDistance ipd in newIpdList)
+                            intervalList.Add(ipd.Value);
+                        inversions.Add(intervalList);
+                    }
+                    // the intervalList for a particular inversionIndex is now inversions[inversionIndex]
+                }
+            }
+            return inversions;
+        }
+
         /// <summary>
         /// Converts a string containing byte values separated by whitescape and the character in arg2
         /// to the corresponding list of bytes.
@@ -729,6 +802,17 @@ namespace Moritz.Globals
                 rval = value;
 
             return (byte)rval;
+        }
+
+        public static List<byte> MidiList(List<int> values)
+        {
+            List<byte> rval = new List<byte>();
+            foreach(int val in values)
+            {
+                Debug.Assert(val >= 0 && val <= 127);
+                rval.Add((byte)val);
+            }
+            return rval;
         }
 
         /// <summary>

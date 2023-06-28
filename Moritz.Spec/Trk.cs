@@ -146,9 +146,10 @@ namespace Moritz.Spec
 
             foreach(IUniqueDef iu2 in trk2.UniqueDefs)
             {
-                IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
+                IUniqueDef lastIud = (_uniqueDefs.Count > 0) ? _uniqueDefs[_uniqueDefs.Count - 1] : null;
                 IUniqueDef clonedIUD = (IUniqueDef)iu2.Clone();
-                if(lastIud is RestDef finalRestDef && clonedIUD is RestDef restDef2)
+
+                if(_uniqueDefs.Count > 0 && (lastIud is RestDef finalRestDef && clonedIUD is RestDef restDef2))
                 {
                     finalRestDef.MsDuration += restDef2.MsDuration;
                 }

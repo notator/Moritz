@@ -1,36 +1,44 @@
-﻿using Krystals5ObjectLibrary;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
+using Krystals5ObjectLibrary;
+using Moritz.Globals;
 using Moritz.Palettes;
 using Moritz.Spec;
 using Moritz.Symbols;
 
-using System.Collections.Generic;
-using System.Diagnostics;
-
 namespace Moritz.Algorithm.Tombeau1
 {
-    public partial class Tombeau1Algorithm : CompositionAlgorithm
-    {
-        public Tombeau1Algorithm()
-            : base()
-        {
-            CheckParameters();
-        }
+	public partial class Tombeau1Algorithm : CompositionAlgorithm
+	{
+		public Tombeau1Algorithm()
+			: base()
+		{
+			CheckParameters();
+		}
 
-        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
-        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
-        public override int NumberOfBars { get { return 50; } }
+		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
+		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
+		public override int NumberOfBars { get { return 120; } }
+		public override IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>() { 0, 24, 48, 72, 96 }; } }
 
-        /// <summary>
-        /// See CompositionAlgorithm.DoAlgorithm()
-        /// </summary>
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
-        {
-            _krystals = krystals;
-            _palettes = palettes;
+		/// <summary>
+		/// See CompositionAlgorithm.DoAlgorithm()
+		/// </summary>
+		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+		{
+			_krystals = krystals;
+			_palettes = palettes;
 
-            #region main comment (thoughts etc.)
-            /*********************************************************************************************
+			/*************************/
+			/*  note these functions */
+			//Envelope basedEnvelope = _krystals[1].ToEnvelope(0, 127); // values increase gradually from 0 to 127, becoming more eccentric.
+			//Envelope centredEnvelope = _krystals[0].ToEnvelope(0, 127); // values distributed around 11, gradually becoming more eccentric
+			/*************************/
+
+			#region main comment (thoughts etc.)
+			/*********************************************************************************************
 			Think Nancarrow: Mechanical Piano music... outside the notation system... outside the management system...
 			Think Webern Piano Variations. Phrases, envelope counterpoint...
 			Think Study 1: background/foreground, depth.
@@ -114,26 +122,50 @@ namespace Moritz.Algorithm.Tombeau1
 
 			Instead of using Modes in Tombeau 1, I want to implement something like "passing notes" in voices that link particular,
 			freely chosen, recognizable harmonies. To be recognisable, harmonies have to be both clearly recognizable and perceptibly
-			repeated! Better to choose particular harmonies by ear than rely on some theoretical distance... We'll see.
+			repeated! Better to choose particular, memorable harmonies by ear than rely on some theoretical distance...
 			
-			The first thing to do is create a specialized Trk class (ChainTrk) that contains IUniqueDefs that move stepwise,
-			according to some envelope, between start and end pitches.
+			Create three things:
+			1.	a specialized Trk class (ChainTrk) that contains IUniqueDefs that move stepwise, according to some envelope,
+				between start and end pitches.
 					a) the start and end pitches must be defined - even if they are not actually performed
 					b) the pitch envelope is freely definable, and may exceed the range defined by the target pitches
 						(the pitches in the chains may be microtonal).
 					c) the duration envelope is freely definable.
-					d) it should be possible to replace any MidiChordDef in a Chain by a MidiRestDef.
+					d) it should be possible to replace any MidiChordDef, or sequence of MidiChordDefs, in a Chain by a MidiRestDef
+					   or an ornamented MidiChordDef.
+					   -- if current MidiChordDefs are too short to display, they can be agglommerated using the following,
+					   constructor (that already exists):
+							MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs, string ornamentText)
+		    
+			2.	a MidiChordDefPalette of chords that will be used as anchor points in the piece. The pitches in these chords will
+				be used as the end-points of the ChainTrks.
+				Possibly use a second instument (say an organ or clarinet) quietly in the background, to underline the harmonic
+				progression... That would mean creating a new SoundFont for the ResidentSf2Synth to load.
+
+			3.	a basic chord progression that will later be joined by chainTrks. This basic chord progression could be the subject
+				of a set of variations and transformations. It could, for example, be repeated, made polyphonic and/or varied in
+				some way. It could also be organized by krystal (i.e. a single sequence, selected by krystal, from the
+				MidiChordDefPalette for the whole piece). However, I want to use the repeat capability (maybe in addition)...
+				So:
+					a) Construct the main, outer Harmonic progression using up to 7 pitches per chord.
+					b) Construct the main Seq using the harmonic progression in a). Note that each Trk MidiChordDef might have more
+					   than one pitch, but that the ChainTrk can only consist of a single MidiChordDef sequence. Can ChainTrks be
+					   powerful enough to do that? In particular, can they be constructed with different chord structures at the
+					   beginning and end?
+					c) To make the progression polyphonic, introduce intermediary harmonic knots, linking some Trks at some points.
+					   The "intermediary" chords can be closely related to the other harmonies/intervals...
+				
 
             ****************************************************************************/
-            #endregion main comment (thoughts etc.)
-            #region MoritzStatics functions
-            /***************************************************************************
+			#endregion main comment (thoughts etc.)
+			#region MoritzStatics functions
+			/***************************************************************************
             public static Moritz.Statics functions relating to pitch hierarchies and velocities:
                 GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
             ***************************************************************************/
-            #endregion MoritzStatics functions
-            #region Envelope functions
-            /***************************************************************************
+			#endregion MoritzStatics functions
+			#region Envelope functions
+			/***************************************************************************
             public Envelope functions that have been implemented:
                 constructors:
                 Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
@@ -148,9 +180,9 @@ namespace Moritz.Algorithm.Tombeau1
                 TimeWarp(List<int> originalMsPositions, double distortion)
                 GetValuePerMsPosition(List<int> msPositions) // Returns a dictionary in which: Key is one of the positions in msPositions, Value is the envelope value at that msPosition.
             ***************************************************************************/
-            #endregion Envelope functions
-            #region Mode functions
-            /***************************************************************************
+			#endregion Envelope functions
+			#region Mode functions
+			/***************************************************************************
             public Mode functions and properties that have been implemented:
                 (Mode is immutable)
                 constructor:
@@ -174,9 +206,9 @@ namespace Moritz.Algorithm.Tombeau1
                 List {get;} // a copy of the private list.
                 Count {get;}            
 			***************************************************************************/
-            #endregion Mode functions
-            #region MidiChordDef functions
-            /***************************************************************************            
+			#endregion Mode functions
+			#region MidiChordDef functions
+			/***************************************************************************            
             public MidiChordDef functions that have been implemented and are especially relevant to this project:
                 constructors:
                 SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
@@ -215,9 +247,9 @@ namespace Moritz.Algorithm.Tombeau1
 
                 Mode {get; set;} // The Mode can only be set (or changed) if all the pitches in the MidiChordDef are in the new Mode.
             ***************************************************************************/
-            #endregion MidiChordDef functions
-            #region Trk functions
-            /***************************************************************************            
+			#endregion MidiChordDef functions
+			#region Trk functions
+			/***************************************************************************            
             public Trk functions that have been implemented and are especially relevant to this project:
             constructors:
                 Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
@@ -302,9 +334,9 @@ namespace Moritz.Algorithm.Tombeau1
                 MasterVolume // Algorithms must set this value in the first Trk in each midiChannel in the score. (Default is null.)
 
             ***************************************************************************/
-            #endregion Trk functions
-            #region Seq functions
-            /***************************************************************************            
+			#endregion Trk functions
+			#region Seq functions
+			/***************************************************************************            
             public Seq functions that have been implemented and are especially relevant to this project:
                 constructors:
                 Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
@@ -340,9 +372,9 @@ namespace Moritz.Algorithm.Tombeau1
                 MidiChannelPerOutputVoice { get; }
 
             ***************************************************************************/
-            #endregion Seq functions
-            #region Block functions
-            /***************************************************************************            
+			#endregion Seq functions
+			#region Block functions
+			/***************************************************************************            
             public Block functions that have been implemented and are especially relevant to this project:
                 constructors:
                 Block(Seq seq, List<int> rightBarlineMsPositions)
@@ -370,358 +402,297 @@ namespace Moritz.Algorithm.Tombeau1
                 InputVoiceDefs { get; }
 
             ***************************************************************************/
-            #endregion Block functions
+			#endregion Block functions
 
-            Envelope centredEnvelope = _krystals[0].ToEnvelope(0, 127); // values distributed around 64, gradually becoming more eccentric
-            Envelope basedEnvelope = _krystals[1].ToEnvelope(0, 127); // values increase gradually from 0 to 127, becoming more eccentric. 
+			//GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
+			GetTrksAndBarlines1(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
-            /**********************************************/
+			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
-            List<IUniqueDef> trk0iuds = new List<IUniqueDef>();
-            for(int i = 0; i < 50; i++)
-            {
-                trk0iuds.Add(new MidiChordDef(new List<byte>() { 64 }, new List<byte>() { 64 }, 5000, true));
-            }
+			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
+			FinalizeMainSeq(mainSeq);
 
-            Trk trk0 = new Trk(0, 0, trk0iuds);
-            Trk trk1 = new Trk(1, 0, new List<IUniqueDef>());
-            Trk trk2 = new Trk(2, 0, new List<IUniqueDef>());
-            Trk trk3 = new Trk(3, 0, new List<IUniqueDef>());
+			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
-            var trks = new List<Trk>() { trk0, trk1, trk2, trk3 };
+			return bars;
+		}
 
-            Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
+		public override ScoreData SetScoreRegionsData(List<Bar> bars)
+		{
+			List<(int index, int msPosition)> regionBorderlines = GetRegionBarlineIndexMsPosList(bars);
 
-            List<int> barlineMsPositions = GetBarlinePositions(trk0iuds);
+			// Each regionBorderline consists of a bar's index and its msPositionInScore.
+			// The finalBarline is also included, so regionBorderlines.Count is 1 + RegionStartBarIndices.Count.
 
-            //Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
-            FinalizeMainSeq(mainSeq);
+			RegionDef rd1 = new RegionDef("A", regionBorderlines[0], regionBorderlines[1]);
+			RegionDef rd2 = new RegionDef("B", regionBorderlines[1], regionBorderlines[3]);
+			RegionDef rd3 = new RegionDef("C", regionBorderlines[1], regionBorderlines[2]);
+			RegionDef rd4 = new RegionDef("D", regionBorderlines[3], regionBorderlines[5]);
+			RegionDef rd5 = new RegionDef("E", regionBorderlines[4], regionBorderlines[5]);
 
-            List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
+			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5 };
 
-            return bars;
-        }
+			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCADEA");
 
-        public override ScoreData SetScoreRegionsData(List<Bar> bars)
-        {
-            Dictionary<int, (int index, int msPosition)> msPosPerBarlineIndexDict = GetMsPosPerBarlineIndexDict(bars);
+			ScoreData scoreData = new ScoreData(regionSequence);
 
-            // Each barline is the left barline of the bar with the same index.
-            // The finalBarline has also been added to the Dictionary, so
-            // msPosPerBarlineIndexDict.Count is 1 + bars.Count.
-            var barline0 = msPosPerBarlineIndexDict[0];
-            var barline6 = msPosPerBarlineIndexDict[6];
-            var barline16 = msPosPerBarlineIndexDict[16];
-            var barline31 = msPosPerBarlineIndexDict[31];
-            var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
+			return scoreData;
+		}
 
-            RegionDef rd1 = new RegionDef("A", barline0, barline6);
-            RegionDef rd2 = new RegionDef("B", barline6, barline31);
-            RegionDef rd3 = new RegionDef("C", barline6, barline16);
-            RegionDef rd4 = new RegionDef("D", barline31, finalBarline);
+		#region available Trk transformations
+		// Add();
+		// AddRange();
+		// AdjustChordMsDurations();
+		// AdjustExpression();
+		// AdjustVelocities();
+		// AdjustVelocitiesHairpin();
+		// AlignObjectAtIndex();
+		// CreateAccel();
+		// FindIndexAtMsPositionReFirstIUD();
+		// Insert();
+		// InsertRange();
+		// Permute();
+		// Remove();
+		// RemoveAt();
+		// RemoveBetweenMsPositions();
+		// RemoveRange();
+		// RemoveScorePitchWheelCommands();
+		// Replace();
+		// SetDurationsFromPitches();
+		// SetPanGliss(0, subT.MsDuration, 0, 127);
+		// SetPitchWheelDeviation();
+		// SetPitchWheelSliders();
+		// SetVelocitiesFromDurations();
+		// SetVelocityPerAbsolutePitch();
+		// TimeWarp();
+		// Translate();
+		// Transpose();
+		// TransposeStepsInModeGamut();
+		// TransposeToRootInModeGamut();
+		#endregion available Trk transformations
 
-            List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };
+		/// <summary>
+		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
+		/// The compulsory final barline (at the end of the final ModeSegment) IS included in the returned list.
+		/// There is a barline at the end of each voice1 modeSegment.
+		/// All the returned barline positions are unique, and in ascending order.
+		/// </summary>
+		private List<int> GetBarlinePositions(List<IUniqueDef> trk0iuds)
+		{
+			//var msValuesListList = voice1.GetMsValuesOfModeGrpTrks();
 
-            RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCAD");
+			List<int> barlinePositions = new List<int>();
+			int currentPosition = 0;
+			foreach(IUniqueDef iud in trk0iuds)
+			{
+				currentPosition += iud.MsDuration;
+				barlinePositions.Add(currentPosition);
+			}
 
-            ScoreData scoreData = new ScoreData(regionSequence);
+			// add further barlines here, maybe using a list provided as an argument.
 
-            return scoreData;
-        }
+			// old code:
+			//foreach(IReadOnlyList<MsValues> msValuesList in msValuesListList)
+			//{
+			//	foreach(MsValues msValues in msValuesList)
+			//	{
+			//		barlinePositions.Add(msValues.EndMsPosition);
+			//	}
+			//}
 
-        /// <summary>
-        /// Returns a dictionary containing (barlineIndex, (barlineIndex, barlineMsPosition)) KeyValuePairs.
-        /// Each barlineIndex is the index of the left barline of the bar with the same index, so the first KeyValuePair
-        /// is (0,(0,0)). The finalBarline is also added to the returned dictionary, so its Count is 1 + bars.Count.
-        /// The data for the final barline in the score is in the final entry.
-        /// </summary>
-        private Dictionary<int, (int index, int msPosition)> GetMsPosPerBarlineIndexDict(List<Bar> bars)
-        {
-            var rval = new Dictionary<int, (int index, int msPosition)>();
+			return barlinePositions;
+		}
 
-            int barlineMsPos = 0;
-            int barsCount = bars.Count;
-            for(int i = 0; i < barsCount; ++i)
-            {
-                var tuple = (index: i, msPosition: barlineMsPos);
-                rval.Add(i, tuple);
-                barlineMsPos += bars[i].MsDuration;
-            }
-            rval.Add(barsCount, (index: barsCount, msPosition: barlineMsPos));
+		/// <summary>
+		/// Pad empty Trks with a single MidiRestDef.
+		/// Also, do other global changes that affect the whole piece here (accel., rit, transpositions etc.).
+		/// </summary>
+		private void FinalizeMainSeq(Seq mainSeq)
+		{
+			mainSeq.PadEmptyTrks();
+		}
 
-            return rval;
-        }
+		/// <summary>
+		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
+		{
+			return null;
+		}
 
-        #region available Trk and ModeGrpTrk transformations
-        // Add();
-        // AddRange();
-        // AdjustChordMsDurations();
-        // AdjustExpression();
-        // AdjustVelocities();
-        // AdjustVelocitiesHairpin();
-        // AlignObjectAtIndex();
-        // CreateAccel();
-        // FindIndexAtMsPositionReFirstIUD();
-        // Insert();
-        // InsertRange();
-        // Permute();
-        // Remove();
-        // RemoveAt();
-        // RemoveBetweenMsPositions();
-        // RemoveRange();
-        // RemoveScorePitchWheelCommands();
-        // Replace();
-        // SetDurationsFromPitches();
-        // SetPanGliss(0, subT.MsDuration, 0, 127);
-        // SetPitchWheelDeviation();
-        // SetPitchWheelSliders();
-        // SetVelocitiesFromDurations();
-        // SetVelocityPerAbsolutePitch();
-        // TimeWarp();
-        // Translate();
-        // Transpose();
-        // TransposeStepsInModeGamut();
-        // TransposeToRootInModeGamut();
-        #endregion available Trk and ModeGrpTrk transformations
+		#region private properties for use by Tombeau1Algorithm
+		#region envelopes
+		/// <summary>
+		/// If domain is null, the returned shape will come from the _sliderShapesLong list. 
+		/// </summary>
+		/// <param name="domain">null, or in range 2..7</param>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private IReadOnlyList<byte> SliderShape(int? domain, int index)
+		{
+			if(domain != null)
+			{
+				Debug.Assert(domain > 1 && domain < 8);
+			}
+			IReadOnlyList<byte> rval = null;
+			switch(domain)
+			{
+				case 2:
+					Debug.Assert(index < _sliderShapes2.Count);
+					rval = _sliderShapes2[index];
+					break;
+				case 3:
+					Debug.Assert(index < _sliderShapes3.Count);
+					rval = _sliderShapes3[index];
+					break;
+				case 4:
+					Debug.Assert(index < _sliderShapes4.Count);
+					rval = _sliderShapes4[index];
+					break;
+				case 5:
+					Debug.Assert(index < _sliderShapes5.Count);
+					rval = _sliderShapes5[index];
+					break;
+				case 6:
+					Debug.Assert(index < _sliderShapes6.Count);
+					rval = _sliderShapes6[index];
+					break;
+				case 7:
+					Debug.Assert(index < _sliderShapes7.Count);
+					rval = _sliderShapes7[index];
+					break;
+				case null:
+					Debug.Assert(index < _sliderShapesLong.Count);
+					rval = _sliderShapesLong[index];
+					break;
+			}
+			return rval;
+		}
+		private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes2 = new List<List<byte>>()
+			{
+				{ new List<byte>() {64, 0} },
+				{ new List<byte>() {64, 18} },
+				{ new List<byte>() {64, 36} },
+				{ new List<byte>() {64, 54} },
+				{ new List<byte>() {64, 72} },
+				{ new List<byte>() {64, 91} },
+				{ new List<byte>() {64, 109} },
+				{ new List<byte>() {64, 127} }
+			};
+		private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes3 = new List<List<byte>>()
+			{
+				{ new List<byte>() {64, 0, 64} },
+				{ new List<byte>() {64, 18, 64} },
+				{ new List<byte>() {64, 36, 64} },
+				{ new List<byte>() {64, 54, 64} },
+				{ new List<byte>() {64, 72, 64} },
+				{ new List<byte>() {64, 91, 64} },
+				{ new List<byte>() {64, 109, 64} },
+				{ new List<byte>() {64, 127, 64} }
+			};
+		private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes4 = new List<List<byte>>()
+			{
+				{ new List<byte>() {64, 0, 64, 64} },
+				{ new List<byte>() {64, 22, 64, 64} },
+				{ new List<byte>() {64, 22, 96, 64} },
+				{ new List<byte>() {64, 64, 0, 64} },
+				{ new List<byte>() {64, 64, 22, 64} },
+				{ new List<byte>() {64, 64, 80, 64} },
+				{ new List<byte>() {64, 80, 64, 64} },
+				{ new List<byte>() {64, 96, 22, 64 } }
+			};
+		private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes5 = new List<List<byte>>()
+			{
+				{ new List<byte>() {64, 50, 72, 50, 64} },
+				{ new List<byte>() {64, 64, 0, 64, 64} },
+				{ new List<byte>() {64, 64, 64, 80, 64} },
+				{ new List<byte>() {64, 64, 64, 106, 64} },
+				{ new List<byte>() {64, 64, 127, 64, 64} },
+				{ new List<byte>() {64, 70, 35, 105, 64} },
+				{ new List<byte>() {64, 72, 50, 70, 64} },
+				{ new List<byte>() {64, 80, 64, 64, 64} },
+				{ new List<byte>() {64, 105, 35, 70, 64} },
+				{ new List<byte>() {64, 106, 64, 64, 64} }
+			};
+		private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes6 = new List<List<byte>>()
+			{
+				{ new List<byte>() {64, 22, 43, 64, 64, 64} },
+				{ new List<byte>() {64, 30, 78, 64, 40, 64} },
+				{ new List<byte>() {64, 40, 64, 78, 30, 64} },
+				{ new List<byte>() {64, 43, 106, 64, 64, 64} },
+				{ new List<byte>() {64, 64, 64, 43, 22, 64} },
+				{ new List<byte>() {64, 64, 64, 64, 106, 64} },
+				{ new List<byte>() {64, 64, 64, 64, 127, 64} },
+				{ new List<byte>() {64, 64, 64, 106, 43, 64} },
+				{ new List<byte>() {64, 106, 64, 64, 64, 64} },
+				{ new List<byte>() {64, 127, 127, 22, 64, 64} }
+			};
+		private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes7 = new List<List<byte>>()
+			{
+				{ new List<byte>() {64, 0, 0, 106, 106, 64, 64} },
+				{ new List<byte>() {64, 28, 68, 48, 108, 88, 64} },
+				{ new List<byte>() {64, 40, 20, 80, 60, 100, 64} },
+				{ new List<byte>() {64, 55, 50, 75, 50, 64, 64} },
+				{ new List<byte>() {64, 64, 64, 64, 64, 32, 64} },
+				{ new List<byte>() {64, 64, 50, 75, 50, 55, 64} },
+				{ new List<byte>() {64, 73, 78, 53, 78, 64, 64} },
+				{ new List<byte>() {64, 85, 64, 106, 64, 127, 64} },
+				{ new List<byte>() {64, 88, 108, 48, 68, 28, 64} },
+				{ new List<byte>() {64, 100, 60, 80, 20, 40, 64} },
+				{ new List<byte>() {64, 127, 127, 64, 64, 64, 64} }
+			};
+		private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapesLong = new List<List<byte>>()
+			{
+				{ new List<byte>() {64, 0, 64, 96, 127, 30, 0, 64} },
+				{ new List<byte>() {64, 64, 64, 127, 64, 106, 43, 64} },
+				{ new List<byte>() {64, 64, 43, 43, 64, 64, 85, 22, 64} },
+				{ new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 64} },
+				{ new List<byte>() {64, 80, 64, 92, 64, 64, 64, 98, 64} },
+				{ new List<byte>() {64, 98, 64, 64, 64, 92, 64, 80, 64} },
+				{ new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 127, 0, 64, 64} },
+				{ new List<byte>() {64, 64, 64, 64, 64, 64, 64, 64, 64, 100, 50, 100} },
+				{ new List<byte>() {64, 64, 64, 64, 64, 64, 64, 64, 64, 127, 43, 127, 64} },
+				{ new List<byte>() {64, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} },
+				{ new List<byte>() {64, 64, 64, 64, 64, 64, 64, 127, 43, 127, 64, 127, 43, 127, 64} },
+				{ new List<byte>() {64, 127, 43, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} },
+				{ new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 127, 64, 0, 64, 127, 64, 0, 64} },
+				{ new List<byte>() {64, 127, 64, 64, 0, 64, 127, 0, 64, 127, 64, 0, 64, 127, 64, 0, 64} },
+				{ new List<byte>() {64, 127, 43, 127, 43, 127, 64, 127, 43, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} }
+			};
+		#endregion envelopes
+		#region duration modi
+		private static IReadOnlyList<IReadOnlyList<int>> _durationModi = new List<List<int>>()
+		{
+			_durations1, _durations2, _durations3, _durations4, _durations5,_durations6,
+			_durations7, _durations8, _durations9, _durations10, _durations11, _durations12
 
-        /// <summary>
-        /// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
-        /// The compulsory final barline (at the end of the final ModeSegment) IS included in the returned list.
-        /// There is a barline at the end of each voice1 modeSegment.
-        /// All the returned barline positions are unique, and in ascending order.
-        /// </summary>
-        private List<int> GetBarlinePositions(List<IUniqueDef> trk0iuds)
-        {
-            //var msValuesListList = voice1.GetMsValuesOfModeGrpTrks();
+		};
+		private static List<int> _durations1 = new List<int>()
+			{   1000 };
+		private static List<int> _durations2 = new List<int>()
+			{   1000, 707 }; // 1 / ( 2^(1 / 2) )
+		private static List<int> _durations3 = new List<int>()
+			{   1000, 794, 630 }; // 1 / ( 2^(1 / 3) )
+		private static List<int> _durations4 = new List<int>()
+			{   1000, 841, 707, 595 }; // 1 / ( 2^(1 / 4) )
+		private static List<int> _durations5 = new List<int>()
+			{   1000, 871, 758, 660, 574 }; // 1 / ( 2^(1 / 5) )
+		private static List<int> _durations6 = new List<int>()
+			{   1000, 891, 794, 707, 630, 561 }; // 1 / ( 2^(1 / 6) )
+		private static List<int> _durations7 = new List<int>()
+			{   1000, 906, 820, 743, 673, 610, 552 }; // 1 / ( 2^(1 / 7) )
+		private static List<int> _durations8 = new List<int>()
+			{   1000, 917, 841, 771, 707, 648, 595, 545}; // 1 / ( 2^(1 / 8) )
+		private static List<int> _durations9 = new List<int>()
+			{   1000, 926, 857, 794, 735, 680, 630, 583, 540}; // 1 / ( 2^(1 / 9) )
+		private static List<int> _durations10 = new List<int>()
+			{   1000, 933, 871, 812, 758, 707, 660, 616, 574, 536}; // 1 / ( 2^(1 / 10) )
+		private static List<int> _durations11 = new List<int>()
+			{   1000, 939, 882, 828, 777, 730, 685, 643, 604, 567, 533 }; // 1 / ( 2^(1 / 11) )
+		private static List<int> _durations12 = new List<int>()
+			{   1000, 944, 891, 841, 794, 749, 707, 667, 630, 595, 561, 530 }; // 1 / ( 2^(1 / 12) )
 
-            List<int> barlinePositions = new List<int>();
-            int currentPosition = 0;
-            foreach(IUniqueDef iud in trk0iuds)
-            {
-                currentPosition += iud.MsDuration;
-                barlinePositions.Add(currentPosition);
-            }
-
-            // add further barlines here, maybe using a list provided as an argument.
-
-            // old code:
-            //foreach(IReadOnlyList<MsValues> msValuesList in msValuesListList)
-            //{
-            //	foreach(MsValues msValues in msValuesList)
-            //	{
-            //		barlinePositions.Add(msValues.EndMsPosition);
-            //	}
-            //}
-
-            return barlinePositions;
-        }
-
-        private void RemoveDuplicates(List<int> barlinePositions)
-        {
-            for(int i = barlinePositions.Count - 1; i > 0; --i)
-            {
-                int iPos = barlinePositions[i];
-                for(int j = i - 1; j >= 0; j--)
-                {
-                    if(iPos == barlinePositions[j])
-                    {
-                        barlinePositions.RemoveAt(i);
-                        break;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Pad empty Trks with a single MidiRestDef.
-        /// Also, do other global changes that affect the whole piece here (accel., rit, transpositions etc.).
-        /// </summary>
-        private void FinalizeMainSeq(Seq mainSeq)
-        {
-            mainSeq.PadEmptyTrks();
-        }
-
-        /// <summary>
-        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
-        /// </summary>
-        protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-        {
-            return null;
-        }
-
-        #region private properties for use by Tombeau1Algorithm
-        #region envelopes
-        /// <summary>
-        /// If domain is null, the returned shape will come from the _sliderShapesLong list. 
-        /// </summary>
-        /// <param name="domain">null, or in range 2..7</param>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private IReadOnlyList<byte> SliderShape(int? domain, int index)
-        {
-            if(domain != null)
-            {
-                Debug.Assert(domain > 1 && domain < 8);
-            }
-            IReadOnlyList<byte> rval = null;
-            switch(domain)
-            {
-                case 2:
-                    Debug.Assert(index < _sliderShapes2.Count);
-                    rval = _sliderShapes2[index];
-                    break;
-                case 3:
-                    Debug.Assert(index < _sliderShapes3.Count);
-                    rval = _sliderShapes3[index];
-                    break;
-                case 4:
-                    Debug.Assert(index < _sliderShapes4.Count);
-                    rval = _sliderShapes4[index];
-                    break;
-                case 5:
-                    Debug.Assert(index < _sliderShapes5.Count);
-                    rval = _sliderShapes5[index];
-                    break;
-                case 6:
-                    Debug.Assert(index < _sliderShapes6.Count);
-                    rval = _sliderShapes6[index];
-                    break;
-                case 7:
-                    Debug.Assert(index < _sliderShapes7.Count);
-                    rval = _sliderShapes7[index];
-                    break;
-                case null:
-                    Debug.Assert(index < _sliderShapesLong.Count);
-                    rval = _sliderShapesLong[index];
-                    break;
-            }
-            return rval;
-        }
-        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes2 = new List<List<byte>>()
-            {
-                { new List<byte>() {64, 0} },
-                { new List<byte>() {64, 18} },
-                { new List<byte>() {64, 36} },
-                { new List<byte>() {64, 54} },
-                { new List<byte>() {64, 72} },
-                { new List<byte>() {64, 91} },
-                { new List<byte>() {64, 109} },
-                { new List<byte>() {64, 127} }
-            };
-        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes3 = new List<List<byte>>()
-            {
-                { new List<byte>() {64, 0, 64} },
-                { new List<byte>() {64, 18, 64} },
-                { new List<byte>() {64, 36, 64} },
-                { new List<byte>() {64, 54, 64} },
-                { new List<byte>() {64, 72, 64} },
-                { new List<byte>() {64, 91, 64} },
-                { new List<byte>() {64, 109, 64} },
-                { new List<byte>() {64, 127, 64} }
-            };
-        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes4 = new List<List<byte>>()
-            {
-                { new List<byte>() {64, 0, 64, 64} },
-                { new List<byte>() {64, 22, 64, 64} },
-                { new List<byte>() {64, 22, 96, 64} },
-                { new List<byte>() {64, 64, 0, 64} },
-                { new List<byte>() {64, 64, 22, 64} },
-                { new List<byte>() {64, 64, 80, 64} },
-                { new List<byte>() {64, 80, 64, 64} },
-                { new List<byte>() {64, 96, 22, 64 } }
-            };
-        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes5 = new List<List<byte>>()
-            {
-                { new List<byte>() {64, 50, 72, 50, 64} },
-                { new List<byte>() {64, 64, 0, 64, 64} },
-                { new List<byte>() {64, 64, 64, 80, 64} },
-                { new List<byte>() {64, 64, 64, 106, 64} },
-                { new List<byte>() {64, 64, 127, 64, 64} },
-                { new List<byte>() {64, 70, 35, 105, 64} },
-                { new List<byte>() {64, 72, 50, 70, 64} },
-                { new List<byte>() {64, 80, 64, 64, 64} },
-                { new List<byte>() {64, 105, 35, 70, 64} },
-                { new List<byte>() {64, 106, 64, 64, 64} }
-            };
-        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes6 = new List<List<byte>>()
-            {
-                { new List<byte>() {64, 22, 43, 64, 64, 64} },
-                { new List<byte>() {64, 30, 78, 64, 40, 64} },
-                { new List<byte>() {64, 40, 64, 78, 30, 64} },
-                { new List<byte>() {64, 43, 106, 64, 64, 64} },
-                { new List<byte>() {64, 64, 64, 43, 22, 64} },
-                { new List<byte>() {64, 64, 64, 64, 106, 64} },
-                { new List<byte>() {64, 64, 64, 64, 127, 64} },
-                { new List<byte>() {64, 64, 64, 106, 43, 64} },
-                { new List<byte>() {64, 106, 64, 64, 64, 64} },
-                { new List<byte>() {64, 127, 127, 22, 64, 64} }
-            };
-        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes7 = new List<List<byte>>()
-            {
-                { new List<byte>() {64, 0, 0, 106, 106, 64, 64} },
-                { new List<byte>() {64, 28, 68, 48, 108, 88, 64} },
-                { new List<byte>() {64, 40, 20, 80, 60, 100, 64} },
-                { new List<byte>() {64, 55, 50, 75, 50, 64, 64} },
-                { new List<byte>() {64, 64, 64, 64, 64, 32, 64} },
-                { new List<byte>() {64, 64, 50, 75, 50, 55, 64} },
-                { new List<byte>() {64, 73, 78, 53, 78, 64, 64} },
-                { new List<byte>() {64, 85, 64, 106, 64, 127, 64} },
-                { new List<byte>() {64, 88, 108, 48, 68, 28, 64} },
-                { new List<byte>() {64, 100, 60, 80, 20, 40, 64} },
-                { new List<byte>() {64, 127, 127, 64, 64, 64, 64} }
-            };
-        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapesLong = new List<List<byte>>()
-            {
-                { new List<byte>() {64, 0, 64, 96, 127, 30, 0, 64} },
-                { new List<byte>() {64, 64, 64, 127, 64, 106, 43, 64} },
-                { new List<byte>() {64, 64, 43, 43, 64, 64, 85, 22, 64} },
-                { new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 64} },
-                { new List<byte>() {64, 80, 64, 92, 64, 64, 64, 98, 64} },
-                { new List<byte>() {64, 98, 64, 64, 64, 92, 64, 80, 64} },
-                { new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 127, 0, 64, 64} },
-                { new List<byte>() {64, 64, 64, 64, 64, 64, 64, 64, 64, 100, 50, 100} },
-                { new List<byte>() {64, 64, 64, 64, 64, 64, 64, 64, 64, 127, 43, 127, 64} },
-                { new List<byte>() {64, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} },
-                { new List<byte>() {64, 64, 64, 64, 64, 64, 64, 127, 43, 127, 64, 127, 43, 127, 64} },
-                { new List<byte>() {64, 127, 43, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} },
-                { new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 127, 64, 0, 64, 127, 64, 0, 64} },
-                { new List<byte>() {64, 127, 64, 64, 0, 64, 127, 0, 64, 127, 64, 0, 64, 127, 64, 0, 64} },
-                { new List<byte>() {64, 127, 43, 127, 43, 127, 64, 127, 43, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} }
-            };
-        #endregion envelopes
-        #region duration modi
-        private static IReadOnlyList<IReadOnlyList<int>> _durationModi = new List<List<int>>()
-        {
-            _durations1, _durations2, _durations3, _durations4, _durations5,_durations6,
-            _durations7, _durations8, _durations9, _durations10, _durations11, _durations12
-
-        };
-        private static List<int> _durations1 = new List<int>()
-            {   1000 };
-        private static List<int> _durations2 = new List<int>()
-            {   1000, 707 }; // 1 / ( 2^(1 / 2) )
-        private static List<int> _durations3 = new List<int>()
-            {   1000, 794, 630 }; // 1 / ( 2^(1 / 3) )
-        private static List<int> _durations4 = new List<int>()
-            {   1000, 841, 707, 595 }; // 1 / ( 2^(1 / 4) )
-        private static List<int> _durations5 = new List<int>()
-            {   1000, 871, 758, 660, 574 }; // 1 / ( 2^(1 / 5) )
-        private static List<int> _durations6 = new List<int>()
-            {   1000, 891, 794, 707, 630, 561 }; // 1 / ( 2^(1 / 6) )
-        private static List<int> _durations7 = new List<int>()
-            {   1000, 906, 820, 743, 673, 610, 552 }; // 1 / ( 2^(1 / 7) )
-        private static List<int> _durations8 = new List<int>()
-            {   1000, 917, 841, 771, 707, 648, 595, 545}; // 1 / ( 2^(1 / 8) )
-        private static List<int> _durations9 = new List<int>()
-            {   1000, 926, 857, 794, 735, 680, 630, 583, 540}; // 1 / ( 2^(1 / 9) )
-        private static List<int> _durations10 = new List<int>()
-            {   1000, 933, 871, 812, 758, 707, 660, 616, 574, 536}; // 1 / ( 2^(1 / 10) )
-        private static List<int> _durations11 = new List<int>()
-            {   1000, 939, 882, 828, 777, 730, 685, 643, 604, 567, 533 }; // 1 / ( 2^(1 / 11) )
-        private static List<int> _durations12 = new List<int>()
-            {   1000, 944, 891, 841, 794, 749, 707, 667, 630, 595, 561, 530 }; // 1 / ( 2^(1 / 12) )
-
-        #endregion duration modi
-        #endregion private properties for use by Tombeau1Algorithm
-    }
+		#endregion duration modi
+		#endregion private properties for use by Tombeau1Algorithm
+	}
 }
