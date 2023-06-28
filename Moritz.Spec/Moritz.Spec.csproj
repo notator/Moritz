@@ -51,7 +51,6 @@
     <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="CarryMsgs.cs" />
-    <Compile Include="FortePitchClassSet.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="GamutVector.cs" />
     <Compile Include="ModeProximity.cs" />
