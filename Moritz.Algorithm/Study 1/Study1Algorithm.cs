@@ -52,15 +52,33 @@ namespace Moritz.Algorithm.Study1
 
         private List<byte> GetTrackChordNumbers()
         {
-            byte[] bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study 1\A4chordNumbers");
+            var bytes = new byte[] { };
+            if(Directory.Exists(M.LaptopMoritzFolder))
+            {
+                bytes = File.ReadAllBytes(@"E:\JamesDokumente\Visual Studio\Projects\notator\Moritz\Moritz.Algorithm\Study 1\A4chordNumbers");
+            }
+            else if(Directory.Exists(M.SilentMaxxMoritzFolder))
+            {
+                bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study 1\A4chordNumbers");
+            }
             var rval = new List<byte>(bytes);
+
             return rval;
         }
 
         private List<byte> GetTrackRootPitches()
         {
-            byte[] bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study 1\A4pitches");
+            var bytes = new byte[] { };
+            if(Directory.Exists(M.LaptopMoritzFolder))
+            {
+                bytes = File.ReadAllBytes(@"E:\JamesDokumente\Visual Studio\Projects\notator\Moritz\Moritz.Algorithm\Study 1\A4pitches");
+            }
+            else if(Directory.Exists(M.SilentMaxxMoritzFolder))
+            {
+                bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study 1\A4pitches");
+            }
             var rval = new List<byte>(bytes);
+
             return rval;
         }
 
