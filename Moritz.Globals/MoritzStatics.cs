@@ -56,6 +56,8 @@ namespace Moritz.Globals
             return value.ToString("0.####", En_USNumberFormat);
         }
 
+        #region folders
+
         /// <summary>
         /// Returns the names of all scores which have a .mkss file in
         /// the folders below the baseFolderPath(without the .mkss extension).
@@ -131,6 +133,8 @@ namespace Moritz.Globals
         public static string SilentMaxxMoritzFolder = @"D:\My Work\Programming\Moritz\Moritz";
         public static string LaptopMoritzFolder = @"E:\JamesDokumente\Moritz";
 
+        public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
+
         private static void SetLocalKrystalsFolders()
         {
             string audioFolder = @"\audio";
@@ -157,8 +161,7 @@ namespace Moritz.Globals
             }
         }
 
-        public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
-
+        #endregion folders
 
         /// <summary>
         /// Adapted from CapXML Utilities.
@@ -278,8 +281,6 @@ namespace Moritz.Globals
                 textBox.BackColor = Color.White;
             }
         }
-
-
 
         #region lists of lists of bytes
         /// <summary>
@@ -589,7 +590,6 @@ namespace Moritz.Globals
 
         #endregion float lists
 
-
         /// <summary>
         /// Used to populate the Inversions lists
         /// </summary>
@@ -750,8 +750,6 @@ namespace Moritz.Globals
             sb.Remove(0, separator.Length);
             return sb.ToString();
         }
-
-
 
         /// <summary>
         /// This function divides total into divisor parts, returning a List of ints whose:
