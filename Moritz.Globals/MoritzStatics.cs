@@ -33,6 +33,8 @@ namespace Moritz.Globals
 
             MoritzPerformanceOptionsExtension = ".mpox";
             MoritzKrystalScoreSettingsExtension = ".mkss";
+
+            SetLocalKrystalsFolders();
         }
 
         /// <summary>
@@ -129,7 +131,7 @@ namespace Moritz.Globals
         public static string SilentMaxxMoritzFolder = @"D:\My Work\Programming\Moritz\Moritz";
         public static string LaptopMoritzFolder = @"E:\JamesDokumente\Moritz";
 
-        public static void SetLocalKrystalsFolders()
+        private static void SetLocalKrystalsFolders()
         {
             string audioFolder = @"\audio";
             string krystalsFolder = @"\krystals\krystals";

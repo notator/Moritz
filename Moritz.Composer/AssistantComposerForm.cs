@@ -1834,7 +1834,6 @@ namespace Moritz.Composer
             Krystal krystal = null;
             try
             {
-                M.SetLocalKrystalsFolders();
                 string krystalPath = M.LocalMoritzKrystalsFolder + @"\" + krystalFileName;
                 krystal = K.LoadKrystal(krystalPath);
             }
