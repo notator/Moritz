@@ -11,7 +11,15 @@ namespace Moritz
     {
         public MoritzForm1()
         {
-            InitializeComponent();
+            if(Directory.Exists(M.LocalAssistantPerformerScoresFolder)
+            && Directory.Exists(M.LocalMoritzAlgorithmFolder))
+            {
+                InitializeComponent();
+            }
+            else
+            {
+                MessageBox.Show("By design, this program only runs on my main desktop computer (j.i.).", "Can´t Run.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
 
         #region Krystals Editor
