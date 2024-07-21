@@ -2,6 +2,7 @@ using Moritz.Composer;
 using Moritz.Globals;
 
 using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Moritz
@@ -25,27 +26,35 @@ namespace Moritz
 
         private void LoadScoreSettingsButton_Click(object sender, EventArgs e)
         {
-            using(OpenFileDialog openFileDialog = new OpenFileDialog())
+            if(Directory.Exists(M.MainPC_ScoresFolder))
             {
-                openFileDialog.InitialDirectory = M.LocalMoritzScoresFolder;
-                string filterString = @"Krystal Score Settings (*" + M.MoritzKrystalScoreSettingsExtension +
-                    @")|*" + M.MoritzKrystalScoreSettingsExtension;
-                // "Krystal Score Settings (*.mkss)|*.mkss";
-                openFileDialog.Filter = filterString;
-                openFileDialog.FilterIndex = (int)0;
-                openFileDialog.Title = "Load Krystal Score Settings";
-                openFileDialog.RestoreDirectory = true;
-
-                if(openFileDialog.ShowDialog() == DialogResult.OK)
+                using(OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
-                    string settingsPathname = openFileDialog.FileName;
-                    if(!String.IsNullOrEmpty(settingsPathname))
+
+                    openFileDialog.InitialDirectory = M.MainPC_ScoresFolder;
+                    string filterString = @"Krystal Score Settings (*" + M.MoritzKrystalScoreSettingsExtension +
+                        @")|*" + M.MoritzKrystalScoreSettingsExtension;
+                    // "Krystal Score Settings (*.mkss)|*.mkss";
+                    openFileDialog.Filter = filterString;
+                    openFileDialog.FilterIndex = (int)0;
+                    openFileDialog.Title = "Load Krystal Score Settings";
+                    openFileDialog.RestoreDirectory = true;
+
+                    if(openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        _assistantComposerForm = new AssistantComposerForm(settingsPathname, (IMoritzForm1)this);
-                        _assistantComposerForm.Show();
-                        this.Hide();
+                        string settingsPathname = openFileDialog.FileName;
+                        if(!String.IsNullOrEmpty(settingsPathname))
+                        {
+                            _assistantComposerForm = new AssistantComposerForm(settingsPathname, (IMoritzForm1)this);
+                            _assistantComposerForm.Show();
+                            this.Hide();
+                        }
                     }
                 }
+            }
+            else
+            {
+                MessageBox.Show("Scores can only be compiled on my main desktop computer.", "Can´t compile", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 

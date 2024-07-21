@@ -33,8 +33,6 @@ namespace Moritz.Globals
 
             MoritzPerformanceOptionsExtension = ".mpox";
             MoritzKrystalScoreSettingsExtension = ".mkss";
-
-            SetLocalKrystalsFolders();
         }
 
         /// <summary>
@@ -117,49 +115,18 @@ namespace Moritz.Globals
             return folder;
         }
 
-        public static string moritzAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Moritz";
-        public static string LocalMoritzPreferencesPath = moritzAppDataFolder + @"\Preferences.mzpf";
+        public static string LocalMoritzAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Moritz";
+        public static string LocalMoritzPreferencesPath = LocalMoritzAppDataFolder + @"\Preferences.mzpf";
 
-        public static string LocalMoritzFolderLocation = "D:";
+        public static string LocalMoritzAudioFolder = LocalMoritzAppDataFolder + @"\audio";
+        public static string LocalMoritzKrystalsFolder = LocalMoritzAppDataFolder + @"\krystals\krystals";
+        public static string LocalMoritzExpansionFieldsFolder = LocalMoritzAppDataFolder + @"\krystals\expansion operators";
+        public static string LocalMoritzModulationOperatorsFolder = LocalMoritzAppDataFolder + @"\krystals\modulation operators";
+        public static string LocalMoritzKrystalsSVGFolder = LocalMoritzAppDataFolder + @"\krystals\svg";
 
-        public static string LocalMoritzAudioFolder = "";
-        public static string LocalMoritzKrystalsFolder = "";
-        public static string LocalMoritzExpansionFieldsFolder = "";
-        public static string LocalMoritzModulationOperatorsFolder = "";
-        public static string LocalMoritzKrystalsSVGFolder = "";
-
-        public static string LocalMoritzScoresFolder = LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
-
-        public static string SilentMaxxMoritzFolder = @"D:\My Work\Programming\Moritz\Moritz";
-        public static string LaptopMoritzFolder = @"E:\JamesDokumente\Moritz";
+        public static string MainPC_ScoresFolder = @"D:\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
 
         public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
-
-        private static void SetLocalKrystalsFolders()
-        {
-            string audioFolder = @"\audio";
-            string krystalsFolder = @"\krystals\krystals";
-            string expansionFieldsFolder = @"\krystals\expansion operators";
-            string modulationOperatorsFolder = @"\krystals\modulation operators";
-            string krystalsSVGFolder = @"\krystals\svg";
-
-            if(Directory.Exists(LaptopMoritzFolder))
-            {
-                LocalMoritzAudioFolder = LaptopMoritzFolder + audioFolder;
-                LocalMoritzKrystalsFolder = LaptopMoritzFolder + krystalsFolder;
-                LocalMoritzExpansionFieldsFolder = LaptopMoritzFolder + expansionFieldsFolder;
-                LocalMoritzModulationOperatorsFolder = LaptopMoritzFolder + modulationOperatorsFolder;
-                LocalMoritzKrystalsSVGFolder = LaptopMoritzFolder + krystalsSVGFolder;
-            }
-            else if(Directory.Exists(SilentMaxxMoritzFolder))
-            {
-                LocalMoritzAudioFolder = SilentMaxxMoritzFolder + audioFolder;
-                LocalMoritzKrystalsFolder = SilentMaxxMoritzFolder + krystalsFolder;
-                LocalMoritzExpansionFieldsFolder = SilentMaxxMoritzFolder + expansionFieldsFolder;
-                LocalMoritzModulationOperatorsFolder = SilentMaxxMoritzFolder + modulationOperatorsFolder;
-                LocalMoritzKrystalsSVGFolder = SilentMaxxMoritzFolder + krystalsSVGFolder;
-            }
-        }
 
         #endregion folders
 

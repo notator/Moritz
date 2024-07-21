@@ -46,13 +46,13 @@ namespace Moritz
 
         private void SetUserInfo()
         {
-            LocalMoritzFolderTextBox.Text = M.LocalMoritzFolderLocation;
+            LocalMoritzFolderTextBox.Text = M.LocalMoritzAppDataFolder;
             PreferencesFilePathLabel.Text = M.LocalMoritzPreferencesPath;
             LocalAudioFolderInfoLabel.Text = M.LocalMoritzAudioFolder;
             LocalKrystalsFolderInfoLabel.Text = M.LocalMoritzKrystalsFolder;
             LocalExpansionFieldsFolderInfoLabel.Text = M.LocalMoritzExpansionFieldsFolder;
             LocalModulationOperatorsFolderInfoLabel.Text = M.LocalMoritzModulationOperatorsFolder;
-            LocalScoresRootFolderInfoLabel.Text = M.LocalMoritzScoresFolder;
+            LocalScoresRootFolderInfoLabel.Text = M.MainPC_ScoresFolder;
 
             OnlineXMLSchemasFolderInfoLabel.Text = M.OnlineXMLSchemasFolder;
         }
@@ -61,7 +61,7 @@ namespace Moritz
         {
             if(Directory.Exists(LocalMoritzFolderTextBox.Text))
             {
-                M.LocalMoritzFolderLocation = LocalMoritzFolderTextBox.Text;
+                M.LocalMoritzAppDataFolder = LocalMoritzFolderTextBox.Text;
                 M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, true);
                 OKBtn.Enabled = true;
                 SetUserInfo();
