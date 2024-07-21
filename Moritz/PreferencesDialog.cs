@@ -52,7 +52,7 @@ namespace Moritz
             LocalKrystalsFolderInfoLabel.Text = M.LocalMoritzKrystalsFolder;
             LocalExpansionFieldsFolderInfoLabel.Text = M.LocalMoritzExpansionFieldsFolder;
             LocalModulationOperatorsFolderInfoLabel.Text = M.LocalMoritzModulationOperatorsFolder;
-            LocalScoresRootFolderInfoLabel.Text = M.MainPC_ScoresFolder;
+            LocalScoresRootFolderInfoLabel.Text = M.LocalAssistantPerformerScoresFolder;
 
             OnlineXMLSchemasFolderInfoLabel.Text = M.OnlineXMLSchemasFolder;
         }

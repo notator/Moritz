@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--created: Wednesday 03.08.2022, 15:23:37-->
+<expander xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://james-ingram-act-two.de/open-source/XMLSchemas/krystals.xsd">
+	<inputGamete>
+		<fixedPoints>
+			<pointGroup color="black" count="5" shape="spiral">
+				<value>7 6 5 4 3</value>
+				<from angle="180" radius="0.85" />
+				<to angle="60" radius="0.85" />
+			</pointGroup>
+		</fixedPoints>
+		<planet density="6.7_28.14.1.exp.krys">
+			<pointGroup color="black" count="6" shape="straightLine">
+				<value>1</value>
+				<from angle="100" radius="0.9" />
+				<to angle="100" radius="0.45" />
+			</pointGroup>
+			<pointGroup color="black" count="22" shape="straightLine">
+				<value>1</value>
+				<from angle="100" radius="0.45" />
+				<to angle="0" radius="1" />
+			</pointGroup>
+		</planet>
+		<planet density="6.7_28.14.1.exp.krys">
+			<pointGroup color="black" count="28" shape="spiral">
+				<value>2</value>
+				<from angle="120" radius="0.5" />
+				<to angle="0" radius="1" />
+			</pointGroup>
+		</planet>
+	</inputGamete>
+	<outputGamete>
+		<fixedPoints>
+			<pointGroup color="red" count="7" shape="spiral">
+				<value>1 2 3 4 5 6 7</value>
+				<from angle="0" radius="1" />
+				<to angle="180" radius="1" />
+			</pointGroup>
+		</fixedPoints>
+	</outputGamete>
+</expander>

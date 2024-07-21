@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--created: Monday 12.02.2007, 12:24:08-->
+<modulator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="J:\Visual Studio\Projects\Moritz\XML Schemas\krystals.xsd">
+	<array xdim="7" ydim="7">
+				1	1	1	1	1	1	1	
+				1	1	1	1	1	1	1	
+				4	5	5	5	5	5	5	
+				1	1	1	1	1	1	1	
+				1	1	1	1	1	1	1	
+				1	1	1	1	1	1	1	
+				1	1	1	1	1	1	1	
+			</array>
+</modulator>

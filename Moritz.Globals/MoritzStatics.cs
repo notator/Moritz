@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Ignore Spelling: Schemas
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -23,16 +25,24 @@ namespace Moritz.Globals
     {
         static M()
         {
-            //Creates and initializes the CultureInfo which uses the international sort.
-            CultureInfo ci = new CultureInfo("en-US", false);
-            En_USNumberFormat = ci.NumberFormat;
+            if(Directory.Exists(M.LocalAssistantPerformerScoresFolder)
+            && Directory.Exists(M.LocalMoritzAlgorithmFolder))
+            {
+                //Creates and initializes the CultureInfo which uses the international sort.
+                CultureInfo ci = new CultureInfo("en-US", false);
+                En_USNumberFormat = ci.NumberFormat;
 
-            SetMidiPitchDict();
+                SetMidiPitchDict();
 
-            Preferences = new Preferences();
+                Preferences = new Preferences();
 
-            MoritzPerformanceOptionsExtension = ".mpox";
-            MoritzKrystalScoreSettingsExtension = ".mkss";
+                MoritzPerformanceOptionsExtension = ".mpox";
+                MoritzKrystalScoreSettingsExtension = ".mkss";
+            }       
+            else
+            {
+                throw new Exception("By design, this program only runs on my main desktop computer (j.i.).");
+            }
         }
 
         /// <summary>
@@ -119,13 +129,17 @@ namespace Moritz.Globals
         public static string LocalMoritzPreferencesPath = LocalMoritzAppDataFolder + @"\Preferences.mzpf";
 
         public static string LocalMoritzAudioFolder = LocalMoritzAppDataFolder + @"\audio";
-        public static string LocalMoritzKrystalsFolder = LocalMoritzAppDataFolder + @"\krystals\krystals";
-        public static string LocalMoritzExpansionFieldsFolder = LocalMoritzAppDataFolder + @"\krystals\expansion operators";
-        public static string LocalMoritzModulationOperatorsFolder = LocalMoritzAppDataFolder + @"\krystals\modulation operators";
-        public static string LocalMoritzKrystalsSVGFolder = LocalMoritzAppDataFolder + @"\krystals\svg";
 
-        public static string MainPC_ScoresFolder = @"D:\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
+        // contains folders containing files needed for Moritz´ input (krystals and algorithm-specific files)  
+        public static string LocalMoritzAlgorithmFolder = @"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm";
+        // contains Moritz´ output scores (The Assistant Performer´s input)
+        public static string LocalAssistantPerformerScoresFolder = @"D:\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
 
+        public static string LocalMoritzKrystalsFolder = LocalMoritzAlgorithmFolder + @"\krystals\krystals";
+        public static string LocalMoritzExpansionFieldsFolder = LocalMoritzAlgorithmFolder + @"\krystals\expansion operators";
+        public static string LocalMoritzModulationOperatorsFolder = LocalMoritzAlgorithmFolder + @"\krystals\modulation operators";
+        public static string LocalMoritzKrystalsSVGFolder = LocalMoritzAlgorithmFolder + @"\krystals\svg";
+  
         public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
 
         #endregion folders

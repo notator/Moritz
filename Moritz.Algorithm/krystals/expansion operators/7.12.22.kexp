@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--created: Wednesday 03.08.2022, 15:23:37-->
+<expander xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://james-ingram-act-two.de/open-source/XMLSchemas/krystals.xsd">
+	<inputGameteFile name="7.7.38.kexp" />
+	<outputGameteFile name="7.12.20.kexp" />
+</expander>

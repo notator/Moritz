@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--created: Monday 08.08.2022, 20:20:03-->
+<krystal xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://james-ingram-act-two.de/open-source/XMLSchemas/krystals.xsd">
+	<line />
+	<strands>
+		<s l="1">1 2 3 4 5 6 7</s>
+	</strands>
+</krystal>

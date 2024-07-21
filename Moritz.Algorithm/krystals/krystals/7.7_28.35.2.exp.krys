@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--created: Monday 08.08.2022, 20:20:04-->
+<krystal xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://james-ingram-act-two.de/open-source/XMLSchemas/krystals.xsd">
+	<expansion density="7.1_7.1.line.krys" inputPoints="7.1_7.1.line.krys" expander="7.7.35.kexp" />
+	<strands>
+		<s l="1">1</s>
+		<s l="2">1 1</s>
+		<s l="2">1 1 2</s>
+		<s l="2">1 2 3 1</s>
+		<s l="2">4 2 1 5 3</s>
+		<s l="2">6 7 1 2 4 3</s>
+		<s l="2">6 7 5 1 2 4 6</s>
+	</strands>
+</krystal>

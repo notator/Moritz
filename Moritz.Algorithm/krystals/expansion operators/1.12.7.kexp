@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--created: Wednesday 03.08.2022, 15:23:37-->
+<expander xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://james-ingram-act-two.de/open-source/XMLSchemas/krystals.xsd">
+	<inputGamete>
+		<planet density="7.7_28.27.1.exp.krys">
+			<pointGroup color="black" count="28" shape="spiral">
+				<value>1</value>
+				<from angle="270" radius="0.95" />
+				<to angle="540" radius="0.95" />
+			</pointGroup>
+		</planet>
+	</inputGamete>
+	<outputGameteFile name="7.12.20.kexp" />
+</expander>

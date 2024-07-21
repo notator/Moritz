@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--created: Monday 08.08.2022, 20:20:05-->
+<krystal xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://james-ingram-act-two.de/open-source/XMLSchemas/krystals.xsd">
+	<expansion density="7.7_28.27.1.exp.krys" inputPoints="2.1_7.2.line.krys" expander="2.12.19.kexp" />
+	<strands>
+		<s l="1">1</s>
+		<s l="2">4 4 4 4 4 4</s>
+		<s l="3">5 4 4 5 4</s>
+		<s l="2">5 6 5 4</s>
+		<s l="3">5 5 7</s>
+		<s l="3">5 5 5 5 5 5 5</s>
+		<s l="2">5 5</s>
+		<s l="3">5 5 5 5</s>
+		<s l="3">6 5 5 5</s>
+		<s l="3">6 5 6 4 5</s>
+		<s l="2">6 6 5</s>
+		<s l="3">6 6 5</s>
+		<s l="3">6 6</s>
+		<s l="3">6 6 4</s>
+		<s l="3">6 6 6</s>
+		<s l="2">6 6</s>
+		<s l="3">6 6</s>
+		<s l="3">2 6</s>
+		<s l="3">6 6</s>
+		<s l="3">6 6</s>
+		<s l="3">6 6</s>
+		<s l="2">9</s>
+		<s l="3">8</s>
+		<s l="3">9</s>
+		<s l="3">9</s>
+		<s l="3">9</s>
+		<s l="3">9</s>
+		<s l="3">9</s>
+	</strands>
+</krystal>

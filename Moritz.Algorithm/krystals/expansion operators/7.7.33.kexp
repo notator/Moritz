@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--created: Wednesday 03.08.2022, 15:23:36-->
+<expander xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://james-ingram-act-two.de/open-source/XMLSchemas/krystals.xsd">
+	<inputGamete>
+		<fixedPoints>
+			<pointGroup color="black" count="7" shape="spiral">
+				<value>1 2 3 4 5 6 7</value>
+				<from angle="0" radius="0" />
+				<to angle="180" radius="1" />
+			</pointGroup>
+		</fixedPoints>
+	</inputGamete>
+	<outputGamete>
+		<fixedPoints>
+			<pointGroup color="red" count="7" shape="spiral">
+				<value>1 2 3 4 5 6 7</value>
+				<from angle="0" radius="1" />
+				<to angle="180" radius="1" />
+			</pointGroup>
+		</fixedPoints>
+	</outputGamete>
+</expander>
