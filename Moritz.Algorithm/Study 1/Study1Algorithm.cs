@@ -54,7 +54,7 @@ namespace Moritz.Algorithm.Study1
         {
             var bytes = new byte[] { };
             
-            bytes = File.ReadAllBytes(M.LocalMoritzAlgorithmFolder + @"\Study 1\A4chordNumbers");
+            bytes = File.ReadAllBytes(M.LocalMoritzScoresFolder + @"\Study 1\A4chordNumbers");
 
             var rval = new List<byte>(bytes);
 
@@ -65,7 +65,7 @@ namespace Moritz.Algorithm.Study1
         {
             var bytes = new byte[] { };
 
-            bytes = File.ReadAllBytes(M.LocalMoritzAlgorithmFolder + @"\Study 1\A4pitches");
+            bytes = File.ReadAllBytes(M.LocalMoritzScoresFolder + @"\Study 1\A4pitches");
 
             var rval = new List<byte>(bytes);
 

@@ -118,19 +118,19 @@ namespace Moritz.Globals
         }
 
         public static string LocalMoritzAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Moritz";
-        public static string LocalMoritzPreferencesPath = LocalMoritzAppDataFolder + @"\Preferences.mzpf";
 
+        public static string LocalMoritzPreferencesPath = LocalMoritzAppDataFolder + @"\Preferences.mzpf";
         public static string LocalMoritzAudioFolder = LocalMoritzAppDataFolder + @"\audio";
 
-        // contains folders containing files needed for Moritz´ input (krystals and algorithm-specific files)  
-        public static string LocalMoritzAlgorithmFolder = @"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm";
-        // contains Moritz´ output scores (The Assistant Performer´s input)
-        public static string LocalAssistantPerformerScoresFolder = @"D:\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
+        public static string LocalMoritzKrystalsFolder = LocalMoritzAppDataFolder + @"\krystals\krystals";
+        public static string LocalMoritzExpansionFieldsFolder = LocalMoritzAppDataFolder + @"\krystals\expansion operators";
+        public static string LocalMoritzModulationOperatorsFolder = LocalMoritzAppDataFolder + @"\krystals\modulation operators";
+        public static string LocalMoritzKrystalsSVGFolder = LocalMoritzAppDataFolder + @"\krystals\svg";
 
-        public static string LocalMoritzKrystalsFolder = LocalMoritzAlgorithmFolder + @"\krystals\krystals";
-        public static string LocalMoritzExpansionFieldsFolder = LocalMoritzAlgorithmFolder + @"\krystals\expansion operators";
-        public static string LocalMoritzModulationOperatorsFolder = LocalMoritzAlgorithmFolder + @"\krystals\modulation operators";
-        public static string LocalMoritzKrystalsSVGFolder = LocalMoritzAlgorithmFolder + @"\krystals\svg";
+        // Moritz´output scores are saved here.
+        // They should be copied to the online folder
+        // james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
+        public static string LocalMoritzScoresFolder = LocalMoritzAppDataFolder + @"\scores";
 
         public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
 

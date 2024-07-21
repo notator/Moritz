@@ -17,80 +17,52 @@ namespace Moritz
         #region Krystals Editor
         private void KrystalsEditorButton_Click(object sender, EventArgs e)
         {
-            if(CheckMainPC)
+            using(Form krystals5Application = new Krystals5Application.MainWindow())
             {
-                using(Form krystals5Application = new Krystals5Application.MainWindow())
-                {
-                    krystals5Application.ShowDialog();
-                }
-            }
-            else
-            {
-                this.Close();
+                krystals5Application.ShowDialog();
             }
         }
         #endregion
 
         private void LoadScoreSettingsButton_Click(object sender, EventArgs e)
         {
-            if(CheckMainPC)
+            using(OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                using(OpenFileDialog openFileDialog = new OpenFileDialog())
-                {
-                    openFileDialog.InitialDirectory = M.LocalAssistantPerformerScoresFolder;
-                    string filterString = @"Krystal Score Settings (*" + M.MoritzKrystalScoreSettingsExtension +
-                        @")|*" + M.MoritzKrystalScoreSettingsExtension;
-                    // "Krystal Score Settings (*.mkss)|*.mkss";
-                    openFileDialog.Filter = filterString;
-                    openFileDialog.FilterIndex = (int)0;
-                    openFileDialog.Title = "Load Krystal Score Settings";
-                    openFileDialog.RestoreDirectory = true;
+                openFileDialog.InitialDirectory = M.LocalMoritzScoresFolder;
+                string filterString = @"Krystal Score Settings (*" + M.MoritzKrystalScoreSettingsExtension +
+                    @")|*" + M.MoritzKrystalScoreSettingsExtension;
+                // "Krystal Score Settings (*.mkss)|*.mkss";
+                openFileDialog.Filter = filterString;
+                openFileDialog.FilterIndex = (int)0;
+                openFileDialog.Title = "Load Krystal Score Settings";
+                openFileDialog.RestoreDirectory = true;
 
-                    if(openFileDialog.ShowDialog() == DialogResult.OK)
+                if(openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string settingsPathname = openFileDialog.FileName;
+                    if(!String.IsNullOrEmpty(settingsPathname))
                     {
-                        string settingsPathname = openFileDialog.FileName;
-                        if(!String.IsNullOrEmpty(settingsPathname))
-                        {
-                            _assistantComposerForm = new AssistantComposerForm(settingsPathname, (IMoritzForm1)this);
-                            _assistantComposerForm.Show();
-                            this.Hide();
-                        }
+                        _assistantComposerForm = new AssistantComposerForm(settingsPathname, (IMoritzForm1)this);
+                        _assistantComposerForm.Show();
+                        this.Hide();
                     }
                 }
-            }
-            else
-            {
-                this.Close();
             }
         }
 
         private void PreferencesButton_Click(object sender, EventArgs e)
         {
-            if(CheckMainPC)
+            using(PreferencesDialog pd = new PreferencesDialog())
             {
-                using(PreferencesDialog pd = new PreferencesDialog())
-                {
-                    pd.ShowDialog(this);
-                }
-            }
-            else
-            {
-                this.Close();
+                pd.ShowDialog(this);
             }
         }
 
         private void AboutButton_Click(object sender, EventArgs e)
         {
-            if(CheckMainPC)
+            using(Form aboutMoritz = new AboutMoritzDialog())
             {
-                using(Form aboutMoritz = new AboutMoritzDialog())
-                {
-                    aboutMoritz.ShowDialog();
-                }
-            }
-            else
-            {
-                this.Close();
+                aboutMoritz.ShowDialog();
             }
         }
 
@@ -128,19 +100,5 @@ namespace Moritz
         }
 
         private AssistantComposerForm _assistantComposerForm = null;
-        private bool CheckMainPC
-        {
-            get
-            {
-                var rval = true;
-                if(!(Directory.Exists(M.LocalAssistantPerformerScoresFolder)
-                    && Directory.Exists(M.LocalMoritzAlgorithmFolder)))
-                {
-                    MessageBox.Show("By design, this program only runs on my main desktop computer (j.i.).", "Can´t Run.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    rval = false;
-                }
-                return rval;
-            }
-        }
     }
 }

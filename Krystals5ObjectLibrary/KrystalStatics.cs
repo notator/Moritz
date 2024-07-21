@@ -324,7 +324,7 @@ namespace Krystals5ObjectLibrary
         public static Dictionary<string, List<string>> GetKrystalScoresDict()
         {
             var rval = new Dictionary<string, List<string>>();
-            string scoresPath = M.LocalAssistantPerformerScoresFolder;
+            string scoresPath = M.LocalMoritzScoresFolder;
             var allScoreSettings = Directory.EnumerateFiles(scoresPath, "*.mkss", SearchOption.AllDirectories);
             foreach(var scoreSettings in allScoreSettings)
             {
