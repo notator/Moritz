@@ -17,31 +17,23 @@ namespace Moritz
         #region Krystals Editor
         private void KrystalsEditorButton_Click(object sender, EventArgs e)
         {
-            if(!(Directory.Exists(M.LocalAssistantPerformerScoresFolder)
-                && Directory.Exists(M.LocalMoritzAlgorithmFolder)))
-            {
-                MessageBox.Show("By design, this program only runs on my main desktop computer (j.i.).", "Can´t Run.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                this.Close();
-            }
-            else
+            if(CheckMainPC)
             {
                 using(Form krystals5Application = new Krystals5Application.MainWindow())
                 {
                     krystals5Application.ShowDialog();
                 }
             }
+            else
+            {
+                this.Close();
+            }
         }
         #endregion
 
         private void LoadScoreSettingsButton_Click(object sender, EventArgs e)
         {
-            if(!(Directory.Exists(M.LocalAssistantPerformerScoresFolder)
-                && Directory.Exists(M.LocalMoritzAlgorithmFolder)))
-            {
-                MessageBox.Show("By design, this program only runs on my main desktop computer (j.i.).", "Can´t Run.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                this.Close();
-            }
-            else
+            if(CheckMainPC)
             {
                 using(OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
@@ -66,30 +58,39 @@ namespace Moritz
                     }
                 }
             }
+            else
+            {
+                this.Close();
+            }
         }
 
         private void PreferencesButton_Click(object sender, EventArgs e)
         {
-            if(!(Directory.Exists(M.LocalAssistantPerformerScoresFolder)
-                && Directory.Exists(M.LocalMoritzAlgorithmFolder)))
-            {
-                MessageBox.Show("By design, this program only runs on my main desktop computer (j.i.).", "Can´t Run.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                this.Close();
-            }
-            else
+            if(CheckMainPC)
             {
                 using(PreferencesDialog pd = new PreferencesDialog())
                 {
                     pd.ShowDialog(this);
                 }
             }
+            else
+            {
+                this.Close();
+            }
         }
 
         private void AboutButton_Click(object sender, EventArgs e)
         {
-            using(Form aboutMoritz = new AboutMoritzDialog())
+            if(CheckMainPC)
             {
-                aboutMoritz.ShowDialog();
+                using(Form aboutMoritz = new AboutMoritzDialog())
+                {
+                    aboutMoritz.ShowDialog();
+                }
+            }
+            else
+            {
+                this.Close();
             }
         }
 
@@ -127,5 +128,19 @@ namespace Moritz
         }
 
         private AssistantComposerForm _assistantComposerForm = null;
+        private bool CheckMainPC
+        {
+            get
+            {
+                var rval = true;
+                if(!(Directory.Exists(M.LocalAssistantPerformerScoresFolder)
+                    && Directory.Exists(M.LocalMoritzAlgorithmFolder)))
+                {
+                    MessageBox.Show("By design, this program only runs on my main desktop computer (j.i.).", "Can´t Run.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    rval = false;
+                }
+                return rval;
+            }
+        }
     }
 }
