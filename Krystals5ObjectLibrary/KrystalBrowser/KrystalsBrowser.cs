@@ -114,7 +114,7 @@ namespace Krystals5ObjectLibrary
             var dialogResult = MessageBox.Show(msg, "Delete Krystal", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if(dialogResult == DialogResult.Yes)
             {
-                string krystalPath = M.LocalMoritzKrystalsFolder + "//" + krystalToDelete;
+                string krystalPath = M.MoritzKrystalsFolder + "//" + krystalToDelete;
                 File.Delete(krystalPath);
 
                 _krystalChildrenTreeView.BeginUpdate();
@@ -636,7 +636,7 @@ namespace Krystals5ObjectLibrary
             }
         }
 
-        private readonly string _krystalsFolder = M.LocalMoritzKrystalsFolder;
+        private readonly string _krystalsFolder = M.MoritzKrystalsFolder;
 
         private KrystalFamily _krystalFamily = null;
         private Krystal _krystal = null;

@@ -152,7 +152,7 @@ namespace Krystals5ObjectLibrary
 
             if(answer == DialogResult.Yes)
             {
-                var pathname = M.LocalMoritzModulationOperatorsFolder + "/" + Name;
+                var pathname = M.MoritzModulationOperatorsFolder + "/" + Name;
 
                 XmlWriterSettings settings = new XmlWriterSettings
                 {
@@ -183,7 +183,7 @@ namespace Krystals5ObjectLibrary
 
         private IEnumerable<string> GetSimilarModulatorPaths(string nameRoot)
         {
-            var dirPath = M.LocalMoritzModulationOperatorsFolder;
+            var dirPath = M.MoritzModulationOperatorsFolder;
 
             var searchString = nameRoot + "*" + K.ModulatorFilenameSuffix;
             var modulatorPaths = Directory.EnumerateFiles(dirPath, searchString);

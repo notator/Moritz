@@ -28,7 +28,7 @@ namespace Moritz
         {
             using(OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.InitialDirectory = M.LocalMoritzScoresFolder;
+                openFileDialog.InitialDirectory = M.MoritzScoresFolder;
                 string filterString = @"Krystal Score Settings (*" + M.MoritzKrystalScoreSettingsExtension +
                     @")|*" + M.MoritzKrystalScoreSettingsExtension;
                 // "Krystal Score Settings (*.mkss)|*.mkss";

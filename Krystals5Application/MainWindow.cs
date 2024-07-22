@@ -243,7 +243,7 @@ namespace Krystals5Application
             Close();
         }
 
-        private readonly string _krystalsFolder = M.LocalMoritzKrystalsFolder;
+        private readonly string _krystalsFolder = M.MoritzKrystalsFolder;
         private KrystalsBrowser KrystalBrowser = null;
 
 

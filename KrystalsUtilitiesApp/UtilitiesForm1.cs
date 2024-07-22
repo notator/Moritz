@@ -261,7 +261,7 @@ namespace DeleteUnusedDuplicateKrystalsApp
         private Dictionary<string, string> SaveExpandersWithNewNames()
         {
             var expandersNamesDict = new Dictionary<string, string>();
-            var expanderFilePaths = Directory.EnumerateFiles(M.LocalMoritzExpansionFieldsFolder, "e*.kexp");
+            var expanderFilePaths = Directory.EnumerateFiles(M.MoritzExpansionFieldsFolder, "e*.kexp");
             List<string> sortedExpanderFilePaths = expanderFilePaths.ToList();
             sortedExpanderFilePaths.Sort();
 
@@ -543,6 +543,6 @@ namespace DeleteUnusedDuplicateKrystalsApp
             Close();
         }
 
-        private readonly string _krystalsFolder = M.LocalMoritzKrystalsFolder;
+        private readonly string _krystalsFolder = M.MoritzKrystalsFolder;
     }
 }

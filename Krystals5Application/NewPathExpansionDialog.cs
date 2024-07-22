@@ -13,7 +13,7 @@ namespace Krystals5Application
         public NewPathExpansionDialog()
         {
             InitializeComponent();
-            _krystalsFolder = M.LocalMoritzKrystalsFolder;
+            _krystalsFolder = M.MoritzKrystalsFolder;
         }
 
         #region Events

@@ -20,7 +20,7 @@ namespace Moritz.Globals
             M.CreateDirectoryIfItDoesNotExist(moritzAppDataFolder);
 
             #region read prefs
-            if(!File.Exists(M.LocalMoritzPreferencesPath))
+            if(!File.Exists(M.MoritzPreferencesPath))
             {
                 LocalMoritzFolderLocation = "C://Documents";
                 PreferredOutputDevice = "";
@@ -28,14 +28,14 @@ namespace Moritz.Globals
                 Save();
 
                 string msg = "A preferences file could not be found at\n" +
-                            "\t" + M.LocalMoritzPreferencesPath + ".\n\n" +
+                            "\t" + M.MoritzPreferencesPath + ".\n\n" +
                             "A new one has been created with default values.";
                 MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
             try
             {
-                using(XmlReader r = XmlReader.Create(M.LocalMoritzPreferencesPath))
+                using(XmlReader r = XmlReader.Create(M.MoritzPreferencesPath))
                 {
                     M.ReadToXmlElementTag(r, "moritzPreferences"); // check that this is a moritz preferences file
 
@@ -108,7 +108,7 @@ namespace Moritz.Globals
                 IndentChars = ("\t"),
                 CloseOutput = true
             }; // not disposable
-            using(XmlWriter w = XmlWriter.Create(M.LocalMoritzPreferencesPath, settings))
+            using(XmlWriter w = XmlWriter.Create(M.MoritzPreferencesPath, settings))
             {
                 w.WriteStartDocument();
                 w.WriteComment("file created: " + M.NowString);

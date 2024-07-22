@@ -115,7 +115,7 @@ namespace Krystals5Application
         #endregion Events
 
         #region private variables
-        private readonly string _krystalsFolder = M.LocalMoritzKrystalsFolder;
+        private readonly string _krystalsFolder = M.MoritzKrystalsFolder;
         private string _densityInputFilepath;
         private string _pointsInputFilepath;
         private string _expanderFilepath;

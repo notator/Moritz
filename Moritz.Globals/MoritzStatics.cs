@@ -117,20 +117,20 @@ namespace Moritz.Globals
             return folder;
         }
 
-        public static string LocalMoritzAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Moritz";
+        public static string MoritzAppDataFolder = @"C:\Users\James\OneDrive\Moritz";
 
-        public static string LocalMoritzPreferencesPath = LocalMoritzAppDataFolder + @"\Preferences.mzpf";
-        public static string LocalMoritzAudioFolder = LocalMoritzAppDataFolder + @"\audio";
+        public static string MoritzPreferencesPath = MoritzAppDataFolder + @"\Preferences.mzpf";
+        public static string MoritzAudioFolder = MoritzAppDataFolder + @"\audio";
 
-        public static string LocalMoritzKrystalsFolder = LocalMoritzAppDataFolder + @"\krystals\krystals";
-        public static string LocalMoritzExpansionFieldsFolder = LocalMoritzAppDataFolder + @"\krystals\expansion operators";
-        public static string LocalMoritzModulationOperatorsFolder = LocalMoritzAppDataFolder + @"\krystals\modulation operators";
-        public static string LocalMoritzKrystalsSVGFolder = LocalMoritzAppDataFolder + @"\krystals\svg";
+        public static string MoritzKrystalsFolder = MoritzAppDataFolder + @"\krystals\krystals";
+        public static string MoritzExpansionFieldsFolder = MoritzAppDataFolder + @"\krystals\expansion operators";
+        public static string MoritzModulationOperatorsFolder = MoritzAppDataFolder + @"\krystals\modulation operators";
+        public static string MoritzKrystalsSVGFolder = MoritzAppDataFolder + @"\krystals\svg";
 
         // Moritz´output scores are saved here.
         // They should be copied to the online folder
         // james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
-        public static string LocalMoritzScoresFolder = LocalMoritzAppDataFolder + @"\scores";
+        public static string MoritzScoresFolder = MoritzAppDataFolder + @"\scores";
 
         public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
 

@@ -227,7 +227,7 @@ namespace Moritz.Composer
         {
             get
             {
-                string path = M.LocalMoritzAudioFolder + @"\" + _scoreTitle;
+                string path = M.MoritzAudioFolder + @"\" + _scoreTitle;
                 return path;
             }
         }
@@ -1494,7 +1494,7 @@ namespace Moritz.Composer
             }
             else
             {
-                string staffKrystalPath = M.LocalMoritzKrystalsFolder + @"\" + newKrystal.Name;
+                string staffKrystalPath = M.MoritzKrystalsFolder + @"\" + newKrystal.Name;
                 Krystal krystal = K.LoadKrystal(staffKrystalPath);
                 this.KrystalsListBox.SuspendLayout();
                 this.KrystalsListBox.Items.Add(krystal);
@@ -1834,7 +1834,7 @@ namespace Moritz.Composer
             Krystal krystal = null;
             try
             {
-                string krystalPath = M.LocalMoritzKrystalsFolder + @"\" + krystalFileName;
+                string krystalPath = M.MoritzKrystalsFolder + @"\" + krystalFileName;
                 krystal = K.LoadKrystal(krystalPath);
             }
             catch(Exception ex)

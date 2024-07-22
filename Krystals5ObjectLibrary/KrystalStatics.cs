@@ -24,12 +24,12 @@ namespace Krystals5ObjectLibrary
             _numberFormat = ci.NumberFormat;
             _dateTimeFormat = ci.DateTimeFormat;
 
-            KrystalsFolder = M.LocalMoritzKrystalsFolder;
-            ExpansionOperatorsFolder = M.LocalMoritzExpansionFieldsFolder;
-            ModulationOperatorsFolder = M.LocalMoritzModulationOperatorsFolder;
+            KrystalsFolder = M.MoritzKrystalsFolder;
+            ExpansionOperatorsFolder = M.MoritzExpansionFieldsFolder;
+            ModulationOperatorsFolder = M.MoritzModulationOperatorsFolder;
             // The Schemas location is a programmer's preference. The user need not bother with it.
             MoritzXmlSchemasFolder = M.OnlineXMLSchemasFolder;
-            KrystalsSVGFolder = M.LocalMoritzKrystalsSVGFolder;
+            KrystalsSVGFolder = M.MoritzKrystalsSVGFolder;
         }
 
         public static Krystal LoadKrystal(string pathname)
@@ -324,7 +324,7 @@ namespace Krystals5ObjectLibrary
         public static Dictionary<string, List<string>> GetKrystalScoresDict()
         {
             var rval = new Dictionary<string, List<string>>();
-            string scoresPath = M.LocalMoritzScoresFolder;
+            string scoresPath = M.MoritzScoresFolder;
             var allScoreSettings = Directory.EnumerateFiles(scoresPath, "*.mkss", SearchOption.AllDirectories);
             foreach(var scoreSettings in allScoreSettings)
             {
