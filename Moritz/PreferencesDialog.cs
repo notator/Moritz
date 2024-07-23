@@ -46,45 +46,21 @@ namespace Moritz
 
         private void SetUserInfo()
         {
-            LocalMoritzFolderTextBox.Text = M.MoritzAppDataFolder;
-            PreferencesFilePathLabel.Text = M.MoritzPreferencesPath;
-            LocalAudioFolderInfoLabel.Text = M.MoritzAudioFolder;
-            LocalKrystalsFolderInfoLabel.Text = M.MoritzKrystalsFolder;
-            LocalExpansionFieldsFolderInfoLabel.Text = M.MoritzExpansionFieldsFolder;
-            LocalModulationOperatorsFolderInfoLabel.Text = M.MoritzModulationOperatorsFolder;
-            LocalScoresRootFolderInfoLabel.Text = M.MoritzScoresFolder;
+            MoritzFolderLocationInfoLabel.Text = M.MoritzAppDataFolder;
+            PreferencesFilePathInfoLabel.Text = M.MoritzPreferencesPath;
+            AudioFolderInfoLabel.Text = M.MoritzAudioFolder;
+            KrystalsFolderInfoLabel.Text = M.MoritzKrystalsFolder;
+            ExpansionFieldsFolderInfoLabel.Text = M.MoritzExpansionFieldsFolder;
+            ModulationOperatorsFolderInfoLabel.Text = M.MoritzModulationOperatorsFolder;
+            ScoresRootFolderInfoLabel.Text = M.MoritzScoresFolder;
 
             OnlineXMLSchemasFolderInfoLabel.Text = M.OnlineXMLSchemasFolder;
         }
 
-        private void LocalMoritzFolderTextBox_Leave(object sender, EventArgs e)
-        {
-            if(Directory.Exists(LocalMoritzFolderTextBox.Text))
-            {
-                M.MoritzAppDataFolder = LocalMoritzFolderTextBox.Text;
-                M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, true);
-                OKBtn.Enabled = true;
-                SetUserInfo();
-            }
-            else
-            {
-                M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, false);
-                OKBtn.Enabled = false;
-            }
-        }
-
-        private void LocalMoritzFolderTextBox_Enter(object sender, EventArgs e)
-        {
-            M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, true);
-            OKBtn.Enabled = true;
-        }
-
-        #region OK, Cancel
         private void OKBtn_Click(object sender, EventArgs e)
         {
             M.Preferences.Save();
             Close();
         }
-        #endregion
     }
 }

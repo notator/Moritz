@@ -13,25 +13,7 @@ namespace Moritz.Globals
     {
         public Preferences()
         {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-            string moritzAppDataFolder = appData + @"\Moritz";
-            // C:\Users\James\AppData\Roaming\Moritz
-            M.CreateDirectoryIfItDoesNotExist(moritzAppDataFolder);
-
-            #region read prefs
-            if(!File.Exists(M.MoritzPreferencesPath))
-            {
-                LocalMoritzFolderLocation = "C://Documents";
-                PreferredOutputDevice = "";
-
-                Save();
-
-                string msg = "A preferences file could not be found at\n" +
-                            "\t" + M.MoritzPreferencesPath + ".\n\n" +
-                            "A new one has been created with default values.";
-                MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            CheckMoritzFolders();
 
             try
             {
@@ -50,7 +32,6 @@ namespace Moritz.Globals
                 string msg = "Error reading preferences file";
                 MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            #endregion
 
             if(CaptureOutputDevices())
             {
@@ -63,6 +44,72 @@ namespace Moritz.Globals
                 else
                 {
                     CurrentOutputDeviceName = PreferredOutputDevice;
+                }
+            }
+        }
+
+        private void CheckMoritzFolders()
+        {
+            var errorString = "";
+
+            if(!Directory.Exists(M.MoritzAppDataFolder))
+            {
+                // The M.MoritzAppDataFolder must exist, and also contain all the files that Moritz needs as input.
+                errorString = M.MoritzAppDataFolder + "\n";
+
+                string msg = $@"The Moritz Application Data folder could not be found at\n{errorString}\n" +
+                    "This folder must contain all the input files Moritz needs in order to run.\n\n";
+
+                MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                if(!File.Exists(M.MoritzPreferencesPath))
+                {
+                    LocalMoritzFolderLocation = M.MoritzAppDataFolder;
+                    PreferredOutputDevice = "Microsoft GS Wavetable Synth";
+
+                    Save();
+
+                    string msg = "A preferences file could not be found at\n" +
+                                "\t" + M.MoritzPreferencesPath + ".\n\n" +
+                                "A new one has been created with default values.";
+                    MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                if(!Directory.Exists(M.MoritzAudioFolder))
+                {
+                    errorString = M.MoritzAudioFolder + "\n";
+                }
+                if(!Directory.Exists(M.MoritzKrystalsFolder))
+                {
+                    errorString = errorString + M.MoritzKrystalsFolder + "\n";
+                }
+                if(!Directory.Exists(M.MoritzExpansionFieldsFolder))
+                {
+                    errorString = errorString + M.MoritzExpansionFieldsFolder + "\n";
+                }
+                if(!Directory.Exists(M.MoritzModulationOperatorsFolder))
+                {
+                    errorString = errorString + M.MoritzModulationOperatorsFolder + "\n";
+                }
+                if(!Directory.Exists(M.MoritzKrystalsSVGFolder))
+                {
+                    errorString = errorString + M.MoritzKrystalsSVGFolder + "\n";
+                }
+                if(!Directory.Exists(M.MoritzScoresFolder))
+                {
+                    // Moritz´output scores are saved here.
+                    // They should be copied to the online folder
+                    // james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
+                    errorString = errorString + M.MoritzScoresFolder + "\n";
+                }
+
+                if(errorString.Length > 0)
+                {
+                    string msg = $"The following folders, that Moritz requires in order to run, could not be found:\n {errorString}\n";
+
+                    MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
