@@ -17,32 +17,26 @@ namespace Moritz
         #region Krystals Editor
         private void KrystalsEditorButton_Click(object sender, EventArgs e)
         {
-            using(Form krystals5Application = new Krystals5Application.MainWindow())
-            {
-                krystals5Application.ShowDialog();
-            }
+            ShowDialogForm(new Krystals5Application.MainWindow());
         }
         #endregion
 
         private void LoadScoreSettingsButton_Click(object sender, EventArgs e)
         {
-            using(OpenFileDialog openFileDialog = new OpenFileDialog())
+            using(var openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.InitialDirectory = M.MoritzScoresFolder;
-                string filterString = @"Krystal Score Settings (*" + M.MoritzKrystalScoreSettingsExtension +
-                    @")|*" + M.MoritzKrystalScoreSettingsExtension;
-                // "Krystal Score Settings (*.mkss)|*.mkss";
-                openFileDialog.Filter = filterString;
-                openFileDialog.FilterIndex = (int)0;
+                openFileDialog.Filter = $"Krystal Score Settings (*{M.MoritzKrystalScoreSettingsExtension})|*{M.MoritzKrystalScoreSettingsExtension}";
+                openFileDialog.FilterIndex = 0;
                 openFileDialog.Title = "Load Krystal Score Settings";
                 openFileDialog.RestoreDirectory = true;
 
                 if(openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    string settingsPathname = openFileDialog.FileName;
-                    if(!String.IsNullOrEmpty(settingsPathname))
+                    var settingsPathname = openFileDialog.FileName;
+                    if(!string.IsNullOrEmpty(settingsPathname))
                     {
-                        _assistantComposerForm = new AssistantComposerForm(settingsPathname, (IMoritzForm1)this);
+                        _assistantComposerForm = new AssistantComposerForm(settingsPathname, this);
                         _assistantComposerForm.Show();
                         this.Hide();
                     }
@@ -52,18 +46,12 @@ namespace Moritz
 
         private void PreferencesButton_Click(object sender, EventArgs e)
         {
-            using(PreferencesDialog pd = new PreferencesDialog())
-            {
-                pd.ShowDialog(this);
-            }
+            ShowDialogForm(new PreferencesDialog());
         }
 
         private void AboutButton_Click(object sender, EventArgs e)
         {
-            using(Form aboutMoritz = new AboutMoritzDialog())
-            {
-                aboutMoritz.ShowDialog();
-            }
+            ShowDialogForm(new AboutMoritzDialog());
         }
 
         private void QuitButton_Click(object sender, EventArgs e)
@@ -84,8 +72,7 @@ namespace Moritz
         /// <param name="e"></param>
         private void MoritzForm1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(_assistantComposerForm != null && !_assistantComposerForm.Disposing)
-                _assistantComposerForm.Dispose();
+            _assistantComposerForm?.Dispose();
             M.Preferences.Dispose();
         }
 
@@ -97,6 +84,14 @@ namespace Moritz
                 _assistantComposerForm = null;
             }
             this.Show();
+        }
+
+        private void ShowDialogForm(Form form)
+        {
+            using(form)
+            {
+                form.ShowDialog(this);
+            }
         }
 
         private AssistantComposerForm _assistantComposerForm = null;
