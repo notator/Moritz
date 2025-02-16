@@ -86,11 +86,9 @@
     <Compile Include="System Components\Staff Components\Voice Components\ChordSymbol.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\Clef.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\DurationSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\InputChordSymbol.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\OutputRestSymbol.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\NoteObject.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\OutputChordSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\InputRestSymbol.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\RestSymbol.cs" />
     <Compile Include="System Components\Staff Components\Voice.cs" />
     <Compile Include="System Components\Staff.cs" />

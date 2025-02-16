@@ -9,7 +9,11 @@ using System.Diagnostics;
 namespace Moritz.Spec
 {
     /// <summary>
-	/// Trks are "OutputVoiceDefs".
+    /// Feb. 2024: The InputVoiceDef class has been removed, so VoiceDefs are all "OutputVoiceDefs" (=Trks).
+    /// Abstract VoiceDefs were previously the base class for both InputVoiceDefs and OutputVoiceDefs (i.e. Trks)
+    /// So the VoiceDef class could be removed after moving its code into the Trk class.
+    /// 
+	/// Trks are non-abstract VoiceDefs. 
     /// In Seqs, Trks can contain any combination of MidiRestDef and MidiChordDef.
     /// In Blocks, Trks can additionally contain CautionaryChordDefs and ClefDefs.
     /// <para>Trks are, like all VoiceDef objects, IEnumerable, so that foreach loops can be used.</para>
@@ -735,7 +739,7 @@ namespace Moritz.Spec
             if(CheckIndices(beginIndex, endIndex))
             {
                 Debug.Assert(startFactor >= 0 && endFactor >= 0);
-                int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+                int nNonMidiChordDefs = GetNumberOfNonMidiChordDefs(beginIndex, endIndex);
                 int steps = endIndex - 1 - beginIndex - nNonMidiChordDefs;
                 if(steps > 0)
                 {
@@ -776,7 +780,7 @@ namespace Moritz.Spec
             {
                 Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
 
-                int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+                int nNonMidiChordDefs = GetNumberOfNonMidiChordDefs(beginIndex, endIndex);
                 int steps = (endIndex - 1 - beginIndex - nNonMidiChordDefs);
                 if(steps > 0)
                 {
@@ -845,7 +849,7 @@ namespace Moritz.Spec
             Debug.Assert(pwValueAtBeginIndex >= 0 && pwValueAtEndIndex >= 0);
             Debug.Assert(pwValueAtBeginIndex <= 127 && pwValueAtEndIndex <= 127);
 
-            int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+            int nNonMidiChordDefs = GetNumberOfNonMidiChordDefs(beginIndex, endIndex);
 
             double pwdfactor = Math.Pow(pwValueAtEndIndex / pwValueAtBeginIndex, (double)1 / (endIndex - beginIndex - nNonMidiChordDefs)); // f13.Count'th root of furies1EndPwdValue/furies1StartPwdValue -- the last pwd should be furies1EndPwdValue
 

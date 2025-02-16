@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// The base class for Trk and InputVoiceDef.
+    /// The base class for Trk.
     /// <para>VoiceDef classes are IEnumerable (foreach loops can be used).</para>
     /// <para>They are also indexable (IUniqueDef iu = this[index])</para>
     /// </summary>
@@ -74,8 +74,6 @@ namespace Moritz.Spec
                 {
                     Debug.Assert(false, "Index out of range");
                 }
-
-                Debug.Assert(!((this is Trk && value is InputChordDef) || (this is InputVoiceDef && value is MidiChordDef)));
 
                 _uniqueDefs[i] = value;
                 SetMsPositionsReFirstUD();
@@ -252,18 +250,18 @@ namespace Moritz.Spec
         #region attribute changers (Transpose etc.)
 
         /// <summary>
-        /// An object is a NonMidiOrInputChordDef if it is not a MidiChordDef and it is not an InputChordDef.
+        /// An object is a NonMidiChordDef if it is not a MidiChordDef.
         /// For example: a CautionaryChordDef, a RestDef or ClefDef.
         /// </summary>
         /// <param name="beginIndex"></param>
         /// <param name="endIndex"></param>
         /// <returns></returns>
-        protected int GetNumberOfNonMidiOrInputChordDefs(int beginIndex, int endIndex)
+        protected int GetNumberOfNonMidiChordDefs(int beginIndex, int endIndex)
         {
             int nNonMidiChordDefs = 0;
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                if(!(_uniqueDefs[i] is MidiChordDef) && !(_uniqueDefs[i] is InputChordDef))
+                if(!(_uniqueDefs[i] is MidiChordDef))
                     nNonMidiChordDefs++;
             }
             return nNonMidiChordDefs;
@@ -317,7 +315,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Transpose all the IUniqueChordDefs from beginIndex to (excluding) endIndex
         /// up by the number of semitones given in the interval argument.
-        /// IUniqueChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
+        /// IUniqueChordDefs are MidiChordDef and CautionaryChordDef.
         /// Negative interval values transpose down.
         /// It is not an error if Midi pitch values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
@@ -397,14 +395,14 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Transposes the UniqueDefs from the beginIndex upto (excluding) endIndex
-        /// by an equally increasing amount, so that the final MidiChordDef or InputChordDef is transposed by glissInterval.
+        /// by an equally increasing amount, so that the final MidiChordDef is transposed by glissInterval.
         /// glissInterval can be negative.
         /// </summary>
         public void StepwiseGliss(int beginIndex, int endIndex, int glissInterval)
         {
             if(CheckIndices(beginIndex, endIndex))
             {
-                int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+                int nNonMidiChordDefs = GetNumberOfNonMidiChordDefs(beginIndex, endIndex);
 
                 int nSteps = (endIndex - 1 - beginIndex - nNonMidiChordDefs);
                 if(nSteps > 0)
@@ -413,8 +411,7 @@ namespace Moritz.Spec
                     double step = interval;
                     for(int i = beginIndex; i < endIndex; ++i)
                     {
-                        InputChordDef icd = _uniqueDefs[i] as InputChordDef;
-                        IUniqueChordDef iucd = (!(_uniqueDefs[i] is MidiChordDef mcd)) ? (IUniqueChordDef)icd : (IUniqueChordDef)mcd;
+                        IUniqueChordDef iucd = _uniqueDefs[i] as MidiChordDef;
                         if(iucd != null)
                         {
                             iucd.Transpose((int)Math.Round(interval));
@@ -562,19 +559,10 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                InputChordDef icd = this[i] as InputChordDef;
-                IUniqueDef iud = (!(this[i] is MidiChordDef mcd)) ? (IUniqueDef)icd : (IUniqueDef)mcd;
+                IUniqueDef iud = this[i] as MidiChordDef;
                 if(iud != null)
                 {
-                    RestDef restDef;
-                    if(this is InputVoiceDef)
-                    {
-                        restDef = new InputRestDef(iud.MsPositionReFirstUD, iud.MsDuration);
-                    }
-                    else
-                    {
-                        restDef = new MidiRestDef(iud.MsPositionReFirstUD, iud.MsDuration);
-                    }
+                    RestDef restDef = new MidiRestDef(iud.MsPositionReFirstUD, iud.MsDuration);
                     RemoveAt(i);
                     Insert(i, restDef);
                 }

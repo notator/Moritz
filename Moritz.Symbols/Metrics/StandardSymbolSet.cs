@@ -597,8 +597,6 @@ namespace Moritz.Symbols
             CautionaryChordDef cautionaryChordDef = iud as CautionaryChordDef;
             MidiChordDef midiChordDef = iud as MidiChordDef;
             MidiRestDef midiRestDef = iud as MidiRestDef;
-            InputChordDef inputChordDef = iud as InputChordDef;
-            InputRestDef inputRestDef = iud as InputRestDef;
             ClefDef clefDef = iud as ClefDef;
 
             if(cautionaryChordDef != null && iudIndex == 1)

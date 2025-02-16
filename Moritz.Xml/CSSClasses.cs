@@ -24,11 +24,11 @@ namespace Moritz.Xml
         author,     // Used and defined on page 1. Not recorded. Container:titles.
         systems, // Used and defined on every page. Not recorded. Container:svg.
         system, // Used and defined on every page. Not recorded. Container:systems.
-        staffName, inputStaffName, // recorded and used. Container:voice/inputVoice.
-        staff, inputStaff, // recorded and used. Not defined. Container:system.
-        stafflines, inputStafflines, // used but not recorded. Not defined. Container:staff/inputStaff.
-        staffline, inputStaffline, // used but not recorded. Defined if staff/inputStaff exists. Container:stafflines/inputStafflines.
-        voice, inputVoice, // used, but has no Metrics, inherits definition from staff or inputStaff. Container:staff/inputStaff.
+        staffName, // recorded and used. Container:voice.
+        staff, // recorded and used. Not defined. Container:system.
+        stafflines, // used but not recorded. Not defined. Container:staff.
+        staffline, // used but not recorded. Defined if staff/inputStaff exists. Container:stafflines.
+        voice, // used, but has no Metrics, inherits definition from staff or inputStaff. Container:staff.
 
         // all event symbol graphics are contained in a graphics group. Moritz never writes a CSS definition for this group.
         graphics, // Contained by: chord, inputChord, rest, inputRest.
