@@ -440,7 +440,6 @@ namespace Moritz.Symbols
 
         public override Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, PageFormat pageFormat)
         {
-            bool isInput = (noteObject.Voice is InputVoice);
             float strokeWidth = pageFormat.StafflineStemStrokeWidth;
 
             Metrics returnMetrics = null;
@@ -449,7 +448,6 @@ namespace Moritz.Symbols
             Barline barline = noteObject as Barline;
             CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
             ChordSymbol chordSymbol = noteObject as ChordSymbol;
-            InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
             if(barline != null)
             {
@@ -462,9 +460,8 @@ namespace Moritz.Symbols
                 {
                     if(smallClef.IsVisible)
                     {
-                        CSSObjectClass cssClass = isInput ? CSSObjectClass.inputSmallClef : CSSObjectClass.smallClef;
-                        ClefID smallClefID = GetSmallClefID(clef, isInput);
-                        returnMetrics = new SmallClefMetrics(clef, gap, cssClass, smallClefID);
+                        ClefID smallClefID = GetSmallClefID(clef);
+                        returnMetrics = new SmallClefMetrics(clef, gap, CSSObjectClass.smallClef, smallClefID);
                     }
                     else
                     {
@@ -476,18 +473,13 @@ namespace Moritz.Symbols
             {
                 if(clef.ClefType != "n")
                 {
-                    CSSObjectClass cssClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;
-                    ClefID clefID = GetClefID(clef, isInput);
-                    returnMetrics = new ClefMetrics(clef, gap, cssClass, clefID);
+                    ClefID clefID = GetClefID(clef);
+                    returnMetrics = new ClefMetrics(clef, gap, CSSObjectClass.clef, clefID);
                 }
             }
             else if(cautionaryChordSymbol != null)
             {
                 returnMetrics = new ChordMetrics(graphics, cautionaryChordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.cautionaryChord);
-            }
-            else if(inputChordSymbol != null)
-            {
-                returnMetrics = new ChordMetrics(graphics, inputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.inputChord);
             }
             else if(chordSymbol != null)
             {
@@ -495,44 +487,43 @@ namespace Moritz.Symbols
             }
             else if(rest != null)
             {
-                CSSObjectClass restClass = GetRestClass(rest);
                 // All rests are originally created on the centre line.
                 // They are moved vertically later, if they are on a 2-Voice staff.
-                returnMetrics = new RestMetrics(graphics, rest, gap, noteObject.Voice.Staff.NumberOfStafflines, strokeWidth, restClass);
+                returnMetrics = new RestMetrics(graphics, rest, gap, noteObject.Voice.Staff.NumberOfStafflines, strokeWidth, CSSObjectClass.rest);
             }
 
             return returnMetrics;
         }
 
-        private ClefID GetSmallClefID(Clef clef, bool isInput)
+        private ClefID GetSmallClefID(Clef clef)
         {
             ClefID clefID = ClefID.none;
 
             switch(clef.ClefType)
             {
                 case "t":
-                    clefID = isInput ? ClefID.inputSmallTrebleClef : ClefID.smallTrebleClef;
+                    clefID = ClefID.smallTrebleClef;
                     break;
                 case "t1": // trebleClef8
-                    clefID = isInput ? ClefID.inputSmallTrebleClef8 : ClefID.smallTrebleClef8;
+                    clefID = ClefID.smallTrebleClef8;
                     break;
                 case "t2": // trebleClef2x8
-                    clefID = isInput ? ClefID.inputSmallTrebleClef2x8 : ClefID.smallTrebleClef2x8;
+                    clefID = ClefID.smallTrebleClef2x8;
                     break;
                 case "t3": // trebleClef3x8
-                    clefID = isInput ? ClefID.inputSmallTrebleClef3x8 : ClefID.smallTrebleClef3x8;
+                    clefID = ClefID.smallTrebleClef3x8;
                     break;
                 case "b":
-                    clefID = isInput ? ClefID.inputSmallBassClef : ClefID.smallBassClef;
+                    clefID = ClefID.smallBassClef;
                     break;
                 case "b1": // bassClef8
-                    clefID = isInput ? ClefID.inputSmallBassClef8 : ClefID.smallBassClef8;
+                    clefID = ClefID.smallBassClef8;
                     break;
                 case "b2": // bassClef2x8
-                    clefID = isInput ? ClefID.inputSmallBassClef2x8 : ClefID.smallBassClef2x8;
+                    clefID = ClefID.smallBassClef2x8;
                     break;
                 case "b3": // bassClef3x8
-                    clefID = isInput ? ClefID.inputSmallBassClef3x8 : ClefID.smallBassClef3x8;
+                    clefID = ClefID.smallBassClef3x8;
                     break;
                 default:
                     Debug.Assert(false, "Unknown clef type.");
@@ -542,35 +533,35 @@ namespace Moritz.Symbols
             return clefID;
         }
 
-        private ClefID GetClefID(Clef clef, bool isInput)
+        private ClefID GetClefID(Clef clef)
         {
             ClefID clefID = ClefID.none;
 
             switch(clef.ClefType)
             {
                 case "t":
-                    clefID = isInput ? ClefID.inputTrebleClef : ClefID.trebleClef;
+                    clefID = ClefID.trebleClef;
                     break;
                 case "t1": // trebleClef8
-                    clefID = isInput ? ClefID.inputTrebleClef8 : ClefID.trebleClef8;
+                    clefID = ClefID.trebleClef8;
                     break;
                 case "t2": // trebleClef2x8
-                    clefID = isInput ? ClefID.inputTrebleClef2x8 : ClefID.trebleClef2x8;
+                    clefID = ClefID.trebleClef2x8;
                     break;
                 case "t3": // trebleClef3x8
-                    clefID = isInput ? ClefID.inputTrebleClef3x8 : ClefID.trebleClef3x8;
+                    clefID = ClefID.trebleClef3x8;
                     break;
                 case "b":
-                    clefID = isInput ? ClefID.inputBassClef : ClefID.bassClef;
+                    clefID = ClefID.bassClef;
                     break;
                 case "b1": // bassClef8
-                    clefID = isInput ? ClefID.inputBassClef8 : ClefID.bassClef8;
+                    clefID = ClefID.bassClef8;
                     break;
                 case "b2": // bassClef2x8
-                    clefID = isInput ? ClefID.inputBassClef2x8 : ClefID.bassClef2x8;
+                    clefID = ClefID.bassClef2x8;
                     break;
                 case "b3": // bassClef3x8
-                    clefID = isInput ? ClefID.inputBassClef3x8 : ClefID.bassClef3x8;
+                    clefID = ClefID.bassClef3x8;
                     break;
                 default:
                     Debug.Assert(false, "Unknown clef type.");
@@ -578,16 +569,6 @@ namespace Moritz.Symbols
             }
 
             return clefID;
-        }
-
-        private CSSObjectClass GetRestClass(RestSymbol rest)
-        {
-            CSSObjectClass restClass = CSSObjectClass.rest; // OutputChordSymbol
-            if(rest is InputRestSymbol)
-            {
-                restClass = CSSObjectClass.inputRest;
-            }
-            return restClass;
         }
 
         public override NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, int iudIndex,
@@ -623,16 +604,6 @@ namespace Moritz.Symbols
             {
                 OutputRestSymbol outputRestSymbol = new OutputRestSymbol(voice, iud, absMsPosition, pageFormat);
                 noteObject = outputRestSymbol;
-            }
-            else if(inputChordDef != null)
-            {
-                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, absMsPosition, pageFormat);
-                noteObject = inputChordSymbol;
-            }
-            else if(inputRestDef != null)
-            {
-                InputRestSymbol inputRestSymbol = new InputRestSymbol(voice, inputRestDef, absMsPosition, pageFormat);
-                noteObject = inputRestSymbol;
             }
             else if(clefDef != null)
             {

@@ -201,7 +201,7 @@ namespace Moritz.Symbols
                 Staff staff = Staves[staffIndex];
 
                 float staffHeight = staff.Gap * (staff.NumberOfStafflines - 1);
-                staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight, staff is InputStaff);
+                staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight);
 
                 for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                 {

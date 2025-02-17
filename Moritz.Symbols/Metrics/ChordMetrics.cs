@@ -47,16 +47,13 @@ namespace Moritz.Symbols
             }
             else
             {
-                CSSObjectClass lyricClass = GetLyricClass(chord);
-                _lyricMetrics = NewLyricMetrics(chord.Voice.StemDirection, graphics, gap, lyricClass);
+                _lyricMetrics = NewLyricMetrics(chord.Voice.StemDirection, graphics, gap, CSSObjectClass.lyric);
 
                 GetRelativePositions(chord.Voice.StemDirection, _lyricMetrics, out bool ornamentIsBelow, out bool dynamicIsBelow);
 
                 _ornamentMetrics = NewOrnamentMetrics(graphics, ornamentIsBelow);
 
-                CSSObjectClass dynamicClass = GetDynamicClass(chord);
-
-                _dynamicMetrics = NewCLichtDynamicMetrics(gap, dynamicIsBelow, dynamicClass);
+                _dynamicMetrics = NewCLichtDynamicMetrics(gap, dynamicIsBelow, CSSObjectClass.dynamic);
 
                 MoveAuxilliaries(chord.Stem.Direction, gap);
             }
@@ -165,15 +162,12 @@ namespace Moritz.Symbols
 
         private CSSObjectClass GetMainHeadClass(ChordSymbol chord)
         {
-            CSSObjectClass headClass = CSSObjectClass.notehead; // OutputChordSymbol
+            CSSObjectClass headClass = CSSObjectClass.notehead;  // chordClass == chord
             if(chord is CautionaryChordSymbol)
             {
                 headClass = CSSObjectClass.cautionaryNotehead;
             }
-            else if(chord is InputChordSymbol)
-            {
-                headClass = CSSObjectClass.inputNotehead;
-            }
+
             return headClass;
         }
 
@@ -184,38 +178,15 @@ namespace Moritz.Symbols
             {
                 accidentalClass = CSSObjectClass.cautionaryAccidental;
             }
-            else if(chordClass == CSSObjectClass.inputChord)
-            {
-                accidentalClass = CSSObjectClass.inputAccidental;
-            }
+
             return accidentalClass;
-        }
-
-        private CSSObjectClass GetDynamicClass(ChordSymbol chord)
-        {
-            CSSObjectClass dynamicClass = CSSObjectClass.dynamic; // OutputChordSymbol
-            if(chord is InputChordSymbol)
-            {
-                dynamicClass = CSSObjectClass.inputDynamic;
-            }
-            return dynamicClass;
-        }
-
-        private CSSObjectClass GetLyricClass(ChordSymbol chord)
-        {
-            CSSObjectClass lyricClass = CSSObjectClass.lyric; // OutputChordSymbol
-            if(chord is InputChordSymbol)
-            {
-                lyricClass = CSSObjectClass.inputLyric;
-            }
-            return lyricClass;
         }
 
         private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth, CSSObjectClass chordClass)
         {
             float limbLength = (topDownHeadsMetrics[0].RightStemX - topDownHeadsMetrics[0].LeftStemX) / 2F; // change to taste later
 
-            CSSObjectClass llsClass = GetLedgerlinesClass(chordClass);
+            CSSObjectClass llsClass = CSSObjectClass.ledgerlines;
             _upperLedgerlineBlockMetrics = CreateUpperLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth, llsClass);
             _lowerLedgerlineBlockMetrics = CreateLowerLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth, llsClass);
 
@@ -247,10 +218,7 @@ namespace Moritz.Symbols
             {
                 llClass = CSSObjectClass.ledgerlines; // N.B. cautionaryLedgerlines does not exist.
             }
-            else if(chordClass == CSSObjectClass.inputChord)
-            {
-                llClass = CSSObjectClass.inputLedgerlines;
-            }
+
             return llClass;
         }
 
@@ -436,7 +404,7 @@ namespace Moritz.Symbols
             LedgerlineBlockMetrics upperLedgerlineBlockMetrics = null;
             if(topHeadMetrics.OriginY < -(_gap * 0.75F))
             {
-                upperLedgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, strokeWidth, ledgerlinesClass); // contains no ledgerlines
+                upperLedgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, strokeWidth); // contains no ledgerlines
 
                 float topLedgerlineY = topHeadMetrics.OriginY;
                 if((topLedgerlineY % _gap) < 0)
@@ -470,7 +438,7 @@ namespace Moritz.Symbols
             LedgerlineBlockMetrics lowerLedgerlineBlockMetrics = null;
             if(bottomHeadMetrics.OriginY > (_gap * 4.75))
             {
-                lowerLedgerlineBlockMetrics = new LedgerlineBlockMetrics(leftX, rightX, strokeWidth, ledgerlinesClass); // contains no ledgerlines
+                lowerLedgerlineBlockMetrics = new LedgerlineBlockMetrics(leftX, rightX, strokeWidth);
 
                 float bottomLedgerlineY = bottomHeadMetrics.OriginY;
                 if((bottomLedgerlineY % _gap) > 0)
@@ -489,7 +457,6 @@ namespace Moritz.Symbols
         #region set stem and flags
         private void SetStemAndFlags(ChordSymbol chord, List<HeadMetrics> topDownHeadsMetrics, float stemThickness)
         {
-            bool isInput = chord is InputChordSymbol;
             DurationClass durationClass = chord.DurationClass;
             _flagsMetrics = null;
             if(chord.BeamBlock == null
@@ -503,8 +470,7 @@ namespace Moritz.Symbols
                                                                 durationClass,
                                                                 chord.FontHeight,
                                                                 chord.Stem.Direction,
-                                                                stemThickness,
-                                                                isInput);
+                                                                stemThickness);
             }
 
             if(durationClass == DurationClass.minim
@@ -515,7 +481,7 @@ namespace Moritz.Symbols
             || durationClass == DurationClass.fourFlags
             || durationClass == DurationClass.fiveFlags)
             {
-                _stemMetrics = NewStemMetrics(topDownHeadsMetrics, chord, _flagsMetrics, stemThickness, isInput);
+                _stemMetrics = NewStemMetrics(topDownHeadsMetrics, chord, _flagsMetrics, stemThickness);
             }
         }
 
@@ -523,7 +489,7 @@ namespace Moritz.Symbols
         /// Returns null if the durationClass does not have a flagsBlock,
         /// otherwise returns the metrics for the flagsBlock attached to this chord, correctly positioned wrt the noteheads.
         /// </summary>
-        private FlagsMetrics GetFlagsMetrics(List<HeadMetrics> topDownHeadsMetrics, DurationClass durationClass, float fontSize, VerticalDir stemDirection, float stemThickness, bool isInput)
+        private FlagsMetrics GetFlagsMetrics(List<HeadMetrics> topDownHeadsMetrics, DurationClass durationClass, float fontSize, VerticalDir stemDirection, float stemThickness)
         {
             Debug.Assert(durationClass == DurationClass.quaver
                 || durationClass == DurationClass.semiquaver
@@ -531,7 +497,7 @@ namespace Moritz.Symbols
                 || durationClass == DurationClass.fourFlags
                 || durationClass == DurationClass.fiveFlags);
 
-            FlagsMetrics flagsMetrics = new FlagsMetrics(durationClass, fontSize, stemDirection, isInput);
+            FlagsMetrics flagsMetrics = new FlagsMetrics(durationClass, fontSize, stemDirection);
 
             if(flagsMetrics != null)
             {
@@ -1112,7 +1078,7 @@ namespace Moritz.Symbols
         /// is too close to the noteheads in the other chord, the stem tip (and flagsBlock) is moved outwards.
         /// FlagsBlockMetrics exist if the duration class is small enough, and the chord is not owned by a beamBlock.
         /// </summary>
-        public void AdjustStemLengthAndFlagBlock(DurationClass thisDurationClass, float thisFontHeight, List<HeadMetrics> otherHeadsMetrics, bool isInput)
+        public void AdjustStemLengthAndFlagBlock(DurationClass thisDurationClass, float thisFontHeight, List<HeadMetrics> otherHeadsMetrics)
         {
             if(_stemMetrics == null
             || (_stemMetrics.VerticalDir == VerticalDir.up && BottomHeadMetrics.Bottom <= otherHeadsMetrics[0].Top)
@@ -1125,12 +1091,11 @@ namespace Moritz.Symbols
                                                 thisDurationClass,
                                                 thisFontHeight,
                                                 _stemMetrics.VerticalDir,
-                                                _stemMetrics.StrokeWidth,
-                                                isInput);
+                                                _stemMetrics.StrokeWidth);
 
                 StemMetrics dummyStemMetrics =
                     DummyStemMetrics(otherHeadsMetrics, _stemMetrics.VerticalDir, thisFontHeight,
-                        dummyFlagsMetrics, null, _stemMetrics.StrokeWidth, isInput);
+                        dummyFlagsMetrics, null, _stemMetrics.StrokeWidth);
 
                 if(_stemMetrics.VerticalDir == VerticalDir.up)
                 {
@@ -1153,7 +1118,7 @@ namespace Moritz.Symbols
             {
                 StemMetrics dummyStemMetrics =
                     DummyStemMetrics(otherHeadsMetrics, _stemMetrics.VerticalDir, thisFontHeight, null, null,
-                        _stemMetrics.StrokeWidth, isInput);
+                        _stemMetrics.StrokeWidth);
 
                 if(_stemMetrics.VerticalDir == VerticalDir.up)
                 {
@@ -1213,9 +1178,9 @@ namespace Moritz.Symbols
         /// <summary>
         /// Sets the stem. Pass flagsBlockMetrics=null for duration classes having no flags.
         /// </summary>
-        private StemMetrics NewStemMetrics(List<HeadMetrics> topDownHeadsMetrics, ChordSymbol chord, Metrics flagsBlockMetrics, float strokeWidth, bool isInput)
+        private StemMetrics NewStemMetrics(List<HeadMetrics> topDownHeadsMetrics, ChordSymbol chord, Metrics flagsBlockMetrics, float strokeWidth)
         {
-            return NewStemMetrics(topDownHeadsMetrics, chord.Stem.Direction, chord.FontHeight, flagsBlockMetrics, chord.BeamBlock, strokeWidth, isInput);
+            return NewStemMetrics(topDownHeadsMetrics, chord.Stem.Direction, chord.FontHeight, flagsBlockMetrics, chord.BeamBlock, strokeWidth);
         }
 
         private StemMetrics NewStemMetrics(
@@ -1224,8 +1189,7 @@ namespace Moritz.Symbols
             float fontHeight,
             Metrics flagsBlockMetrics,
             BeamBlock beamBlock,
-            float strokeWidth,
-            bool isInput)
+            float strokeWidth)
         {
             HeadMetrics outerNotehead = FindOuterNotehead(topDownHeadsMetrics, stemDirection);
             HeadMetrics innerNotehead = FindInnerNotehead(topDownHeadsMetrics, stemDirection);
@@ -1287,7 +1251,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            StemMetrics stemMetrics = new StemMetrics(top, x, bottom, strokeWidth, stemDirection, isInput);
+            StemMetrics stemMetrics = new StemMetrics(top, x, bottom, strokeWidth, stemDirection);
             return stemMetrics;
         }
 
@@ -1301,8 +1265,7 @@ namespace Moritz.Symbols
             float fontHeight,
             Metrics flagsBlockMetrics,
             BeamBlock beamBlock,
-            float strokeWidth,
-            bool isInput)
+            float strokeWidth)
         {
             List<HeadMetrics> tempTopDownHeadsMetrics = new List<HeadMetrics>();
             foreach(HeadMetrics headMetrics in otherChordTopDownHeadsMetrics)
@@ -1311,7 +1274,7 @@ namespace Moritz.Symbols
                 tempTopDownHeadsMetrics.Add(newHeadMetrics);
             }
 
-            return NewStemMetrics(tempTopDownHeadsMetrics, stemDirection, fontHeight, flagsBlockMetrics, beamBlock, strokeWidth, isInput);
+            return NewStemMetrics(tempTopDownHeadsMetrics, stemDirection, fontHeight, flagsBlockMetrics, beamBlock, strokeWidth);
         }
 
         public BeamBlock BeamBlock = null;
@@ -2161,7 +2124,7 @@ namespace Moritz.Symbols
             }
             if(top != float.MaxValue)
             {
-                ledgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, staffLineStemStrokeWidth, CSSObjectClass.ledgerlines);
+                ledgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, staffLineStemStrokeWidth);
                 ledgerlineBlockMetrics.SetTop(top);
                 ledgerlineBlockMetrics.SetBottom(bottom);
             }

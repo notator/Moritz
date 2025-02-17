@@ -4,8 +4,8 @@ namespace Moritz.Symbols
 {
     public class StaffMetrics : GroupMetrics
     {
-        public StaffMetrics(float left, float right, float height, bool isInput)
-            : base(isInput ? CSSObjectClass.inputStaff : CSSObjectClass.staff)
+        public StaffMetrics(float left, float right, float height)
+            : base(CSSObjectClass.staff)
         {
             _top = 0F;
             _right = right;

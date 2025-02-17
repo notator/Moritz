@@ -41,8 +41,8 @@ namespace Moritz.Symbols
 
     internal class StemMetrics : LineMetrics
     {
-        public StemMetrics(float top, float x, float bottom, float strokeWidth, VerticalDir verticalDir, bool isInput)
-            : base(isInput ? CSSObjectClass.inputStem : CSSObjectClass.stem, strokeWidth, "black")
+        public StemMetrics(float top, float x, float bottom, float strokeWidth, VerticalDir verticalDir)
+            : base(CSSObjectClass.stem, strokeWidth, "black")
         {
             _originX = x;
             _originY = top;
@@ -69,8 +69,8 @@ namespace Moritz.Symbols
     }
     internal class LedgerlineBlockMetrics : LineMetrics, ICloneable
     {
-        public LedgerlineBlockMetrics(float left, float right, float strokeWidth, CSSObjectClass ledgerlinesClass)
-            : base(ledgerlinesClass, strokeWidth, "black")
+        public LedgerlineBlockMetrics(float left, float right, float strokeWidth)
+            : base(CSSObjectClass.ledgerlines, strokeWidth, "black")
         {
             /// The base class has deliberately been called with CSSClass.ledgerline (singular) here.
             /// This is so that its less confusing later when comparing the usage with stafflines/staffline.
@@ -113,13 +113,11 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            CSSObjectClass ledgerlineClass = (CSSObjectClass == CSSObjectClass.inputLedgerlines) ? CSSObjectClass.inputLedgerline : CSSObjectClass.ledgerline;
-
             w.WriteStartElement("g");
             w.WriteAttributeString("class", CSSObjectClass.ToString());
             foreach(float y in Ys)
             {
-                w.SvgLine(ledgerlineClass, _left + _strokeWidth, y, _right - _strokeWidth, y);
+                w.SvgLine(CSSObjectClass.ledgerline, _left + _strokeWidth, y, _right - _strokeWidth, y);
             }
             w.WriteEndElement();
         }

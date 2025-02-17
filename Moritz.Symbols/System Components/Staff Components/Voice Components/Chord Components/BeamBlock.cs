@@ -8,8 +8,8 @@ namespace Moritz.Symbols
 {
     public class BeamBlock : LineMetrics
     {
-        public BeamBlock(Clef clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness, bool isInput)
-            : base(isInput ? CSSObjectClass.inputBeamBlock : CSSObjectClass.beamBlock, strokeThickness, "black", "black")
+        public BeamBlock(Clef clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
+            : base(CSSObjectClass.beamBlock, strokeThickness, "black", "black")
         {
             Chords = new List<ChordSymbol>(chordsBeamedTogether);
             SetBeamedGroupStemDirection(clef, chordsBeamedTogether, voiceStemDirection);
@@ -1094,8 +1094,6 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            bool isInput = (CSSObjectClass == CSSObjectClass.inputBeamBlock);
-
             w.SvgStartGroup(CSSObjectClass.ToString());
             foreach(Beam beam in Beams)
             {
@@ -1114,9 +1112,9 @@ namespace Moritz.Symbols
                         topRight = beam.RightTopY - _beamThickness;
                     }
 
-                    w.SvgBeam(beam.LeftX, beam.RightX, topLeft, topRight, _beamThickness * 1.5F, true, isInput);
+                    w.SvgBeam(beam.LeftX, beam.RightX, topLeft, topRight, _beamThickness * 1.5F, true);
                 }
-                w.SvgBeam(beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, false, isInput);
+                w.SvgBeam(beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, false);
             }
             w.SvgEndGroup();
         }

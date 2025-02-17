@@ -50,7 +50,7 @@ namespace Moritz.Algorithm.Study2
 
             Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
-            List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
+            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
 
             return bars;
         }

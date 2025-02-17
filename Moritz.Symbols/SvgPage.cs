@@ -113,9 +113,8 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, Metadata metadata, bool isSinglePageScore)
         {
-            int nOutputVoices = 0;
-            int nInputVoices = 0;
-            GetNumbersOfVoices(Systems[0], ref nOutputVoices, ref nInputVoices);
+            int nVoices = 0;
+            GetNumberOfVoices(Systems[0], ref nVoices);
 
             w.WriteStartDocument(); // standalone="no"
             //<?xml-stylesheet href="../../fontsStyleSheet.css" type="text/css"?>
@@ -124,7 +123,7 @@ namespace Moritz.Symbols
 
             WriteSvgHeader(w);
 
-            metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
+            metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nVoices);
 
             _score.WriteDefs(w, _pageNumber);
 
@@ -150,21 +149,16 @@ namespace Moritz.Symbols
             w.WriteEndDocument();
         }
 
-        private void GetNumbersOfVoices(SvgSystem svgSystem, ref int nOutputVoices, ref int nInputVoices)
+        private void GetNumberOfVoices(SvgSystem svgSystem, ref int nVoices)
         {
-            nOutputVoices = 0;
-            nInputVoices = 0;
+            nVoices = 0;
             foreach(Staff staff in svgSystem.Staves)
             {
                 foreach(Voice voice in staff.Voices)
                 {
                     if(voice is OutputVoice)
                     {
-                        nOutputVoices++;
-                    }
-                    else if(voice is InputVoice)
-                    {
-                        nInputVoices++;
+                        nVoices++;
                     }
                 }
             }

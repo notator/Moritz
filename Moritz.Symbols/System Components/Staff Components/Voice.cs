@@ -37,8 +37,6 @@ namespace Moritz.Symbols
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
                 NoteObject noteObject = NoteObjects[i];
-                InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
-                InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
                 CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
                 OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
                 OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
@@ -56,10 +54,6 @@ namespace Moritz.Symbols
                     }
                     barline.WriteDrawObjectsSVG(w);
                 }
-                else if(inputChordSymbol != null)
-                {
-                    inputChordSymbol.WriteSVG(w);
-                }
                 else if(cautionaryChordSymbol != null)
                 {
                     cautionaryChordSymbol.WriteSVG(w);
@@ -68,10 +62,6 @@ namespace Moritz.Symbols
                 {
                     Debug.Assert(carryMsgsPerChannel != null);
                     outputChordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
-                }
-                else if(inputRestSymbol != null)
-                {
-                    inputRestSymbol.WriteSVG(w);
                 }
                 else if(outputRestSymbol != null)
                 {
@@ -83,18 +73,16 @@ namespace Moritz.Symbols
                     if(clef.Metrics != null)
                     {
                         // if this is the first barline, the staff name and (maybe) barnumber will be written.
-                        bool isInput = (noteObject.Voice is InputVoice);
                         ClefMetrics cm = clef.Metrics as ClefMetrics;
-                        clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY, isInput);
+                        clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY);
                     }
                 }
                 else if(smallClef != null)
                 {
                     if(smallClef.Metrics != null)
                     {
-                        bool isInput = (noteObject.Voice is InputVoice);
                         SmallClefMetrics scm = smallClef.Metrics as SmallClefMetrics;
-                        smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY, isInput);
+                        smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY);
                     }
                 }
                 else
@@ -292,13 +280,8 @@ namespace Moritz.Symbols
                         {
                             float beamThickness = pageFormat.BeamThickness;
                             float beamStrokeThickness = pageFormat.StafflineStemStrokeWidth;
-                            if(this is InputVoice)
-                            {
-                                beamThickness *= pageFormat.InputSizeFactor;
-                                beamStrokeThickness *= pageFormat.InputSizeFactor;
-                            }
                             chordsBeamedTogether[0].BeamBlock =
-                                new BeamBlock(currentClef, chordsBeamedTogether, this.StemDirection, beamThickness, beamStrokeThickness, this is InputVoice);
+                                new BeamBlock(currentClef, chordsBeamedTogether, this.StemDirection, beamThickness, beamStrokeThickness);
                         }
                     }
                     chordsBeamedTogether.Clear();

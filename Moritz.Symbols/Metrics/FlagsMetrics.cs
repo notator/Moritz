@@ -10,8 +10,8 @@ namespace Moritz.Symbols
         /// <summary>
         /// Should be called with a duration class having a flag block
         /// </summary>
-        public FlagsMetrics(DurationClass durationClass, float fontHeight, VerticalDir stemDirection, bool isInput)
-            : base(isInput ? CSSObjectClass.inputFlag : CSSObjectClass.flag)
+        public FlagsMetrics(DurationClass durationClass, float fontHeight, VerticalDir stemDirection)
+            : base(CSSObjectClass.flag)
         {
             _left = 0F;
 
@@ -31,36 +31,36 @@ namespace Moritz.Symbols
             {
                 case DurationClass.quaver:
                     if(stemDirection == VerticalDir.up)
-                        _flagID = isInput ? FlagID.inputRight1Flag : FlagID.right1Flag;
+                        _flagID = FlagID.right1Flag;
                     else
-                        _flagID = isInput ? FlagID.inputLeft1Flag : FlagID.left1Flag;
+                        _flagID = FlagID.left1Flag;
                     break;
                 case DurationClass.semiquaver:
                     if(stemDirection == VerticalDir.up)
-                        _flagID = isInput ? FlagID.inputRight2Flags : FlagID.right2Flags;
+                        _flagID = FlagID.right2Flags;
                     else
-                        _flagID = isInput ? FlagID.inputLeft2Flags : FlagID.left2Flags;
+                        _flagID = FlagID.left2Flags;
                     offset = 0.25F;
                     break;
                 case DurationClass.threeFlags:
                     if(stemDirection == VerticalDir.up)
-                        _flagID = isInput ? FlagID.inputRight3Flags : FlagID.right3Flags;
+                        _flagID = FlagID.right3Flags;
                     else
-                        _flagID = isInput ? FlagID.inputLeft3Flags : FlagID.left3Flags;
+                        _flagID = FlagID.left3Flags;
                     offset = 0.5F;
                     break;
                 case DurationClass.fourFlags:
                     if(stemDirection == VerticalDir.up)
-                        _flagID = isInput ? FlagID.inputRight4Flags : FlagID.right4Flags;
+                        _flagID = FlagID.right4Flags;
                     else
-                        _flagID = isInput ? FlagID.inputLeft4Flags : FlagID.left4Flags;
+                        _flagID = FlagID.left4Flags;
                     offset = 0.75F;
                     break;
                 case DurationClass.fiveFlags:
                     if(stemDirection == VerticalDir.up)
-                        _flagID = isInput ? FlagID.inputRight5Flags : FlagID.right5Flags;
+                        _flagID = FlagID.right5Flags;
                     else
-                        _flagID = isInput ? FlagID.inputLeft5Flags : FlagID.left5Flags;
+                        _flagID = FlagID.left5Flags;
                     offset = 1F;
                     break;
                 default:

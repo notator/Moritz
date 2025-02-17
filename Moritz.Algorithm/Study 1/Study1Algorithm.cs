@@ -33,9 +33,9 @@ namespace Moritz.Algorithm.Study1
 
             Trk track = GetTrack(trackChordNumbers, trackRootPitches);
             Seq mainSeq = new Seq(0, new List<Trk>() { track }, MidiChannelPerOutputVoice);
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, null, NumberOfBars);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, NumberOfBars);
 
-            List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
+            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
 
             SetPatch0InTheFirstChord(bars[0].VoiceDefs[0]);
 

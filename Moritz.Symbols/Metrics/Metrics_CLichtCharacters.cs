@@ -92,7 +92,7 @@ namespace Moritz.Symbols
 		public CLichtCharacterMetrics(DurationClass durationClass, float fontHeight, CSSObjectClass cssClass)
             : base(cssClass, "CLicht", fontHeight)
         {
-            _characterString = GetClichtCharacterString(durationClass, (cssClass == CSSObjectClass.rest || cssClass == CSSObjectClass.inputRest));
+            _characterString = GetClichtCharacterString(durationClass, cssClass == CSSObjectClass.rest);
 
             Debug.Assert(_characterString != null);
             Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
@@ -274,7 +274,6 @@ namespace Moritz.Symbols
             _originY += dy; // the staffline on which the rest is aligned
             _ledgerlineStub = gap * 0.75F;
             Move((Left - Right) / 2F, 0F); // centre the glyph horizontally
-            CSSObjectClass llBlockClass = (restClass == CSSObjectClass.rest) ? CSSObjectClass.ledgerlines : CSSObjectClass.inputLedgerlines;
             switch(rest.DurationClass)
             {
                 case DurationClass.breve:
@@ -282,14 +281,14 @@ namespace Moritz.Symbols
                     Move(gap * -0.25F, 0F);
                     if(numberOfStafflines == 1)
                         Move(0F, gap);
-                    _ledgerlineBlockMetrics = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub, ledgerlineStrokeWidth, llBlockClass);
+                    _ledgerlineBlockMetrics = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub, ledgerlineStrokeWidth);
                     _ledgerlineBlockMetrics.AddLedgerline(_originY - gap, 0F);
                     _ledgerlineBlockMetrics.Move(gap * 0.17F, 0F);
                     _top -= (gap * 1.5F);
                     break;
                 case DurationClass.minim:
                     Move(gap * 0.18F, 0);
-                    _ledgerlineBlockMetrics = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub - (gap * 0.3F), ledgerlineStrokeWidth, llBlockClass);
+                    _ledgerlineBlockMetrics = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub - (gap * 0.3F), ledgerlineStrokeWidth);
                     _ledgerlineBlockMetrics.AddLedgerline(_originY, 0F);
                     _bottom += (gap * 1.5F);
                     break;

@@ -167,17 +167,13 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
-            List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
-
-            //List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
-
             List<int> endBarlinePositions = GetEndBarlineMsPositions(firstATrkUIDs, firstBTrkUIDs, firstCTrkUIDs, msDuration);
 
             Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
             List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, mainSeq.Trks.Count);
 
-            List<Bar> bars = GetBars(mainSeq, inputVoiceDefs, endBarlinePositions, clefChangesPerBar, null);
+            List<Bar> bars = GetBars(mainSeq, endBarlinePositions, clefChangesPerBar, null);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 

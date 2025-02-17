@@ -28,10 +28,9 @@ namespace Moritz.Symbols
         /// Writes a clef or smallClef to the SVG file.
         /// The Character metrics have been set in SvgSystem.Justify()
         /// </summary>
-        public void WriteSVG(SvgWriter w, ClefID clefOrSmallClefID, float originX, float originY, bool isInput)
+        public void WriteSVG(SvgWriter w, ClefID clefOrSmallClefID, float originX, float originY)
         {
-            CSSObjectClass clefClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;
-            w.SvgUseXY(clefClass, clefOrSmallClefID.ToString(), originX, originY);
+            w.SvgUseXY(CSSObjectClass.clef, clefOrSmallClefID.ToString(), originX, originY);
         }
 
         public override string ToString()
