@@ -159,21 +159,21 @@ namespace Moritz.Spec
                 w.WriteStartElement("switches");
                 if(BankIndex != null && BankIndex != carryMsgs.BankState)
                 {
-                    MidiMsg msg = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_BANK_CHANGE_0, BankIndex);
+                    MidiMsg msg = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL1.BANK_0, BankIndex);
                     msg.WriteSVG(w);
                     carryMsgs.BankState = (byte)BankIndex;
                 }
                 if(PatchIndex != null && PatchIndex != carryMsgs.PatchState)
                 {
-                    MidiMsg msg = new MidiMsg(M.CMD_PATCH_CHANGE_0xC0 + channel, (int)PatchIndex, null);
+                    MidiMsg msg = new MidiMsg((int)M.CMD.PRESET_192 + channel, (int)PatchIndex, null);
                     msg.WriteSVG(w);
                     carryMsgs.PatchState = (byte)PatchIndex;
                 }
                 if(PitchWheelDeviation != null && PitchWheelDeviation != carryMsgs.PitchWheelDeviationState)
                 {
-                    MidiMsg msg1 = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_REGISTEREDPARAMETER_COARSE_101, M.SELECT_PITCHBEND_RANGE_0);
+                    MidiMsg msg1 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL1.REGISTERED_PARAMETER_101, M.SELECT_PITCHBEND_RANGE_0);
                     msg1.WriteSVG(w);
-                    MidiMsg msg2 = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_DATAENTRY_COARSE_6, PitchWheelDeviation);
+                    MidiMsg msg2 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL1.DATA_ENTRY_6, PitchWheelDeviation);
                     msg2.WriteSVG(w);
                     carryMsgs.PitchWheelDeviationState = (byte)PitchWheelDeviation;
                 }
@@ -184,7 +184,7 @@ namespace Moritz.Spec
             {
                 Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
                 w.WriteStartElement("noteOns");
-                int status = M.CMD_NOTE_ON_0x90 + channel; // NoteOn
+                int status = (int)M.CMD.NOTE_ON_144 + channel; // NoteOn
                 for(int i = 0; i < Pitches.Count; ++i)
                 {
                     MidiMsg msg = new MidiMsg(status, Pitches[i], Velocities[i]);
@@ -194,7 +194,7 @@ namespace Moritz.Spec
 
                 if(HasChordOff)
                 {
-                    status = M.CMD_NOTE_OFF_0x80 + channel;
+                    status = (int)M.CMD.NOTE_OFF_120 + channel;
                     int data2 = M.DEFAULT_NOTEOFF_VELOCITY_64;
                     foreach(byte pitch in Pitches)
                     {

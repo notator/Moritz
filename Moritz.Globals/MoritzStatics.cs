@@ -943,39 +943,72 @@ namespace Moritz.Globals
 
         #region MIDI
         /// <summary>
-        /// Commands
+        /// Moritz only uses commands and controls supported by the ResidentSynth.
+        /// See https://james-ingram-act-two.de/open-source/aboutResidentSynthHost.html
         /// </summary>
-        public static readonly int CMD_NOTE_OFF_0x80 = 0x80;
-        public static readonly int CMD_NOTE_ON_0x90 = 0x90;
-        public static readonly int CMD_AFTERTOUCH_0xA0 = 0xA0;
-        public static readonly int CMD_CONTROL_CHANGE_0xB0 = 0xB0;
-        public static readonly int CMD_PATCH_CHANGE_0xC0 = 0xC0;
-        public static readonly int CMD_CHANNEL_PRESSURE_0xD0 = 0xD0;
-        public static readonly int CMD_PITCH_WHEEL_0xE0 = 0xE0;
+        public enum CMD
+        {
+            // AFTERTOUCH and CHANNEL_PRESSURE are not defined, because
+            // they are not used in existing scores, and the ResidentSynth
+            // does not support them.
+            NOTE_OFF_120 = 0x80,
+            NOTE_ON_144 = 0x90,
+            CONTROL_CHANGE_176 = 0xB0,
+            PRESET_192 = 0xC0,
+            PITCH_WHEEL_224 = 0xE0
+        }
 
         /// <summary>
-        /// Control Numbers (These are just the ones Moritz uses.)
+        /// Standard MIDI control numbers implemented by the ResidentSynth.
+        /// Some, but not all, are used in legacy code.
+        /// See https://james-ingram-act-two.de/open-source/aboutResidentSynthHost.html
         /// </summary>
-        public static readonly int CTL_BANK_CHANGE_0 = 0;
-        public static readonly int CTL_MODWHEEL_1 = 1;
-        public static readonly int CTL_PAN_10 = 10;
-        public static readonly int CTL_EXPRESSION_11 = 11;
-        public static readonly int CTL_REGISTEREDPARAMETER_COARSE_101 = 101;
-        public static readonly int CTL_REGISTEREDPARAMETER_FINE_100 = 100;
-        public static readonly int CTL_DATAENTRY_COARSE_6 = 6;
-        public static readonly int CTL_DATAENTRY_FINE_38 = 38;
-        public static readonly int SELECT_PITCHBEND_RANGE_0 = 0;
+        public enum CTL1
+        {   
+            BANK_0 = 0, 
+            MOD_WHEEL_1 = 1,
+            VOLUME_7 = 7,
+            PAN_10 = 10,
+            EXPRESSION_11 = 11,
+            ALL_SOUND_OFF_120 = 120,
+            ALL_CONTROLLERS_OFF = 121,
+            // The following are used by legacy code and implemented by the ResidentSynth,
+            // but are deprecated. Use CTL2.PITCHWHEEL_SENSITIVITY_16 instead.
+            REGISTERED_PARAMETER_101 = 101,
+            DATA_ENTRY_6 = 6
+        }
+
+        /// <summary>
+        /// Non-standard MIDI control numbers implemented by the ResidentSynth.
+        /// See https://james-ingram-act-two.de/open-source/aboutResidentSynthHost.html
+        /// </summary>
+        public enum CTL2
+        {
+            PITCH_WHEEL_SENSITIVITY_16 = 16,
+            MIXTURE_17 = 17,
+            TUNING_GROUP_18,
+            TUNING_19 = 19,
+            ORNAMENT_75 = 75,
+            SEMITONE_OFFSET_80 = 80,
+            CENT_OFFSET_81 = 81,
+            VELOCITY_PITCH_SENSITIVITY_83 = 83,
+            REVERBERATION_91 = 91
+        }
+        #region MIDI helper constants
+        public static readonly int SELECT_PITCHBEND_RANGE_0 = 0; // deprecated (Use CTL2.PITCHWHEEL_SENSITIVITY_16 instead)
+        public static readonly byte DEFAULT_PITCHWHEELDEVIATION_2 = 2;
         public static readonly int DEFAULT_NOTEOFF_VELOCITY_64 = 64;
+        #endregion
         /// <summary>
         /// The following values are (supposed to be) set by AllControllersOff.
         /// </summary>
-        public static readonly byte DEFAULT_BANKAndPATCH_0 = 0;
-        public static readonly byte DEFAULT_VOLUME_100 = 100;
-        public static readonly byte DEFAULT_EXPRESSION_127 = 127;
-        public static readonly byte DEFAULT_PITCHWHEELDEVIATION_2 = 2;
-        public static readonly byte DEFAULT_PITCHWHEEL_64 = 64;
-        public static readonly byte DEFAULT_PAN_64 = 64;
-        public static readonly byte DEFAULT_MODWHEEL_0 = 0;
+        //public static readonly byte DEFAULT_BANKAndPATCH_0 = 0;
+        //public static readonly byte DEFAULT_VOLUME_100 = 100;
+        //public static readonly byte DEFAULT_EXPRESSION_127 = 127;
+
+        //public static readonly byte DEFAULT_PITCHWHEEL_64 = 64;
+        //public static readonly byte DEFAULT_PAN_64 = 64;
+        //public static readonly byte DEFAULT_MODWHEEL_0 = 0;
         /// <summary>
         /// Constants that are set when palette fields are empty
         /// </summary>

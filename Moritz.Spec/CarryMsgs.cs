@@ -80,7 +80,7 @@ namespace Moritz.Spec
         private bool IsNoteOffMsg(MidiMsg msg)
         {
             int statusHighNibbble = msg.Status & 0xF0;
-            if(statusHighNibbble == M.CMD_NOTE_OFF_0x80 || (statusHighNibbble == M.CMD_NOTE_ON_0x90 && msg.Data2 == 0))
+            if(statusHighNibbble == (int)M.CMD.NOTE_OFF_120 || (statusHighNibbble == (int)M.CMD.NOTE_ON_144 && msg.Data2 == 0))
             {
                 return true;
             }

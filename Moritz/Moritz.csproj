@@ -128,9 +128,9 @@
       <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
+    <ProjectReference Include="..\Moritz.Midi\Moritz.StandardMidi.csproj">
       <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
-      <Name>Moritz.Midi</Name>
+      <Name>Moritz.StandardMidi</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Palettes\Moritz.Palettes.csproj">
       <Project>{a240ecd4-6ec2-4a0e-99e4-70cec7b603ca}</Project>
