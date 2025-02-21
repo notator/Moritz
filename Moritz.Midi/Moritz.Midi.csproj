@@ -51,8 +51,7 @@
     <Compile Include="ChordMessage.cs" />
     <Compile Include="MidiChord.cs" />
     <Compile Include="MidiChordSlider.cs" />
-    <Compile Include="MidiCommand.cs" />
-    <Compile Include="MidiControl.cs" />
+    <Compile Include="MidiMessage.cs" />
     <Compile Include="MidiDurationSymbol.cs" />
     <Compile Include="MidiSlider.cs" />
     <Compile Include="MidiSwitch.cs" />

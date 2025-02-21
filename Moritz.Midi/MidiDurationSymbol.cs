@@ -60,7 +60,7 @@ namespace Moritz.Midi
         /// Controls whose values must be set outside this MidiDurationSymbol (i.e. during the performance).
         /// Currently, these are either MidiSliders or MidiSwitches.
         /// </summary>
-        public List<MidiControl> MidiControls = new List<MidiControl>();
+        public List<MidiMessage> MidiControls = new List<MidiMessage>();
         /// <summary>
         /// Messages to be sent when this durationSymbol ends (e.g. PedOff)
         /// </summary>

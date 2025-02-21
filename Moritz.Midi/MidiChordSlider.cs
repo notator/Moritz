@@ -7,13 +7,8 @@ namespace Moritz.Midi
     /// <summary>
     /// MidiControls which change the MIDI Expression value in their own time.
     /// </summary>
-    public abstract class MidiChordSlider : MidiControl
+    public abstract class MidiChordSlider : MidiMessage
     {
-        protected MidiChordSlider()
-            : base()
-        {
-        }
-
         protected MidiChordSlider(ChordSliderType chordSliderType, List<byte> values, int channel, int noteDurationMilliseconds)
             : base()
         {
@@ -42,18 +37,6 @@ namespace Moritz.Midi
             }
         }
 
-        /// <summary>
-        /// Returns a value in range 0..127.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        protected byte MidiByte(double value)
-        {
-            double rval = (value > 127 ? 127 : value);
-            rval = value < 0 ? 0 : value;
-            return (byte)rval;
-        }
-
         private void SetSingleMidiChordSlider(ChordSliderType chordSliderType, int channel, byte value)
         {
             MidiSliderTime midiSliderTime = null;
@@ -61,19 +44,19 @@ namespace Moritz.Midi
             {
                 case ChordSliderType.Pitchwheel:
                     midiSliderTime =
-                        new MidiSliderTime(new PitchWheel(channel, value, ControlContinuation.NoChange), 0);
+                        new MidiSliderTime(new PitchWheelCommand(channel, value), 0);
                     break;
                 case ChordSliderType.Pan:
                     midiSliderTime =
-                        new MidiSliderTime(new Pan(channel, value, ControlContinuation.NoChange), 0);
+                        new MidiSliderTime(new Pan(channel, value), 0);
                     break;
                 case ChordSliderType.ModulationWheel:
                     midiSliderTime =
-                        new MidiSliderTime(new ModulationWheel(channel, value, ControlContinuation.NoChange), 0);
+                        new MidiSliderTime(new ModulationWheel(channel, value), 0);
                     break;
                 case ChordSliderType.Expression:
                     midiSliderTime =
-                        new MidiSliderTime(new Expression(channel, value, ControlContinuation.NoChange), 0);
+                        new MidiSliderTime(new Expression(channel, value), 0);
                     break;
                 default:
                     break;
@@ -108,19 +91,19 @@ namespace Moritz.Midi
                 {
                     case ChordSliderType.Pitchwheel:
                         midiSliderTime =
-                            new MidiSliderTime(new PitchWheel(channel, (byte)floatCurrentValue, ControlContinuation.NoChange), sleepTime);
+                            new MidiSliderTime(new PitchWheelCommand(channel, (byte)floatCurrentValue), sleepTime);
                         break;
                     case ChordSliderType.Pan:
                         midiSliderTime =
-                            new MidiSliderTime(new Pan(channel, (byte)floatCurrentValue, ControlContinuation.NoChange), sleepTime);
+                            new MidiSliderTime(new Pan(channel, (byte)floatCurrentValue), sleepTime);
                         break;
                     case ChordSliderType.ModulationWheel:
                         midiSliderTime =
-                            new MidiSliderTime(new ModulationWheel(channel, (byte)floatCurrentValue, ControlContinuation.NoChange), sleepTime);
+                            new MidiSliderTime(new ModulationWheel(channel, (byte)floatCurrentValue), sleepTime);
                         break;
                     case ChordSliderType.Expression:
                         midiSliderTime =
-                            new MidiSliderTime(new Expression(channel, (byte)floatCurrentValue, ControlContinuation.NoChange), sleepTime);
+                            new MidiSliderTime(new Expression(channel, (byte)floatCurrentValue), sleepTime);
                         break;
                     default:
                         break;

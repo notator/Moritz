@@ -48,11 +48,11 @@ namespace Moritz.Midi
 
             if(midiChordDef.Bank != null)
             {
-                _bank = new BankControl(channel, (byte)midiChordDef.Bank);
+                _bank = new Bank(channel, (byte)midiChordDef.Bank);
             }
             if(midiChordDef.Patch != null)
             {
-                _patch = new PatchControl(channel, (byte)midiChordDef.Patch);
+                _patch = new PresetCommand(channel, (byte)midiChordDef.Patch);
             }
 
             // Moritz currently never repeats MidiChords, so the _repeat field is unnecessary.
@@ -62,7 +62,7 @@ namespace Moritz.Midi
 
             if(midiChordDef.PitchWheelDeviation != null)
             {
-                _pitchWheelDeviation = new PitchWheelDeviation(channel, (byte)midiChordDef.PitchWheelDeviation);
+                _pitchWheelDeviation = new PitchWheelSensitivity(channel, (byte)midiChordDef.PitchWheelDeviation);
             }
             if(midiChordDef.MidiChordSliderDefs != null)
                 CreateSliders(channel, midiChordDef.MidiChordSliderDefs, MsDuration);
@@ -166,9 +166,9 @@ namespace Moritz.Midi
             }
         }
 
-        private BankControl _bank = null;
-        private PatchControl _patch = null;
-        private PitchWheelDeviation _pitchWheelDeviation = null;
+        private Bank _bank = null;
+        private PresetCommand _patch = null;
+        private PitchWheelSensitivity _pitchWheelDeviation = null;
         private readonly List<BasicMidiChord> _basicMidiChords = new List<BasicMidiChord>();
         private MidiChordSlider _pitchWheelSlider = null;
         private MidiChordSlider _panSlider = null;

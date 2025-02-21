@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Globals", "Moritz.Gl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Xml", "Moritz.Xml\Moritz.Xml.csproj", "{B239C302-A15D-4397-9F3C-EE6CC85440F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.StandardMidi", "Moritz.Midi\Moritz.StandardMidi.csproj", "{82E776E6-C819-42E6-9986-7EBDC3DFFA06}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Midi", "Moritz.Midi\Moritz.Midi.csproj", "{82E776E6-C819-42E6-9986-7EBDC3DFFA06}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Symbols", "Moritz.Symbols\Moritz.Symbols.csproj", "{DF59888C-F935-4E4F-BA31-664DAF79F7D6}"
 EndProject

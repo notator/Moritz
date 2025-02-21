@@ -15,11 +15,11 @@ namespace Moritz.Midi
 
             if(bmcd.BankIndex != null)
             {
-                BankControl = new BankControl(channel, (byte)bmcd.BankIndex);
+                BankControl = new Bank(channel, (byte)bmcd.BankIndex);
             }
             if(bmcd.PatchIndex != null)
             {
-                PatchControl = new PatchControl(channel, (byte)bmcd.PatchIndex);
+                PatchControl = new PresetCommand(channel, (byte)bmcd.PatchIndex);
             }
 
             ChordOn = new ChordOn(this);
@@ -77,8 +77,8 @@ namespace Moritz.Midi
         #endregion
         /****************/
 
-        public BankControl BankControl = null;
-        public PatchControl PatchControl = null;
+        public Bank BankControl = null;
+        public PresetCommand PatchControl = null;
         /// <summary>
         /// The ChordOn message which begins this BasicMidiChord.
         /// Contains NoteOns which are sent as ChannelMessages when the ChordOn is sent.
