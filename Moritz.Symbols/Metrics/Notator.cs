@@ -64,15 +64,6 @@ namespace Moritz.Symbols
                         Voice voice = staff.Voices[voiceIndex];
                         voice.VoiceDef.AgglomerateRests();
 
-                        if(staff is InputStaff)
-                        {
-                            InputVoice inputVoice = staff.Voices[voiceIndex] as InputVoice;
-                            if(systemIndex == 0)
-                            {
-                                InputVoiceDef inputVoiceDef = inputVoice.VoiceDef as InputVoiceDef;
-                                inputVoice.MidiChannel = inputVoiceDef.MidiChannel; // The channel is only set in the first system
-                            }
-                        }
                         msPositionReVoiceDef = 0;
                         List<IUniqueDef> iuds = voice.VoiceDef.UniqueDefs;
                         Debug.Assert(iuds[0] is ClefDef);

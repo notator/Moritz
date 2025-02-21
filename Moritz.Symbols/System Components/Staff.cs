@@ -25,14 +25,11 @@ namespace Moritz.Symbols
         {
             w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
-            CSSObjectClass stafflinesClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStafflines : CSSObjectClass.stafflines;
-            CSSObjectClass stafflineClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStaffline : CSSObjectClass.staffline;
-
-            w.SvgStartGroup(stafflinesClass.ToString());
+            w.SvgStartGroup(CSSObjectClass.stafflines.ToString());
             float stafflineY = this.Metrics.StafflinesTop;
             for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
             {
-                w.SvgLine(stafflineClass, this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
+                w.SvgLine(CSSObjectClass.staffline, this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
 
                 if(staffLineIndex < (NumberOfStafflines - 1))
                     stafflineY += Gap;
@@ -415,9 +412,8 @@ namespace Moritz.Symbols
 
         private void AdjustStemLengths(ChordSymbol upperChord, ChordSymbol lowerChord)
         {
-            bool isInput = (upperChord is InputChordSymbol);
-            upperChord.ChordMetrics.AdjustStemLengthAndFlagBlock(upperChord.DurationClass, upperChord.FontHeight, lowerChord.ChordMetrics.HeadsMetrics, isInput);
-            lowerChord.ChordMetrics.AdjustStemLengthAndFlagBlock(lowerChord.DurationClass, lowerChord.FontHeight, upperChord.ChordMetrics.HeadsMetrics, isInput);
+            upperChord.ChordMetrics.AdjustStemLengthAndFlagBlock(upperChord.DurationClass, upperChord.FontHeight, lowerChord.ChordMetrics.HeadsMetrics);
+            lowerChord.ChordMetrics.AdjustStemLengthAndFlagBlock(lowerChord.DurationClass, lowerChord.FontHeight, upperChord.ChordMetrics.HeadsMetrics);
         }
 
         /// <summary>
@@ -451,7 +447,7 @@ namespace Moritz.Symbols
                     {
                         foreach(ChordSymbol otherChord in enclosedChords)
                         {
-                            chord.ChordMetrics.AdjustStemLengthAndFlagBlock(chord.DurationClass, chord.FontHeight, otherChord.ChordMetrics.HeadsMetrics, (chord is InputChordSymbol));
+                            chord.ChordMetrics.AdjustStemLengthAndFlagBlock(chord.DurationClass, chord.FontHeight, otherChord.ChordMetrics.HeadsMetrics);
                         }
                     }
                     if(adjustVoiceIndex == 0)

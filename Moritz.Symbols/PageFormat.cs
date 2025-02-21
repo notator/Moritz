@@ -137,7 +137,6 @@ namespace Moritz.Symbols
         public float RegionInfoFrameStrokeWidth { get { return BarNumberFrameStrokeWidth * 1.5F; } }
         #endregion
 
-        public float InputSizeFactor { get { return 1.5F; } }
         public float BeamThickness { get { return Gap * 0.42F; } }
 
         #endregion

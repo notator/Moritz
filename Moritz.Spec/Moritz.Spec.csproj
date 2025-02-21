@@ -61,11 +61,9 @@
     </Compile>
     <Compile Include="ClefDef.cs" />
     <Compile Include="Mode.cs" />
-    <Compile Include="InputNoteDef.cs" />
     <Compile Include="ITrksContainer.cs" />
     <Compile Include="MsValues.cs" />
     <Compile Include="NoteTrigger.cs" />
-    <Compile Include="InputRestDef.cs" />
     <Compile Include="PitchWeight.cs" />
     <Compile Include="PitchWeightVector.cs" />
     <Compile Include="Seq.cs" />
@@ -73,9 +71,7 @@
     <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="TrkRef.cs" />
     <Compile Include="DurationDef.cs" />
-    <Compile Include="InputChordDef.cs" />
     <Compile Include="TrkOptions.cs" />
-    <Compile Include="InputVoiceDef.cs" />
     <Compile Include="IUniqueChordDef.cs" />
     <Compile Include="IUniqueDef.cs" />
     <Compile Include="IUniqueSplittableChordDef.cs" />

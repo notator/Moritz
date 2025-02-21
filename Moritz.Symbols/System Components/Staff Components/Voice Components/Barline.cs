@@ -41,8 +41,7 @@ namespace Moritz.Symbols
             {
                 if(drawObject is StaffNameText staffNameText)
                 {
-                    CSSObjectClass staffClass = (Voice is InputVoice) ? CSSObjectClass.inputStaffName : CSSObjectClass.staffName;
-                    StaffNameMetrics = new StaffNameMetrics(staffClass, graphics, staffNameText.TextInfo);
+                    StaffNameMetrics = new StaffNameMetrics(CSSObjectClass.staffName, graphics, staffNameText.TextInfo);
                     // move the staffname vertically to the middle of this staff
                     float staffheight = staffMetrics.StafflinesBottom - staffMetrics.StafflinesTop;
                     float dy = (staffheight * 0.5F) + (Gap * 0.8F);

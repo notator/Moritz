@@ -48,13 +48,13 @@ namespace Moritz.Algorithm.Study3Sketch1
             mainSeq.Concat(bar2Seq);
             mainSeq.Concat(bars345Seq);
 
-            List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, null, approximateBarlineMsPositions);
+            List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, approximateBarlineMsPositions);
 
             List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
 
             List<List<SortedDictionary<int, string>>> lyricsPerBar = GetLyricsPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
 
-            List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, clefChangesPerBar, lyricsPerBar);
+            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, clefChangesPerBar, lyricsPerBar);
 
             return bars;
         }

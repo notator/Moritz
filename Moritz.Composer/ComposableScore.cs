@@ -93,10 +93,6 @@ namespace Moritz.Composer
             {
                 errorString = BasicChecks(bars);
             }
-            if(string.IsNullOrEmpty(errorString))
-            {
-                errorString = CheckCCSettings(bars);
-            }
             Debug.Assert(string.IsNullOrEmpty(errorString), errorString);
         }
         #region private to CheckBars(...)
@@ -210,67 +206,6 @@ namespace Moritz.Composer
             return nOutputVoices;
         }
 
-        private int NInputVoices(List<VoiceDef> bar1)
-        {
-            int nInputVoices = 0;
-            foreach(VoiceDef voiceDef in bar1)
-            {
-                if(voiceDef is InputVoiceDef)
-                {
-                    nInputVoices++;
-                }
-            }
-            return nInputVoices;
-        }
-
-        /// <summary>
-        /// Synchronous continuous controller settings (ccSettings) are not allowed.
-        /// </summary>
-        private string CheckCCSettings(List<Bar> bars)
-        {
-            string errorString = null;
-            List<InputVoiceDef> ivds = new List<InputVoiceDef>();
-            List<int> ccSettingsMsPositions = new List<int>();
-            foreach(Bar bar in bars)
-            {
-                ccSettingsMsPositions.Clear();
-
-                foreach(VoiceDef voice in bar.VoiceDefs)
-                {
-                    if(voice is InputVoiceDef ivd)
-                    {
-                        foreach(IUniqueDef iud in ivd.UniqueDefs)
-                        {
-                            if(iud is InputChordDef icd && icd.CCSettings != null)
-                            {
-                                int msPos = icd.MsPositionReFirstUD;
-                                if(ccSettingsMsPositions.Contains(msPos))
-                                {
-                                    errorString = "\nSynchronous continuous controller settings (ccSettings) are not allowed.";
-                                    break;
-                                }
-                                else
-                                {
-                                    ccSettingsMsPositions.Add(msPos);
-                                }
-
-                            }
-                        }
-                        if(!string.IsNullOrEmpty(errorString))
-                        {
-                            break;
-                        }
-                    }
-                }
-                if(!string.IsNullOrEmpty(errorString))
-                {
-                    break;
-                }
-            }
-
-            return errorString;
-        }
-
         #endregion
 
         /// <summary>
@@ -322,11 +257,10 @@ namespace Moritz.Composer
                 this.Systems.Add(system);
             }
 
-            CreateEmptyOutputStaves(bars);
-            CreateEmptyInputStaves(bars);
+            CreateEmptyStaves(bars);
         }
 
-        private void CreateEmptyOutputStaves(List<Bar> bars)
+        private void CreateEmptyStaves(List<Bar> bars)
         {
             int nStaves = _pageFormat.OutputMIDIChannelsPerStaff.Count;
 
@@ -356,90 +290,6 @@ namespace Moritz.Composer
                     system.Staves.Add(outputStaff);
                 }
                 #endregion
-            }
-        }
-
-        private void CreateEmptyInputStaves(List<Bar> bars)
-        {
-            int nPrintedOutputStaves = _pageFormat.OutputMIDIChannelsPerStaff.Count;
-            int nPrintedInputStaves = _pageFormat.InputMIDIChannelsPerStaff.Count;
-            int nStaffNames = _pageFormat.ShortStaffNames.Count;
-
-            for(int i = 0; i < Systems.Count; i++)
-            {
-                SvgSystem system = Systems[i];
-                IReadOnlyList<VoiceDef> voiceDefs = bars[i].VoiceDefs;
-
-                for(int staffIndex = 0; staffIndex < nPrintedInputStaves; staffIndex++)
-                {
-                    int staffNameIndex = nPrintedOutputStaves + staffIndex;
-                    string staffname = StaffName(i, staffNameIndex);
-
-                    float gap = _pageFormat.Gap * _pageFormat.InputSizeFactor;
-                    float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputSizeFactor;
-                    InputStaff inputStaff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap, stafflineStemStrokeWidth);
-
-                    List<byte> inputVoiceIndices = _pageFormat.InputMIDIChannelsPerStaff[staffIndex];
-                    for(int ivIndex = 0; ivIndex < inputVoiceIndices.Count; ++ivIndex)
-                    {
-                        InputVoiceDef inputVoiceDef = voiceDefs[inputVoiceIndices[ivIndex] + _algorithm.MidiChannelPerOutputVoice.Count] as InputVoiceDef;
-                        Debug.Assert(inputVoiceDef != null);
-                        InputVoice inputVoice = new InputVoice(inputStaff)
-                        {
-                            VoiceDef = inputVoiceDef
-                        };
-                        inputStaff.Voices.Add(inputVoice);
-                    }
-                    SetStemDirections(inputStaff);
-                    system.Staves.Add(inputStaff);
-                }
-            }
-        }
-
-        private void AdjustOutputVoiceRefs(List<SvgSystem> systems, List<int> outputMidiChannelSubstitutions)
-        {
-            Debug.Assert(_algorithm.MidiChannelPerInputVoice != null);
-
-            foreach(var system in systems)
-            {
-                foreach(var staff in system.Staves)
-                {
-                    if(staff is InputStaff inputStaff)
-                    {
-                        foreach(var voice in inputStaff.Voices)
-                        {
-                            if(voice is InputVoice inputVoice)
-                            {
-                                DoMidiChannelSubstitution(inputVoice, outputMidiChannelSubstitutions);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void DoMidiChannelSubstitution(InputVoice inputVoice, List<int> outputMidiChannelSubstitutions)
-        {
-            foreach(var noteObject in inputVoice.NoteObjects)
-            {
-                if(noteObject is InputChordSymbol ics)
-                {
-                    var inputNoteDefs = ics.InputChordDef.InputNoteDefs;
-                    foreach(var inputNoteDef in inputNoteDefs)
-                    {
-                        var noteOnTrkRefs = inputNoteDef.NoteOn.SeqRef.TrkRefs; // each TrkRef has a midiChannel
-                        foreach(var trkRef in noteOnTrkRefs)
-                        {
-                            trkRef.TrkIndex = outputMidiChannelSubstitutions[trkRef.TrkIndex];
-                        }
-
-                        var noteOffTrkOffs = inputNoteDef.NoteOff.TrkOffs; // trkOffs is a list of trk indices
-                        for(int index = 0; index < noteOffTrkOffs.Count; index++)
-                        {
-                            noteOffTrkOffs[index] = outputMidiChannelSubstitutions[noteOffTrkOffs[index]];
-                        }
-                    }
-                }
             }
         }
 

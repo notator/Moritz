@@ -412,7 +412,7 @@ namespace Moritz.Algorithm.Tombeau1
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);
 
-			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
+			List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
 
 			return bars;
 		}

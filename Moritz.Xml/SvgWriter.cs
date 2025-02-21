@@ -162,7 +162,7 @@ namespace Moritz.Xml
         /// <param name="topRightY"></param>
         /// <param name="beamWidth">The vertical distance between the coordinates on the left and right sides.</param>
         /// <param name="isOpaque"></param>
-        public void SvgBeam(float left, float right, float topLeftY, float topRightY, float beamWidth, bool isOpaque, bool isInput)
+        public void SvgBeam(float left, float right, float topLeftY, float topRightY, float beamWidth, bool isOpaque)
         {
             float bottomLeftY = topLeftY + beamWidth;
             float bottomRightY = topRightY + beamWidth;
@@ -177,11 +177,11 @@ namespace Moritz.Xml
             CSSObjectClass beamClass;
             if(isOpaque)
             {
-                beamClass = isInput ? CSSObjectClass.inputOpaqueBeam : CSSObjectClass.opaqueBeam;
+                beamClass = CSSObjectClass.opaqueBeam;
             }
             else
             {
-                beamClass = isInput ? CSSObjectClass.inputBeam : CSSObjectClass.beam;
+                beamClass = CSSObjectClass.beam;
             }
             _w.WriteAttributeString("class", beamClass.ToString());
             _w.WriteAttributeString("d", dSB.ToString());

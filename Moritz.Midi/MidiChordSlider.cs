@@ -135,7 +135,6 @@ namespace Moritz.Midi
 
         protected readonly int _defaultSleepTime = 30;
 
-        public BackgroundWorker BackgroundWorker = null;
         public List<MidiSliderTime> MidiSliderTimes = new List<MidiSliderTime>();
     }
 

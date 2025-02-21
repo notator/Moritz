@@ -23,7 +23,7 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         /// <param name="pageNumber"></param>
         /// <param name="nScorePages"></param>
-        public void WriteSVG(SvgWriter w, int pageNumber, int nScorePages, string aboutThePieceLinkURL, int nOutputVoices, int nInputVoices)
+        public void WriteSVG(SvgWriter w, int pageNumber, int nScorePages, string aboutThePieceLinkURL, int nVoices)
         {
             Debug.Assert(!String.IsNullOrEmpty(Page1Title));
 
@@ -96,8 +96,7 @@ namespace Moritz.Symbols
             {
                 desc.Append("\nNumber of pages in the score: " + nScorePages.ToString());
             }
-            desc.Append("\nNumber of output voices: " + nOutputVoices.ToString());
-            desc.Append("\nNumber of input voices: " + nInputVoices.ToString());
+            desc.Append("\nNumber of output voices: " + nVoices.ToString());
             if(!String.IsNullOrEmpty(Comment))
                 desc.Append("\nComments: " + Comment);
 
