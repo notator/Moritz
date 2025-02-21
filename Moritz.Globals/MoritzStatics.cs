@@ -959,12 +959,13 @@ namespace Moritz.Globals
         }
 
         /// <summary>
-        /// Standard MIDI control numbers implemented by the ResidentSynth.
+        /// Standard and non-standard MIDI control numbers implemented by the ResidentSynth.
         /// Some, but not all, are used in legacy code.
         /// See https://james-ingram-act-two.de/open-source/aboutResidentSynthHost.html
         /// </summary>
-        public enum CTL1
-        {   
+        public enum CTL
+        {
+            #region standard controls
             BANK_0 = 0, 
             MOD_WHEEL_1 = 1,
             VOLUME_7 = 7,
@@ -973,17 +974,13 @@ namespace Moritz.Globals
             ALL_SOUND_OFF_120 = 120,
             ALL_CONTROLLERS_OFF = 121,
             // The following are used by legacy code and implemented by the ResidentSynth,
-            // but are deprecated. Use CTL2.PITCHWHEEL_SENSITIVITY_16 instead.
+            // but are deprecated. Use PITCHWHEEL_SENSITIVITY_16 instead.
             REGISTERED_PARAMETER_101 = 101,
-            DATA_ENTRY_6 = 6
-        }
-
-        /// <summary>
-        /// Non-standard MIDI control numbers implemented by the ResidentSynth.
-        /// See https://james-ingram-act-two.de/open-source/aboutResidentSynthHost.html
-        /// </summary>
-        public enum CTL2
-        {
+            DATA_ENTRY_6 = 6,
+            #endregion
+            #region non-standard controls
+            // Non-standard MIDI control numbers
+            // (These can only be used by the ResidentSynth, not by the Microsoft GS Wavetable Synth.)
             PITCH_WHEEL_SENSITIVITY_16 = 16,
             MIXTURE_17 = 17,
             TUNING_GROUP_18,
@@ -993,7 +990,9 @@ namespace Moritz.Globals
             CENT_OFFSET_81 = 81,
             VELOCITY_PITCH_SENSITIVITY_83 = 83,
             REVERBERATION_91 = 91
+            #endregion
         }
+
         #region MIDI helper constants
         public static readonly int SELECT_PITCHBEND_RANGE_0 = 0; // deprecated (Use CTL2.PITCHWHEEL_SENSITIVITY_16 instead)
         public static readonly byte DEFAULT_PITCHWHEELDEVIATION_2 = 2;

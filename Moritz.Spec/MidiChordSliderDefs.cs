@@ -41,17 +41,17 @@ namespace Moritz.Spec
 
                 if(DoWriteControl(PanMsbs, carryMsgs.PanState))
                 {
-                    carryMsgs.PanState = WriteCCEnv(w, channel, (int)M.CTL1.PAN_10, PanMsbs, msDuration);
+                    carryMsgs.PanState = WriteCCEnv(w, channel, (int)M.CTL.PAN_10, PanMsbs, msDuration);
                 }
 
                 if(DoWriteControl(ModulationWheelMsbs, carryMsgs.ModWheelState))
                 {
-                    carryMsgs.ModWheelState = WriteCCEnv(w, channel, (int)M.CTL1.MOD_WHEEL_1, ModulationWheelMsbs, msDuration);
+                    carryMsgs.ModWheelState = WriteCCEnv(w, channel, (int)M.CTL.MOD_WHEEL_1, ModulationWheelMsbs, msDuration);
                 }
 
                 if(DoWriteControl(ExpressionMsbs, carryMsgs.ExpressionState))
                 {
-                    carryMsgs.ExpressionState = WriteCCEnv(w, channel, (int)M.CTL1.EXPRESSION_11, ExpressionMsbs, msDuration);
+                    carryMsgs.ExpressionState = WriteCCEnv(w, channel, (int)M.CTL.EXPRESSION_11, ExpressionMsbs, msDuration);
                 }
 
                 if(DoWriteControl(PitchWheelMsbs, carryMsgs.PitchWheelState))

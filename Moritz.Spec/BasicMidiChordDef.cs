@@ -159,7 +159,7 @@ namespace Moritz.Spec
                 w.WriteStartElement("switches");
                 if(BankIndex != null && BankIndex != carryMsgs.BankState)
                 {
-                    MidiMsg msg = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL1.BANK_0, BankIndex);
+                    MidiMsg msg = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL.BANK_0, BankIndex);
                     msg.WriteSVG(w);
                     carryMsgs.BankState = (byte)BankIndex;
                 }
@@ -171,9 +171,9 @@ namespace Moritz.Spec
                 }
                 if(PitchWheelDeviation != null && PitchWheelDeviation != carryMsgs.PitchWheelDeviationState)
                 {
-                    MidiMsg msg1 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL1.REGISTERED_PARAMETER_101, M.SELECT_PITCHBEND_RANGE_0);
+                    MidiMsg msg1 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL.REGISTERED_PARAMETER_101, M.SELECT_PITCHBEND_RANGE_0);
                     msg1.WriteSVG(w);
-                    MidiMsg msg2 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL1.DATA_ENTRY_6, PitchWheelDeviation);
+                    MidiMsg msg2 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL.DATA_ENTRY_6, PitchWheelDeviation);
                     msg2.WriteSVG(w);
                     carryMsgs.PitchWheelDeviationState = (byte)PitchWheelDeviation;
                 }
