@@ -59,9 +59,9 @@ namespace Moritz
 			this.DateLabel.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.DateLabel.Location = new System.Drawing.Point(25, 89);
 			this.DateLabel.Name = "DateLabel";
-			this.DateLabel.Size = new System.Drawing.Size(31, 14);
+			this.DateLabel.Size = new System.Drawing.Size(43, 14);
 			this.DateLabel.TabIndex = 2;
-			this.DateLabel.Text = "date:";
+			this.DateLabel.Text = "history:";
 			this.DateLabel.Click += new System.EventHandler(this.Anything_Click);
 			// 
 			// AuthorLabel
@@ -81,9 +81,10 @@ namespace Moritz
 			this.DateText.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.DateText.Location = new System.Drawing.Point(80, 89);
 			this.DateText.Name = "DateText";
-			this.DateText.Size = new System.Drawing.Size(134, 42);
+			this.DateText.Size = new System.Drawing.Size(162, 56);
 			this.DateText.TabIndex = 5;
-			this.DateText.Text = "version 1: 2008\r\nversion 2: May 2011\r\nversion 3: December 2014";
+			this.DateText.Text = "version 1: 2008\r\nversion 2: May 2011\r\nversion 3: December 2014\r\nversion 4: begun " +
+    "February 2025";
 			this.DateText.Click += new System.EventHandler(this.Anything_Click);
 			// 
 			// label1
@@ -94,7 +95,7 @@ namespace Moritz
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(97, 15);
 			this.label1.TabIndex = 10;
-			this.label1.Text = "Moritz version 3";
+			this.label1.Text = "Moritz version 4";
 			this.label1.Click += new System.EventHandler(this.Anything_Click);
 			// 
 			// WebsiteLinkLabel
@@ -104,7 +105,7 @@ namespace Moritz
 			this.WebsiteLinkLabel.LinkArea = new System.Windows.Forms.LinkArea(0, 27);
 			this.WebsiteLinkLabel.Location = new System.Drawing.Point(80, 65);
 			this.WebsiteLinkLabel.Name = "WebsiteLinkLabel";
-			this.WebsiteLinkLabel.Size = new System.Drawing.Size(158, 17);
+			this.WebsiteLinkLabel.Size = new System.Drawing.Size(157, 17);
 			this.WebsiteLinkLabel.TabIndex = 29;
 			this.WebsiteLinkLabel.TabStop = true;
 			this.WebsiteLinkLabel.Text = "www.james-ingram-act-two.de\r\n";
@@ -115,7 +116,7 @@ namespace Moritz
 			// 
 			this.ThanksLabel.AutoSize = true;
 			this.ThanksLabel.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.ThanksLabel.Location = new System.Drawing.Point(25, 256);
+			this.ThanksLabel.Location = new System.Drawing.Point(25, 266);
 			this.ThanksLabel.Name = "ThanksLabel";
 			this.ThanksLabel.Size = new System.Drawing.Size(222, 28);
 			this.ThanksLabel.TabIndex = 32;
@@ -127,7 +128,7 @@ namespace Moritz
 			// 
 			this.AcknowledgmentsLabel.AutoSize = true;
 			this.AcknowledgmentsLabel.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.AcknowledgmentsLabel.Location = new System.Drawing.Point(25, 142);
+			this.AcknowledgmentsLabel.Location = new System.Drawing.Point(25, 152);
 			this.AcknowledgmentsLabel.Name = "AcknowledgmentsLabel";
 			this.AcknowledgmentsLabel.Size = new System.Drawing.Size(106, 14);
 			this.AcknowledgmentsLabel.TabIndex = 33;
@@ -138,7 +139,7 @@ namespace Moritz
 			// 
 			this.label6.AutoSize = true;
 			this.label6.Font = new System.Drawing.Font("Arial", 7F);
-			this.label6.Location = new System.Drawing.Point(25, 233);
+			this.label6.Location = new System.Drawing.Point(25, 243);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(220, 13);
 			this.label6.TabIndex = 36;
@@ -149,7 +150,7 @@ namespace Moritz
 			// 
 			this.MaxUndMoritzLinkLabel.AutoSize = true;
 			this.MaxUndMoritzLinkLabel.Font = new System.Drawing.Font("Arial", 7F);
-			this.MaxUndMoritzLinkLabel.Location = new System.Drawing.Point(25, 219);
+			this.MaxUndMoritzLinkLabel.Location = new System.Drawing.Point(25, 229);
 			this.MaxUndMoritzLinkLabel.Name = "MaxUndMoritzLinkLabel";
 			this.MaxUndMoritzLinkLabel.Size = new System.Drawing.Size(80, 13);
 			this.MaxUndMoritzLinkLabel.TabIndex = 37;
@@ -161,7 +162,7 @@ namespace Moritz
 			// 
 			this.LeslieSanfordLinkLabel.AutoSize = true;
 			this.LeslieSanfordLinkLabel.Font = new System.Drawing.Font("Arial", 7F);
-			this.LeslieSanfordLinkLabel.Location = new System.Drawing.Point(25, 159);
+			this.LeslieSanfordLinkLabel.Location = new System.Drawing.Point(25, 169);
 			this.LeslieSanfordLinkLabel.Name = "LeslieSanfordLinkLabel";
 			this.LeslieSanfordLinkLabel.Size = new System.Drawing.Size(156, 13);
 			this.LeslieSanfordLinkLabel.TabIndex = 39;
@@ -173,7 +174,7 @@ namespace Moritz
 			// 
 			this.label8.AutoSize = true;
 			this.label8.Font = new System.Drawing.Font("Arial", 7F);
-			this.label8.Location = new System.Drawing.Point(25, 173);
+			this.label8.Location = new System.Drawing.Point(25, 183);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(169, 13);
 			this.label8.TabIndex = 38;
@@ -184,7 +185,7 @@ namespace Moritz
 			// 
 			this.label14.AutoSize = true;
 			this.label14.Font = new System.Drawing.Font("Arial", 7F);
-			this.label14.Location = new System.Drawing.Point(25, 202);
+			this.label14.Location = new System.Drawing.Point(25, 212);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(204, 13);
 			this.label14.TabIndex = 46;
@@ -215,7 +216,7 @@ namespace Moritz
 			this.label2.AutoSize = true;
 			this.label2.Font = new System.Drawing.Font("Arial", 7F);
 			this.label2.ForeColor = System.Drawing.Color.Blue;
-			this.label2.Location = new System.Drawing.Point(25, 189);
+			this.label2.Location = new System.Drawing.Point(25, 199);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(155, 13);
 			this.label2.TabIndex = 50;
@@ -226,7 +227,7 @@ namespace Moritz
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.Honeydew;
-			this.ClientSize = new System.Drawing.Size(295, 305);
+			this.ClientSize = new System.Drawing.Size(266, 316);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.WebsiteLabel);

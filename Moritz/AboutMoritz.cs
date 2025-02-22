@@ -50,11 +50,11 @@ namespace Moritz
             try
             {
                 LeslieSanfordLinkLabel.LinkVisited = true;
-                System.Diagnostics.Process.Start("https://www.codeproject.com/KB/audio-video/MIDIToolkit.aspx");
+                System.Diagnostics.Process.Start("https://github.com/tebjan/Sanford.Multimedia.Midi");
             }
             catch
             {
-                string msg = "Unable to open https://www.codeproject.com/KB/audio-video/MIDIToolkit.aspx";
+                string msg = "Unable to open https://github.com/tebjan/Sanford.Multimedia.Midi";
                 MessageBox.Show(msg, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
 
@@ -65,11 +65,11 @@ namespace Moritz
             try
             {
                 MaxUndMoritzLinkLabel.LinkVisited = true;
-                System.Diagnostics.Process.Start("http://www.fln.vcu.edu/mm/mmmenu.html");
+                System.Diagnostics.Process.Start("https://en.wikipedia.org/wiki/Max_and_Moritz");
             }
             catch
             {
-                string msg = "Unable to open http://www.fln.vcu.edu/mm/mmmenu.html";
+                string msg = "Unable to open https://en.wikipedia.org/wiki/Max_and_Moritz";
                 MessageBox.Show(msg, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
