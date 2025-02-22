@@ -48,11 +48,11 @@ namespace Moritz.Midi
 
             if(midiChordDef.Bank != null)
             {
-                _bank = new Bank(channel, (byte)midiChordDef.Bank);
+                _bank = new SSBankMsg(channel, (byte)midiChordDef.Bank);
             }
             if(midiChordDef.Patch != null)
             {
-                _patch = new PresetCommand(channel, (byte)midiChordDef.Patch);
+                _patch = new SSPresetMsg(channel, (byte)midiChordDef.Patch);
             }
 
             // Moritz currently never repeats MidiChords, so the _repeat field is unnecessary.
@@ -62,7 +62,7 @@ namespace Moritz.Midi
 
             if(midiChordDef.PitchWheelDeviation != null)
             {
-                _pitchWheelDeviation = new PitchWheelSensitivity(channel, (byte)midiChordDef.PitchWheelDeviation);
+                _pitchWheelSensitivity = new SSPitchWheelSensitivityMsg(channel, (byte)midiChordDef.PitchWheelDeviation);
             }
             if(midiChordDef.MidiChordSliderDefs != null)
                 CreateSliders(channel, midiChordDef.MidiChordSliderDefs, MsDuration);
@@ -92,8 +92,8 @@ namespace Moritz.Midi
                 startMessages.AddRange(_bank.ChannelMessages);
             if(_patch != null)
                 startMessages.AddRange(_patch.ChannelMessages);
-            if(_pitchWheelDeviation != null)
-                startMessages.AddRange(_pitchWheelDeviation.ChannelMessages);
+            if(_pitchWheelSensitivity != null)
+                startMessages.AddRange(_pitchWheelSensitivity.ChannelMessages);
 
             if(!_messagesDict.ContainsKey(0))
                 _messagesDict.Add(msPosition, new List<ChannelMessage>());
@@ -104,10 +104,10 @@ namespace Moritz.Midi
                 if(!_messagesDict.ContainsKey(msPosition))
                     _messagesDict.Add(msPosition, new List<ChannelMessage>());
 
-                if(bmc.BankControl != null)
-                    _messagesDict[msPosition].AddRange(bmc.BankControl.ChannelMessages);
-                if(bmc.PatchControl != null)
-                    _messagesDict[msPosition].AddRange(bmc.PatchControl.ChannelMessages);
+                if(bmc.SSBankMsg != null)
+                    _messagesDict[msPosition].AddRange(bmc.SSBankMsg.ChannelMessages);
+                if(bmc.SSPresetMsg != null)
+                    _messagesDict[msPosition].AddRange(bmc.SSPresetMsg.ChannelMessages);
                 if(bmc.ChordOn != null)
                     _messagesDict[msPosition].AddRange(bmc.ChordOn.ChannelMessages);
 
@@ -166,9 +166,9 @@ namespace Moritz.Midi
             }
         }
 
-        private Bank _bank = null;
-        private PresetCommand _patch = null;
-        private PitchWheelSensitivity _pitchWheelDeviation = null;
+        private SSBankMsg _bank = null;
+        private SSPresetMsg _patch = null;
+        private SSPitchWheelSensitivityMsg _pitchWheelSensitivity = null;
         private readonly List<BasicMidiChord> _basicMidiChords = new List<BasicMidiChord>();
         private MidiChordSlider _pitchWheelSlider = null;
         private MidiChordSlider _panSlider = null;

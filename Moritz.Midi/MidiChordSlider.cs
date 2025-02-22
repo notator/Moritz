@@ -7,7 +7,7 @@ namespace Moritz.Midi
     /// <summary>
     /// MidiControls which change the MIDI Expression value in their own time.
     /// </summary>
-    public abstract class MidiChordSlider : MidiMessage
+    public abstract class MidiChordSlider : SanfordMessage
     {
         protected MidiChordSlider(ChordSliderType chordSliderType, List<byte> values, int channel, int noteDurationMilliseconds)
             : base()
@@ -44,19 +44,19 @@ namespace Moritz.Midi
             {
                 case ChordSliderType.Pitchwheel:
                     midiSliderTime =
-                        new MidiSliderTime(new PitchWheelCommand(channel, value), 0);
+                        new MidiSliderTime(new SSPitchWheelMsg(channel, value), 0);
                     break;
                 case ChordSliderType.Pan:
                     midiSliderTime =
-                        new MidiSliderTime(new Pan(channel, value), 0);
+                        new MidiSliderTime(new SSPanMsg(channel, value), 0);
                     break;
                 case ChordSliderType.ModulationWheel:
                     midiSliderTime =
-                        new MidiSliderTime(new ModulationWheel(channel, value), 0);
+                        new MidiSliderTime(new SSModulationWheelMsg(channel, value), 0);
                     break;
                 case ChordSliderType.Expression:
                     midiSliderTime =
-                        new MidiSliderTime(new Expression(channel, value), 0);
+                        new MidiSliderTime(new SSExpressionMsg(channel, value), 0);
                     break;
                 default:
                     break;
@@ -91,19 +91,19 @@ namespace Moritz.Midi
                 {
                     case ChordSliderType.Pitchwheel:
                         midiSliderTime =
-                            new MidiSliderTime(new PitchWheelCommand(channel, (byte)floatCurrentValue), sleepTime);
+                            new MidiSliderTime(new SSPitchWheelMsg(channel, (byte)floatCurrentValue), sleepTime);
                         break;
                     case ChordSliderType.Pan:
                         midiSliderTime =
-                            new MidiSliderTime(new Pan(channel, (byte)floatCurrentValue), sleepTime);
+                            new MidiSliderTime(new SSPanMsg(channel, (byte)floatCurrentValue), sleepTime);
                         break;
                     case ChordSliderType.ModulationWheel:
                         midiSliderTime =
-                            new MidiSliderTime(new ModulationWheel(channel, (byte)floatCurrentValue), sleepTime);
+                            new MidiSliderTime(new SSModulationWheelMsg(channel, (byte)floatCurrentValue), sleepTime);
                         break;
                     case ChordSliderType.Expression:
                         midiSliderTime =
-                            new MidiSliderTime(new Expression(channel, (byte)floatCurrentValue), sleepTime);
+                            new MidiSliderTime(new SSExpressionMsg(channel, (byte)floatCurrentValue), sleepTime);
                         break;
                     default:
                         break;
@@ -165,12 +165,12 @@ namespace Moritz.Midi
     /******************************************************************************/
     public class MidiSliderTime
     {
-        public MidiSliderTime(MidiSlider midiSlider, int msDuration)
+        public MidiSliderTime(SanfordSlider midiSlider, int msDuration)
         {
             MidiSlider = midiSlider;
             MsDuration = msDuration;
         }
-        public MidiSlider MidiSlider;
+        public SanfordSlider MidiSlider;
         public int MsDuration; // the duration to sleep after sending the Expression's messages
     }
 

@@ -5,23 +5,28 @@ using System.Collections.Generic;
 namespace Moritz.Midi
 {
     /// <summary>
-    /// MidiMessages are grouped into two types here: 
-    ///   1. Switch: Bank, PresetCommand, PitchWheelSensitivity 
-    ///	  2. Slider: PitchWheelCommand, ModulationWheel, Pan, Expression
-    ///	See the comments in MidiSwitch.cs and MidiSlider.cs
+    /// This class is the interface to the Microsoft GS Wavetable Synth (the system synthesizer),
+    /// so it can only use MIDI messages with their original, standard meaning. 
+    /// Each SanfordMessage converts its arguments to a list of Sanford.Multimedia.Midi.ChannelMessage objects
+    /// that are later sent by the Sanford.Multimedia.Midi dll to the system synth.
+    /// Moritz uses them for demonstration purposes while editing Palettes. They are never stored in scores.
+    /// There are two sub-types defined for use in Moritz' Palettes: 
+    ///   1. SanfordSwitch: Bank, SSPresetMsg, PitchWheelSensitivity 
+    ///	  2. SanfordSlider: PitchWheelCommand, ModulationWheel, Pan, Expression
+    ///	See the comments in SanfordSwitch.cs and SanfordSlider.cs
     /// </summary>
-    public abstract class MidiMessage
+    public abstract class SanfordMessage
     {
         /// <summary>
         /// Used by MidiChordSlider
         /// </summary>
-        protected MidiMessage()
+        protected SanfordMessage()
         {
         }
         /// <summary>
         /// Used by PitchWheelDeviation controller, which must set both its coarse and fine controllers.
         /// </summary>
-        protected MidiMessage(int channel, ControllerType coarseController, ControllerType fineController, int msb)
+        protected SanfordMessage(int channel, ControllerType coarseController, ControllerType fineController, int msb)
         {
             ChannelMessages.Add(new ChannelMessage(ChannelCommand.Controller, channel, (int)coarseController, msb));
             ChannelMessages.Add(new ChannelMessage(ChannelCommand.Controller, channel, (int)fineController, msb));
@@ -30,7 +35,7 @@ namespace Moritz.Midi
         /// <summary>
         /// Used by controllers which only need to set their coarse controller.
         /// </summary>
-        protected MidiMessage(int channel, ControllerType coarseController, int msb)
+        protected SanfordMessage(int channel, ControllerType coarseController, int msb)
         {
             ChannelMessages.Add(new ChannelMessage(ChannelCommand.Controller, channel, (int)coarseController, msb));
         }
@@ -38,14 +43,14 @@ namespace Moritz.Midi
         /// <summary>
 		/// Sets the control's ChannelMessage MSB. LSBs are not used.
 		/// </summary>
-		protected MidiMessage(int channel, ChannelCommand command, int value)
+		protected SanfordMessage(int channel, ChannelCommand command, int value)
         {
             ChannelMessages.Add(new ChannelMessage(command, channel, value, 0));
         }
         /// <summary>
         /// Sets the control's ChannelMessage MSB and LSB.
         /// </summary>
-        protected MidiMessage(int channel, ChannelCommand command, int msb, int lsb)
+        protected SanfordMessage(int channel, ChannelCommand command, int msb, int lsb)
         {
             ChannelMessages.Add(new ChannelMessage(command, channel, msb, lsb));
         }

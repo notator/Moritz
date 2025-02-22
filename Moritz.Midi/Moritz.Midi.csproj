@@ -51,10 +51,10 @@
     <Compile Include="ChordMessage.cs" />
     <Compile Include="MidiChord.cs" />
     <Compile Include="MidiChordSlider.cs" />
-    <Compile Include="MidiMessage.cs" />
+    <Compile Include="SanfordMessage.cs" />
     <Compile Include="MidiDurationSymbol.cs" />
-    <Compile Include="MidiSlider.cs" />
-    <Compile Include="MidiSwitch.cs" />
+    <Compile Include="SanfordSlider.cs" />
+    <Compile Include="SanfordSwitch.cs" />
     <Compile Include="NoteMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
