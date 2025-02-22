@@ -960,7 +960,7 @@ namespace Moritz.Globals
 
         /// <summary>
         /// Standard and non-standard MIDI control numbers implemented by the ResidentSynth.
-        /// Some, but not all, are used in legacy code.
+        /// Some, but not all, of the standard controls are used in legacy code.
         /// See https://james-ingram-act-two.de/open-source/aboutResidentSynthHost.html
         /// </summary>
         public enum CTL
@@ -971,16 +971,18 @@ namespace Moritz.Globals
             VOLUME_7 = 7,
             PAN_10 = 10,
             EXPRESSION_11 = 11,
+            #region defined but not used in legacy code
             ALL_SOUND_OFF_120 = 120,
             ALL_CONTROLLERS_OFF = 121,
-            // The following are used by legacy code and implemented by the ResidentSynth,
-            // but are deprecated. Use PITCHWHEEL_SENSITIVITY_16 instead.
+            #endregion
+            #region deprecated (used in legacy code Feb. 2025)
+            // Use PITCHWHEEL_SENSITIVITY_16 instead.
             REGISTERED_PARAMETER_101 = 101,
             DATA_ENTRY_6 = 6,
+            #endregion deprecated
             #endregion
             #region non-standard controls
-            // Non-standard MIDI control numbers
-            // (These can only be used by the ResidentSynth, not by the Microsoft GS Wavetable Synth.)
+            // These can only be used by the ResidentSynth, not by the Microsoft GS Wavetable Synth.
             PITCH_WHEEL_SENSITIVITY_16 = 16,
             MIXTURE_17 = 17,
             TUNING_GROUP_18,
