@@ -1,11 +1,13 @@
-﻿using Moritz.Spec;
+﻿using Moritz.Globals;
+using Moritz.Spec;
+using Moritz.Xml;
 
 using System;
 using System.Diagnostics;
 
 namespace Moritz.Symbols
 {
-    internal abstract class RestSymbol : DurationSymbol
+    internal class RestSymbol : DurationSymbol
     {
         public RestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, int minimumCrotchetDurationMS, float fontHeight)
             : base(voice, iumdd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontHeight)
@@ -16,6 +18,56 @@ namespace Moritz.Symbols
             }
             LocalCautionaryChordDef = iumdd as CautionaryChordDef;
         }
+
+        public RestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, PageFormat pageFormat)
+    : this(voice, iumdd, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight)
+        {
+            if(iumdd is MidiRestDef mrd)
+            {
+                _midiRestDef = mrd;
+            }
+
+            // This needs testing!!
+            if(iumdd is CautionaryChordDef ccd)
+            {
+                Console.WriteLine("rest is CautionaryChordDef!");
+                LocalCautionaryChordDef = ccd;
+            }
+        }
+
+        /// <summary>
+        /// Dont use this function, use the other WriteSVG().
+        /// </summary>
+        /// <param name="w"></param>
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
+        {
+            if(LocalCautionaryChordDef == null)
+            {
+                Debug.Assert(_msDuration > 0);
+
+                w.SvgStartGroup(CSSObjectClass.rest.ToString()); // "rest"
+
+                w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
+
+                _midiRestDef.WriteSVG(w, channel, carryMsgs);
+
+                if(this.Metrics != null)
+                {
+                    ((RestMetrics)this.Metrics).WriteSVG(w);
+                }
+
+                w.SvgEndGroup(); // "rest"
+            }
+        }
+
+        public override string ToString() => "outputRest " + InfoString;
+
+        MidiRestDef _midiRestDef = null;
 
         #region display attributes
         /// <summary>

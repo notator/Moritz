@@ -275,7 +275,7 @@ namespace Moritz.Symbols
                 {
                     foreach(NoteObject chordObject in chordObjects)
                     {
-                        if(chordObject is OutputChordSymbol chordSymbol)
+                        if(chordObject is ChordSymbol chordSymbol)
                         {
                             if(chordSymbol.AbsMsPosition > restSymbol.AbsMsPosition)
                                 break;
@@ -723,7 +723,7 @@ namespace Moritz.Symbols
         {
             get
             {
-                List<NoteObjectMoment> momentSymbols = MomentSymbols<OutputChordSymbol>();
+                List<NoteObjectMoment> momentSymbols = MomentSymbols<ChordSymbol>();
                 foreach(NoteObjectMoment momentSymbol in momentSymbols)
                     yield return momentSymbol;
             }

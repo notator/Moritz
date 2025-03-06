@@ -949,7 +949,7 @@ namespace Moritz.Symbols
                             {
                                 ccs.Visible = visible;
                             }
-                            else if(noteObject is OutputChordSymbol ocs)
+                            else if(noteObject is ChordSymbol ocs)
                             {
                                 visible = false;
                             }

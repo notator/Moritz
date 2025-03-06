@@ -162,7 +162,7 @@ namespace Moritz.Symbols
 
         private CSSObjectClass GetMainHeadClass(ChordSymbol chord)
         {
-            CSSObjectClass headClass = CSSObjectClass.notehead; // OutputChordSymbol
+            CSSObjectClass headClass = CSSObjectClass.notehead; // ChordSymbol
             if(chord is CautionaryChordSymbol)
             {
                 headClass = CSSObjectClass.cautionaryNotehead;

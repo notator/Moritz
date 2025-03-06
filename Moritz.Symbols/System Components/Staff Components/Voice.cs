@@ -38,8 +38,8 @@ namespace Moritz.Symbols
             {
                 NoteObject noteObject = NoteObjects[i];
                 CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
-                OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
-                OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
+                ChordSymbol chordSymbol = noteObject as ChordSymbol;
+                RestSymbol restSymbol = noteObject as RestSymbol;
                 Clef clef = noteObject as Clef;
                 SmallClef smallClef = noteObject as SmallClef;
 
@@ -58,15 +58,15 @@ namespace Moritz.Symbols
                 {
                     cautionaryChordSymbol.WriteSVG(w);
                 }
-                else if(outputChordSymbol != null)
+                else if(chordSymbol != null)
                 {
                     Debug.Assert(carryMsgsPerChannel != null);
-                    outputChordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+                    chordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
                 }
-                else if(outputRestSymbol != null)
+                else if(restSymbol != null)
                 {
                     Debug.Assert(carryMsgsPerChannel != null);
-                    outputRestSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+                    restSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
                 }
                 else if(clef != null) // clef
                 {

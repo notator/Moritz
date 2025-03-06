@@ -110,7 +110,7 @@ namespace Moritz.Symbols
         {
             float overlap = float.MinValue;
 
-            if(previousAS is OutputChordSymbol chord)
+            if(previousAS is ChordSymbol chord)
             {
                 overlap = chord.ChordMetrics.OverlapWidth(this);
             }

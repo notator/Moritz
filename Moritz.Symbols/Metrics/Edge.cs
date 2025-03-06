@@ -148,7 +148,7 @@ namespace Moritz.Symbols
                 {
                     Clef clef = noteObject as Clef;
 
-                    if(noteObject is OutputChordSymbol chordSymbol)
+                    if(noteObject is ChordSymbol chordSymbol)
                     {
                         chordSymbol.ChordMetrics.AddToEdge(this);
                     }

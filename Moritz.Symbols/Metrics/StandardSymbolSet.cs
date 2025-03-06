@@ -534,23 +534,23 @@ namespace Moritz.Symbols
             }
             else if(midiChordDef != null)
             {
-                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, absMsPosition, pageFormat);
+                ChordSymbol chordSymbol = new ChordSymbol(voice, midiChordDef, absMsPosition, pageFormat);
 
                 if(this._coloredVelocities == true)
                 {
-                    outputChordSymbol.SetNoteheadColorClasses();
+                    chordSymbol.SetNoteheadColorClasses();
                 }
                 else if(midiChordDef.NotatedMidiVelocities[0] != currentVelocity)
                 {
-                    outputChordSymbol.AddDynamic(midiChordDef.NotatedMidiVelocities[0], currentVelocity);
+                    chordSymbol.AddDynamic(midiChordDef.NotatedMidiVelocities[0], currentVelocity);
                     currentVelocity = midiChordDef.NotatedMidiVelocities[0];
                 }
-                noteObject = outputChordSymbol;
+                noteObject = chordSymbol;
             }
             else if(midiRestDef != null || cautionaryChordDef != null)
             {
-                OutputRestSymbol outputRestSymbol = new OutputRestSymbol(voice, iud, absMsPosition, pageFormat);
-                noteObject = outputRestSymbol;
+                RestSymbol restSymbol = new RestSymbol(voice, iud, absMsPosition, pageFormat);
+                noteObject = restSymbol;
             }
             else if(clefDef != null)
             {

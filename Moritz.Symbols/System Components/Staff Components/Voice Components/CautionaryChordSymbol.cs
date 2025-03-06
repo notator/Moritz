@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Moritz.Symbols
 {
-    internal class CautionaryChordSymbol : OutputChordSymbol
+    internal class CautionaryChordSymbol : ChordSymbol
     {
         public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, int absMsPosition, PageFormat pageFormat)
             : base(voice, lccd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight * pageFormat.SmallSizeFactor)
