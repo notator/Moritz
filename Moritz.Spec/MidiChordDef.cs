@@ -1062,7 +1062,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Note that neither OutputRests nor OutputChords have a msDuration attribute.
+        /// Note that neither Rests nor Chords have a msDuration attribute.
         /// Their msDuration is deduced from the contained moment msDurations.
         /// See: https://github.com/notator/Moritz/issues/2
         /// </summary>
@@ -1085,7 +1085,7 @@ namespace Moritz.Spec
             }
             #endregion
 
-            w.WriteStartElement("score", "midi", null);
+            w.WriteStartElement("midi");
 
             w.WriteStartElement("moments");
 
@@ -1104,7 +1104,7 @@ namespace Moritz.Spec
                 MidiChordSliderDefs.WriteSVG(w, channel, this.MsDuration, carryMsgs);
             }
 
-            w.WriteEndElement(); // score:midi
+            w.WriteEndElement(); // midi
 
             if(HasChordOff)
             {
