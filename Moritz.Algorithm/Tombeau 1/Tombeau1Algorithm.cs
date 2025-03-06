@@ -18,8 +18,7 @@ namespace Moritz.Algorithm.Tombeau1
 			CheckParameters();
 		}
 
-		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
-		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
+		public override IReadOnlyList<int> MidiChannelPerVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
 		public override int NumberOfBars { get { return 120; } }
 		public override IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>() { 0, 24, 48, 72, 96 }; } }
 
@@ -407,7 +406,7 @@ namespace Moritz.Algorithm.Tombeau1
 			//GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 			GetTrksAndBarlines1(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
-			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
+			Seq mainSeq = new Seq(0, trks, MidiChannelPerVoice);
 
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);

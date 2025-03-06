@@ -17,9 +17,8 @@ namespace Moritz.Algorithm.ThreeCrashes
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2 }; } }
+        public override IReadOnlyList<int> MidiChannelPerVoice { get { return new List<int>() { 0, 1, 2 }; } }
         public override int NumberOfBars { get { return 27; } }
-        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
         private static readonly int nKeyboardPitches = 85;
         private readonly int transposition = (byte)((127 - nKeyboardPitches) / 2); // 21 -- puts the range in middle of the MIDI range
@@ -165,7 +164,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
 
-            Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
+            Seq mainSeq = new Seq(0, trks, MidiChannelPerVoice);
 
             //List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
 

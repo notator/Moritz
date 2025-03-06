@@ -46,17 +46,13 @@ namespace Moritz.Composer
 
             Debug.Assert(_algorithm != null);
 
-            _outputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerOutputVoice);
-            if(_algorithm.MidiChannelPerInputVoice != null)
-            {
-                _inputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerInputVoice);
-            }
+            _outputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerVoice);
 
             GetSelectedSettings();
 
             if(VoiceIndicesPerStaffTextBox.Text == "")
             {
-                SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelPerOutputVoice.Count);
+                SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelPerVoice.Count);
             }
         }
         #region called from ctor
@@ -146,7 +142,7 @@ namespace Moritz.Composer
         {
             LoadSettings();
 
-            SetVoiceIndicesHelpLabel(_algorithm.MidiChannelPerOutputVoice, _algorithm.MidiChannelPerInputVoice);
+            SetVoiceIndicesHelpLabel(_algorithm.MidiChannelPerVoice);
             SetSystemStartBarsHelpLabel(_algorithm.NumberOfBars);
 
             VoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
@@ -155,7 +151,7 @@ namespace Moritz.Composer
                 (SavedState)KrystalsGroupBox.Tag, (SavedState)PalettesGroupBox.Tag);
         }
         #region helpers
-        private void SetVoiceIndicesHelpLabel(IReadOnlyList<int> midiChannelIndexPerOutputVoice, IReadOnlyList<int> midiChannelIndexPerInputVoice)
+        private void SetVoiceIndicesHelpLabel(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
             Debug.Assert(midiChannelIndexPerOutputVoice.Count > 0);
             StringBuilder sb = new StringBuilder();
@@ -166,18 +162,6 @@ namespace Moritz.Composer
             }
             sb.Remove(0, 2);
 
-            if(midiChannelIndexPerInputVoice != null && midiChannelIndexPerInputVoice.Count > 0)
-            {
-                sb.Append(" | ");
-                StringBuilder ivsb = new StringBuilder();
-                foreach(var channel in midiChannelIndexPerInputVoice)
-                {
-                    ivsb.Append(", ");
-                    ivsb.Append(channel.ToString());
-                }
-                ivsb.Remove(0, 2);
-                sb.Append(ivsb);
-            }
             VoiceIndicesHelpLabel.Text = sb.ToString();
         }
 

@@ -18,9 +18,8 @@ namespace Moritz.Algorithm.ErratumMusical
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0 }; } }
+        public override IReadOnlyList<int> MidiChannelPerVoice { get { return new List<int>() { 0 }; } }
         public override int NumberOfBars { get { return 8; } }
-        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
         private static IReadOnlyList<IReadOnlyList<byte>> erratumMusicalGraphPitches = new List<List<byte>>()
         {
@@ -112,7 +111,7 @@ namespace Moritz.Algorithm.ErratumMusical
             List<int> endBarlinePositions = new List<int>();
             List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
 
-            Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
+            Seq mainSeq = new Seq(0, trks, MidiChannelPerVoice);
 
             List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, mainSeq.Trks.Count);
 

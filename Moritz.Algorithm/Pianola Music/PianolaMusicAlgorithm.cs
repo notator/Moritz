@@ -16,9 +16,8 @@ namespace Moritz.Algorithm.PianolaMusic
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5 }; } }
+        public override IReadOnlyList<int> MidiChannelPerVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5 }; } }
         public override int NumberOfBars { get { return 8; } }
-        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
         // Neither the krystals, nor the palettes argument is used.
         public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
@@ -29,9 +28,9 @@ namespace Moritz.Algorithm.PianolaMusic
 
             // Add each Trk to trks here, in top to bottom (=channelIndex) order in the score.
             List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
-            Debug.Assert(trks.Count == MidiChannelPerOutputVoice.Count);
+            Debug.Assert(trks.Count == MidiChannelPerVoice.Count);
 
-            Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
+            Seq mainSeq = new Seq(0, trks, MidiChannelPerVoice);
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, 8);
             List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
 

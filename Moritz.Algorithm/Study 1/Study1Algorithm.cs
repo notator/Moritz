@@ -19,9 +19,8 @@ namespace Moritz.Algorithm.Study1
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0 }; } }
+        public override IReadOnlyList<int> MidiChannelPerVoice { get { return new List<int>() { 0 }; } }
         public override int NumberOfBars { get { return 68; } }
-        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
         // Neither the krystals, nor the palettes argument is used.
         public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
@@ -32,7 +31,7 @@ namespace Moritz.Algorithm.Study1
             Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
             Trk track = GetTrack(trackChordNumbers, trackRootPitches);
-            Seq mainSeq = new Seq(0, new List<Trk>() { track }, MidiChannelPerOutputVoice);
+            Seq mainSeq = new Seq(0, new List<Trk>() { track }, MidiChannelPerVoice);
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, NumberOfBars);
 
             List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);

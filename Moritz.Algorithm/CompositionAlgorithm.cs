@@ -30,17 +30,17 @@ namespace Moritz.Algorithm
 
         protected void CheckParameters()
         {
-            #region check output channels
-            int outputChannelCount = MidiChannelPerOutputVoice.Count;
-            if(outputChannelCount < 1)
+            #region check channels
+            int channelCount = MidiChannelPerVoice.Count;
+            if(channelCount < 1)
                 throw new ApplicationException("CompositionAlgorithm: There must be at least one output voice!");
-            if(outputChannelCount > 16)
+            if(channelCount > 16)
                 throw new ApplicationException("CompositionAlgorithm: There cannot be more than 16 output voices.");
 
             int previousChannelIndex = -1;
-            for(int i = 0; i < outputChannelCount; ++i)
+            for(int i = 0; i < channelCount; ++i)
             {
-                int channelIndex = MidiChannelPerOutputVoice[i];
+                int channelIndex = MidiChannelPerVoice[i];
 
                 if(channelIndex < 0 || channelIndex > 15)
                     throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
@@ -52,46 +52,6 @@ namespace Moritz.Algorithm
                         throw new ApplicationException("CompositionAlgorithm: (non-percussion) midi channels must be unique and in ascending order!");
                     }
                     previousChannelIndex = channelIndex;
-                }
-            }
-            #endregion
-            #region check input channels
-            // See the comment on the definition of MidiChannelPerInputVoice.
-            if(MidiChannelPerInputVoice != null)
-            {
-                var mcipiv = MidiChannelPerInputVoice;
-                if(mcipiv.Count == 0 || mcipiv[0] != 0)
-                {
-                    throw new ApplicationException("CompositionAlgorithm: the first input channel must be 0!");
-                }
-                if(mcipiv.Count > 4)
-                {
-                    throw new ApplicationException("CompositionAlgorithm: too many input voices!");
-                }
-                int channel0Count = 0;
-                int channel1Count = 0;
-                var prevChannel = -1;
-                foreach(var channel in mcipiv)
-                {
-                    if(channel < 0 || channel > 1)
-                    {
-                        throw new ApplicationException("CompositionAlgorithm: input channel out of range!");
-                    }
-                    if(channel != prevChannel && channel != (prevChannel + 1))
-                    {
-                        throw new ApplicationException("CompositionAlgorithm: input channels must be in numerical order!");
-                    }
-                    prevChannel = channel;
-                    channel0Count = (channel == 0) ? channel0Count + 1 : channel0Count;
-                    channel1Count = (channel == 1) ? channel1Count + 1 : channel1Count;
-                }
-                if(channel0Count < 1 || channel0Count > 2)
-                {
-                    throw new ApplicationException("CompositionAlgorithm: input channel 0 must occur 1 or 2 times.");
-                }
-                if(channel1Count != 0 && channel1Count > 2)
-                {
-                    throw new ApplicationException("CompositionAlgorithm: input channel 1 may occur 0, 1 or 2 times.");
                 }
             }
             #endregion
@@ -122,39 +82,24 @@ namespace Moritz.Algorithm
         /// <summary>
         /// Defines the midi channel index for each output voice, in the top to bottom order of the output voices in each system.
         /// This list may not be empty.
-        /// Each midi channel (in range [0..15]) can can only be used once, and (apart from channel index 9 -- the percussion
-        /// channel), must be allocated contiguously in top-bottom order starting at channel index 0.
-        /// Channel index 9 can be allocated (once) at any voice index.
+        /// Each midi channel (in range [0..15]) can can only be used once, and allocated contiguously in top-bottom order starting
+        /// at channel index 0.
         /// Notes:
-        /// Midi channels are always allocated to tracks (voices) in this top-bottom order. Contrary to previous versions of
-        /// Moritz, the channel order cannot be changed, and all tracks are always visible.
+        /// Midi channels are always allocated to voices in this top-bottom order. Contrary to previous versions of
+        /// Moritz, the channel order cannot be changed, and voices are always visible.
         /// The association of voices with staves continues to be controlled using an input field in the Assistant Composer's
         /// main dialog.
-        /// Moritz provides complete midi message information (including the midi channel info) for each output track, so
-        /// the Assistant Performer can use this information at load time to create binary midi messages that are associated
-        /// with each track.
+        /// Each Voice can contain more than one (performance) track (Trk), all such tracks have the same midi channel.
+        /// Moritz provides complete midi message information (including the midi channel info) for each track, so
+        /// the Assistant Performer can use this information (together with the track index in the voice) at load time
+        /// to create binary midi messages that are associated with each track.
         /// This means
-        /// 1. that the Assistant Performer can ignore the channel info at run time, and simply refer to tracks by their index.
-        /// 2. that Moritz can use the track indices (rather than midi channels) in the references to tracks in the input
-        ///    notes that it creates. That should simplify the code considerably re previous Moritz versions.
-        /// The AP could provide track-channel info to users if necessary, but I think this could initially be done simply
-        /// by using descriptive staff names in the score.
+        /// 1. that the Assistant Performer can ignore the channel info at run time, and simply refer to voices by their index.
+        /// 2. that Moritz can use the voice indices (rather than midi channels) in the references to tracks in the input
+        ///    notes that it creates.
+        /// The AP can provide voice-channel and track-index-in-voice info to users when/if necessary.
         /// </summary>
-        public abstract IReadOnlyList<int> MidiChannelPerOutputVoice { get; }
-
-        /// <summary>
-        /// Defines the midi channel index for each input voice, in the top to bottom order of the input voices in each system.
-        /// This list can be null, in which case there will be no input voices.
-        /// Input voices are rendered larger than, and placed below, output voices in scores.
-        /// 1. Currently, only midi input channels 0 and 1 are allowed. (These channels could be sent by a single,
-        ///    split keyboard.)
-        /// 2. The first channel must be 0 with subsequent channels in numerical order.
-        ///    Channel 0 can be used once or twice. Channel 1 can be missing or used once or twice.
-        ///    (The possible alternatives are: {0}, {0,1}, {0,0,1}, {0,1,1} and {0,0,1,1}.)
-        /// At load time, the Assistant Performer agglomerates input voices having the same midi input channel into a
-        /// single input sequence.
-        /// </summary>
-        public abstract IReadOnlyList<int> MidiChannelPerInputVoice { get; }
+        public abstract IReadOnlyList<int> MidiChannelPerVoice { get; }
 
         /// <summary>
         /// Returns the number of bars (=bar definitions) created by the algorithm.

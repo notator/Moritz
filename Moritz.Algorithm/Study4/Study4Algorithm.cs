@@ -18,8 +18,7 @@ namespace Moritz.Algorithm.Study4
 			CheckParameters();
 		}
 
-		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
-		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
+		public override IReadOnlyList<int> MidiChannelPerVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override int NumberOfBars { get { return 55; } }
 		public override IReadOnlyList<int> RegionStartBarIndices { get { return new List<int>() { 0, 1, 5, 11, 19, 29, 41 }; } }
 
@@ -47,7 +46,7 @@ namespace Moritz.Algorithm.Study4
 
 			GetTrksAndBarlines(study4GamutVector, out List<Trk> trks, out List<int> barlineMsPositions);
 
-			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
+			Seq mainSeq = new Seq(0, trks, MidiChannelPerVoice);
 
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);

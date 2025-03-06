@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Study4
 		{
 			trks = new List<Trk>();
 			barlineMsPositions = new List<int>();
-			for(int i = 0; i < this.MidiChannelPerOutputVoice.Count; i++)
+			for(int i = 0; i < this.MidiChannelPerVoice.Count; i++)
 			{
 				trks.Add(new Trk(i));
 			}
@@ -41,7 +41,7 @@ namespace Moritz.Algorithm.Study4
 		private List<List<Trk>> GetTrkListList(GamutVector gamutVector, out List<int> barlineMsPositions)
 		{
 			var nBars = gamutVector.Gamuts.Count;
-			var nChannels = this.MidiChannelPerOutputVoice.Count;
+			var nChannels = this.MidiChannelPerVoice.Count;
 
 			//var nMidiChordDefs = palette.Count;
 			//var midiChordDef = palette.MidiChordDef(0);
