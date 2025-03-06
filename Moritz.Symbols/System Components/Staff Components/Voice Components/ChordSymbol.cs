@@ -169,7 +169,14 @@ namespace Moritz.Symbols
             w.SvgStartGroup(CSSObjectClass.chord.ToString()); // "chord"
             w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 
-            _midiChordDef.WriteSVG(w, channel, carryMsgs);
+            w.WriteStartElement("score", "midis", null);
+
+            foreach(var midiChordDef in _midiChordDefs)
+            {
+                midiChordDef.WriteSVG(w, channel, carryMsgs);
+            }
+
+            w.WriteEndElement(); // end score:midis
 
             w.SvgStartGroup(CSSObjectClass.graphics.ToString());
             ChordMetrics.WriteSVG(w);
@@ -181,13 +188,12 @@ namespace Moritz.Symbols
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("outputChord  ");
+            sb.Append("chord  ");
             sb.Append(InfoString);
             return sb.ToString();
         }
 
-        public MidiChordDef MidiChordDef { get { return _midiChordDef; } }
-        protected MidiChordDef _midiChordDef = null;
+        private List<MidiChordDef> _midiChordDefs = new List<MidiChordDef>();
 
         public VerticalDir DefaultStemDirection(Clef clef)
         {
