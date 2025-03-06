@@ -20,9 +20,8 @@ namespace Moritz.Algorithm.Study1
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0 }; } }
+        public override IReadOnlyList<int> MidiChannelPerVoice { get { return new List<int>() { 0 }; } }
         public override int NumberOfBars { get { return 68; } }
-        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
         // Neither the krystals, nor the palettes argument is used.
         public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
@@ -33,14 +32,16 @@ namespace Moritz.Algorithm.Study1
             Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
             Trk track0 = GetTrack0(trackChordNumbers, trackRootPitches);
-            Trk track1 = GetTrack1(track0);
+            Trk track1 = GetTrack1(track0);                                      
             Trk track2 = GetTrack2(track1);
             Trk track3 = GetTrack3(track2);
 
-            Seq mainSeq = new Seq(0, new List<Trk>() { track0 }, MidiChannelPerOutputVoice);
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, NumberOfBars);
+            List<Trk> channel0Layers = new List<Trk>() { track0, track1, track2, track3 }; // all in channel 0
 
-            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
+            Seq seq = new Seq(0, channel0Layers, MidiChannelPerVoice);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(seq, NumberOfBars);
+
+            List<Bar> bars = GetBars(seq, barlineMsPositions, null, null);
 
             SetPatch0InTheFirstChord(bars[0].VoiceDefs[0]);
 
@@ -73,7 +74,7 @@ namespace Moritz.Algorithm.Study1
         {
             var trk3 = (Trk)trk2.Clone();
 
-            foreach(var midiChordDef in trk3.MidiChordDefs)
+            foreach(var midiChordDef in trk2.MidiChordDefs)
             {
 
             }
