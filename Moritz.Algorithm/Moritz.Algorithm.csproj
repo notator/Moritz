@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
+    <Compile Include="Study 1 Performances\Study1PerformancesAlgorithm.cs" />
     <Compile Include="Study4\GetStudy4GamutVector.cs" />
     <Compile Include="Study4\GetTrksAndBarlines.cs" />
     <Compile Include="Study4\Study4Algorithm.cs" />

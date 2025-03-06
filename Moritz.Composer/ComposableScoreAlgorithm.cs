@@ -41,6 +41,9 @@ namespace Moritz.Composer
                 case "Study 1":
                     algorithm = new Study1Algorithm();
                     break;
+                case "Study 1 Performances":
+                    algorithm = new Study1PerformancesAlgorithm();
+                    break;
                 case "Study 2":
                     algorithm = new Study2Algorithm();
                     break;
