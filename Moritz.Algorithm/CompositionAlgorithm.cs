@@ -31,7 +31,7 @@ namespace Moritz.Algorithm
         protected void CheckParameters()
         {
             #region check channels
-            int channelCount = MidiChannelPerVoice.Count;
+            int channelCount = NumberOfMidiChannels;
             if(channelCount < 1)
                 throw new ApplicationException("CompositionAlgorithm: There must be at least one output voice!");
             if(channelCount > 16)
@@ -40,7 +40,7 @@ namespace Moritz.Algorithm
             int previousChannelIndex = -1;
             for(int i = 0; i < channelCount; ++i)
             {
-                int channelIndex = MidiChannelPerVoice[i];
+                int channelIndex = i;
 
                 if(channelIndex < 0 || channelIndex > 15)
                     throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
@@ -80,26 +80,16 @@ namespace Moritz.Algorithm
         }
 
         /// <summary>
-        /// Defines the midi channel index for each output voice, in the top to bottom order of the output voices in each system.
-        /// This list may not be empty.
-        /// Each midi channel (in range [0..15]) can can only be used once, and allocated contiguously in top-bottom order starting
-        /// at channel index 0.
+        /// Defines the number of MIDI channels used by the algorithm.
+        /// This number must be in range [1..16].
+        /// Each voice in a score has a particular midi channel, so the number of midi channels is also the number of voices.
+        /// Midi channels are always allocated from top to bottom in each score. 
         /// Notes:
-        /// Midi channels are always allocated to voices in this top-bottom order. Contrary to previous versions of
-        /// Moritz, the channel order cannot be changed, and voices are always visible.
-        /// The association of voices with staves continues to be controlled using an input field in the Assistant Composer's
-        /// main dialog.
+        /// The association of voices with staves is controlled using an input field in the Assistant Composer's main dialog.
+        /// Each Voice contains a list of Trk. Each Trk contains a different interpretation (=performance) of the voice's graphics.
         /// Each Voice can contain more than one (performance) track (Trk), all such tracks have the same midi channel.
-        /// Moritz provides complete midi message information (including the midi channel info) for each track, so
-        /// the Assistant Performer can use this information (together with the track index in the voice) at load time
-        /// to create binary midi messages that are associated with each track.
-        /// This means
-        /// 1. that the Assistant Performer can ignore the channel info at run time, and simply refer to voices by their index.
-        /// 2. that Moritz can use the voice indices (rather than midi channels) in the references to tracks in the input
-        ///    notes that it creates.
-        /// The AP can provide voice-channel and track-index-in-voice info to users when/if necessary.
         /// </summary>
-        public abstract IReadOnlyList<int> MidiChannelPerVoice { get; }
+        public abstract int NumberOfMidiChannels { get; }
 
         /// <summary>
         /// Returns the number of bars (=bar definitions) created by the algorithm.
@@ -237,8 +227,7 @@ namespace Moritz.Algorithm
         }
 
         /// <summary>
-        /// If inputVoiceDefs != null, then barlines will be fit to the InputChordDefs in the inputVoices,
-        /// otherwise they will be fit to the MidiChordDefs in the trks.
+        /// Barlines will be fit to MidiChordDefs in the trks.
         /// </summary>
         /// <param name="mainSeq"></param>
         /// <param name="inputVoiceDefs">can be null</param>
@@ -323,9 +312,9 @@ namespace Moritz.Algorithm
         /// <param name="inputVoiceDefs">Can be null</param>
         /// <param name="nBars"></param>
         /// <returns></returns>
-        public List<int> GetBalancedBarlineMsPositions(IReadOnlyList<Trk> trks, int nBars)
+        public List<int> GetBalancedBarlineMsPositions(Seq seq, int nBars)
         {
-            List<VoiceDef> voiceDefs = new List<VoiceDef>(trks);
+            List<VoiceDef> voiceDefs = seq.VoiceDefs;
 
             int msDuration = voiceDefs[0].MsDuration;
 

@@ -46,13 +46,13 @@ namespace Moritz.Composer
 
             Debug.Assert(_algorithm != null);
 
-            _outputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerVoice);
+            _outputMIDIChannels = GetVoiceIndices(_algorithm.NumberOfMidiChannels);
 
             GetSelectedSettings();
 
             if(VoiceIndicesPerStaffTextBox.Text == "")
             {
-                SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelPerVoice.Count);
+                SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfMidiChannels);
             }
         }
         #region called from ctor
@@ -127,14 +127,12 @@ namespace Moritz.Composer
             ShowSelectedPaletteButton.Enabled = false;
         }
         #endregion DeselectAll
-        private List<byte> GetVoiceIndices(IReadOnlyList<int> MidiChannelIndexPerVoice)
+        private List<byte> GetVoiceIndices(int numberOfMidiChannels)
         {
-            Debug.Assert(MidiChannelIndexPerVoice != null);
-
             List<byte> rval = new List<byte>();
-            for(byte i = 0; i < MidiChannelIndexPerVoice.Count; ++i)
+            for(byte i = 0; i < numberOfMidiChannels; ++i)
             {
-                rval.Add((byte)MidiChannelIndexPerVoice[i]);
+                rval.Add(i);
             }
             return rval;
         }
@@ -142,7 +140,7 @@ namespace Moritz.Composer
         {
             LoadSettings();
 
-            SetVoiceIndicesHelpLabel(_algorithm.MidiChannelPerVoice);
+            SetVoiceIndicesHelpLabel(_algorithm.NumberOfMidiChannels);
             SetSystemStartBarsHelpLabel(_algorithm.NumberOfBars);
 
             VoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
@@ -151,11 +149,10 @@ namespace Moritz.Composer
                 (SavedState)KrystalsGroupBox.Tag, (SavedState)PalettesGroupBox.Tag);
         }
         #region helpers
-        private void SetVoiceIndicesHelpLabel(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+        private void SetVoiceIndicesHelpLabel(int numberOfMidiChannels)
         {
-            Debug.Assert(midiChannelIndexPerOutputVoice.Count > 0);
             StringBuilder sb = new StringBuilder();
-            foreach(var channel in midiChannelIndexPerOutputVoice)
+            for(var channel = 0; channel < numberOfMidiChannels; ++channel)
             {
                 sb.Append(", ");
                 sb.Append(channel.ToString());
