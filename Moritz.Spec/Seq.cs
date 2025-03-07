@@ -3,70 +3,72 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Moritz.Spec
 {
-    public class Seq : ITrksContainer
+    public class Seq : IVoiceDefsContainer
     {
         /// <summary>
-        /// trks.Count must be less than or equal to midiChannelIndexPerOutputVoice.Count. (See trks parameter comment.)
+        /// This constructor creates the Seq.VoiceDefs field containing a list of VoiceDef objects.
+        /// Each VoiceDef has a unique midi channel that is its index in the VoiceDefs list.
+        /// Each VoiceDef contains a list of Trk. Each such Trk has the same channel, and is an alternative performance
+        /// of the graphics that will eventually be associated with the VoiceDef's graphics. 
         /// </summary>
         /// <param name="absSeqMsPosition">Must be greater than or equal to zero.</param>
         /// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
-        /// combination of MidiRestDef or MidiChordDef. Each trk.MidiChannel must be unique and present in the
-        /// midiChannelIndexPerOutputVoice list. Each trk.MsPositionReContainer must be 0. All trk.UniqueDef.MsPositionReFirstUD
-        /// values must be set correctly.
+        /// combination of MidiRestDef or MidiChordDef.
+        /// More than one trk can have the same midiChannel, but each successive trk in the trks list must have a trk.MidiChannel
+        /// that is greater than or equal to the previous trk's. (i.e. the midiChannels must be in contiguous order.)
+        /// Each trk.MsPositionReContainer must be 0. All trk.UniqueDef.MsPositionReFirstUD values must be set correctly.
+        /// All Trks that have the same channel must have the same trk.DurationsCount. (They are different performances of the same ChordSymbols.)
         /// <para>Not all the Seq's channels need to be given an explicit Trk in the trks argument. The seq will be given empty
-        /// (default) Trks for the channels that are missing.</para>
+        /// (default) Trks for the channels that are missing.
+        /// trks.Count must be less than or equal to numberOfMidiChannels.</para>
         /// </param>
-        /// <param name="barlineMsPositionsReSeq">Can be null or empty. All barlineMsPositions must be unique, in ascending order, and less than or equal to the final msDuration of the Seq.</param>
-        /// <param name="midiChannelIndexPerOutputVoice">The Seq will contain one trk for each channel in this list.</param>
-        public Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+        /// <param name="numberOfMidiChannels">Each Voice has one channel index.</param>
+        public Seq(int absSeqMsPosition, List<Trk> trks, int numberOfMidiChannels)
         {
             #region conditions
             Debug.Assert(absSeqMsPosition >= 0);
-            for(int i = 0; i < trks.Count - 1; ++i)
+            Debug.Assert(trks != null && trks.Count > 0);
+            for(int i = 0; i < trks.Count; ++i)
             {
                 Trk trk = trks[i];
-                for(int j = i + 1; j < trks.Count; ++j)
-                {
-                    Debug.Assert(trk.MidiChannel != trks[j].MidiChannel);
-                }
-                bool trkChannelFound = false;
-                foreach(int ovChannel in midiChannelIndexPerOutputVoice)
-                {
-                    if(trk.MidiChannel == ovChannel)
-                    {
-                        trkChannelFound = true;
-                        break;
-                    }
-                }
-                Debug.Assert(trkChannelFound);
+                Debug.Assert(trk.MidiChannel < numberOfMidiChannels, "Unknown voice/channel index.");
                 Debug.Assert(trk.MsPositionReContainer == 0);
                 trk.AssertConsistency();
             }
+            Debug.Assert(numberOfMidiChannels > 0 && numberOfMidiChannels <= 16);
             #endregion conditions
 
-            _absMsPosition = absSeqMsPosition;
-
-            foreach(int channel in midiChannelIndexPerOutputVoice)
+            int durationsCount = trks[0].DurationsCount;
+            VoiceDef voiceDef = new VoiceDef(trks[0]);
+            _voiceDefs.Add(voiceDef);
+            for(int i = 0; i < trks.Count - 1; ++i)
             {
-                Trk newTrk = null;
-                foreach(Trk trk in trks)
+                Trk trk = trks[i];
+                Trk nextTrk = trks[i+1];
+                if(trk.MidiChannel == nextTrk.MidiChannel)
                 {
-                    if(trk.MidiChannel == channel)
-                    {
-                        newTrk = trk;
-                        break;
-                    }
+                    Debug.Assert(nextTrk.DurationsCount == durationsCount);
+                    voiceDef.Trks.Add(nextTrk);
                 }
-                if(newTrk == null)
+                else if(nextTrk.MidiChannel == trk.MidiChannel + 1)
                 {
-                    newTrk = new Trk(channel);
+                    durationsCount = nextTrk.DurationsCount;
+                    voiceDef = new VoiceDef(nextTrk);
+                    _voiceDefs.Add(voiceDef);
                 }
-                newTrk.Container = this;
-                _trks.Add(newTrk);
+                else
+                {
+                    Debug.Assert(false, "Non-contiguous midiChannel.");
+                }
             }
+
+            Debug.Assert(VoiceDefs.Count == numberOfMidiChannels, "Wrong number of VoiceDefs.");
+
+            _absMsPosition = absSeqMsPosition;
 
             AssertConsistency();
         }
@@ -74,12 +76,15 @@ namespace Moritz.Spec
         public Seq Clone()
         {
             List<Trk> trks = new List<Trk>();
-            for(int i = 0; i < _trks.Count; ++i)
+            foreach(var voiceDef in this.VoiceDefs)
             {
-                trks.Add((Trk)_trks[i].Clone());
+                foreach(var trk in voiceDef.Trks)
+                {
+                    trks.Add((Trk)trk.Clone());
+                }
             }
 
-            Seq clone = new Seq(_absMsPosition, trks, MidiChannelPerOutputVoice);
+            Seq clone = new Seq(_absMsPosition, trks, VoiceDefs.Count);
 
             return clone;
         }
@@ -88,7 +93,7 @@ namespace Moritz.Spec
         /// Concatenates seq2 to the caller (seq1). Returns a pointer to the caller.
         /// Both Seqs must be normalized before calling this function.
         /// When this function is called, seq2.AbsMsPosition is the earliest position, relative to seq1, at which it can be concatenated.
-        /// When it returns, seq2's Trks will have been concatenated to Seq1, and seq1 is consistent.
+        /// When it returns, seq2's VoiceDefs will have been concatenated to Seq1, and seq1 is consistent.
         /// If Seq2 is needed after calling this function, then it should be cloned first.
         /// For example:
         /// If seq2.MsPosition==0, it will be concatenated such that there will be at least one trk concatenation without an
@@ -100,35 +105,44 @@ namespace Moritz.Spec
         public Seq Concat(Seq seq2)
         {
             #region assertions
-            Debug.Assert(_trks.Count == seq2.Trks.Count);
+            Debug.Assert(VoiceDefs.Count == seq2.VoiceDefs.Count);
             Debug.Assert(this.IsNormalized);
             Debug.Assert(seq2.IsNormalized);
-            AssertChannelConsistency(seq2.MidiChannelPerOutputVoice);
+            for(int i = 0; i < VoiceDefs.Count; ++i)
+            {
+                Debug.Assert(VoiceDefs[i].Trks.Count == seq2.VoiceDefs[i].Count);
+            }
+            AssertChannelConsistency(seq2.VoiceDefs.Count);
             #endregion
 
-            int nTrks = _trks.Count;
+            int nVoiceDefs = VoiceDefs.Count;
 
             #region find concatMsPos
             int absConcatMsPos = seq2.AbsMsPosition;
             if(seq2.AbsMsPosition < (AbsMsPosition + MsDuration))
             {
-                for(int i = 0; i < nTrks; ++i)
+                for(int i = 0; i < nVoiceDefs; ++i)
                 {
-                    Trk trk1 = _trks[i];
-                    Trk trk2 = seq2.Trks[i];
-                    int earliestAbsConcatPos = trk1.MsPositionReContainer + trk1.EndMsPositionReFirstIUD - trk2.MsPositionReContainer;
+                    VoiceDef voiceDef1 = _voiceDefs[i];
+                    VoiceDef voiceDef2 = seq2.VoiceDefs[i];
+                    int earliestAbsConcatPos = voiceDef1.MsPositionReContainer + voiceDef1.EndMsPositionReFirstIUD - voiceDef2.MsPositionReContainer;
                     absConcatMsPos = (earliestAbsConcatPos > absConcatMsPos) ? earliestAbsConcatPos : absConcatMsPos;
                 }
             }
             #endregion
 
             #region concatenation
-            for(int i = 0; i < nTrks; ++i)
+            for(int i = 0; i < nVoiceDefs; ++i)
             {
-                Trk trk2 = seq2.Trks[i];
-                if(trk2.UniqueDefs.Count > 0)
+                VoiceDef voiceDef1 = _voiceDefs[i];
+                VoiceDef voiceDef2 = seq2.VoiceDefs[i];
+
+                int nTrks = voiceDef1.Trks.Count;
+
+                for(int j = 0; j < nTrks; ++j)
                 {
-                    Trk trk1 = _trks[i];
+                    Trk trk1 = voiceDef1.Trks[j];
+                    Trk trk2 = voiceDef2.Trks[j];
                     int trk1AbsEndMsPosition = AbsMsPosition + trk1.MsPositionReContainer + trk1.EndMsPositionReFirstIUD;
                     int trk2AbsStartMsPosition = absConcatMsPos + trk2.MsPositionReContainer;
                     if(trk1AbsEndMsPosition < trk2AbsStartMsPosition)
@@ -140,9 +154,12 @@ namespace Moritz.Spec
             }
             #endregion
 
-            foreach(Trk trk in Trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                trk.AgglomerateRests();
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    trk.AgglomerateRests();
+                }
             }
 
             AssertConsistency();
@@ -151,27 +168,27 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Replaces (or updates) a trk having the same channel in the seq. trk.Container is set to the Seq.
-        /// An exception is thrown if the trk to replace is not found.
-        /// trk.MsPositionReContainer can have any value, but this function normalizes the seq.
+        /// Replaces (or updates) a VoiceDef having the same channel in the seq.
+        /// VoiceDef.Container is set to the Seq.
+        /// An exception is thrown if the VoiceDef to replace is not found.
+        /// VoiceDef.MsPositionReContainer can have any value, but this function normalizes the seq.
         /// </summary>
         /// <param name="trk"></param>
-        public void SetTrk(Trk trk)
+        public void SetVoiceDef(VoiceDef voiceDef)
         {
             bool found = false;
-            for(int i = 0; i < _trks.Count; ++i)
+            for(int i = 0; i < VoiceDefs.Count; ++i)
             {
-                if(trk.MidiChannel == _trks[i].MidiChannel)
+                if(voiceDef.MidiChannel == _voiceDefs[i].MidiChannel)
                 {
-                    trk.Container = this;
-                    _trks[i] = trk;
+                    voiceDef.Container = this;
+                    _voiceDefs[i] = voiceDef;
                     found = true;
                     break;
                 }
             }
 
             Debug.Assert(found == true, "Illegal channel");
-
         }
 
         /// <summary>
@@ -181,11 +198,14 @@ namespace Moritz.Spec
         {
             int msDuration = MsDuration; // Getting this value checks that all trk msDurations are either 0, or the same.
 
-            foreach(Trk trk in Trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                if(trk.UniqueDefs.Count == 0)
+                foreach(Trk trk in voiceDef.Trks)
                 {
-                    trk.Add(new MidiRestDef(0, msDuration));
+                    if(trk.UniqueDefs.Count == 0)
+                    {
+                        trk.Add(new MidiRestDef(0, msDuration));
+                    }
                 }
             }
         }
@@ -202,7 +222,6 @@ namespace Moritz.Spec
         {
             Debug.Assert(barlineMsPositionsReSeq[0] > 0, "The first msPosition must be greater than 0.");
 
-            int msDuration = this.MsDuration;
             for(int i = 0; i < barlineMsPositionsReSeq.Count; ++i)
             {
                 int msPosition = barlineMsPositionsReSeq[i];
@@ -219,150 +238,184 @@ namespace Moritz.Spec
                 Debug.Assert(msPosition > currentMsPos, "Value out of order.");
                 currentMsPos = msPosition;
                 bool found = false;
-                foreach(Trk trk in Trks)
+                foreach(var voiceDef in VoiceDefs)
                 {
-                    Debug.Assert(trk.MsPositionReContainer == 0);
-                    foreach(IUniqueDef iud in trk.UniqueDefs)
+                    foreach(Trk trk in voiceDef.Trks)
                     {
-                        if(msPosition == (iud.MsPositionReFirstUD + iud.MsDuration))
+                        Debug.Assert(trk.MsPositionReContainer == 0);
+                        foreach(IUniqueDef iud in trk.UniqueDefs)
                         {
-                            found = true;
+                            if(msPosition == (iud.MsPositionReFirstUD + iud.MsDuration))
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if(found)
+                        {
                             break;
                         }
-                    }
-                    if(found)
-                    {
-                        break;
-                    }
 
+                    }
                 }
                 Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef.");
             }
         }
 
         /// <summary>
-        /// Every Trk.MidiChannel is parallel to the indices in midiChannelIndexPerOutputVoice.
+        /// Every VoiceDef.MidiChannel and contained Trk MidiChannel is equal to the
+        /// index of the VoiceDef in the VoiceDefsList.
         /// </summary>
-        private void AssertChannelConsistency(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+        private void AssertChannelConsistency(int numberOfMidiChannels)
         {
-            Debug.Assert(_trks != null && _trks.Count > 0);
-            int nTrks = 0;
-            for(int i = 0; i < _trks.Count; ++i)
+            Debug.Assert(VoiceDefs != null && VoiceDefs.Count == numberOfMidiChannels);
+            for(int channel = 0; channel < numberOfMidiChannels; ++channel)
             {
-                if(_trks[i] is Trk trk)
-                {
-                    nTrks++;
-                    Debug.Assert(trk.MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
+                var voiceDef = VoiceDefs[channel];
+                Debug.Assert(channel == voiceDef.MidiChannel);
+                var trks = voiceDef.Trks;
+                for(int i = 0; i < trks.Count; ++i)
+                { 
+                    Debug.Assert(trks[i].MidiChannel == channel);
                 }
             }
-
-            Debug.Assert(nTrks == midiChannelIndexPerOutputVoice.Count);
         }
 
         /// <summary>
         /// AbsMsPosition is greater than or equal 0.
-        /// There is at least one Trk in _trks.
-        /// All Trk.MidiChannel values are unique per trk.
-        /// All Trk.MsPositionReContainer values are 0.
-        /// All Trks either have the same MsDuration or have msDuration=0.
-        /// All Trks contain only MidiRestDef or MidiChordDef objects.
-        /// All Trk.UniqueDef.MsPositionReFirstUD values are set correctly.
+        /// There is at least one VoiceDef in VoiceDefs
+        /// and at least one Trk in each VoiceDef.
+        /// All VoiceDef.MidiChannel and Trk.MidiChannel values are equal to the voiceDef's index in VoiceDefs.
+        /// All VoiceDef.MsPositionReContainer and Trk.MsPositionReContainer values are 0.
+        /// All VoiceDefs and their contained Trks have the same MsDuration.
+        /// (?)All VoiceDefs contain Trks that contain only MidiRestDef or MidiChordDef objects.
+        /// (?)All Trk.UniqueDef.MsPositionReFirstUD values are set correctly.
         /// </summary>
         public void AssertConsistency()
         {
             Debug.Assert(AbsMsPosition >= 0);
-            Debug.Assert(_trks != null && _trks.Count > 0);
+            Debug.Assert(VoiceDefs.Count > 0);
+            AssertChannelConsistency(VoiceDefs.Count);
 
-            List<int> midiChannels = new List<int>();
-            int thisMsDuration = MsDuration;
-            foreach(Trk trk in _trks)
+            int nMidiChannels = VoiceDefs.Count;
+            foreach(var voiceDef in VoiceDefs)
             {
-                trk.AssertConsistency();
-                int trkMsDuration = trk.MsDuration;
-                Debug.Assert(trkMsDuration == thisMsDuration || trkMsDuration == 0);
-                Debug.Assert(midiChannels.Contains(trk.MidiChannel) == false);
-                midiChannels.Add(trk.MidiChannel);
+                Debug.Assert(voiceDef.MsPositionReContainer == 0);
+                int msDuration = voiceDef.MsDuration;
+                foreach(var trk in voiceDef.Trks)
+                {
+                    Debug.Assert(trk.MsPositionReContainer == 0);
+                    Debug.Assert(trk.MsDuration == msDuration);
+                    Debug.Assert(trk.Container == voiceDef);
+
+                    /// (?)All VoiceDefs contain Trks that contain only MidiRestDef or MidiChordDef objects.
+                    /// (?)All Trk.UniqueDef.MsPositionReFirstUD values are set correctly.
+                    trk.AssertConsistency();
+                }
             }
         }
 
         #region sort functions
         public void SortVelocityIncreasing()
         {
-            foreach(Trk trk in Trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                trk.SortVelocityIncreasing();
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    trk.SortVelocityIncreasing();
+                }
             }
         }
         public void SortVelocityDecreasing()
         {
-            foreach(Trk trk in Trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                trk.SortVelocityDecreasing();
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    trk.SortVelocityDecreasing();
+                }
             }
         }
         public void SortRootNotatedPitchAscending()
         {
-            foreach(Trk trk in Trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                trk.SortRootNotatedPitchAscending();
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    trk.SortRootNotatedPitchAscending();
+                }
             }
         }
         public void SortRootNotatedPitchDescending()
         {
-            foreach(Trk trk in Trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                trk.SortRootNotatedPitchDescending();
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    trk.SortRootNotatedPitchDescending();
+                }
             }
         }
         #endregion sort functions
 
         /// <summary>
         /// Aligns the Trk UniqueDefs whose indices are given in the argument.
-        /// The argument.Count must be equal to the number of trks in the Seq, and in order of the trks in the seq's _trks list.
-        /// Each alignmentPosition must be a valid UniqueDef index in its trk.
+        /// The argument.Count must be equal to the number of VoiceDefs in the Seq,
+        /// and in order of the voiceDefs in the seq's VoiceDefs list.
+        /// Each alignmentPosition must be a valid UniqueDef index in each Trk in each VoiceDef.
         /// The Seq is normalized at the end of this function by adding rests at the beginnings and ends of trks as necessary.
 		/// The seq's msDuration changes automatically.
         /// </summary>
         public void AlignTrkUniqueDefs(List<int> indicesToAlign)
         {
-            Debug.Assert(indicesToAlign.Count == this._trks.Count);
+            Debug.Assert(indicesToAlign.Count == this.VoiceDefs.Count);
             List<int> newMsPositionsReContainer = new List<int>();
             int minMsPositionReContainer = int.MaxValue;
-            for(int i = 0; i < _trks.Count; ++i)
+            for(int i = 0; i < VoiceDefs.Count; ++i)
             {
                 newMsPositionsReContainer.Add(0); // default value
-                Trk trk = _trks[i];
-                int index = indicesToAlign[i];
-                Debug.Assert(index >= 0);
-
-                if(index < trk.UniqueDefs.Count)
+                VoiceDef voiceDef = VoiceDefs[i];
+                foreach(Trk trk in voiceDef.Trks)
                 {
-                    int alignmentMsPositionReFirstUD = 0;
-                    for(int j = 0; j < index; ++j)
-                    {
-                        alignmentMsPositionReFirstUD += trk.UniqueDefs[j].MsDuration;
-                    }
+                    int index = indicesToAlign[i];
+                    Debug.Assert(index >= 0);
 
-                    int newMsPositionReContainer = trk.MsPositionReContainer - alignmentMsPositionReFirstUD;
-                    newMsPositionsReContainer[i] = newMsPositionReContainer;
-                    minMsPositionReContainer = (minMsPositionReContainer < newMsPositionReContainer) ? minMsPositionReContainer : newMsPositionReContainer;
+                    if(index < trk.UniqueDefs.Count)
+                    {
+                        int alignmentMsPositionReFirstUD = 0;
+                        for(int j = 0; j < index; ++j)
+                        {
+                            alignmentMsPositionReFirstUD += trk.UniqueDefs[j].MsDuration;
+                        }
+
+                        int newMsPositionReContainer = trk.MsPositionReContainer - alignmentMsPositionReFirstUD;
+                        newMsPositionsReContainer[i] = newMsPositionReContainer;
+                        minMsPositionReContainer = (minMsPositionReContainer < newMsPositionReContainer) ? minMsPositionReContainer : newMsPositionReContainer;
+                    }
                 }
             }
-            for(int i = 0; i < _trks.Count; ++i)
+            for(int i = 0; i < VoiceDefs.Count; ++i)
             {
-                Trk trk = _trks[i];
-                trk.MsPositionReContainer = newMsPositionsReContainer[i] - minMsPositionReContainer;
+                VoiceDef voiceDef = VoiceDefs[i];
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    trk.MsPositionReContainer = newMsPositionsReContainer[i] - minMsPositionReContainer;
+                }
             }
 
             AssertConsistency();
         }
 
+
         public void AlignTrkAxes()
         {
             List<int> indicesToAlign = new List<int>();
-            foreach(Trk trk in Trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                indicesToAlign.Add(trk.AxisIndex);
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    indicesToAlign.Add(trk.AxisIndex);
+                }
             }
             AlignTrkUniqueDefs(indicesToAlign);
         }
@@ -375,11 +428,14 @@ namespace Moritz.Spec
         /// <param name="msShifts">The number of milliseconds to shift each trk. (May be negative.)</param>
         public void ShiftTrks(List<int> msShifts)
         {
-            Debug.Assert(msShifts.Count == this._trks.Count);
+            Debug.Assert(msShifts.Count == this.VoiceDefs.Count);
             for(int i = 0; i < msShifts.Count; ++i)
             {
-                Trk trk = _trks[i];
-                trk.MsPositionReContainer += msShifts[i];
+                VoiceDef voiceDef = VoiceDefs[i];
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    trk.MsPositionReContainer += msShifts[i];
+                }
             }
 
             AssertConsistency();
@@ -393,9 +449,12 @@ namespace Moritz.Spec
             get
             {
                 int minMsPositionReContainer = int.MaxValue;
-                foreach(Trk trk in _trks)
+                foreach(var voiceDef in VoiceDefs)
                 {
-                    minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
+                    foreach(var trk in voiceDef.Trks)
+                    {
+                        minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
+                    }
                 }
                 return (minMsPositionReContainer == 0);
             }
@@ -423,22 +482,25 @@ namespace Moritz.Spec
             }
             #endregion get warpDict
 
-            foreach(Trk trk in _trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                List<IUniqueDef> iuds = trk.UniqueDefs;
-                IUniqueDef iud = null;
-                int msPos = 0;
-                for(int i = 1; i < iuds.Count; ++i)
+                foreach(Trk trk in voiceDef.Trks)
                 {
-                    iud = iuds[i - 1];
-                    msPos = warpDict[iud.MsPositionReFirstUD];
+                    List<IUniqueDef> iuds = trk.UniqueDefs;
+                    IUniqueDef iud = null;
+                    int msPos = 0;
+                    for(int i = 1; i < iuds.Count; ++i)
+                    {
+                        iud = iuds[i - 1];
+                        msPos = warpDict[iud.MsPositionReFirstUD];
+                        iud.MsPositionReFirstUD = msPos;
+                        iud.MsDuration = warpDict[iuds[i].MsPositionReFirstUD] - msPos;
+                        msPos += iud.MsDuration;
+                    }
+                    iud = iuds[iuds.Count - 1];
                     iud.MsPositionReFirstUD = msPos;
-                    iud.MsDuration = warpDict[iuds[i].MsPositionReFirstUD] - msPos;
-                    msPos += iud.MsDuration;
+                    iud.MsDuration = originalMsDuration - msPos;
                 }
-                iud = iuds[iuds.Count - 1];
-                iud.MsPositionReFirstUD = msPos;
-                iud.MsDuration = originalMsDuration - msPos;
             }
 
             Debug.Assert(originalMsDuration == MsDuration);
@@ -446,8 +508,10 @@ namespace Moritz.Spec
             AssertConsistency();
         }
 
+
         /// <summary>
-        /// returns a list containing the msPositions of all the IUniqueDefs plus the endMsPosition of the final object.
+        /// returns a list containing the msPositions of all the IUniqueDefs in all Trks
+        /// plus the endMsPosition of the final object.
         /// </summary>
         /// <returns></returns>
         private List<int> GetMsPositions()
@@ -455,18 +519,21 @@ namespace Moritz.Spec
             int originalMsDuration = MsDuration;
 
             List<int> originalMsPositions = new List<int>();
-            foreach(Trk trk in _trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                foreach(IUniqueDef iud in trk)
+                foreach(Trk trk in voiceDef.Trks)
                 {
-                    int msPos = iud.MsPositionReFirstUD;
-                    if(!originalMsPositions.Contains(msPos))
+                    foreach(IUniqueDef iud in trk)
                     {
-                        originalMsPositions.Add(msPos);
+                        int msPos = iud.MsPositionReFirstUD;
+                        if(!originalMsPositions.Contains(msPos))
+                        {
+                            originalMsPositions.Add(msPos);
+                        }
                     }
                 }
-                originalMsPositions.Sort();
             }
+            originalMsPositions.Sort();
             originalMsPositions.Add(originalMsDuration);
 
             return originalMsPositions;
@@ -485,15 +552,15 @@ namespace Moritz.Spec
 
             Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
 
-            foreach(Trk trk in _trks)
+            foreach(var voiceDef in VoiceDefs)
             {
-                trk.SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
+                foreach(Trk trk in voiceDef.Trks)
+                {
+                    trk.SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
+                }
             }
         }
         #endregion Envelopes
-
-        public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
-        private List<Trk> _trks = new List<Trk>();
 
         private int _absMsPosition;
         public int AbsMsPosition
@@ -508,48 +575,50 @@ namespace Moritz.Spec
 
         /// <summary>
         /// The duration between the beginning of the first UniqueDef in the Seq and the end of the last UniqueDef in the Seq.
+        /// Getting this value checks that all trk msDurations are equal.
         /// Setting this value stretches or compresses the msDurations of all the trks and their contained UniqueDefs.
-        /// Getting this value checks that all trk msDurations either 0, or the same.
         /// </summary>
         public virtual int MsDuration
         {
             get
             {
-                Debug.Assert(_trks != null && _trks.Count > 0);
-                int msDuration = 0;
-                foreach(Trk trk in _trks)
+                Debug.Assert(VoiceDefs != null && VoiceDefs.Count > 0);
+                int msDuration = VoiceDefs[0].MsDuration;
+                foreach(var voiceDef in VoiceDefs)
                 {
-                    int trkMsDur = trk.MsDuration;
-                    if(msDuration == 0 && trkMsDur > 0)
+                    Debug.Assert(voiceDef.MsDuration == msDuration);
+                    foreach(var trk in voiceDef.Trks)
                     {
-                        msDuration = trkMsDur;
-                    }
-                    if(msDuration > 0)
-                    {
-                        Debug.Assert(trkMsDur == 0 || trkMsDur == msDuration);
+                        Debug.Assert(trk.MsDuration == msDuration);
                     }
                 }
                 return msDuration;
             }
             set
             {
-                Debug.Assert(_trks.Count > 0);
-                // there is a trk that begins at msPosition==0.
+                Debug.Assert(VoiceDefs.Count > 0);
+                // there is a voiceDef that begins at msPosition==0.
                 int currentDuration = MsDuration;
                 double factor = ((double)value) / currentDuration;
-                foreach(Trk trk in _trks)
+                foreach(var voiceDef in VoiceDefs)
                 {
-                    trk.MsDuration = (int)Math.Round(trk.MsDuration * factor);
-                    trk.MsPositionReContainer = (int)Math.Round(trk.MsPositionReContainer * factor);
+                    foreach(var trk in voiceDef.Trks)
+                    {
+                        trk.MsDuration = (int)Math.Round(trk.MsDuration * factor);
+                        trk.MsPositionReContainer = (int)Math.Round(trk.MsPositionReContainer * factor);
+                    }
                 }
                 int roundingError = value - MsDuration;
                 if(roundingError != 0)
                 {
-                    foreach(Trk trk in _trks)
+                    foreach(var voiceDef in VoiceDefs)
                     {
-                        if((trk.EndMsPositionReFirstIUD + roundingError) == value)
+                        foreach(var trk in voiceDef.Trks)
                         {
-                            trk.EndMsPositionReFirstIUD += roundingError;
+                            if((trk.EndMsPositionReFirstIUD + roundingError) == value)
+                            {
+                                trk.EndMsPositionReFirstIUD += roundingError;
+                            }
                         }
                     }
                 }
@@ -557,17 +626,10 @@ namespace Moritz.Spec
             }
         }
 
-        public IReadOnlyList<int> MidiChannelPerOutputVoice
+        public IReadOnlyList<VoiceDef> VoiceDefs
         {
-            get
-            {
-                List<int> channels = new List<int>();
-                foreach(Trk trk in _trks)
-                {
-                    channels.Add(trk.MidiChannel);
-                }
-                return channels;
-            }
+            get => _voiceDefs;
         }
+        private List<VoiceDef> _voiceDefs = new List<VoiceDef>();
     }
 }
