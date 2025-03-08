@@ -20,6 +20,7 @@ namespace Moritz.Algorithm.Study1
             CheckParameters();
         }
 
+        // required as forward reference by AssistantComposerForm.
         public override int NumberOfMidiChannels { get { return 1; } }
         public override int NumberOfBars { get { return 68; } }
 
@@ -31,24 +32,29 @@ namespace Moritz.Algorithm.Study1
 
             Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
-            Trk track0 = GetTrack0(trackChordNumbers, trackRootPitches);
-            Trk track1 = GetTrack1(track0);                                      
-            Trk track2 = GetTrack2(track1);
-            Trk track3 = GetTrack3(track2);
+            Trk trk0 = GetTrk0(trackChordNumbers, trackRootPitches);
+            Trk trk1 = GetTrk1(trk0);                                      
+            Trk trk2 = GetTrk2(trk1);
+            Trk trk3 = GetTrk3(trk2);
 
-            List<Trk> channel0Layers = new List<Trk>() { track0, track1, track2, track3 }; // all in channel 0
+            List<Trk> midiChannel0Trks = new List<Trk>() { trk0, trk1, trk2, trk3 }; // all in the same channel
+            var channelDef = new ChannelDef(midiChannel0Trks);
+            List<ChannelDef> channelDefs = new List<ChannelDef>() { channelDef };
 
-            Seq seq = new Seq(0, channel0Layers, NumberOfMidiChannels);
+            Debug.Assert(channelDefs.Count == NumberOfMidiChannels);
+
+            Seq seq = new Seq(0, channelDefs);
+
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(seq, NumberOfBars);
 
             List<Bar> bars = GetBars(seq, barlineMsPositions, null, null);
 
-            SetPatch0InTheFirstChord(bars[0].VoiceDefs[0]);
+            SetPatch0InTheFirstChord(bars[0].ChannelDefs[0]);
 
             return bars;
         }
 
-        private Trk GetTrack1(Trk trk0)
+        private Trk GetTrk1(Trk trk0)
         {
             var trk1 = (Trk)trk0.Clone();
 
@@ -57,9 +63,11 @@ namespace Moritz.Algorithm.Study1
 
             }
 
+            trk1.AssertConsistency();
+
             return trk1;
         }
-        private Trk GetTrack2(Trk trk1)
+        private Trk GetTrk2(Trk trk1)
         {
             var trk2 = (Trk)trk1.Clone();
 
@@ -68,9 +76,11 @@ namespace Moritz.Algorithm.Study1
 
             }
 
+            trk2.AssertConsistency();
+
             return trk2;
         }
-        private Trk GetTrack3(Trk trk2)
+        private Trk GetTrk3(Trk trk2)
         {
             var trk3 = (Trk)trk2.Clone();
 
@@ -78,6 +88,8 @@ namespace Moritz.Algorithm.Study1
             {
 
             }
+
+            trk3.AssertConsistency();
 
             return trk3;
         }
@@ -112,9 +124,9 @@ namespace Moritz.Algorithm.Study1
             return rval;
         }
 
-        private Trk GetTrack0(List<byte> trackChordNumbers, List<byte> trackRootPitches)
+        private Trk GetTrk0(List<byte> trackChordNumbers, List<byte> trackRootPitches)
         {
-            Trk track = new Trk(0, 0, new List<IUniqueDef>());
+            Trk trk0 = new Trk(0, new List<IUniqueDef>());
             List<List<byte>> chordIntervals = GetChordIntervals();
             List<byte> chordVelocities = GetChordVelocities();
             List<int> chordDurations = GetChordMsDurations();
@@ -129,10 +141,12 @@ namespace Moritz.Algorithm.Study1
                 IUniqueDef midiChordDef = GetMidiChordDef(chordIntervals[chordNumber - 1], chordVelocities[chordNumber - 1], chordDurations[chordNumber - 1], pitchNumber, chordMsPosition);
                 chordMsPosition += midiChordDef.MsDuration;
 
-                track.UniqueDefs.Add(midiChordDef);
+                trk0.UniqueDefs.Add(midiChordDef);
             }
 
-            return track;
+            trk0.AssertConsistency();
+
+            return trk0;
         }
 
         private IUniqueDef GetMidiChordDef(List<byte> chordIntervals, byte chordVelocity, int chordDuration, int relativePitch, int msPosition)
@@ -241,10 +255,10 @@ namespace Moritz.Algorithm.Study1
         /// <summary>
         /// The patch only needs to be set in the first chord, since it will be set by shunting if the Assistant Performer starts later.
         /// </summary>
-        private void SetPatch0InTheFirstChord(VoiceDef voiceDef)
+        private void SetPatch0InTheFirstChord(ChannelDef channelDef)
         {
             MidiChordDef firstMidiChordDef = null;
-            foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
+            foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
             {
                 firstMidiChordDef = iUniqueDef as MidiChordDef;
                 if(firstMidiChordDef != null)

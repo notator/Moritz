@@ -1,17 +1,15 @@
 namespace Moritz.Spec
 {
     ///<summary>
-    /// IUniqueDef is implemented by all objects that can be added to a VoiceDefs.UniqueDefs list.
+    /// IUniqueDef is implemented by all objects that can be added to a ChannelDefs.UniqueDefs list.
     /// Currently (11.9.2014) these are:
     ///     MidiChordDef
     ///     MidiRestDef
-    ///     InputChordDef
-    ///     InputRestDef
     ///     CautionaryChordDef
     ///     ClefDef
-    /// These objects must implement DeepClone() so that VoiceDefs.DeepClone() can be implemented.
-    /// VoiceDefs is used for composition. When complete, the UniqueDefs list is transferred to
-    /// Voice before the definitions are converted to the objects themselves.
+    /// These objects must implement DeepClone() so that ChannelDefs.DeepClone() can be implemented.
+    /// ChannelDefs is used for composition. When complete, the UniqueDefs list is used to create
+    /// NoteObjects (in Voice objects) that also contain their (graphic) representations.
     ///</summary>
     public interface IUniqueDef : System.ICloneable
     {

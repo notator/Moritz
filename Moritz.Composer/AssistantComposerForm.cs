@@ -2113,8 +2113,8 @@ namespace Moritz.Composer
         }
 
         /// <summary>
-        /// Returns a clef for each VoiceDef (=MIDI Channel) in the system.
-        /// The pageFormat.ClefsList has one clef per staff. Each staff can have either one or two VoiceDefs. 
+        /// Returns a clef for each ChannelDef (=MIDI Channel) in the system.
+        /// The pageFormat.ClefsList has one clef per staff. Each staff can have either one or two ChannelDefs. 
         /// </summary>
         public List<string> GetClefPerMIDIChannel(PageFormat pageFormat)
         {

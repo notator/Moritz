@@ -11,19 +11,32 @@ using System.Diagnostics;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// The base class for Trk and InputVoiceDef.
-    /// <para>VoiceDef classes are IEnumerable (foreach loops can be used).</para>
+    /// <para>ChannelDef classes are IEnumerable (foreach loops can be used).</para>
     /// <para>They are also indexable (IUniqueDef iu = this[index])</para>
     /// </summary>
-    public abstract class VoiceDef : IEnumerable
+    public class ChannelDef : IEnumerable
     {
         #region constructors
 
-        protected VoiceDef(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+        public ChannelDef(List<Trk> trks)
         {
-            Debug.Assert(midiChannel >= 0 && msPositionReContainer >= 0 && iuds != null);
+            Trks = trks;
+            foreach(var trk in trks)
+            {
+                trk.MidiChannelDefsContainer = (IMidiChannelDefsContainer)this;
+            }
 
-            this.MidiChannel = midiChannel;
+            this._msPositionReContainer = 0;
+
+            SetMsPositionsReFirstUD();
+
+            AssertConsistency();
+        }
+
+        public List<Trk> Trks = new List<Trk>();
+
+        public ChannelDef(int msPositionReContainer, List<IUniqueDef> iuds)
+        {
             this._msPositionReContainer = msPositionReContainer;
             this._uniqueDefs = iuds;
 
@@ -33,7 +46,7 @@ namespace Moritz.Spec
         }
         #endregion constructors
 
-        internal void SetToRange(VoiceDef argVoiceDef, int startMsPosReSeq, int endMsPosReSeq)
+        internal void SetToRange(ChannelDef argVoiceDef, int startMsPosReSeq, int endMsPosReSeq)
         {
             _uniqueDefs.Clear();
             foreach(IUniqueDef iud in argVoiceDef)
@@ -54,9 +67,9 @@ namespace Moritz.Spec
 
         #region public indexer & enumerator
         /// <summary>
-        /// Indexer. Allows individual UniqueDefs to be accessed using array notation on the VoiceDef.
+        /// Indexer. Allows individual UniqueDefs to be accessed using array notation on the ChannelDef.
         /// Automatically resets the MsPositions of all UniqueDefs in the list.
-        /// e.g. iumdd = voiceDef[3].
+        /// e.g. iumdd = channelDef[3].
         /// </summary>
         public IUniqueDef this[int i]
         {
@@ -152,25 +165,21 @@ namespace Moritz.Spec
             Debug.Assert(MsPositionReContainer >= 0);
             Debug.Assert(UniqueDefs != null);
             bool restFound = false;
-            foreach(IUniqueDef iud in UniqueDefs)
+            Debug.Assert(Trks != null && Trks.Count > 0);
+            foreach(var trk in Trks)
             {
-                if(iud is RestDef)
+                trk.AssertConsistency();
+                foreach(IUniqueDef iud in trk.UniqueDefs)
                 {
-                    Debug.Assert(restFound == false, "Consecutive rests found!");
-                    restFound = true;
-                }
-                else
-                {
-                    restFound = false;
-                }
-            }
-            if(UniqueDefs.Count > 0)
-            {
-                int msPos = 0;
-                foreach(IUniqueDef iud in UniqueDefs)
-                {
-                    Debug.Assert(iud.MsPositionReFirstUD == msPos, "Error in iUniqueDef.MsPositionReFirstUD");
-                    msPos += iud.MsDuration;
+                    if(iud is RestDef)
+                    {
+                        Debug.Assert(restFound == false, "Consecutive rests found!");
+                        restFound = true;
+                    }
+                    else
+                    {
+                        restFound = false;
+                    }
                 }
             }
         }
@@ -195,10 +204,10 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric.
+        /// Rests dont have lyrics, so their index in the ChannelDef can't be shown as a lyric.
         /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
         /// </summary>
-        /// <param name="voiceDef"></param>
+        /// <param name="channelDef"></param>
         public virtual void SetLyricsToIndex()
         {
             for(int index = 0; index < _uniqueDefs.Count; ++index)
@@ -214,11 +223,11 @@ namespace Moritz.Spec
         /// <para>If a ClefDef is defined directly before a rest, the resulting SmallClef will be placed before the
         /// following Chord or the bar's end barline.
         /// </para>
-        /// <para>If the index is equal to or greater than the number of objects in the voiceDef, the ClefDef will be
+        /// <para>If the index is equal to or greater than the number of objects in the channelDef, the ClefDef will be
         /// placed before the final barline.
         /// </para>
         /// <para>
-        /// When changing clefs more than once in the same VoiceDef, it is easier to get the indices right if
+        /// When changing clefs more than once in the same ChannelDef, it is easier to get the indices right if
         /// they are added backwards.
         /// </para>
         /// </summary>
@@ -335,7 +344,7 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Transpose the whole VoiceDef up by the number of semitones given in the argument.
+        /// Transpose the whole ChannelDef up by the number of semitones given in the argument.
         /// </summary>
         /// <param name="interval"></param>
         public void Transpose(int interval)
@@ -343,7 +352,7 @@ namespace Moritz.Spec
             Transpose(0, _uniqueDefs.Count, interval);
         }
         /// <summary>
-        /// Transposes all the MidiHeadSymbols in this VoiceDef by the number of semitones in the argument
+        /// Transposes all the MidiHeadSymbols in this ChannelDef by the number of semitones in the argument
         /// without changing the sound. Negative arguments transpose downwards.
         /// If the resulting midiHeadSymbol would be less than 0 or greater than 127,
         /// it is silently coerced to 0 or 127 respectively.
@@ -427,7 +436,7 @@ namespace Moritz.Spec
 
         #region Count changers
         #region list functions
-        public abstract void Add(IUniqueDef iUniqueDef);
+        public void Add(IUniqueDef iUniqueDef) { }
         protected void _Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(Container is Bar), "Cannot Add IUniqueDefs inside a Bar.");
@@ -445,16 +454,16 @@ namespace Moritz.Spec
 
             AssertConsistency();
         }
-        public abstract void AddRange(VoiceDef voiceDef);
+        public void AddRange(ChannelDef channelDef) { }
         /// <summary>
-        /// This function __moves__ the voiceDef's UniqueDefs to the end of this voiceDef's UniqueDefs _without_cloning_them_ (c.f. Trk.ConcatCloneAt(...) ).
+        /// This function __moves__ the channelDef's UniqueDefs to the end of this channelDef's UniqueDefs _without_cloning_them_ (c.f. Trk.ConcatCloneAt(...) ).
         /// Rests are automatically agglommerated.
         /// </summary>
-        protected void _AddRange(VoiceDef voiceDef)
+        protected void _AddRange(ChannelDef channelDef)
         {
-            Debug.Assert(!(Container is Bar), "Cannot AddRange of VoiceDefs inside a Bar.");
+            Debug.Assert(!(Container is Bar), "Cannot AddRange of ChannelDefs inside a Bar.");
 
-            _uniqueDefs.AddRange(voiceDef.UniqueDefs);
+            _uniqueDefs.AddRange(channelDef.UniqueDefs);
 
             AgglomerateRests();
 
@@ -463,7 +472,7 @@ namespace Moritz.Spec
             AssertConsistency();
         }
 
-        public abstract void Insert(int index, IUniqueDef iUniqueDef);
+        public void Insert(int index, IUniqueDef iUniqueDef) { }
         protected void _Insert(int index, IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(Container is Bar && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
@@ -473,11 +482,11 @@ namespace Moritz.Spec
 
             AssertConsistency();
         }
-        protected void _InsertRange(int index, VoiceDef voiceDef)
+        protected void _InsertRange(int index, ChannelDef channelDef)
         {
             Debug.Assert(!(Container is Bar), "Cannot Insert range of IUniqueDefs inside a Bar.");
 
-            _uniqueDefs.InsertRange(index, voiceDef.UniqueDefs);
+            _uniqueDefs.InsertRange(index, channelDef.UniqueDefs);
             SetMsPositionsReFirstUD();
 
             AssertConsistency();
@@ -590,7 +599,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns the index of the IUniqueDef which starts at or is otherwise current at msPosition.
         /// If msPosition is the EndMsPosition, the index of the final IUniqueDef + 1 (=Count) is returned.
-        /// If the VoiceDef does not span msPosition, -1 (=error) is returned.
+        /// If the ChannelDef does not span msPosition, -1 (=error) is returned.
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
@@ -610,10 +619,10 @@ namespace Moritz.Spec
         }
         #endregion list functions
 
-        #region VoiceDef duration changers
+        #region ChannelDef duration changers
 
         /// <summary>
-        /// Removes all the rests in this VoiceDef
+        /// Removes all the rests in this ChannelDef
         /// </summary>
         public void RemoveRests()
         {
@@ -622,7 +631,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each chord and rest from beginIndex to endIndex (exclusive) by factor.
         /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this VoiceDef changes accordingly.
+        /// The total duration of this ChannelDef changes accordingly.
         /// </summary>
         public void AdjustMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
@@ -631,7 +640,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each chord and rest in the UniqueDefs list by factor.
         /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this VoiceDef changes accordingly.
+        /// The total duration of this ChannelDef changes accordingly.
         /// </summary>
         public void AdjustMsDurations(double factor, int minThreshold = 100)
         {
@@ -640,7 +649,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each rest from beginIndex to endIndex (exclusive) by factor.
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this VoiceDef changes accordingly.
+        /// The total duration of this ChannelDef changes accordingly.
         /// </summary>
         public void AdjustRestMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
@@ -649,7 +658,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each rest in the UniqueDefs list by factor.
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this VoiceDef changes accordingly.
+        /// The total duration of this ChannelDef changes accordingly.
         /// </summary>
         public void AdjustRestMsDurations(double factor, int minThreshold = 100)
         {
@@ -659,7 +668,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each T from beginIndex to endIndex (exclusive) by factor.
         /// If a MsDuration becomes less than minThreshold, the T (chord or rest) is removed.
-        /// The total duration of this VoiceDef changes accordingly.
+        /// The total duration of this ChannelDef changes accordingly.
         /// </summary>
         protected void AdjustMsDurations<T>(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
@@ -732,7 +741,7 @@ namespace Moritz.Spec
             AssertConsistency();
         }
 
-        #endregion VoiceDef duration changers
+        #endregion ChannelDef duration changers
 
         internal void RemoveDuplicateClefDefs()
         {
@@ -799,21 +808,21 @@ namespace Moritz.Spec
 
         #region Properties
 
-        private int _midiChannel = int.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
-        public int MidiChannel
-        {
-            get
-            {
-                return _midiChannel;
-            }
-            set
-            {
-                Debug.Assert(value >= 0 && value <= 15);
-                _midiChannel = value;
-            }
-        }
+        //private int _midiChannel = int.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
+        //public int MidiChannel
+        //{
+        //    get
+        //    {
+        //        return _midiChannel;
+        //    }
+        //    set
+        //    {
+        //        Debug.Assert(value >= 0 && value <= 15);
+        //        _midiChannel = value;
+        //    }
+        //}
 
-        public ITrksContainer Container = null;
+        public IMidiChannelDefsContainer Container = null;
 
         public int Count { get { return _uniqueDefs.Count; } }
 
@@ -836,28 +845,16 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
-        /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
+        /// Setting this property stretches or compresses all the durations in 
+        /// all the trk.UniqueDefs lists to fit the given total duration.
+        /// This does not change the ChannelDef's MsPosition, but does affect its EndMsPosition.
         /// See also EndMsPosition.set.
         /// </summary>
         public int MsDuration
         {
             get
-            {
-                int total = 0;
-                foreach(IUniqueDef iud in _uniqueDefs)
-                {
-                    if(iud is IUniqueSplittableChordDef iuscd && iuscd.MsDurationToNextBarline != null)
-                    {
-                        total += (int)iuscd.MsDurationToNextBarline;
-                    }
-                    else
-                    {
-                        total += iud.MsDuration;
-                    }
-
-                }
-                return total;
+            {                 
+                return Trks[0].MsDuration;
             }
             set
             {

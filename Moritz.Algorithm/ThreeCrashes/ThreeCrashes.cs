@@ -662,9 +662,9 @@ namespace Moritz.Algorithm.ThreeCrashes
         private void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
         {
             MidiChordDef midiChordDef = null;
-            foreach(VoiceDef voiceDef in bar1.VoiceDefs)
+            foreach(ChannelDef channelDef in bar1.ChannelDefs)
             {
-                foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
+                foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
                 {
                     midiChordDef = iUniqueDef as MidiChordDef;
                     if(midiChordDef != null)

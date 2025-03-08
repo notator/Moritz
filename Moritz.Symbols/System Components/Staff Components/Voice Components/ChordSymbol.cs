@@ -22,9 +22,9 @@ namespace Moritz.Symbols
         }
 
         public ChordSymbol(Voice voice, MidiChordDef umcd, int absMsPosition, PageFormat pageFormat)
-    : this(voice, umcd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight, umcd.BeamContinues)
+            : this(voice, umcd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight, umcd.BeamContinues)
         {
-            _midiChordDef = umcd;
+            _midiChordDefs.Add(umcd);
 
             _msDurationToNextBarline = umcd.MsDurationToNextBarline;
 
@@ -104,6 +104,28 @@ namespace Moritz.Symbols
                     this.HeadsTopDown[i].DisplayAccidental = DisplayAccidental.force;
                 }
             }
+        }
+
+        /// <summary>
+        /// Adds the argument to the chord's private list of MidiChordDefs. 
+        /// </summary>
+        /// <param name="midiChordDef"></param>
+        /// <returns>The number of midiChordDefs after adding the argument.</returns>
+        public int AddMidiChordDef(MidiChordDef midiChordDef)
+        {
+            _midiChordDefs.Add(midiChordDef);
+            return _midiChordDefs.Count;
+        }
+
+        /// <summary>
+        /// Throws an exception if the argument (index) is out of range. 
+        /// </summary>
+        /// <param name="indexInPrivateMidiChordDefsList"></param>
+        /// <returns>A deep clone of the MidiChordDef at the given index</returns>
+        public MidiChordDef GetMidiChordDefClone(int indexInPrivateMidiChordDefsList)
+        {
+            Debug.Assert(indexInPrivateMidiChordDefsList >= 0 && indexInPrivateMidiChordDefsList < _midiChordDefs.Count);
+            return (MidiChordDef)_midiChordDefs[indexInPrivateMidiChordDefsList].Clone();
         }
 
         internal void SetNoteheadColorClasses()

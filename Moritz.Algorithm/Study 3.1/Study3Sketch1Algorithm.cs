@@ -47,7 +47,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             mainSeq.Concat(bar2Seq);
             mainSeq.Concat(bars345Seq);
 
-            List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, approximateBarlineMsPositions);
+            List<int> barlineMsPositions = GetBarlinePositions(mainSeq.ChannelDefs, approximateBarlineMsPositions);
 
             List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
 
@@ -69,7 +69,7 @@ namespace Moritz.Algorithm.Study3Sketch1
         /// <summary>
         /// Lyrics can be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
         /// provides the possibility of adding them all in one place.
-        /// This function returns null or a SortedDictionary per VoiceDef in each bar.
+        /// This function returns null or a SortedDictionary per ChannelDef in each bar.
         /// The dictionary contains the index of the MidiChordDef or InputChordDef in the bar to which the associated
         /// lyric string will be attached. The index is of MidiChordDefs or InputChordDefs only, beginning with 0 for
         /// the first MidiChordDef or InptChordDef in the bar.

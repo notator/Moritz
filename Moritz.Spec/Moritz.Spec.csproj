@@ -61,7 +61,7 @@
     </Compile>
     <Compile Include="ClefDef.cs" />
     <Compile Include="Mode.cs" />
-    <Compile Include="ITrksContainer.cs" />
+    <Compile Include="IMidiChannelDefsContainer.cs" />
     <Compile Include="MsValues.cs" />
     <Compile Include="NoteTrigger.cs" />
     <Compile Include="PitchWeight.cs" />
@@ -81,7 +81,7 @@
     <Compile Include="Trk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestDef.cs" />
-    <Compile Include="VoiceDef.cs" />
+    <Compile Include="ChannelDef.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

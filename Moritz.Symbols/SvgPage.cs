@@ -155,10 +155,7 @@ namespace Moritz.Symbols
             {
                 foreach(Voice voice in staff.Voices)
                 {
-                    if(voice is OutputVoice)
-                    {
-                        nVoices++;
-                    }
+                    nVoices++;
                 }
             }
             return nVoices;

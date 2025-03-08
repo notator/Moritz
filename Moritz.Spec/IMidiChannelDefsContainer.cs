@@ -5,11 +5,10 @@ using System.Collections.Generic;
 namespace Moritz.Spec
 {
     ///<summary>
-    /// ITrksContainer is implemented by Seq and Bar.
-    /// A Seq only contains a list of Trk.
-    /// A Bar contains a list of VoiceDef (i.e. both Trk and InputVoiceDef), and implements Trks by traversing that list.
+    /// IMidiChannelDefsContainer is implemented by Seq and Bar.
+    /// Both Seq and Bar contain a list of ChannelDef (each ChannelDef contains a list of Trk).
     ///</summary>
-    public interface ITrksContainer
+    public interface IMidiChannelDefsContainer
     {
         int AbsMsPosition { get; set; }
         int MsDuration { get; set; }
@@ -17,6 +16,6 @@ namespace Moritz.Spec
         void TimeWarp(Envelope envelope, double distortion);
         void SetPitchWheelSliders(Envelope envelope);
 
-        IReadOnlyList<Trk> Trks { get; }
+        IReadOnlyList<ChannelDef> ChannelDefs { get; }
     }
 }

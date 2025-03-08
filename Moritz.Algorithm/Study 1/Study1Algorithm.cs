@@ -36,7 +36,7 @@ namespace Moritz.Algorithm.Study1
 
             List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
 
-            SetPatch0InTheFirstChord(bars[0].VoiceDefs[0]);
+            SetPatch0InTheFirstChord(bars[0].ChannelDefs[0]);
 
             return bars;
         }
@@ -200,10 +200,10 @@ namespace Moritz.Algorithm.Study1
         /// <summary>
         /// The patch only needs to be set in the first chord, since it will be set by shunting if the Assistant Performer starts later.
         /// </summary>
-        private void SetPatch0InTheFirstChord(VoiceDef voiceDef)
+        private void SetPatch0InTheFirstChord(ChannelDef channelDef)
         {
             MidiChordDef firstMidiChordDef = null;
-            foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
+            foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
             {
                 firstMidiChordDef = iUniqueDef as MidiChordDef;
                 if(firstMidiChordDef != null)

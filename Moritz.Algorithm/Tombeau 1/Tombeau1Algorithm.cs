@@ -255,7 +255,7 @@ namespace Moritz.Algorithm.Tombeau1
                 Trk(int midiChannel)
 
                 Clone()
-				ConcatCloneAt(VoiceDef trk2, int msPositionReTrk) // Appends __clones__ of the IUniqueDefs in trk2 at msPositionReTrk this Trk. (c.f. AddRange(VoiceDef trk)).
+				ConcatCloneAt(ChannelDef trk2, int msPositionReTrk) // Appends __clones__ of the IUniqueDefs in trk2 at msPositionReTrk this Trk. (c.f. AddRange(ChannelDef trk)).
  
                 this[i] { get; set; } // indexer (set sets MsPositionsReFirstUD in whole Trk
                 uniqueDefs // enumerator
@@ -307,7 +307,7 @@ namespace Moritz.Algorithm.Tombeau1
                 **** Functions that change trk's duration ****
                 CreateAccel(int beginIndex, int endIndex, double startEndRatio) // Creates an exponential accelerando or decelerando from beginIndex to (not including) endIndex.
                 Add(IUniqueDef iUniqueDef) // Appends the new IUniqueDef to the end of the trk.
-                AddRange(VoiceDef trk) // Adds the argument's UniqueDefs to the end of the trk.
+                AddRange(ChannelDef trk) // Adds the argument's UniqueDefs to the end of the trk.
                 Insert(int index, IUniqueDef iUniqueDef) // Inserts the iUniqueDef in the list at the given index.
                 InsertRange(int index, Trk trk) // Inserts the trk's UniqueDefs in the list at the given index.
                 Remove(IUniqueDef iUniqueDef) // removes the iUniqueDef from the list.
@@ -394,7 +394,7 @@ namespace Moritz.Algorithm.Tombeau1
                 SetPitchWheelSliders(Envelope envelope)
 
                 // Properties
-                MsDuration { get; set; } // Setting this value stretches or compresses the msDurations of all the voiceDefs and their contained UniqueDefs.
+                MsDuration { get; set; } // Setting this value stretches or compresses the msDurations of all the channelDefs and their contained UniqueDefs.
                 AbsMsPosition { get; set; }
                 BarlineMsPositions // public List<int>
                 Trks { get; } 

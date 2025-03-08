@@ -111,11 +111,11 @@ namespace Moritz.Algorithm.ErratumMusical
             List<int> endBarlinePositions = new List<int>();
             List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
 
-            Seq mainSeq = new Seq(0, trks, NumberOfMidiChannels);
+            Seq seq = new Seq(0, trks, NumberOfMidiChannels);
 
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, mainSeq.Trks.Count);
+            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, seq.ChannelDefs.Count);
 
-            List<Bar> bars = GetBars(mainSeq, endBarlinePositions, clefChangesPerBar, null);
+            List<Bar> bars = GetBars(seq, endBarlinePositions, clefChangesPerBar, null);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
@@ -359,9 +359,9 @@ namespace Moritz.Algorithm.ErratumMusical
         private void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
         {
             MidiChordDef midiChordDef = null;
-            foreach(VoiceDef voiceDef in bar1.VoiceDefs)
+            foreach(ChannelDef channelDef in bar1.ChannelDefs)
             {
-                foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
+                foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
                 {
                     midiChordDef = iUniqueDef as MidiChordDef;
                     if(midiChordDef != null)

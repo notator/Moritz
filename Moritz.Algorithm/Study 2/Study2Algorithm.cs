@@ -104,7 +104,7 @@ namespace Moritz.Algorithm.Study2
             return consecutiveBars;
         }
 
-        private void WriteDurationSymbolsForStrandInTopStaff(VoiceDef voice, int barIndex, List<int> originalStrandValues, ref int msPositionReFirstIUD)
+        private void WriteDurationSymbolsForStrandInTopStaff(Trk trk, int barIndex, List<int> originalStrandValues, ref int msPositionReFirstIUD)
         {
             Palette palette = _palettes[0]; // top templateDefs
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
@@ -113,7 +113,7 @@ namespace Moritz.Algorithm.Study2
                 IUniqueDef noteDef = palette.GetIUniqueDef(value - 1);
                 noteDef.MsPositionReFirstUD = msPositionReFirstIUD;
                 msPositionReFirstIUD += noteDef.MsDuration;
-                voice.UniqueDefs.Add(noteDef);
+                trk.UniqueDefs.Add(noteDef);
             }
         }
 
@@ -148,12 +148,12 @@ namespace Moritz.Algorithm.Study2
             return consecutiveBars;
         }
 
-        private List<int> LowerStaffMsDurations(VoiceDef topStaffVoice, int numberOfDurationSymbolsToConstruct)
+        private List<int> LowerStaffMsDurations(Trk topStaffTrk, int numberOfDurationSymbolsToConstruct)
         {
             #region get topStaffVoice durations and positions
             int voiceMsDuration = 0;
             int numberOfTopDurations = 0;
-            foreach(IUniqueDef iumdd in topStaffVoice.UniqueDefs)
+            foreach(IUniqueDef iumdd in topStaffTrk.UniqueDefs)
             {
                 voiceMsDuration += iumdd.MsDuration;
                 numberOfTopDurations++;
@@ -165,7 +165,7 @@ namespace Moritz.Algorithm.Study2
             int equal1MsPosition = 0;
             List<int> actual1MsPositionsReFirstIUD = new List<int>();
             List<int> actual1MsDurations = new List<int>();
-            foreach(IUniqueDef iumdd in topStaffVoice.UniqueDefs)
+            foreach(IUniqueDef iumdd in topStaffTrk.UniqueDefs)
             {
                 equal1MsPositions.Add(equal1MsPosition);
                 equal1MsPosition += equal1MsDuration;

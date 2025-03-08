@@ -13,13 +13,13 @@ namespace Moritz.Algorithm
 {
     /// <summary>
     /// A CompositionAlgorithm is special to a particular composition.
-    /// When called, the DoAlgorithm() function returns a list of VoiceDef lists,
-    /// whereby each contained VoiceDef list is the definition of a bar (a bar is
+    /// When called, the DoAlgorithm() function returns a list of ChannelDef lists,
+    /// whereby each contained ChannelDef list is the definition of a bar (a bar is
     /// a place where a system can be broken).
     /// Algorithms don't control the page format, how many bars per system there
     /// are, or the shapes of the symbols. Those things are set for a particular
     /// score in an .mkss file using the Assistant Composer's main form.
-    /// The VoiceDefs returned from DoAlgorithm() are converted to real Voices
+    /// The ChannelDefs returned from DoAlgorithm() are converted to real Voices
     /// (containing real NoteObjects) later, using the options set in an .mkss file. 
     /// </summary>
     public abstract class CompositionAlgorithm
@@ -102,18 +102,18 @@ namespace Moritz.Algorithm
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
         /// This function returns a sequence of abstract bar definitions, devoid of layout information.
-        /// Each bar definition is a list of voice definitions (VoiceDefs), The VoiceDefs are conceptually
+        /// Each bar definition is a list of voice definitions (ChannelDefs), The ChannelDefs are conceptually
         /// in the default top to bottom order of the voices in a final score. The actual order in which
         /// the voices are eventually printed is controlled using the Assistant Composer's layout options,
         /// Each bar definition in the sequence returned by this function contains the same number of
-        /// VoiceDefs. VoiceDefs at the same index in each bar are continuations of the same overall voice
+        /// ChannelDefs. ChannelDefs at the same index in each bar are continuations of the same overall voice
         /// definition, and may be concatenated to create multiple bars on a staff.
-        /// Each VoiceDef returned by this function contains a list of UniqueDef objects (VoiceDef.UniqueDefs).
+        /// Each ChannelDef returned by this function contains a list of UniqueDef objects (ChannelDef.UniqueDefs).
         /// When the Assistant Composer creates a real score, each of these UniqueDef objects is converted to
         /// a real NoteObject containing layout information (by a Notator), and the NoteObject then added to a
         /// concrete Voice.NoteObjects list. See Notator.AddSymbolsToSystems().
         /// ACHTUNG:
-        /// The top (=first) VoiceDef in each bar definition must be a TrkDef.
+        /// The top (=first) ChannelDef in each bar definition must be a TrkDef.
         /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
         /// The chord definitions in TrkDef.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be InputChordDefs.
@@ -141,15 +141,15 @@ namespace Moritz.Algorithm
         public abstract List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
         /// <summary>
-        /// This function returns null or a SortedDictionary per VoiceDef in each bar.
+        /// This function returns null or a SortedDictionary per ChannelDef in each bar.
         /// An empty clefChanges list of the returned type can be
         ///     1. created by calling the protected function GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar) and
         ///     2. populated with code such as clefChanges[barIndex][voiceIndex].Add(9, "t3"). 
-        /// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniqueDefs,
+        /// The dictionary contains the index at which the clef will be inserted in the ChannelDef's IUniqueDefs,
         /// and the clef ID string ("t", "t1", "b3" etc.).
         /// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
         /// the existing IUniqueDefs before which the clef will be inserted.
-        /// The SortedDictionaries should not contain the initial clefs per voiceDef - those will be included
+        /// The SortedDictionaries should not contain the initial clefs per channelDef - those will be included
         /// automatically.
         /// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
         /// cannot be inserted in front of them.
@@ -179,13 +179,13 @@ namespace Moritz.Algorithm
         /// <summary>
         /// Lyrics can simply be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
         /// provides the possibility of adding them all in one place.
-        /// This function returns null or a SortedDictionary per VoiceDef in each bar.
+        /// This function returns null or a SortedDictionary per ChannelDef in each bar.
         /// The SortedDictionary contains the index of the MidiChordDef or InputChordDef in the bar to which the associated
         /// lyric string will be attached. The index is of MidiChordDefs or InputChordDefs only, beginning with 0 for
         /// the first MidiChordDef or InptChordDef in the bar.
         /// Lyrics that are attached to top voices on a staff will, like dynamics, be automatically placed above the staff.
         /// </summary>
-        /// <returns>null or a SortedDictionary per VoiceDef per bar</returns>
+        /// <returns>null or a SortedDictionary per ChannelDef per bar</returns>
         /// <example>
         /// Example for Study3Sketch1Algorithm
         /// var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
@@ -213,12 +213,12 @@ namespace Moritz.Algorithm
             var rval = new List<List<SortedDictionary<int, string>>>();
             for(int barIndex = 0; barIndex < nBars; ++barIndex)
             {
-                var voiceDefs = new List<SortedDictionary<int, string>>();
-                rval.Add(voiceDefs);
+                var channelDefs = new List<SortedDictionary<int, string>>();
+                rval.Add(channelDefs);
                 for(int voiceIndex = 0; voiceIndex < nVoicesPerBar; ++voiceIndex)
                 {
                     var clefDict = new SortedDictionary<int, string>();
-                    voiceDefs.Add(clefDict);
+                    channelDefs.Add(clefDict);
                 }
             }
 
@@ -233,16 +233,14 @@ namespace Moritz.Algorithm
         /// <param name="inputVoiceDefs">can be null</param>
         /// <param name="approximateBarlineMsPositions"></param>
         /// <returns></returns>
-        protected List<int> GetBarlinePositions(IReadOnlyList<Trk> trks, List<double> approximateBarlineMsPositions)
+        protected List<int> GetBarlinePositions(IReadOnlyList<ChannelDef> channelDefs, List<double> approximateBarlineMsPositions)
         {
             List<int> barlineMsPositions = new List<int>();
-
-            List<VoiceDef> voiceDefs = new List<VoiceDef>(trks);
 
             foreach(double approxMsPos in approximateBarlineMsPositions)
             {
                 int barlineMsPos = 0;
-                barlineMsPos = NearestAbsUIDEndMsPosition(voiceDefs, approxMsPos);
+                barlineMsPos = NearestAbsUIDEndMsPosition(channelDefs, approxMsPos);
 
                 barlineMsPositions.Add(barlineMsPos);
             }
@@ -273,15 +271,15 @@ namespace Moritz.Algorithm
 
             return rval;
         }
-        private int NearestAbsUIDEndMsPosition(List<VoiceDef> voiceDefs, double approxAbsMsPosition)
+        private int NearestAbsUIDEndMsPosition(IReadOnlyList<ChannelDef> channelDefs, double approxAbsMsPosition)
         {
             int nearestAbsUIDEndMsPosition = 0;
             double diff = double.MaxValue;
-            foreach(VoiceDef voiceDef in voiceDefs)
+            foreach(ChannelDef channelDef in channelDefs)
             {
-                for(int uidIndex = 0; uidIndex < voiceDef.Count; ++uidIndex)
+                for(int uidIndex = 0; uidIndex < channelDef.Count; ++uidIndex)
                 {
-                    IUniqueDef iud = voiceDef[uidIndex];
+                    IUniqueDef iud = channelDef[uidIndex];
                     int absEndPos = iud.MsPositionReFirstUD + iud.MsDuration;
                     double localDiff = Math.Abs(approxAbsMsPosition - absEndPos);
                     if(localDiff < diff)
@@ -314,9 +312,9 @@ namespace Moritz.Algorithm
         /// <returns></returns>
         public List<int> GetBalancedBarlineMsPositions(Seq seq, int nBars)
         {
-            List<VoiceDef> voiceDefs = seq.VoiceDefs;
+            IReadOnlyList<ChannelDef> channelDefs = seq.ChannelDefs;
 
-            int msDuration = voiceDefs[0].MsDuration;
+            int msDuration = channelDefs[0].MsDuration;
 
             double approxBarMsDuration = (((double)msDuration) / nBars);
             Debug.Assert(approxBarMsDuration * nBars == msDuration);
@@ -326,7 +324,7 @@ namespace Moritz.Algorithm
             for(int barNumber = 1; barNumber <= nBars; ++barNumber)
             {
                 double approxBarMsPosition = approxBarMsDuration * barNumber;
-                int barMsPosition = NearestAbsUIDEndMsPosition(voiceDefs, approxBarMsPosition);
+                int barMsPosition = NearestAbsUIDEndMsPosition(channelDefs, approxBarMsPosition);
 
                 Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
 
@@ -370,7 +368,7 @@ namespace Moritz.Algorithm
 
             for(int i = 0; i < bars.Count; i++)
             {
-                List<VoiceDef> barVoiceDefs = bars[i].VoiceDefs;
+                IReadOnlyList<ChannelDef> barVoiceDefs = bars[i].ChannelDefs;
                 List<SortedDictionary<int, string>> clefChangesPerVoiceDef = clefChangesPerBar[i];
                 Debug.Assert(barVoiceDefs.Count == clefChangesPerVoiceDef.Count);
                 for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
@@ -378,14 +376,14 @@ namespace Moritz.Algorithm
                     SortedDictionary<int, string> clefChanges = clefChangesPerVoiceDef[voiceDefIndex];
                     if(clefChanges.Count > 0)
                     {
-                        VoiceDef voiceDef = barVoiceDefs[voiceDefIndex];
-                        InsertClefChangesInVoiceDef(voiceDef, clefChanges);
+                        ChannelDef channelDef = barVoiceDefs[voiceDefIndex];
+                        InsertClefChangesInVoiceDef(channelDef, clefChanges);
                     }
                 }
             }
         }
 
-        private static void InsertClefChangesInVoiceDef(VoiceDef voiceDef, SortedDictionary<int, string> clefChanges)
+        private static void InsertClefChangesInVoiceDef(ChannelDef channelDef, SortedDictionary<int, string> clefChanges)
         {
             List<int> reversedKeys = new List<int>();
             foreach(int key in clefChanges.Keys)
@@ -397,7 +395,7 @@ namespace Moritz.Algorithm
             foreach(int key in reversedKeys)
             {
                 string clef = clefChanges[key];
-                voiceDef.InsertClefDef(key, clef);
+                channelDef.InsertClefDef(key, clef);
             }
         }
 
@@ -407,26 +405,26 @@ namespace Moritz.Algorithm
 
             for(int i = 0; i < bars.Count; i++)
             {
-                List<VoiceDef> barVoiceDefs = bars[i].VoiceDefs;
+                IReadOnlyList<ChannelDef> barVoiceDefs = bars[i].ChannelDefs;
                 List<SortedDictionary<int, string>> lyricsPerVoiceDef = lyricsPerBar[i];
                 Debug.Assert(barVoiceDefs.Count == lyricsPerVoiceDef.Count);
                 for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
                 {
-                    VoiceDef voiceDef = barVoiceDefs[voiceDefIndex];
+                    ChannelDef channelDef = barVoiceDefs[voiceDefIndex];
                     SortedDictionary<int, string> lyrics = lyricsPerVoiceDef[voiceDefIndex];
-                    AddLyricsToVoiceDef(voiceDef, lyrics);
+                    AddLyricsToVoiceDef(channelDef, lyrics);
                 }
             }
         }
 
-        private static void AddLyricsToVoiceDef(VoiceDef voiceDef, SortedDictionary<int, string> lyrics)
+        private static void AddLyricsToVoiceDef(ChannelDef channelDef, SortedDictionary<int, string> lyrics)
         {
             if(lyrics.Count > 0)
             {
-                Debug.Assert(voiceDef is Trk);
+                Debug.Assert(channelDef is Trk);
 
                 var mcds = new List<MidiChordDef>();
-                foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+                foreach(IUniqueDef iud in channelDef.UniqueDefs)
                 {
                     if(iud is MidiChordDef mcd)
                     {
@@ -456,9 +454,9 @@ namespace Moritz.Algorithm
             }
 
             /// <summary>
-            /// A MainBar contains a list of voiceDefs, that are Trks. A Seq can only contain Trks.
+            /// A MainBar contains a list of channelDefs, that contain Trks. A Seq contain Trks.
             /// As with all Bars, a MainBar does not contain barlines. They are implicit, at the beginning and end of the MainBar.
-            /// This constructor uses its arguments' voiceDefs directly, so if the arguments need to be used again, pass clones.
+            /// This constructor uses its arguments' channelDefs directly, so if the arguments need to be used again, pass clones.
             /// <para>MainBar consistency is identical to Bar consistency, with the further restrictions that AbsMsPosition must be 0
             /// and initalClefPerChannel may not be null.</para>
             /// <para>For further documentation about MainBar and Bar consistency, see their private AssertConsistency() functions.
@@ -473,7 +471,7 @@ namespace Moritz.Algorithm
             /// <summary>
             /// 1. base.AssertConsistency() is called. (The base Bar must be consistent.)
             /// 2. AbsMsPosition must be 0.
-            /// 3. InitialClefPerChannel == null || InitialClefPerChannel.Count == VoiceDefs.Count.
+            /// 3. InitialClefPerChannel == null || InitialClefPerChannel.Count == ChannelDefs.Count.
             /// 4. At least one Trk must end with a MidiChordDef.
             /// </summary> 
             public override void AssertConsistency()
@@ -498,7 +496,7 @@ namespace Moritz.Algorithm
                 #endregion
             }
 
-            /// Converts this MainBar to a list of bars, consuming this bar's voiceDefs.
+            /// Converts this MainBar to a list of bars, consuming this bar's channelDefs.
             /// Uses the argument barline msPositions as the EndBarlines of the returned bars (which don't contain barlines).
             /// An exception is thrown if:
             ///    1) the first argument value is less than or equal to 0.
@@ -547,10 +545,10 @@ namespace Moritz.Algorithm
 
             /// <summary>
             /// Returns a Tuple in which Item1 is the popped bar, Item2 is the remaining part of the input bar.
-            /// The popped bar has a list of voiceDefs containing the IUniqueDefs that
+            /// The popped bar has a list of channelDefs containing the IUniqueDefs that
             /// begin within barDuration. These IUniqueDefs are removed from the current bar before returning it as Item2.
             /// MidiRestDefs and MidiChordDefs are split as necessary, so that when this
-            /// function returns, both the popped bar and the current bar contain voiceDefs
+            /// function returns, both the popped bar and the current bar contain channelDefs
             /// having the same msDuration. i.e.: Both the popped bar and the remaining bar "add up".
             /// </summary>
             /// <param name ="bar">The bar fron which the bar is popped.</param>
@@ -565,83 +563,87 @@ namespace Moritz.Algorithm
                     return new Tuple<Bar, Bar>(bar, null);
                 }
 
-                Bar poppedBar = new Bar();
-                Bar remainingBar = new Bar();
-                int thisMsDuration = this.MsDuration;
-
-                VoiceDef poppedBarVoice;
-                VoiceDef remainingBarVoice;
-                foreach(VoiceDef voiceDef in bar.VoiceDefs)
+                List<Trk> poppedTrks = new List<Trk>();
+                List<Trk> remainingTrks = new List<Trk>();
+                foreach(ChannelDef originalVoiceDef in bar.ChannelDefs)
                 {
-                    Trk trk = voiceDef as Trk;            
-                    poppedBarVoice = new Trk(trk.MidiChannel) { Container = poppedBar };
-                    poppedBar.VoiceDefs.Add(poppedBarVoice);
-                    remainingBarVoice = new Trk(trk.MidiChannel) { Container = remainingBar };
-                    remainingBar.VoiceDefs.Add(remainingBarVoice);
-
-                    foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+                    foreach(var originalTrk in originalVoiceDef.Trks)
                     {
-                        int iudMsDuration = iud.MsDuration;
-                        int iudStartPos = iud.MsPositionReFirstUD;
-                        int iudEndPos = iudStartPos + iudMsDuration;
+                        Trk poppedTrk = new Trk(originalTrk.MidiChannel);
+                        poppedTrks.Add(poppedTrk);
+                        Trk remainingTrk = new Trk(originalTrk.MidiChannel);
+                        remainingTrks.Add(remainingTrk);
 
-                        if(iudStartPos >= barMsDuration)
+                        foreach(IUniqueDef iud in originalTrk.UniqueDefs)
                         {
-                            if(iud is ClefDef && iudStartPos == barMsDuration)
+                            int iudMsDuration = iud.MsDuration;
+                            int iudStartPos = iud.MsPositionReFirstUD;
+                            int iudEndPos = iudStartPos + iudMsDuration;
+
+                            if(iudStartPos >= barMsDuration)
                             {
-                                poppedBarVoice.UniqueDefs.Add(iud);
+                                if(iud is ClefDef && iudStartPos == barMsDuration)
+                                {
+                                    poppedTrk.UniqueDefs.Add(iud);
+                                }
+                                else
+                                {
+                                    remainingTrk.UniqueDefs.Add(iud);
+                                }
+                            }
+                            else if(iudEndPos > barMsDuration)
+                            {
+                                int durationBeforeBarline = barMsDuration - iudStartPos;
+                                int durationAfterBarline = iudEndPos - barMsDuration;
+                                if(iud is MidiRestDef)
+                                {
+                                    // This is a rest. Split it.
+                                    MidiRestDef firstRestHalf = new MidiRestDef(iudStartPos, durationBeforeBarline);
+                                    poppedTrk.UniqueDefs.Add(firstRestHalf);
+
+                                    MidiRestDef secondRestHalf = new MidiRestDef(barMsDuration, durationAfterBarline);
+                                    remainingTrk.UniqueDefs.Add(secondRestHalf);
+                                }
+                                if(iud is CautionaryChordDef)
+                                {
+                                    Debug.Assert(false, "There shouldnt be any cautionary chords here.");
+                                    // This error can happen if an attempt is made to set barlines too close together,
+                                    // i.e. (I think) if an attempt is made to create a bar that contains nothing... 
+                                }
+                                else if(iud is MidiChordDef)
+                                {
+                                    IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
+                                    uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
+                                    poppedTrk.UniqueDefs.Add(uniqueChordDef);
+
+                                    Debug.Assert(remainingTrk.UniqueDefs.Count == 0);
+                                    CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
+                                    remainingTrk.UniqueDefs.Add(ccd);
+                                }
                             }
                             else
                             {
-                                remainingBarVoice.UniqueDefs.Add(iud);
+                                Debug.Assert(iudEndPos <= barMsDuration && iudStartPos >= 0);
+                                poppedTrk.UniqueDefs.Add(iud);
                             }
-                        }
-                        else if(iudEndPos > barMsDuration)
-                        {
-                            int durationBeforeBarline = barMsDuration - iudStartPos;
-                            int durationAfterBarline = iudEndPos - barMsDuration;
-                            if(iud is MidiRestDef)
-                            {
-                                // This is a rest. Split it.
-                                MidiRestDef firstRestHalf = new MidiRestDef(iudStartPos, durationBeforeBarline);
-                                poppedBarVoice.UniqueDefs.Add(firstRestHalf);
-
-                                MidiRestDef secondRestHalf = new MidiRestDef(barMsDuration, durationAfterBarline);
-                                remainingBarVoice.UniqueDefs.Add(secondRestHalf);
-                            }    
-                            if(iud is CautionaryChordDef)
-                            {
-                                Debug.Assert(false, "There shouldnt be any cautionary chords here.");
-                                // This error can happen if an attempt is made to set barlines too close together,
-                                // i.e. (I think) if an attempt is made to create a bar that contains nothing... 
-                            }
-                            else if(iud is MidiChordDef)
-                            {
-                                IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
-                                uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
-                                poppedBarVoice.UniqueDefs.Add(uniqueChordDef);
-
-                                Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
-                                CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
-                                remainingBarVoice.UniqueDefs.Add(ccd);
-                            }
-                        }
-                        else
-                        {
-                            Debug.Assert(iudEndPos <= barMsDuration && iudStartPos >= 0);
-                            poppedBarVoice.UniqueDefs.Add(iud);
                         }
                     }
+
+                    //poppedBar.AbsMsPosition = remainingBar.AbsMsPosition;
+                    //poppedBar.AssertConsistency();
+                    //if(remainingBar != null)
+                    //{
+                    //    remainingBar.AbsMsPosition += barMsDuration;
+                    //    remainingBar.SetMsPositionsReFirstUD();
+                    //    remainingBar.AssertConsistency();
+                    //}
                 }
 
-                poppedBar.AbsMsPosition = remainingBar.AbsMsPosition;
-                poppedBar.AssertConsistency();
-                if(remainingBar != null)
-                {
-                    remainingBar.AbsMsPosition += barMsDuration;
-                    remainingBar.SetMsPositionsReFirstUD();
-                    remainingBar.AssertConsistency();
-                }
+                var poppedSeq = new Seq(bar.AbsMsPosition, poppedTrks, bar.ChannelDefs.Count);
+                var remainingSeq = new Seq(bar.AbsMsPosition, remainingTrks, bar.ChannelDefs.Count);
+
+				Bar poppedBar = new MainBar(poppedSeq);
+				Bar remainingBar = new MainBar(remainingSeq);
 
                 return new Tuple<Bar, Bar>(poppedBar, remainingBar);
             }
@@ -651,7 +653,7 @@ namespace Moritz.Algorithm
             ///    1) the first argument value is less than or equal to 0.
             ///    2) the argument contains duplicate msPositions.
             ///    3) the argument is not in ascending order.
-            ///    4) a VoiceDef.MsPositionReContainer is not 0.
+            ///    4) a ChannelDef.MsPositionReContainer is not 0.
             ///    5) if an msPosition is not the endMsPosition of any IUniqueDef in the Trks.
             /// </summary>
             private void CheckBarlineMsPositions(IReadOnlyList<int> barlineMsPositionsReThisBar)
@@ -676,10 +678,10 @@ namespace Moritz.Algorithm
                     bool found = false;
                     for(int i = _voiceDefs.Count - 1; i >= 0; --i)
                     {
-                        VoiceDef voiceDef = _voiceDefs[i];
+                        ChannelDef channelDef = _voiceDefs[i];
 
-                        Debug.Assert(voiceDef.MsPositionReContainer == 0);
-                        foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+                        Debug.Assert(channelDef.MsPositionReContainer == 0);
+                        foreach(IUniqueDef iud in channelDef.UniqueDefs)
                         {
                             if(msPosition == (iud.MsPositionReFirstUD + iud.MsDuration))
                             {

@@ -9,9 +9,9 @@ using System.Diagnostics;
 namespace Moritz.Symbols
 {
     /// <summary>
-    ///  A sequence of noteObjects.
+    ///  Contains lists of NoteObjects. Each NoteObject has a graphic and a list of performances (=midi levels) 
     /// </summary>
-    public abstract class Voice
+    public class Voice
     {
         public Voice(Staff staff, Voice voice)
         {
@@ -25,15 +25,22 @@ namespace Moritz.Symbols
             Staff = staff;
         }
 
-        public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
+        public Voice(OutputStaff outputStaff, int midiChannel)
+            : this(outputStaff)
+        {
+            MidiChannel = midiChannel;
+        }
+
+        //public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
 
         /// <summary>
         /// Writes out an SVG Voice
-        /// carryperChannel is null for InputVoices
         /// </summary>
         /// <param name="w"></param>
         public virtual void WriteSVG(SvgWriter w, List<CarryMsgs> carryMsgsPerChannel)
         {
+            w.SvgStartGroup(CSSObjectClass.voice.ToString());
+
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
                 NoteObject noteObject = NoteObjects[i];
@@ -90,6 +97,8 @@ namespace Moritz.Symbols
                     throw new ApplicationException("Unknown noteObject type.");
                 }
             }
+
+            w.SvgEndGroup(); // voice
         }
 
         public bool ContainsAChordSymbol
@@ -432,7 +441,7 @@ namespace Moritz.Symbols
             }
         }
 
-        public VoiceDef VoiceDef = null;
+        public ChannelDef ChannelDef = null;
 
         private DurationSymbol _firstDurationSymbol;
     }

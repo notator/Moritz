@@ -64,15 +64,15 @@ namespace Moritz.Composer
             // bars can currently contain cautionary clefs, but no initial clefs
             List<string> currentClefs = new List<string>(initialClefPerMIDIChannel);
             int nBars = bars.Count;
-            int nVoiceDefs = bars[0].VoiceDefs.Count;
-            Debug.Assert(nVoiceDefs == initialClefPerMIDIChannel.Count); // VoiceDefs are both Trks and InputVoiceDefs
+            int nVoiceDefs = bars[0].ChannelDefs.Count;
+            Debug.Assert(nVoiceDefs == initialClefPerMIDIChannel.Count); // ChannelDefs are both Trks and InputVoiceDefs
             foreach(Bar bar in bars)
             {
                 for(int i = 0; i < nVoiceDefs; ++i)
                 {
                     ClefDef initialClefDef = new ClefDef(currentClefs[i], 0); // msPos is set later in Notator.ConvertVoiceDefsToNoteObjects()
-                    bar.VoiceDefs[i].Insert(0, initialClefDef);
-                    List<IUniqueDef> iuds = bar.VoiceDefs[i].UniqueDefs;
+                    bar.ChannelDefs[i].Insert(0, initialClefDef);
+                    List<IUniqueDef> iuds = bar.ChannelDefs[i].UniqueDefs;
                     for(int j = 1; j < iuds.Count; ++j)
                     {
                         if(iuds[j] is ClefDef cautionaryClefDef)
@@ -105,32 +105,32 @@ namespace Moritz.Composer
             for(int barIndex = 0; barIndex < bars.Count; ++barIndex)
             {
                 Bar bar = bars[barIndex];
-                IReadOnlyList<VoiceDef> voiceDefs = bar.VoiceDefs;
+                IReadOnlyList<ChannelDef> channelDefs = bar.ChannelDefs;
                 string barNumber = (barIndex + 1).ToString();
 
-                if(voiceDefs.Count == 0)
+                if(channelDefs.Count == 0)
                 {
                     errorString = $"Bar {barNumber} contains no voices.";
                     break;
                 }
-                if(!(voiceDefs[0] is Trk))
+                if(!(channelDefs[0] is Trk))
                 {
                     errorString = "The top (first) voice in every bar must be an output voice.";
                     break;
                 }
 
-                for(int voiceIndex = 0; voiceIndex < voiceDefs.Count; ++voiceIndex)
+                for(int voiceIndex = 0; voiceIndex < channelDefs.Count; ++voiceIndex)
                 {
-                    VoiceDef voiceDef = voiceDefs[voiceIndex];
+                    ChannelDef channelDef = channelDefs[voiceIndex];
                     string voiceNumber = (voiceIndex + 1).ToString();
-                    if(voiceDef.UniqueDefs.Count == 0)
+                    if(channelDef.UniqueDefs.Count == 0)
                     {
                         errorString = $"Voice number {voiceNumber} in Bar {barNumber} has an empty UniqueDefs list.";
                         break;
                     }
                 }
 
-                errorString = CheckThatLowerVoicesHaveNoSmallClefs(voiceDefs);
+                errorString = CheckThatLowerVoicesHaveNoSmallClefs(channelDefs);
 
                 if(!string.IsNullOrEmpty(errorString))
                     break;
@@ -138,7 +138,7 @@ namespace Moritz.Composer
             return errorString;
         }
 
-        private string CheckThatLowerVoicesHaveNoSmallClefs(IReadOnlyList<VoiceDef> voiceDefs)
+        private string CheckThatLowerVoicesHaveNoSmallClefs(IReadOnlyList<ChannelDef> channelDefs)
         {
             string errorString = "";
 
@@ -146,7 +146,7 @@ namespace Moritz.Composer
 
             foreach(int lowerVoiceIndex in lowerVoiceIndices)
             {
-                var uniqueDefs = voiceDefs[lowerVoiceIndex].UniqueDefs;
+                var uniqueDefs = channelDefs[lowerVoiceIndex].UniqueDefs;
                 foreach(IUniqueDef iud in uniqueDefs)
                 {
                     if(iud is ClefDef)
@@ -193,12 +193,12 @@ namespace Moritz.Composer
             return lowerVoiceIndices;
         }
 
-        private int NOutputVoices(List<VoiceDef> bar1)
+        private int NOutputVoices(List<ChannelDef> bar1)
         {
             int nOutputVoices = 0;
-            foreach(VoiceDef voiceDef in bar1)
+            foreach(ChannelDef channelDef in bar1)
             {
-                if(voiceDef is Trk)
+                if(channelDef is Trk)
                 {
                     nOutputVoices++;
                 }
@@ -239,12 +239,12 @@ namespace Moritz.Composer
         }
 
         /// <summary>
-        /// Creates one System per bar (=list of VoiceDefs) in the argument.
+        /// Creates one System per bar (=list of ChannelDefs) in the argument.
         /// The Systems are complete with staves and voices of the correct type:
         /// Each InputStaff is allocated parallel (empty) InputVoice fields.
         /// Each OutputStaff is allocated parallel (empty) OutputVoice fields.
-        /// Each Voice has a VoiceDef field that is allocated to the corresponding
-        /// VoiceDef from the argument.
+        /// Each Voice has a ChannelDef field that is allocated to the corresponding
+        /// ChannelDef from the argument.
         /// The OutputVoices have MIDIChannels arranged according to _pageFormat.OutputMIDIChannelsPerStaff.
         /// The InputVoices have MIDIChannels arranged according to _pageFormat.InputMIDIChannelsPerStaff.
         /// OutputVoices are given a midi channel allocated from top to bottom in the printed score.
@@ -267,7 +267,7 @@ namespace Moritz.Composer
             for(int systemIndex = 0; systemIndex < Systems.Count; systemIndex++)
             {
                 SvgSystem system = Systems[systemIndex];
-                IReadOnlyList<VoiceDef> voiceDefs = bars[systemIndex].VoiceDefs;
+                IReadOnlyList<ChannelDef> channelDefs = bars[systemIndex].ChannelDefs;
 
                 #region create visible staves
                 for(int staffIndex = 0; staffIndex < nStaves; staffIndex++)
@@ -278,11 +278,11 @@ namespace Moritz.Composer
                     List<byte> outputVoiceIndices = _pageFormat.OutputMIDIChannelsPerStaff[staffIndex];
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
-                        Trk trkDef = voiceDefs[outputVoiceIndices[ovIndex]] as Trk;
+                        Trk trkDef = channelDefs[outputVoiceIndices[ovIndex]] as Trk;
                         Debug.Assert(trkDef != null);
                         OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel)
                         {
-                            VoiceDef = trkDef
+                            ChannelDef = trkDef
                         };
                         outputStaff.Voices.Add(outputVoice);
                     }

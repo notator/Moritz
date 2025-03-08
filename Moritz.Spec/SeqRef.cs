@@ -17,8 +17,8 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// This function only writes TrkRefs that refer to Trks stored in external VoiceDefs. 
-        /// Note that successive Trks in the same VoiceDef may, in principle, contain common IUniqueDefs...
+        /// This function only writes TrkRefs that refer to Trks stored in external ChannelDefs. 
+        /// Note that successive Trks in the same ChannelDef may, in principle, contain common IUniqueDefs...
         /// SVG files contain voice definitions that contain MidiChordDefs and restDefs, but no Trks.
         /// </summary>
         /// <param name="w"></param>

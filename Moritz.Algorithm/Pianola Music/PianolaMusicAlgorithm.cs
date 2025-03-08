@@ -30,11 +30,11 @@ namespace Moritz.Algorithm.PianolaMusic
             List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
             Debug.Assert(trks.Count == NumberOfMidiChannels);
 
-            Seq mainSeq = new Seq(0, trks, NumberOfMidiChannels);
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq, 8);
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
+            Seq seq = new Seq(0, trks, NumberOfMidiChannels);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(seq, 8);
+            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, seq.ChannelDefs.Count);
 
-            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, clefChangesPerBar, null);
+            List<Bar> bars = GetBars(seq, barlineMsPositions, clefChangesPerBar, null);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
@@ -210,9 +210,9 @@ namespace Moritz.Algorithm.PianolaMusic
         private void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
         {
             MidiChordDef midiChordDef = null;
-            foreach(VoiceDef voiceDef in bar1.VoiceDefs)
+            foreach(ChannelDef channelDef in bar1.ChannelDefs)
             {
-                foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
+                foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
                 {
                     midiChordDef = iUniqueDef as MidiChordDef;
                     if(midiChordDef != null)
