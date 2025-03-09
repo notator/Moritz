@@ -28,11 +28,10 @@ namespace Moritz.Spec
         #region constructors
         public Trk(int msPositionReContainer, List<IUniqueDef> iuds)
         {
-            MidiChannelDefsContainer = null;
             MsPositionReContainer = msPositionReContainer;
             _uniqueDefs = iuds;
 
-            AssertConsistency();
+            AssertConsistency();;
         }
 
         /// <summary>
@@ -40,11 +39,10 @@ namespace Moritz.Spec
         /// </summary>
         public Trk()
         {
-            MidiChannelDefsContainer = null;
             MsPositionReContainer = 0;
             _uniqueDefs = new List<IUniqueDef>();
 
-            AssertConsistency();
+            AssertConsistency();;
         }
 
         /// <summary>
@@ -53,7 +51,7 @@ namespace Moritz.Spec
         public object Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs) { MidiChannelDefsContainer = this.MidiChannelDefsContainer };
+            Trk trk = new Trk(MsPositionReContainer, clonedIUDs) { ChannelDefsContainer = this.ChannelDefsContainer };
 
             return trk;
         }
@@ -75,27 +73,21 @@ namespace Moritz.Spec
         #endregion constructors
 
         /// <summary>
-        /// When this function is called, ChannelDef.AssertConsistency() is called (see documentation there), then
-        /// the following are checked:
-        /// 1. MidiChannels are in range [0..15]
-        /// 2. The Container is either null, a Seq or a Bar.
-        /// 3. If the Container is a Seq, the UniqueDefs contain any combination of MidiRestDef and MidiChordDef.
-        ///    If the Container is a Bar, the UniqueDefs can also contain ClefDef and CautionaryChordDef objects.
+        /// The following are checked:
+        /// If container is "Seq", the UniqueDefs contain any combination of MidiRestDef and MidiChordDef.
+        /// If container is "Bar", the UniqueDefs can also contain ClefDef and CautionaryChordDef objects.
+        /// The MsPositionReFirstUD of each UniqueDef is consistent with the uniqueDef.MsDurations.
         /// </summary>
         public void AssertConsistency()
         {
-            Debug.Assert(this.MidiChannel >= 0 && MidiChannel <= 15);
-
-            Debug.Assert(MidiChannelDefsContainer == null || MidiChannelDefsContainer is ChannelDef);
-
-            if(MidiChannelDefsContainer == null || MidiChannelDefsContainer is Seq)
+            if(ChannelDefsContainer is Seq)
             {
                 foreach(IUniqueDef iud in UniqueDefs)
                 {
                     Debug.Assert(iud is MidiChordDef || iud is MidiRestDef);
                 }
             }
-            else if(MidiChannelDefsContainer is Bar)
+            else if(ChannelDefsContainer is Bar)
             {
                 foreach(IUniqueDef iud in UniqueDefs)
                 {
@@ -115,25 +107,23 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The msPosition of the first note or rest in the UniqueDefs list re the start of the containing Seq or Bar.
+        /// The msPosition of the first note or rest in the UniqueDefs list re the start of the containing ChannelDef.
         /// The msPositions of the IUniqueDefs in the Trk are re the first IUniqueDef in the list, so the first IUniqueDef.MsPositionReFirstUID is always 0;
         /// </summary>
         public int MsPositionReContainer
         {
             get
             {
+                Debug.Assert(_msPositionReContainer == 0);
                 return _msPositionReContainer;
             }
             set
             {
-                Debug.Assert(value >= 0);
-                _msPositionReContainer = value;
+                throw new ApplicationException("MsPositionReContainer should always be 0!")
+                //_msPositionReContainer = value;
             }
         }
-
         private int _msPositionReContainer = 0;
-
-        public IMidiChannelDefsContainer MidiChannelDefsContainer = null;  // can be set to Seq or Bar
 
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
         private List<IUniqueDef> _uniqueDefs = null;
@@ -149,7 +139,7 @@ namespace Moritz.Spec
         {
             Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefDef);
 
-            Debug.Assert(!(MidiChannelDefsContainer is Bar), "Cannot Add IUniqueDefs inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar), "Cannot Add IUniqueDefs inside a Bar.");
 
             if(_uniqueDefs.Count > 0)
             {
@@ -172,7 +162,7 @@ namespace Moritz.Spec
         /// </summary>
         public void AddRange(Trk trk)
         {
-            Debug.Assert(!(MidiChannelDefsContainer is Bar), "Cannot AddRange of trk inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar), "Cannot AddRange of trk inside a Bar.");
 
             _uniqueDefs.AddRange(trk.UniqueDefs);
 
@@ -269,7 +259,7 @@ namespace Moritz.Spec
         /// </summary>
         private void _Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(MidiChannelDefsContainer is Bar && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
 
             _uniqueDefs.Insert(index, iUniqueDef);
             SetMsPositionsReFirstUD();
@@ -282,7 +272,7 @@ namespace Moritz.Spec
         /// </summary>
         private void _InsertRange(int index, Trk trk)
         {
-            Debug.Assert(!(MidiChannelDefsContainer is Bar), "Cannot Insert range of IUniqueDefs inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar), "Cannot Insert range of IUniqueDefs inside a Bar.");
 
             _uniqueDefs.InsertRange(index, trk.UniqueDefs);
             SetMsPositionsReFirstUD();
@@ -295,7 +285,7 @@ namespace Moritz.Spec
         /// </summary>
         public void Replace(int index, IUniqueDef replacementIUnique)
         {
-            Debug.Assert(!(MidiChannelDefsContainer is Bar), "Cannot Replace IUniqueDefs inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar), "Cannot Replace IUniqueDefs inside a Bar.");
 
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
@@ -321,8 +311,6 @@ namespace Moritz.Spec
         /// <returns>this</returns>
         public virtual Trk Superimpose(Trk trk2)
         {
-            Debug.Assert(MidiChannel == trk2.MidiChannel);
-
             SuperimposeUniqueDefs(trk2);
 
             AssertConsistency();
@@ -443,7 +431,7 @@ namespace Moritz.Spec
 
         protected void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(MidiChannelDefsContainer is Bar && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
 
             _uniqueDefs.Insert(index, iUniqueDef);
             SetMsPositionsReFirstUD();
@@ -505,7 +493,7 @@ namespace Moritz.Spec
             _uniqueDefs.RemoveAt(index);
             SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertConsistency();;
         }
 
         #region Changing the Trk's duration
@@ -570,7 +558,7 @@ namespace Moritz.Spec
         /// </summary>
         protected void AdjustMsDurations<T>(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
-            Debug.Assert(!(MidiChannelDefsContainer is Bar), "Cannot AdjustChordMsDurations inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar), "Cannot AdjustChordMsDurations inside a Bar.");
 
             if(CheckIndices(beginIndex, endIndex))
             {
@@ -595,7 +583,7 @@ namespace Moritz.Spec
 
                 SetMsPositionsReFirstUD();
 
-                AssertConsistency();
+                AssertConsistency();;
             }
         }
         private bool CheckIndices(int beginIndex, int endIndex)
@@ -1171,7 +1159,7 @@ namespace Moritz.Spec
             }
             #endregion
 
-            AssertConsistency();
+            AssertConsistency();;
         }
         /// <summary>
         /// Debug.Assert fails if
@@ -1294,7 +1282,7 @@ namespace Moritz.Spec
             if(uniqueDefs == _uniqueDefs)
             {
                 AxisIndex = _uniqueDefs.FindIndex(u => (u == axisUniqueDef));
-                AssertConsistency();
+                AssertConsistency();;
             }
         }
         /// <summary>
@@ -1386,7 +1374,7 @@ namespace Moritz.Spec
 
             AxisIndex = _uniqueDefs.FindIndex(u => (u == axisUniqueDef));
 
-            AssertConsistency();
+            AssertConsistency();;
         }
 
         /// <summary>
@@ -1516,7 +1504,7 @@ namespace Moritz.Spec
         /// </summary>
         protected void SortByRootNotatedPitch(bool ascending)
         {
-            Debug.Assert(!(MidiChannelDefsContainer is Bar), "Cannot sort inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar), "Cannot sort inside a Bar.");
 
             List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
             // Remove any rests from localIUDs, and store them (the rests), with their original indices,
@@ -1572,7 +1560,7 @@ namespace Moritz.Spec
         /// </summary>
         protected void SortByVelocity(bool increasing)
         {
-            Debug.Assert(!(MidiChannelDefsContainer is Bar), "Cannot sort inside a Bar.");
+            Debug.Assert(!(ChannelDefsContainer is Bar), "Cannot sort inside a Bar.");
 
             List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
             // Remove any rests from localIUDs, and store them (the rests), with their original indices,
@@ -1773,7 +1761,7 @@ namespace Moritz.Spec
 
                 _uniqueDefs[i] = value;
                 SetMsPositionsReFirstUD();
-                AssertConsistency();
+                AssertConsistency();;
             }
         }
 
@@ -1877,7 +1865,7 @@ namespace Moritz.Spec
 
                 SetMsPositionsReFirstUD();
 
-                AssertConsistency();
+                AssertConsistency();;
             }
         }
 
@@ -1909,9 +1897,11 @@ namespace Moritz.Spec
                 IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
                 lastLmdd.MsDuration = value - EndMsPositionReFirstIUD;
 
-                AssertConsistency();
+                AssertConsistency();;
             }
         }
+
+        public IChannelDefsContainer ChannelDefsContainer { get; set; }
 
         #region Enumerators
         public IEnumerator GetEnumerator()

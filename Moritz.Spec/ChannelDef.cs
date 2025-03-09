@@ -23,7 +23,7 @@ namespace Moritz.Spec
             Trks = trks;
             foreach(var trk in trks)
             {
-                trk.MidiChannelDefsContainer = (IMidiChannelDefsContainer)this;
+                trk.ChannelDefsContainer = (IChannelDefsContainer)this;
             }
 
             this._msPositionReContainer = 0;
@@ -808,21 +808,7 @@ namespace Moritz.Spec
 
         #region Properties
 
-        //private int _midiChannel = int.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
-        //public int MidiChannel
-        //{
-        //    get
-        //    {
-        //        return _midiChannel;
-        //    }
-        //    set
-        //    {
-        //        Debug.Assert(value >= 0 && value <= 15);
-        //        _midiChannel = value;
-        //    }
-        //}
-
-        public IMidiChannelDefsContainer Container = null;
+        public IChannelDefsContainer Container = null;
 
         public int Count { get { return _uniqueDefs.Count; } }
 

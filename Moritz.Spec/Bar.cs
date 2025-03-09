@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Moritz.Spec
 {
-    public class Bar : IMidiChannelDefsContainer
+    public class Bar : IChannelDefsContainer
     {
         public Bar()
         {

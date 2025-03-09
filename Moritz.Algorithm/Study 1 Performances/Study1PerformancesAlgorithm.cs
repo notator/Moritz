@@ -37,8 +37,8 @@ namespace Moritz.Algorithm.Study1
             Trk trk2 = GetTrk2(trk1);
             Trk trk3 = GetTrk3(trk2);
 
-            List<Trk> midiChannel0Trks = new List<Trk>() { trk0, trk1, trk2, trk3 }; // all in the same channel
-            var channelDef = new ChannelDef(midiChannel0Trks);
+            List<Trk> channelTrks = new List<Trk>() { trk0, trk1, trk2, trk3 }; // all in the same channel
+            var channelDef = new ChannelDef(channelTrks);
             List<ChannelDef> channelDefs = new List<ChannelDef>() { channelDef };
 
             Debug.Assert(channelDefs.Count == NumberOfMidiChannels);

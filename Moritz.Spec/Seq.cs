@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Moritz.Spec
 {
-    public class Seq : IMidiChannelDefsContainer
+    public class Seq : IChannelDefsContainer
     {
         /// <summary>
         /// This constructor creates the Seq.ChannelDefs field containing a list of ChannelDef objects.
@@ -36,7 +36,7 @@ namespace Moritz.Spec
             {
                 foreach(var trk in channelDef.Trks)
                 {
-                    trk.MidiChannelDefsContainer = this;
+                    trk.ChannelDefsContainer = this;
                     trk.MsPositionReContainer = 0;
                     trk.AssertConsistency();
                 }
@@ -217,12 +217,15 @@ namespace Moritz.Spec
 
         /// <summary>
         /// AbsMsPosition is greater than or equal 0.
-        /// There is at least one ChannelDef in ChannelDefs
-        /// and at least one Trk in each ChannelDef.
-        /// All ChannelDef.MsPositionReContainer and Trk.MsPositionReContainer values are 0.
-        /// All ChannelDefs and their contained Trks have the same MsDuration.
-        /// (?)All ChannelDefs contain Trks that contain only MidiRestDef or MidiChordDef objects.
-        /// (?)All Trk.UniqueDef.MsPositionReFirstUD values are set correctly.
+        /// There is at least one ChannelDef in ChannelDefs and at least one Trk in each ChannelDef.
+        /// Trk.AssertConsistency() is called on all Trks.
+        /// All ChannelDef.Trks.Count values are the same.
+        /// All ChannelDef.MsPositionReContainer values are 0.
+        /// All Trks have the same number of events as the Trk at index 0 in the same ChannelDef.
+        /// All Trks having the same index in any ChannelDef
+        ///     1. have the same MsDuration.
+        ///     2. have the same channel event sequence as the channel events at ChannelDefs[0].Trks[0]
+        /// (in Seqs) All ChannelDefs contain Trks that contain only MidiRestDef or MidiChordDef objects.
         /// </summary>
         public void AssertConsistency()
         {
@@ -231,19 +234,90 @@ namespace Moritz.Spec
 
             foreach(var channelDef in ChannelDefs)
             {
-                Debug.Assert(channelDef.MsPositionReContainer == 0);
-                int msDuration = channelDef.MsDuration;
                 foreach(var trk in channelDef.Trks)
                 {
-                    Debug.Assert(trk.MsPositionReContainer == 0);
-                    Debug.Assert(trk.MsDuration == msDuration);
-                    Debug.Assert(trk.MidiChannelDefsContainer == channelDef);
-
-                    /// (?)All ChannelDefs contain Trks that contain only MidiRestDef or MidiChordDef objects.
-                    /// (?)All Trk.UniqueDef.MsPositionReFirstUD values are set correctly.
                     trk.AssertConsistency();
                 }
             }
+
+            int nTrks = ChannelDefs[0].Trks.Count;
+            for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
+            {
+                var channelDef = ChannelDefs[channelDefIndex];
+                Debug.Assert(channelDef.Trks.Count == nTrks);
+                Debug.Assert(channelDef.MsPositionReContainer == 0);
+                int nChannelDefTrkEvents = channelDef.Trks[0].Count;
+                for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
+                {
+                    Debug.Assert(channelDef.Trks[trkIndex].Count == nChannelDefTrkEvents);
+                }
+            }
+
+            for(int trkIndex = 0; trkIndex < nTrks; ++nTrks)
+            {
+                int msDuration = ChannelDefs[0].Trks[trkIndex].MsDuration;
+                for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
+                {
+                    var channelDef = ChannelDefs[channelDefIndex];
+                    Debug.Assert(channelDef.Trks[trkIndex].MsDuration == msDuration);
+                }
+            }
+
+            List<List<int>> trk0ChannelEventSequence = GetChannelIndicesSequence(ChannelDefs, 0);
+            for(int trkIndex = 1; trkIndex < nTrks; ++nTrks)
+            {
+                List<List<int>> trkChannelIndicesSequence = GetChannelIndicesSequence(ChannelDefs, trkIndex);
+                for(int i = 0; i < trkChannelIndicesSequence.Count; ++i )
+                {
+                    List<int> channelIndices0 = trk0ChannelEventSequence[i];
+                    List<int> channelIndices1 = trkChannelIndicesSequence[i];
+
+                    Debug.Assert(channelIndices0.SequenceEqual(channelIndices1));
+                }
+            }
+        }
+
+        private List<List<int>> GetChannelIndicesSequence(IReadOnlyList<ChannelDef> channelDefs, int trkLevel)
+        {
+            List<Trk> channelTrks = new List<Trk>();
+            foreach(var channelDef in channelDefs)
+            {
+                channelTrks.Add(channelDef.Trks[trkLevel]);
+            }
+            
+            var channelIndicesPosSequence = new List<Tuple<List<int>, int>>();
+
+            for(var channelIndex = 0; channelIndex < channelTrks.Count; ++channelIndex)
+            {
+                var trk = channelTrks[channelIndex];
+                foreach(var uniqueDef in trk.UniqueDefs)
+                {
+                    var msPos = uniqueDef.MsPositionReFirstUD;
+                    channelIndicesPosSequence.Add(new Tuple<List<int>, int>(new List<int>() { channelIndex }, msPos));
+                }
+            }
+
+            channelIndicesPosSequence.OrderBy(x => x.Item2);
+
+            for(int i = channelIndicesPosSequence.Count - 1; i > 0; i--)
+            {
+                var mPos2 = channelIndicesPosSequence[i].Item2;
+                var mPos1 = channelIndicesPosSequence[i-1].Item2;
+                if(mPos2 == mPos1)
+                {
+                    List<int> channelIndices = channelIndicesPosSequence[i].Item1;
+                    channelIndicesPosSequence[i-1].Item1.AddRange(channelIndices);
+                    channelIndicesPosSequence[i-1].Item1.Sort();
+                    channelIndicesPosSequence.RemoveAt(i);
+                }
+            }
+
+            List<List<int>> channelIndicesSequence = new List<List<int>>();
+            foreach(var tuple in channelIndicesPosSequence)
+            {
+                channelIndicesSequence.Add(tuple.Item1);
+            }
+            return channelIndicesSequence;
         }
 
         #region sort functions

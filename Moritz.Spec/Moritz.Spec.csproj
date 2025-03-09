@@ -61,7 +61,7 @@
     </Compile>
     <Compile Include="ClefDef.cs" />
     <Compile Include="Mode.cs" />
-    <Compile Include="IMidiChannelDefsContainer.cs" />
+    <Compile Include="IChannelDefsContainer.cs" />
     <Compile Include="MsValues.cs" />
     <Compile Include="NoteTrigger.cs" />
     <Compile Include="PitchWeight.cs" />

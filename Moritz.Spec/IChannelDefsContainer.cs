@@ -5,10 +5,10 @@ using System.Collections.Generic;
 namespace Moritz.Spec
 {
     ///<summary>
-    /// IMidiChannelDefsContainer is implemented by Seq and Bar.
+    /// IChannelDefsContainer is implemented by Seq and Bar.
     /// Both Seq and Bar contain a list of ChannelDef (each ChannelDef contains a list of Trk).
     ///</summary>
-    public interface IMidiChannelDefsContainer
+    public interface IChannelDefsContainer
     {
         int AbsMsPosition { get; set; }
         int MsDuration { get; set; }
