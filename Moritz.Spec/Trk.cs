@@ -119,7 +119,7 @@ namespace Moritz.Spec
             }
             set
             {
-                throw new ApplicationException("MsPositionReContainer should always be 0!")
+                throw new ApplicationException("MsPositionReContainer should always be 0 !");
                 //_msPositionReContainer = value;
             }
         }
