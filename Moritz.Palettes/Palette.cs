@@ -333,7 +333,7 @@ namespace Moritz.Palettes
             return midiChordDef;
         }
 
-        public Trk NewTrk(int midiChannel, int msPositionReContainer, List<int> sequence)
+        public Trk NewTrk(int msPositionReContainer, List<int> sequence)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>();
             int msPositionReFirstIUD = 0;
@@ -346,14 +346,14 @@ namespace Moritz.Palettes
                 msPositionReFirstIUD += iumdd.MsDuration;
                 iuds.Add(iumdd);
             }
-            Trk trkDef = new Trk(midiChannel, msPositionReContainer, iuds);
+            Trk trkDef = new Trk(msPositionReContainer, iuds);
             return trkDef;
         }
 
-        public Trk NewTrk(int midiChannel, int msPositionReContainer, Krystal krystal)
+        public Trk NewTrk(int msPositionReContainer, Krystal krystal)
         {
             List<int> sequence = krystal.GetValues((uint)1)[0];
-            return NewTrk(midiChannel, msPositionReContainer, sequence);
+            return NewTrk(msPositionReContainer, sequence);
         }
 
         /// <summary>
@@ -366,7 +366,7 @@ namespace Moritz.Palettes
             {
                 sequence.Add(i);
             }
-            return NewTrk(midiChannel, 0, sequence);
+            return NewTrk(0, sequence);
         }
     }
 

@@ -50,17 +50,6 @@ namespace Moritz.Palettes
         {
             SetValues(trks);
         }
-
-        /// <summary>
-        /// Gets a clone of the trk at index, sets its midi channel to midiChannel, and then returns the result.
-        /// </summary>
-        public Trk GetTrk(int index, int midiChannel)
-        {
-            Trk trk = GetClonedValueAt(index);
-            trk.MidiChannel = midiChannel;
-
-            return trk;
-        }
     }
 
     public class EnvelopePalette : Palette<Envelope>
