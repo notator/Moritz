@@ -33,6 +33,8 @@ namespace Moritz.Algorithm.Study1
             Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
             Trk trk0 = GetTrk0(trackChordNumbers, trackRootPitches);
+            // parallel Trks must have the same number and types of contained UniqueDefs
+            // but they can have different durations and MIDI definitions
             Trk trk1 = GetTrk1(trk0);                                      
             Trk trk2 = GetTrk2(trk1);
             Trk trk3 = GetTrk3(trk2);
@@ -49,7 +51,13 @@ namespace Moritz.Algorithm.Study1
 
             List<Bar> bars = GetBars(seq, barlineMsPositions, null, null);
 
-            SetPatch0InTheFirstChord(bars[0].ChannelDefs[0]);
+            foreach(ChannelDef cDef in channelDefs)
+            {
+                foreach(Trk trk in channelDef.Trks)
+                {
+                    trk.SetPatch0InTheFirstChord();
+                }
+            }            
 
             return bars;
         }
@@ -252,21 +260,6 @@ namespace Moritz.Algorithm.Study1
 
             return chordMsDurations;
         }
-        /// <summary>
-        /// The patch only needs to be set in the first chord, since it will be set by shunting if the Assistant Performer starts later.
-        /// </summary>
-        private void SetPatch0InTheFirstChord(ChannelDef channelDef)
-        {
-            MidiChordDef firstMidiChordDef = null;
-            foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
-            {
-                firstMidiChordDef = iUniqueDef as MidiChordDef;
-                if(firstMidiChordDef != null)
-                {
-                    firstMidiChordDef.Patch = 0;
-                    break;
-                }
-            }
-        }
+       
     }
 }
