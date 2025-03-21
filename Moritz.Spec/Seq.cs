@@ -18,8 +18,6 @@ namespace Moritz.Spec
         /// <param name="absSeqMsPosition">Must be greater than or equal to zero.</param>
         /// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
         /// combination of MidiRestDef or MidiChordDef.
-        /// More than one trk can have the same midiChannel, but each successive trk in the trks list must have a trk.MidiChannel
-        /// that is greater than or equal to the previous trk's. (i.e. the midiChannels must be in contiguous order.)
         /// Each trk.MsPositionReContainer must be 0. All trk.UniqueDef.MsPositionReFirstUD values must be set correctly.
         /// All Trks that have the same channel must have the same trk.DurationsCount. (They are different performances of the same ChordSymbols.)
         /// <para>Not all the Seq's channels need to be given an explicit Trk in the trks argument. The seq will be given empty

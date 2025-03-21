@@ -123,7 +123,7 @@ namespace Moritz.Algorithm.ErratumMusical
         }
 
         /// <summary>
-        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
+        /// See summary and example code on abstract definition in CompositionAlgorithm.cs
         /// </summary>
         protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
         {

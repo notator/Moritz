@@ -45,11 +45,11 @@ namespace Moritz.Algorithm.Study1
 
             Debug.Assert(channelDefs.Count == NumberOfMidiChannels);
 
-            Seq seq = new Seq(0, channelDefs);
+            Seq mainSeq = new Seq(0, channelDefs);
 
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(seq, NumberOfBars);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq, NumberOfBars);
 
-            List<Bar> bars = GetBars(seq, barlineMsPositions, null, null);
+            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
 
             foreach(ChannelDef cDef in channelDefs)
             {

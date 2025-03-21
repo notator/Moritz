@@ -339,14 +339,13 @@ namespace Moritz.Algorithm
         /// Uses the private CompositionAlgorithm.MainBar(...) constructor to create Bar objects.
         /// </summary>
         /// <param name="mainSeq">A Seq containing all the output IUniqueDefs in the composition.</param>
-        /// <param name="inputVoiceDefs">Can be null, or contains all the input IUniqueDefs in the composition.</param>
         /// <param name="barlineMsPositions">All the barline msPositions (except the first).</param>
         /// <param name="clefChangesPerBar">Can be null.</param>
         /// <param name="lyricsPerBar">Can be null.</param>
         /// <returns>A list of Bars</returns>
         protected List<Bar> GetBars(Seq mainSeq, List<int> barlineMsPositions, List<List<SortedDictionary<int, string>>> clefChangesPerBar, List<List<SortedDictionary<int, string>>> lyricsPerBar)
         {
-            MainBar mainBar = new MainBar(mainSeq);
+            Bar mainBar = new Bar(mainSeq);
 
             List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 
@@ -377,13 +376,13 @@ namespace Moritz.Algorithm
                     if(clefChanges.Count > 0)
                     {
                         ChannelDef channelDef = barVoiceDefs[voiceDefIndex];
-                        InsertClefChangesInVoiceDef(channelDef, clefChanges);
+                        InsertClefChangesInChannelDef(channelDef, clefChanges);
                     }
                 }
             }
         }
 
-        private static void InsertClefChangesInVoiceDef(ChannelDef channelDef, SortedDictionary<int, string> clefChanges)
+        private static void InsertClefChangesInChannelDef(ChannelDef channelDef, SortedDictionary<int, string> clefChanges)
         {
             List<int> reversedKeys = new List<int>();
             foreach(int key in clefChanges.Keys)
@@ -440,294 +439,5 @@ namespace Moritz.Algorithm
 
         protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
-
-        private class MainBar : Bar
-        {
-            /// <summary>
-            /// Used only by functions in this class.
-            /// </summary>
-            private MainBar()
-                : base()
-            {
-            }
-
-            /// <summary>
-            /// A MainBar contains a list of channelDefs, that contain Trks. A Seq contain Trks.
-            /// As with all Bars, a MainBar does not contain barlines. They are implicit, at the beginning and end of the MainBar.
-            /// This constructor uses its arguments' channelDefs directly, so if the arguments need to be used again, pass clones.
-            /// <para>MainBar consistency is identical to Bar consistency, with the further restrictions that AbsMsPosition must be 0
-            /// and initalClefPerChannel may not be null.</para>
-            /// <para>For further documentation about MainBar and Bar consistency, see their private AssertConsistency() functions.
-            /// </summary>
-            /// <param name="seq">Cannot be null, and must have Trks</param>
-            public MainBar(Seq seq)
-                : base(seq)
-            {
-                AssertConsistency();
-            }
-
-            /// <summary>
-            /// 1. base.AssertConsistency() is called. (The base Bar must be consistent.)
-            /// 2. AbsMsPosition must be 0.
-            /// 3. InitialClefPerChannel == null || InitialClefPerChannel.Count == ChannelDefs.Count.
-            /// 4. At least one Trk must end with a MidiChordDef.
-            /// </summary> 
-            public override void AssertConsistency()
-            {
-                base.AssertConsistency();
-                Debug.Assert(AbsMsPosition == 0);
-
-                #region At least one Trk must end with a MidiChordDef.
-                IReadOnlyList<Trk> trks = Trks;
-                bool endFound = false;
-                foreach(Trk trk in trks)
-                {
-                    List<IUniqueDef> iuds = trk.UniqueDefs;
-                    IUniqueDef lastIud = iuds[iuds.Count - 1];
-                    if(lastIud is MidiChordDef)
-                    {
-                        endFound = true;
-                        break;
-                    }
-                }
-                Debug.Assert(endFound, "MidiChordDef not found at end.");
-                #endregion
-            }
-
-            /// Converts this MainBar to a list of bars, consuming this bar's channelDefs.
-            /// Uses the argument barline msPositions as the EndBarlines of the returned bars (which don't contain barlines).
-            /// An exception is thrown if:
-            ///    1) the first argument value is less than or equal to 0.
-            ///    2) the argument contains duplicate msPositions.
-            ///    3) the argument is not in ascending order.
-            ///    4) a Trk.MsPositionReContainer is not 0.
-            ///    5) an msPosition is not the endMsPosition of any IUniqueDef in the seq.
-            public List<Bar> GetBars(List<int> barlineMsPositions)
-            {
-                CheckBarlineMsPositions(barlineMsPositions);
-
-                List<int> barMsDurations = new List<int>();
-                int startMsPos = 0;
-                for(int i = 0; i < barlineMsPositions.Count; i++)
-                {
-                    int endMsPos = barlineMsPositions[i];
-                    barMsDurations.Add(endMsPos - startMsPos);
-                    startMsPos = endMsPos;
-                }
-
-                List<Bar> bars = new List<Bar>();
-                int totalDurationBeforePop = this.MsDuration;
-                Bar remainingBar = (Bar)this;
-                foreach(int barMsDuration in barMsDurations)
-                {
-                    Tuple<Bar, Bar> rTuple = PopBar(remainingBar, barMsDuration);
-                    Bar poppedBar = rTuple.Item1;
-                    remainingBar = rTuple.Item2; // null after the last pop.
-
-                    Debug.Assert(poppedBar.MsDuration == barMsDuration);
-                    if(remainingBar != null)
-                    {
-                        Debug.Assert(poppedBar.MsDuration + remainingBar.MsDuration == totalDurationBeforePop);
-                        totalDurationBeforePop = remainingBar.MsDuration;
-                    }
-                    else
-                    {
-                        Debug.Assert(poppedBar.MsDuration == totalDurationBeforePop);
-                    }
-
-                    bars.Add(poppedBar);
-                }
-
-                return bars;
-            }
-
-            /// <summary>
-            /// Returns a Tuple in which Item1 is the popped bar, Item2 is the remaining part of the input bar.
-            /// Note that Trks at the same level inside each ChannelDef in each bar have the same duration.
-            /// </summary>
-            /// <param name ="bar">The bar fron which Item1 is popped.</param>
-            /// <param name="poppedBarMsDuration">The duration of the first Trk in each ChannelDef in the popped bar.</param>
-            /// <returns>The popped bar and the remaining part of the input bar</returns>
-            private Tuple<Bar, Bar> PopBar(Bar bar, int poppedBarMsDuration)
-            {
-                Debug.Assert(poppedBarMsDuration > 0);
-
-                if(poppedBarMsDuration == bar.MsDuration)
-                {
-                    return new Tuple<Bar, Bar>(bar, null);
-                }
-
-                List<ChannelDef> poppedChannelDefs = new List<ChannelDef>();
-                List<ChannelDef> remainingChannelDefs = new List<ChannelDef>();
-
-                foreach(ChannelDef channelDef in bar.ChannelDefs)
-                {
-                    Tuple<ChannelDef, ChannelDef> channelDefs = PopChannelDef(channelDef, poppedBarMsDuration);
-
-                    poppedChannelDefs.Add(channelDefs.Item1);
-                    remainingChannelDefs.Add(channelDefs.Item2);
-                }
-
-                var poppedSeq = new Seq(bar.AbsMsPosition, poppedChannelDefs);
-                var remainingSeq = new Seq(bar.AbsMsPosition, remainingChannelDefs);
-
-                Bar poppedBar = new MainBar(poppedSeq);
-                Bar remainingBar = new MainBar(remainingSeq);
-
-                return new Tuple<Bar, Bar>(poppedBar, remainingBar);
-            }
-
-            /// <summary>
-            /// Returns two ChannelDefs (each has the same channel index)
-            /// Item1.Trks[0] contains the IUniqueDefs that begin within the poppedMsDuration.
-            /// Item2.Trks[0] contains the remaining IUniqueDefs from the original channelDef.Trks.
-            /// The remaining Trks in Item1 and Item2 are parallel IUniqueDefs (that can have other durations).
-            /// The popped IUniqueDefs are removed from the current channelDef before returning it as Item2.
-            /// MidiRestDefs and MidiChordDefs are split as necessary to fit the required Trk[0] duration.
-            /// </summary>
-            /// <param name="channelDef"></param>
-            /// <param name="poppedBarMsDuration"></param>
-            /// <returns></returns>
-            private Tuple<ChannelDef, ChannelDef> PopChannelDef(ChannelDef channelDef, int poppedMsDuration)
-            {
-                Tuple<Trk, Trk> trks = PopTrk(channelDef.Trks[0], poppedMsDuration);
-
-                Trk poppedTrk0 = trks.Item1;
-                Trk remainingTrk0 = trks.Item2;
-
-                List<Trk> poppedTrks = new List<Trk> { poppedTrk0 };
-                List<Trk> remainingTrks = new List<Trk> { remainingTrk0 };
-
-                int nUniqueDefs = poppedTrk0.UniqueDefs.Count;
-                List<Trk> channelTrks = channelDef.Trks;
-
-                for(int trkIndex = 1; trkIndex < channelTrks.Count; ++trkIndex)
-                {
-                    Trk poppedTrk = new Trk();
-                    List<IUniqueDef> originalUids = channelTrks[trkIndex].UniqueDefs;
-                    for(int uidIndex = 0; uidIndex < nUniqueDefs; ++uidIndex)
-                    {
-                        poppedTrk.UniqueDefs.Add(originalUids[0]);
-                        originalUids.RemoveAt(0);
-                    }
-                    poppedTrks.Add(poppedTrk);
-                    remainingTrks.Add(new Trk(0, originalUids));
-                }
-
-                ChannelDef poppedChannelDef = new ChannelDef(poppedTrks);
-                ChannelDef remainingChannelDef = new ChannelDef(remainingTrks);
-
-                return new Tuple<ChannelDef, ChannelDef>(poppedChannelDef, remainingChannelDef);
-            }
-
-            private Tuple<Trk, Trk> PopTrk(Trk trk, int poppedMsDuration)
-            {
-                Trk poppedTrk = new Trk(trk.MsPositionReContainer, new List<IUniqueDef>());
-                Trk remainingTrk = new Trk(trk.MsPositionReContainer + poppedMsDuration, new List<IUniqueDef>());
-
-                foreach(IUniqueDef iud in trk.UniqueDefs)
-                {
-                    int iudMsDuration = iud.MsDuration;
-                    int iudStartPos = iud.MsPositionReFirstUD;
-                    int iudEndPos = iudStartPos + iudMsDuration;
-
-                    if(iudStartPos >= poppedMsDuration)
-                    {
-                        if(iud is ClefDef && iudStartPos == poppedMsDuration)
-                        {
-                            poppedTrk.UniqueDefs.Add(iud);
-                        }
-                        else
-                        {
-                            remainingTrk.UniqueDefs.Add(iud);
-                        }
-                    }
-                    else if(iudEndPos > poppedMsDuration)
-                    {
-                        int durationBeforeBarline = poppedMsDuration - iudStartPos;
-                        int durationAfterBarline = iudEndPos - poppedMsDuration;
-                        if(iud is MidiRestDef)
-                        {
-                            // This is a rest. Split it.
-                            MidiRestDef firstRestHalf = new MidiRestDef(iudStartPos, durationBeforeBarline);
-                            poppedTrk.UniqueDefs.Add(firstRestHalf);
-
-                            MidiRestDef secondRestHalf = new MidiRestDef(poppedMsDuration, durationAfterBarline);
-                            remainingTrk.UniqueDefs.Add(secondRestHalf);
-                        }
-                        if(iud is CautionaryChordDef)
-                        {
-                            Debug.Assert(false, "There shouldnt be any cautionary chords here.");
-                            // This error can happen if an attempt is made to set barlines too close together,
-                            // i.e. (I think) if an attempt is made to create a bar that contains nothing... 
-                        }
-                        else if(iud is MidiChordDef)
-                        {
-                            IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
-                            uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
-                            poppedTrk.UniqueDefs.Add(uniqueChordDef);
-
-                            Debug.Assert(remainingTrk.UniqueDefs.Count == 0);
-                            CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
-                            remainingTrk.UniqueDefs.Add(ccd);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Assert(iudEndPos <= poppedMsDuration && iudStartPos >= 0);
-                        poppedTrk.UniqueDefs.Add(iud);
-                    }
-                }
-
-                return new Tuple<Trk, Trk>(poppedTrk, remainingTrk);
-        }
-
-            /// <summary>
-            /// An exception is thrown if:
-            ///    1) the first argument value is less than or equal to 0.
-            ///    2) the argument contains duplicate msPositions.
-            ///    3) the argument is not in ascending order.
-            ///    4) a ChannelDef.MsPositionReContainer is not 0.
-            ///    5) if an msPosition is not the endMsPosition of any IUniqueDef in the Trks.
-            /// </summary>
-            private void CheckBarlineMsPositions(IReadOnlyList<int> barlineMsPositionsReThisBar)
-            {
-                Debug.Assert(barlineMsPositionsReThisBar[0] > 0, "The first msPosition must be greater than 0.");
-
-                for(int i = 0; i < barlineMsPositionsReThisBar.Count; ++i)
-                {
-                    int msPosition = barlineMsPositionsReThisBar[i];
-                    Debug.Assert(msPosition <= this.MsDuration);
-                    for(int j = i + 1; j < barlineMsPositionsReThisBar.Count; ++j)
-                    {
-                        Debug.Assert(msPosition != barlineMsPositionsReThisBar[j], "Error: Duplicate barline msPositions.");
-                    }
-                }
-
-                int currentMsPos = -1;
-                foreach(int msPosition in barlineMsPositionsReThisBar)
-                {
-                    Debug.Assert(msPosition > currentMsPos, "Value out of order.");
-                    currentMsPos = msPosition;
-                    bool found = false;
-                    for(int i = ChannelDefs.Count - 1; i >= 0; --i)
-                    {
-                        ChannelDef channelDef = ChannelDefs[i];
-
-                        Debug.Assert(channelDef.MsPositionReContainer == 0);
-                        foreach(IUniqueDef iud in channelDef.UniqueDefs)
-                        {
-                            if(msPosition == (iud.MsPositionReFirstUD + iud.MsDuration))
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef in a Trk.");
-                }
-            }
-        }
     }
 }
