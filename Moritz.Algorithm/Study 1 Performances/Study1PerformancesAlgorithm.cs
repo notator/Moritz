@@ -45,11 +45,13 @@ namespace Moritz.Algorithm.Study1
 
             Debug.Assert(channelDefs.Count == NumberOfMidiChannels);
 
-            Seq mainSeq = new Seq(0, channelDefs);
+            Bar singleBar = new Bar(0, channelDefs);
 
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq, NumberOfBars);
+            Debug.Assert(singleBar.Finalised == false);  // only contains MidiChordDefs and RestDefs
 
-            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(singleBar.Trks0, NumberOfBars);
+
+            List<Bar> bars = GetBars(singleBar, barlineMsPositions, null, null);
 
             foreach(ChannelDef cDef in channelDefs)
             {
@@ -134,7 +136,7 @@ namespace Moritz.Algorithm.Study1
 
         private Trk GetTrk0(List<byte> trackChordNumbers, List<byte> trackRootPitches)
         {
-            Trk trk0 = new Trk(0, new List<IUniqueDef>());
+            Trk trk0 = new Trk(new List<IUniqueDef>());
             List<List<byte>> chordIntervals = GetChordIntervals();
             List<byte> chordVelocities = GetChordVelocities();
             List<int> chordDurations = GetChordMsDurations();

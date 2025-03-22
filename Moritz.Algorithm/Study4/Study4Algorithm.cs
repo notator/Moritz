@@ -46,7 +46,7 @@ namespace Moritz.Algorithm.Study4
 
 			GetTrksAndBarlines(study4GamutVector, out List<Trk> trks, out List<int> barlineMsPositions);
 
-			Seq mainSeq = new Seq(0, trks, NumberOfMidiChannels);
+			Bar mainSeq = new Seq(0, trks, NumberOfMidiChannels);
 
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);
@@ -162,7 +162,7 @@ namespace Moritz.Algorithm.Study4
 		/// Pad empty Trks with a single MidiRestDef.
 		/// Also, do other global changes that affect the whole piece here (accel., rit, transpositions etc.).
 		/// </summary>
-		private void FinalizeMainSeq(Seq mainSeq)
+		private void FinalizeMainSeq(Bar mainSeq)
 		{
 			mainSeq.PadEmptyTrks();
 		}

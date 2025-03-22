@@ -32,28 +32,28 @@ namespace Moritz.Algorithm.Study3Sketch1
 
             var approximateBarlineMsPositions = new List<double>();
 
-            Seq bar1Seq = CreateBar1Seq();
-            approximateBarlineMsPositions.Add(bar1Seq.MsDuration);
+            Bar bar1 = CreateBar1();
+            approximateBarlineMsPositions.Add(bar1.MsDuration);
 
-            Seq bar2Seq = CreateBar2Seq();
-            approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration);
+            Bar bar2 = CreateBar2();
+            approximateBarlineMsPositions.Add(bar1.MsDuration + bar2.MsDuration);
 
-            Seq bars345Seq = bar2Seq.Clone();
-            approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 5950);
-            approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 10500);
-            approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + bars345Seq.MsDuration);
+            Bar bars345 = bar2.Clone();
+            approximateBarlineMsPositions.Add(bar1.MsDuration + bar2.MsDuration + 5950);
+            approximateBarlineMsPositions.Add(bar1.MsDuration + bar2.MsDuration + 10500);
+            approximateBarlineMsPositions.Add(bar1.MsDuration + bar2.MsDuration + bars345.MsDuration);
 
-            Seq mainSeq = bar1Seq;
-            mainSeq.Concat(bar2Seq);
-            mainSeq.Concat(bars345Seq);
+            Bar mainBar = bar1;
+            mainBar.Concat(bar2);
+            mainBar.Concat(bars345);
 
-            List<int> barlineMsPositions = GetBarlinePositions(mainSeq.ChannelDefs, approximateBarlineMsPositions);
+            List<int> barlineMsPositions = GetBarlinePositions(mainBar.Trks0, approximateBarlineMsPositions);
 
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
+            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainBar.Trks.Count);
 
-            List<List<SortedDictionary<int, string>>> lyricsPerBar = GetLyricsPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
+            List<List<SortedDictionary<int, string>>> lyricsPerBar = GetLyricsPerBar(barlineMsPositions.Count, mainBar.Trks.Count);
 
-            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, clefChangesPerBar, lyricsPerBar);
+            List<Bar> bars = GetBars(mainBar, barlineMsPositions, clefChangesPerBar, lyricsPerBar);
 
             return bars;
         }
@@ -98,29 +98,29 @@ namespace Moritz.Algorithm.Study3Sketch1
             return null;
         }
 
-        #region CreateBar1Seq()
-        private Seq CreateBar1Seq()
+        #region CreateBar1()
+        private Bar CreateBar1()
         {
-            List<Trk> bar = new List<Trk>();
+            List<ChannelDef> channelDefs = new List<ChannelDef>();
 
             byte channel = (byte)(_palettes.Count - 1);
             foreach(Palette palette in _palettes)
             {
-                Trk trk = new Trk(channel, 0, new List<IUniqueDef>());
-                bar.Add(trk);
+                List<Trk> trks = new List<Trk>();
+                Trk trk = new Trk(new List<IUniqueDef>());
+                trks.Add(trk);
+                ChannelDef channelDef = new ChannelDef(trks);
                 WriteVoiceMidiDurationDefs1(trk, palette);
                 channel--;
             }
 
-            Seq seq = new Seq(0, bar, NumberOfMidiChannels);
+            Bar seq = new Bar(0, channelDefs);
 
             return seq;
         }
 
         private void WriteVoiceMidiDurationDefs1(Trk trk, Palette palette)
         {
-            trk.MsPositionReContainer = 0;
-
             int msPositionReFirstIUD = 0;
             int bar1ChordMsSeparation = 1500;
             for(int i = 0; i < palette.Count; ++i)
@@ -133,29 +133,37 @@ namespace Moritz.Algorithm.Study3Sketch1
                 trk.UniqueDefs.Add(restDef);
             }
         }
-        #endregion CreateBar1Seq()
+        #endregion CreateBar1()
 
         /// <summary>
         /// This function creates only one bar, using Trk objects. 
         /// </summary>
-        private Seq CreateBar2Seq()
+        private Bar CreateBar2()
         {
-            List<Trk> bar = new List<Trk>();
+            List<ChannelDef> channelDefs = new List<ChannelDef>();
 
-            byte channel = (byte)(_palettes.Count - 1);
+            byte paletteIndex = (byte)(_palettes.Count - 1);
             foreach(Palette palette in _palettes)
             {
-                Trk trk = palette.NewTrk(channel);
-                trk.MsPositionReContainer = 0;
+                List<Trk> trks = new List<Trk>();
+                ChannelDef channelDef = new ChannelDef(trks);
+                Trk trk = palette.NewTrk(paletteIndex);
                 trk.MsDuration = 6000; // stretches or compresses the trk duration to 6000ms
-                bar.Add(trk);
-                channel--;
+                trks.Add(trk);
+                channelDefs.Add(channelDef);
+                paletteIndex--;
+            }
+
+            List<Trk> trks0 = new List<Trk>();
+            foreach(var channel in channelDefs)
+            {
+                trks0.Add(channel.Trks[0]);
             }
 
             int maxMsPosReBar = 0;
             // insert rests at the start of the Trks
             int restMsDuration = 0;
-            foreach(Trk trk in bar)
+            foreach(Trk trk in trks0)
             {
                 if(restMsDuration > 0)
                 {
@@ -167,7 +175,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             }
 
             // add the final rest in the bar
-            foreach(Trk trk in bar)
+            foreach(Trk trk in trks0)
             {
                 int trkEndMsPosReBar = trk.EndMsPositionReFirstIUD;
                 if(maxMsPosReBar > trkEndMsPosReBar)
@@ -177,9 +185,9 @@ namespace Moritz.Algorithm.Study3Sketch1
                 }
             }
 
-            Seq seq = new Seq(0, bar, NumberOfMidiChannels);
+            Bar bar = new Bar(0, channelDefs);
 
-            return seq;
+            return bar;
         }
     }
 }

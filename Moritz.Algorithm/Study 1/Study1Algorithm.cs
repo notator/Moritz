@@ -31,7 +31,7 @@ namespace Moritz.Algorithm.Study1
             Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
             Trk track = GetTrack(trackChordNumbers, trackRootPitches);
-            Seq mainSeq = new Seq(0, new List<Trk>() { track }, NumberOfMidiChannels);
+            Bar mainSeq = new Seq(0, new List<Trk>() { track }, NumberOfMidiChannels);
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq, NumberOfBars);
 
             List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);

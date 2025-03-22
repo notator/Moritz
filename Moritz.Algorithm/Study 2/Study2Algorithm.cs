@@ -47,7 +47,7 @@ namespace Moritz.Algorithm.Study2
                     mainTrk3
                 };
 
-            Seq mainSeq = new Seq(0, trks, NumberOfMidiChannels);
+            Bar mainSeq = new Seq(0, trks, NumberOfMidiChannels);
 
             List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
 

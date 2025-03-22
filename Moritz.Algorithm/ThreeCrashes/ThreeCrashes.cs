@@ -164,7 +164,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
 
-            Seq mainSeq = new Seq(0, trks, NumberOfMidiChannels);
+            Bar mainSeq = new Seq(0, trks, NumberOfMidiChannels);
 
             //List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
 

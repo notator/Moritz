@@ -30,11 +30,11 @@ namespace Moritz.Algorithm.PianolaMusic
             List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
             Debug.Assert(trks.Count == NumberOfMidiChannels);
 
-            Seq seq = new Seq(0, trks, NumberOfMidiChannels);
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(seq, 8);
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, seq.ChannelDefs.Count);
+            Bar bar = new Seq(0, trks, NumberOfMidiChannels);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(bar, 8);
+            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, bar.ChannelDefs.Count);
 
-            List<Bar> bars = GetBars(seq, barlineMsPositions, clefChangesPerBar, null);
+            List<Bar> bars = GetBars(bar, barlineMsPositions, clefChangesPerBar, null);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 

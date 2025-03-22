@@ -992,7 +992,7 @@ namespace Moritz.Spec
                 iuds.Add(mcd);
             }
 
-            Trk trk = new Trk(0, iuds)
+            Trk trk = new Trk(iuds)
             {
                 MsDuration = msDuration // calls Trk.SetMsPositionsReFirstUD();
             };

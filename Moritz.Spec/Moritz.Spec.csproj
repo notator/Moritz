@@ -61,12 +61,10 @@
     </Compile>
     <Compile Include="ClefDef.cs" />
     <Compile Include="Mode.cs" />
-    <Compile Include="IChannelDefsContainer.cs" />
     <Compile Include="MsValues.cs" />
     <Compile Include="NoteTrigger.cs" />
     <Compile Include="PitchWeight.cs" />
     <Compile Include="PitchWeightVector.cs" />
-    <Compile Include="Seq.cs" />
     <Compile Include="SeqRef.cs" />
     <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="TrkRef.cs" />

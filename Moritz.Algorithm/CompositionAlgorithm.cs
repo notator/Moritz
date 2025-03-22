@@ -233,14 +233,14 @@ namespace Moritz.Algorithm
         /// <param name="inputVoiceDefs">can be null</param>
         /// <param name="approximateBarlineMsPositions"></param>
         /// <returns></returns>
-        protected List<int> GetBarlinePositions(IReadOnlyList<ChannelDef> channelDefs, List<double> approximateBarlineMsPositions)
+        protected List<int> GetBarlinePositions(IReadOnlyList<Trk> trks0, List<double> approximateBarlineMsPositions)
         {
             List<int> barlineMsPositions = new List<int>();
 
             foreach(double approxMsPos in approximateBarlineMsPositions)
             {
                 int barlineMsPos = 0;
-                barlineMsPos = NearestAbsUIDEndMsPosition(channelDefs, approxMsPos);
+                barlineMsPos = NearestAbsUIDEndMsPosition(trks0, approxMsPos);
 
                 barlineMsPositions.Add(barlineMsPos);
             }
@@ -271,15 +271,15 @@ namespace Moritz.Algorithm
 
             return rval;
         }
-        private int NearestAbsUIDEndMsPosition(IReadOnlyList<ChannelDef> channelDefs, double approxAbsMsPosition)
+        private int NearestAbsUIDEndMsPosition(IReadOnlyList<Trk> trks, double approxAbsMsPosition)
         {
             int nearestAbsUIDEndMsPosition = 0;
             double diff = double.MaxValue;
-            foreach(ChannelDef channelDef in channelDefs)
+            foreach(var trk in trks)
             {
-                for(int uidIndex = 0; uidIndex < channelDef.Count; ++uidIndex)
+                for(int uidIndex = 0; uidIndex < trk.UniqueDefs.Count; ++uidIndex)
                 {
-                    IUniqueDef iud = channelDef[uidIndex];
+                    IUniqueDef iud = trk[uidIndex];
                     int absEndPos = iud.MsPositionReFirstUD + iud.MsDuration;
                     double localDiff = Math.Abs(approxAbsMsPosition - absEndPos);
                     if(localDiff < diff)
@@ -302,7 +302,7 @@ namespace Moritz.Algorithm
 
         /// <summary>
         /// Returns nBars barlineMsPositions.
-        /// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef.
+        /// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef in the top Trk of a ChannelDef.
         /// The returned list contains no duplicates (A Debug.Assertion fails otherwise).
         /// </summary>
         /// <returns></returns>
@@ -310,11 +310,9 @@ namespace Moritz.Algorithm
         /// <param name="inputVoiceDefs">Can be null</param>
         /// <param name="nBars"></param>
         /// <returns></returns>
-        public List<int> GetBalancedBarlineMsPositions(Seq seq, int nBars)
-        {
-            IReadOnlyList<ChannelDef> channelDefs = seq.ChannelDefs;
-
-            int msDuration = channelDefs[0].MsDuration;
+        public List<int> GetBalancedBarlineMsPositions(List<Trk> trks0, int nBars)
+        {            
+            int msDuration = trks0[0].MsDuration; // all the trks0 have the same MsDuration
 
             double approxBarMsDuration = (((double)msDuration) / nBars);
             Debug.Assert(approxBarMsDuration * nBars == msDuration);
@@ -324,7 +322,7 @@ namespace Moritz.Algorithm
             for(int barNumber = 1; barNumber <= nBars; ++barNumber)
             {
                 double approxBarMsPosition = approxBarMsDuration * barNumber;
-                int barMsPosition = NearestAbsUIDEndMsPosition(channelDefs, approxBarMsPosition);
+                int barMsPosition = NearestAbsUIDEndMsPosition(trks0, approxBarMsPosition);
 
                 Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
 
@@ -338,17 +336,24 @@ namespace Moritz.Algorithm
         /// <summary>
         /// Uses the private CompositionAlgorithm.MainBar(...) constructor to create Bar objects.
         /// </summary>
-        /// <param name="mainSeq">A Seq containing all the output IUniqueDefs in the composition.</param>
+        /// <param name="mainBar">A Bar containing all the output IUniqueDefs in the composition.</param>
         /// <param name="barlineMsPositions">All the barline msPositions (except the first).</param>
         /// <param name="clefChangesPerBar">Can be null.</param>
         /// <param name="lyricsPerBar">Can be null.</param>
         /// <returns>A list of Bars</returns>
-        protected List<Bar> GetBars(Seq mainSeq, List<int> barlineMsPositions, List<List<SortedDictionary<int, string>>> clefChangesPerBar, List<List<SortedDictionary<int, string>>> lyricsPerBar)
+        protected List<Bar> GetBars(Bar mainBar, List<int> barlineMsPositions, List<List<SortedDictionary<int, string>>> clefChangesPerBar, List<List<SortedDictionary<int, string>>> lyricsPerBar)
         {
-            Bar mainBar = new Bar(mainSeq);
+            Debug.Assert(mainBar.Finalised == false);
 
             List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 
+            foreach(var bar in bars)
+            {
+                // Each Trk can begin with a CautionaryChordDef.
+                Debug.Assert(bar.Finalised == true);
+            }
+
+            // These are additional clefs, composed after viewing the first rendering.
             if(clefChangesPerBar != null)
             {
                 InsertClefChangesInBars(bars, clefChangesPerBar);

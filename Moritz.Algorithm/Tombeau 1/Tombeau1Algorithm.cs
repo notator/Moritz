@@ -406,7 +406,7 @@ namespace Moritz.Algorithm.Tombeau1
 			//GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 			GetTrksAndBarlines1(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
-			Seq mainSeq = new Seq(0, trks, NumberOfMidiChannels);
+			Bar mainSeq = new Seq(0, trks, NumberOfMidiChannels);
 
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);
@@ -506,7 +506,7 @@ namespace Moritz.Algorithm.Tombeau1
 		/// Pad empty Trks with a single MidiRestDef.
 		/// Also, do other global changes that affect the whole piece here (accel., rit, transpositions etc.).
 		/// </summary>
-		private void FinalizeMainSeq(Seq mainSeq)
+		private void FinalizeMainSeq(Bar mainSeq)
 		{
 			mainSeq.PadEmptyTrks();
 		}

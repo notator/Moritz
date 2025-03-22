@@ -111,7 +111,7 @@ namespace Moritz.Algorithm.ErratumMusical
             List<int> endBarlinePositions = new List<int>();
             List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
 
-            Seq seq = new Seq(0, trks, NumberOfMidiChannels);
+            Bar seq = new Seq(0, trks, NumberOfMidiChannels);
 
             List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, seq.ChannelDefs.Count);
 
@@ -155,7 +155,7 @@ namespace Moritz.Algorithm.ErratumMusical
 
         private Trk GetTrk(List<byte> pitches, List<byte> velocities, List<int> durations, int finalRestDuration)
         {
-            Trk trk = new Trk(0);
+            Trk trk = new Trk();
             List<IUniqueDef> midiChordDefs = GetMidiChordDefs(pitches, velocities, durations);
             trk.UniqueDefs.AddRange(midiChordDefs);
 
