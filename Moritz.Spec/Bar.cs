@@ -75,7 +75,6 @@ namespace Moritz.Spec
         public List<Bar> GetBars(List<int> barlineMsPositionsReTrk0)
         {
             CheckBarlineMsPositionsReTrk0(barlineMsPositionsReTrk0);
-            Debug.Assert(Finalised == false);
             AssertConsistency();
 
             List<int> barMsDurations = new List<int>();
@@ -109,9 +108,6 @@ namespace Moritz.Spec
                 {
                     Debug.Assert(poppedMsDuration == totalDurationBeforePop);
                 }
-
-                Debug.Assert(poppedBar.Finalised == true);
-                Debug.Assert(remainingBar.Finalised == true);
 
                 bars.Add(poppedBar);
             }
@@ -488,14 +484,6 @@ namespace Moritz.Spec
                 }
             }
         }
-
-        /// <summary>
-        /// This value is used by the AssertConsistency() function.
-        /// If Finalised is false, Trks can only contain MidiChordDef and RestDef IUniqueDefs.
-        /// If Finalised is true, Trks can also contain CautionaryChordDefs and ClefDefs.
-        /// </summary>
-        public bool Finalised { get => _finalised; }
-        private bool _finalised = false;
 
         public int MsDuration { get => ChannelDefs[0].Trks[0].MsDuration; }
 

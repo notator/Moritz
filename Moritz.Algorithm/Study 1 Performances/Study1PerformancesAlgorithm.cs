@@ -47,7 +47,7 @@ namespace Moritz.Algorithm.Study1
 
             Bar singleBar = new Bar(0, channelDefs);
 
-            Debug.Assert(singleBar.Finalised == false);  // only contains MidiChordDefs and RestDefs
+            singleBar.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(singleBar.Trks0, NumberOfBars);
 
@@ -61,7 +61,7 @@ namespace Moritz.Algorithm.Study1
                 }
             }            
 
-            return bars;
+            return bars;  // The Trks in these bars dont contain ClefDefs.
         }
 
         private Trk GetTrk1(Trk trk0)

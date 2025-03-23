@@ -72,13 +72,18 @@ namespace Moritz.Spec
 
         public Tuple<Trk, Trk> PopTrk(int poppedMsDuration)
         {
+            CanContainCautionaryChordDef = true;
+            Debug.Assert(CanContainClefDefs == false);
+
             AssertConsistency();
 
             Trk poppedTrk = new Trk(new List<IUniqueDef>());
-            poppedTrk.Finalised = true;  // can contain CautionaryChordDefs and Clefs
+            poppedTrk.CanContainCautionaryChordDef = true;
+            Debug.Assert(poppedTrk.CanContainClefDefs == false);
 
             Trk remainingTrk = new Trk(new List<IUniqueDef>());
-            remainingTrk.Finalised = true;   // can contain CautionaryChordDefs and Clefs
+            remainingTrk.CanContainCautionaryChordDef = true;
+            Debug.Assert(remainingTrk.CanContainClefDefs == false);
 
             foreach(IUniqueDef iud in UniqueDefs)
             {
@@ -88,16 +93,9 @@ namespace Moritz.Spec
 
                 if(iudStartPos >= poppedMsDuration)
                 {
-                    if(iud is ClefDef && iudStartPos == poppedMsDuration)
-                    {
-                        poppedTrk.UniqueDefs.Add(iud);
-                    }
-                    else
-                    {
-                        // moves the first iud, regardless of type, to the start of remainingTrk
-                        // This also moves CautionaryChordDefs (which can only be in this position).
-                        remainingTrk.UniqueDefs.Add(iud);
-                    }
+                    // moves the first iud, regardless of type, to the start of remainingTrk
+                    // This also moves CautionaryChordDefs (which can only be in this position).
+                    remainingTrk.UniqueDefs.Add(iud);
                 }
                 else if(iudEndPos > poppedMsDuration)
                 {
@@ -112,7 +110,7 @@ namespace Moritz.Spec
                         MidiRestDef secondRestHalf = new MidiRestDef(poppedMsDuration, durationAfterBarline);
                         remainingTrk.UniqueDefs.Add(secondRestHalf);
                     }
-                    if(iud is CautionaryChordDef)
+                    else if(iud is CautionaryChordDef)
                     {
                         Debug.Assert(false, "There shouldnt be any cautionary chords here.");
                         // This error can happen if an attempt is made to set barlines too close together,
@@ -146,6 +144,8 @@ namespace Moritz.Spec
         ///     MidiRestDef, MidiChordDef.
         /// If finalized is true then the UniqueDefs can contain any combination of
         ///     MidiRestDef, MidiChordDef, CautionaryChordDef, ClefDef.
+        /// Checks the content of the trk, taking the current state of CanContainCautionaryChordDef 
+        /// and CanContainClefDefs into account.
         /// The MsPositionReFirstUD of each UniqueDef is always consistent with the uniqueDef.MsDurations.
         /// Consecutive MidiRestDefs are always illegal.
         /// </summary>
@@ -175,28 +175,46 @@ namespace Moritz.Spec
                 }
             }
 
-            if(Finalised)
+            if(!CanContainCautionaryChordDef && !CanContainClefDefs)
             {
                 foreach(IUniqueDef iud in UniqueDefs)
                 {
-                    Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefDef);
+                    Debug.Assert(iud is MidiChordDef || iud is RestDef);
+                }
+            }
+            else if(CanContainCautionaryChordDef && !CanContainClefDefs)
+            {
+                IUniqueDef iud = UniqueDefs[0];
+                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef);
+                for(int i = 1; i < UniqueDefs.Count; i++)
+                {
+                    iud = UniqueDefs[i];
+                    Debug.Assert(iud is MidiChordDef || iud is RestDef);
                 }
             }
             else
             {
+                // ClefDefs must be added _after_ CautionaryChordDefs
+                Debug.Assert(!(!CanContainCautionaryChordDef && CanContainClefDefs));
                 foreach(IUniqueDef iud in UniqueDefs)
                 {
-                    Debug.Assert( iud is MidiChordDef || iud is RestDef);
+                    Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefDef);
                 }
             } 
         }
 
         /// <summary>
         /// This value is used by the AssertConsistency() function.
-        /// If Finalised is false, Trks can only contain MidiChordDef and RestDef IUniqueDefs.
-        /// If Finalised is true, Trks can also contain CautionaryChordDefs and ClefDefs.
+        /// If CanContainCautionaryChordDef is false, Trks can only contain MidiChordDef and RestDef IUniqueDefs.
+        /// If CanContainCautionaryChordDef is true, the first IUniqueDef can also be a CautionaryChordDef.
         /// </summary>
-        private bool Finalised = false;
+        private bool CanContainCautionaryChordDef = false;
+        /// <summary>
+        /// This value is used by the AssertConsistency() function.
+        /// If CanContainClefDefs is false, Trks cannot contain ClefDefs.
+        /// If CanContainClefDefs is true, Trks can contain ClefDefs.
+        /// </summary>
+        private bool CanContainClefDefs = false;
 
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
         private List<IUniqueDef> _uniqueDefs = null;
@@ -215,7 +233,8 @@ namespace Moritz.Spec
                 firstMidiChordDef = iUniqueDef as MidiChordDef;
                 if(firstMidiChordDef != null)
                 {
-                    firstMidiChordDef.Patch = 0;
+                    firstMidiChordDef.Preset = 0;
+                    firstMidiChordDef.AllControllersOff = true;
                     break;
                 }
             }
@@ -493,7 +512,7 @@ namespace Moritz.Spec
         /// </summary>
         public void Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(Finalised == true);
+            Debug.Assert(CanContainCautionaryChordDef == true);
 
             if(_uniqueDefs.Count > 0)
             {
@@ -1388,7 +1407,7 @@ namespace Moritz.Spec
                 {
                     if(this[i] is MidiChordDef mcd)
                     {
-                        mcd.PitchWheelDeviation = M.MidiValue(deviation);
+                        mcd.PitchWheelSensitivity = M.MidiValue(deviation);
                     }
                 }
             }
@@ -1406,7 +1425,7 @@ namespace Moritz.Spec
                 {
                     if(this[i] is MidiChordDef umcd)
                     {
-                        umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
+                        umcd.MidiChordControlDefs.PitchWheelMsbs = new List<byte>();
                     }
                 }
             }
@@ -1430,7 +1449,7 @@ namespace Moritz.Spec
             {
                 if(_uniqueDefs[i] is MidiChordDef umc)
                 {
-                    umc.PitchWheelDeviation = M.MidiValue((int)(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i))));
+                    umc.PitchWheelSensitivity = M.MidiValue((int)(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i))));
                 }
             }
         }

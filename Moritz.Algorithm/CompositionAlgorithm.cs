@@ -343,14 +343,14 @@ namespace Moritz.Algorithm
         /// <returns>A list of Bars</returns>
         protected List<Bar> GetBars(Bar mainBar, List<int> barlineMsPositions, List<List<SortedDictionary<int, string>>> clefChangesPerBar, List<List<SortedDictionary<int, string>>> lyricsPerBar)
         {
-            Debug.Assert(mainBar.Finalised == false);
+            mainBar.AssertConsistency();
 
             List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 
             foreach(var bar in bars)
             {
-                // Each Trk can begin with a CautionaryChordDef.
-                Debug.Assert(bar.Finalised == true);
+                // Each Trk can begin with a CautionaryChordDef and contains no ClefDefs.
+                bar.AssertConsistency();
             }
 
             // These are additional clefs, composed after viewing the first rendering.
