@@ -669,7 +669,7 @@ namespace Moritz.Algorithm.ThreeCrashes
                     midiChordDef = iUniqueDef as MidiChordDef;
                     if(midiChordDef != null)
                     {
-                        midiChordDef.Patch = 0;
+                        midiChordDef.Preset = 0;
                         break;
                     }
                 }

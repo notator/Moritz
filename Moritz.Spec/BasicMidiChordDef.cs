@@ -36,14 +36,14 @@ namespace Moritz.Spec
             : base(msDuration)
         {
             BankIndex = bank;
-            PatchIndex = patch;
+            PresetIndex = patch;
             HasChordOff = hasChordOff;
             Pitches = new List<byte>(pitches);
             Velocities = new List<byte>(velocities);
 
             #region check values
             Debug.Assert(BankIndex == null || BankIndex == M.MidiValue((int)BankIndex), "Bank out of range.");
-            Debug.Assert(PatchIndex == null || PatchIndex == M.MidiValue((int)PatchIndex), "Patch out of range.");
+            Debug.Assert(PresetIndex == null || PresetIndex == M.MidiValue((int)PresetIndex), "Patch out of range.");
             Debug.Assert(Pitches.Count == Velocities.Count, "There must be the same number of pitches and velocities.");
             foreach(byte pitch in Pitches)
                 Debug.Assert(pitch >= 0 && pitch <= 127);
@@ -122,7 +122,7 @@ namespace Moritz.Spec
                 }
             }
 
-            BasicMidiChordDef invertedBMCD = new BasicMidiChordDef(MsDuration, BankIndex, PatchIndex, HasChordOff, pitches, Velocities);
+            BasicMidiChordDef invertedBMCD = new BasicMidiChordDef(MsDuration, BankIndex, PresetIndex, HasChordOff, pitches, Velocities);
 
             return invertedBMCD;
         }
@@ -147,36 +147,58 @@ namespace Moritz.Spec
             if(carryMsgs.IsStartOfSwitches)
             {
                 BankIndex = GetValue(BankIndex, 0);
-                PatchIndex = GetValue(PatchIndex, 0);
-                PitchWheelDeviation = GetValue(PitchWheelDeviation, 2);
+                PresetIndex = GetValue(PresetIndex, 0);
+                DataEntryIndex = GetValue(DataEntryIndex, 0);
+                PitchWheelSensitivity = GetValue(PitchWheelSensitivity, 2);
+                Mixture = GetValue(Mixture, 0);
+                TuningGroup = GetValue(TuningGroup, 0);
+                Ornament = GetValue(Ornament, 0);
+                VelocityPitchSensitivity = GetValue(VelocityPitchSensitivity, 0);
+                RegisteredParameter = GetValue(RegisteredParameter, 0);
                 carryMsgs.IsStartOfSwitches = false;
             }
 
+            Debug.Assert(false, "23.03.2025: This function needs to be completed for all the above controls.");
+
             if((BankIndex != null && BankIndex != carryMsgs.BankState)
-            || (PatchIndex != null && PatchIndex != carryMsgs.PatchState)
-            || (PitchWheelDeviation != null && PitchWheelDeviation != carryMsgs.PitchWheelDeviationState))
+            || (PresetIndex != null && PresetIndex != carryMsgs.PatchState)
+            || (PitchWheelSensitivity != null && PitchWheelSensitivity != carryMsgs.PitchWheelDeviationState))
             {
                 w.WriteStartElement("switches");
+                if(AllSoundOff != null)
+                {
+                    // send AllSoundOff
+                    // MidiMsg msg = new MidiMsg(...)
+                    // msg.WriteSVG(w)
+                }
+                if(AllControllersOff != null)
+                {
+                    // send AllSoundOff
+                    // MidiMsg msg = new MidiMsg(...)
+                    // msg.WriteSVG(w)
+                }
+
                 if(BankIndex != null && BankIndex != carryMsgs.BankState)
                 {
                     MidiMsg msg = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL.BANK_0, BankIndex);
                     msg.WriteSVG(w);
                     carryMsgs.BankState = (byte)BankIndex;
                 }
-                if(PatchIndex != null && PatchIndex != carryMsgs.PatchState)
+                if(PresetIndex != null && PresetIndex != carryMsgs.PatchState)
                 {
-                    MidiMsg msg = new MidiMsg((int)M.CMD.PRESET_192 + channel, (int)PatchIndex, null);
+                    MidiMsg msg = new MidiMsg((int)M.CMD.PRESET_192 + channel, (int)PresetIndex, null);
                     msg.WriteSVG(w);
-                    carryMsgs.PatchState = (byte)PatchIndex;
+                    carryMsgs.PatchState = (byte)PresetIndex;
                 }
-                if(PitchWheelDeviation != null && PitchWheelDeviation != carryMsgs.PitchWheelDeviationState)
+                if(PitchWheelSensitivity != null && PitchWheelSensitivity != carryMsgs.PitchWheelDeviationState)
                 {
                     MidiMsg msg1 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL.REGISTERED_PARAMETER_101, M.SELECT_PITCHBEND_RANGE_0);
                     msg1.WriteSVG(w);
-                    MidiMsg msg2 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL.DATA_ENTRY_6, PitchWheelDeviation);
+                    MidiMsg msg2 = new MidiMsg((int)M.CMD.CONTROL_CHANGE_176 + channel, (int)M.CTL.DATA_ENTRY_6, PitchWheelSensitivity);
                     msg2.WriteSVG(w);
-                    carryMsgs.PitchWheelDeviationState = (byte)PitchWheelDeviation;
+                    carryMsgs.PitchWheelDeviationState = (byte)PitchWheelSensitivity;
                 }
+
                 w.WriteEndElement(); // switches
             }
 
@@ -306,9 +328,21 @@ namespace Moritz.Spec
 
         public List<byte> Pitches = new List<byte>();
         public List<byte> Velocities = new List<byte>();
-        public byte? BankIndex = null; // optional. If null, bank commands are not sent
-        public byte? PatchIndex = null; // optional. If null, patch commands are not sent
-        public byte? PitchWheelDeviation = null; // optional. If null, PitchWheelDeviation commands are not sent
         public bool HasChordOff = true;
+
+        #region ResidentSynth commands and controls
+        // These commands and controls are only sent if their value is not null. 
+        public byte? BankIndex = null;
+        public byte? PresetIndex { get; set; } = null;
+        public byte? DataEntryIndex { get; set; } = null;
+        public byte? PitchWheelSensitivity { get; set; } = null;  // non-standard control
+        public byte? Mixture { get; set; } = null; // non-standard control
+        public byte? TuningGroup { get; set; } = null; // non-standard control
+        public byte? Ornament { get; set; } = null;  // non-standard control
+        public byte? VelocityPitchSensitivity { get; set; } = null;  // non-standard control
+        public byte? RegisteredParameter { get; set; } = null;
+        public bool? AllSoundOff { get; set; } = null;
+        public bool? AllControllersOff { get; set; } = null;
+        #endregion
     }
 }

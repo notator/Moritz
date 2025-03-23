@@ -50,9 +50,9 @@ namespace Moritz.Midi
             {
                 _bank = new SSBankMsg(channel, (byte)midiChordDef.Bank);
             }
-            if(midiChordDef.Patch != null)
+            if(midiChordDef.Preset != null)
             {
-                _patch = new SSPresetMsg(channel, (byte)midiChordDef.Patch);
+                _patch = new SSPresetMsg(channel, (byte)midiChordDef.Preset);
             }
 
             // Moritz currently never repeats MidiChords, so the _repeat field is unnecessary.
@@ -60,9 +60,9 @@ namespace Moritz.Midi
             // and may be used by the web AssistantPerformer.
             //_repeat = midiChordDef.Repeat;
 
-            if(midiChordDef.PitchWheelDeviation != null)
+            if(midiChordDef.PitchWheelSensitivity != null)
             {
-                _pitchWheelSensitivity = new SSPitchWheelSensitivityMsg(channel, (byte)midiChordDef.PitchWheelDeviation);
+                _pitchWheelSensitivity = new SSPitchWheelSensitivityMsg(channel, (byte)midiChordDef.PitchWheelSensitivity);
             }
             if(midiChordDef.MidiChordSliderDefs != null)
                 CreateSliders(channel, midiChordDef.MidiChordSliderDefs, MsDuration);

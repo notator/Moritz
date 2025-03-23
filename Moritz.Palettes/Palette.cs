@@ -184,10 +184,10 @@ namespace Moritz.Palettes
 
                     if(basicMidiChordDefs[0].BankIndex == null)
                         basicMidiChordDefs[0].BankIndex = bankIndex; // can be null
-                    if(basicMidiChordDefs[0].PatchIndex == null)
-                        basicMidiChordDefs[0].PatchIndex = patchIndex;
+                    if(basicMidiChordDefs[0].PresetIndex == null)
+                        basicMidiChordDefs[0].PresetIndex = patchIndex;
 
-                    Debug.Assert(basicMidiChordDefs[0].PatchIndex != null);
+                    Debug.Assert(basicMidiChordDefs[0].PresetIndex != null);
 
                     basicMidiChordDefs = Moritz.Spec.MidiChordDef.FitToDuration(basicMidiChordDefs, duration, ornamentMinMsDuration);
 
@@ -245,14 +245,14 @@ namespace Moritz.Palettes
             if(bmcds.Count > 1)
             {
                 byte? prevBank = bmcds[0].BankIndex;
-                byte? prevPatch = bmcds[0].PatchIndex;
+                byte? prevPatch = bmcds[0].PresetIndex;
                 for(int i = 1; i < bmcds.Count; ++i)
                 {
                     bmcds[i].BankIndex = (bmcds[i].BankIndex == null || bmcds[i].BankIndex == prevBank) ? null : bmcds[i].BankIndex;
                     prevBank = (bmcds[i].BankIndex == null) ? prevBank : bmcds[i].BankIndex;
 
-                    bmcds[i].PatchIndex = (bmcds[i].PatchIndex == null || bmcds[i].PatchIndex == prevPatch) ? null : bmcds[i].PatchIndex;
-                    prevPatch = (bmcds[i].PatchIndex == null) ? prevPatch : bmcds[i].PatchIndex;
+                    bmcds[i].PresetIndex = (bmcds[i].PresetIndex == null || bmcds[i].PresetIndex == prevPatch) ? null : bmcds[i].PresetIndex;
+                    prevPatch = (bmcds[i].PresetIndex == null) ? prevPatch : bmcds[i].PresetIndex;
                 }
             }
         }
@@ -346,7 +346,7 @@ namespace Moritz.Palettes
                 msPositionReFirstIUD += iumdd.MsDuration;
                 iuds.Add(iumdd);
             }
-            Trk trkDef = new Trk(msPositionReContainer, iuds);
+            Trk trkDef = new Trk(iuds);
             return trkDef;
         }
 

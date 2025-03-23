@@ -1407,7 +1407,7 @@ namespace Moritz.Spec
                 {
                     if(this[i] is MidiChordDef mcd)
                     {
-                        mcd.PitchWheelSensitivity = M.MidiValue(deviation);
+                        mcd.BasicMidiChordDefs[0].PitchWheelSensitivity = M.MidiValue(deviation);
                     }
                 }
             }
@@ -1425,7 +1425,7 @@ namespace Moritz.Spec
                 {
                     if(this[i] is MidiChordDef umcd)
                     {
-                        umcd.MidiChordControlDefs.PitchWheelMsbs = new List<byte>();
+                        umcd.MidiChordSliderDefs.PitchWheelValues = new List<byte>();
                     }
                 }
             }

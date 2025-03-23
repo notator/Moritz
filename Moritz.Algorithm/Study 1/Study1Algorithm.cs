@@ -208,7 +208,7 @@ namespace Moritz.Algorithm.Study1
                 firstMidiChordDef = iUniqueDef as MidiChordDef;
                 if(firstMidiChordDef != null)
                 {
-                    firstMidiChordDef.Patch = 0;
+                    firstMidiChordDef.Preset = 0;
                     break;
                 }
             }

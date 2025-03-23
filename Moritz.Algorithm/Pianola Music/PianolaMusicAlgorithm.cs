@@ -217,7 +217,7 @@ namespace Moritz.Algorithm.PianolaMusic
                     midiChordDef = iUniqueDef as MidiChordDef;
                     if(midiChordDef != null)
                     {
-                        midiChordDef.Patch = 0;
+                        midiChordDef.Preset = 0;
                         break;
                     }
                 }

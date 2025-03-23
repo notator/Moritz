@@ -17,9 +17,9 @@ namespace Moritz.Midi
             {
                 SSBankMsg = new SSBankMsg(channel, (byte)bmcd.BankIndex);
             }
-            if(bmcd.PatchIndex != null)
+            if(bmcd.PresetIndex != null)
             {
-                SSPresetMsg = new SSPresetMsg(channel, (byte)bmcd.PatchIndex);
+                SSPresetMsg = new SSPresetMsg(channel, (byte)bmcd.PresetIndex);
             }
 
             ChordOn = new ChordOn(this);

@@ -10,59 +10,57 @@ namespace Moritz.Spec
     public class MidiChordSliderDefs
     {
         /// <summary>
-        /// Used by Assistant Composer
+        /// Used by the Assistant Composer's palettes
         /// </summary>
-        public MidiChordSliderDefs(List<byte> pitchWheelMsbs, List<byte> panMsbs, List<byte> modulationWheelMsbs, List<byte> expressionMsbs)
+        public MidiChordSliderDefs(List<byte> pitchWheelValues, List<byte> panValues, List<byte> modWheelValues, List<byte> expressionValues)
         {
-            PitchWheelMsbs = pitchWheelMsbs;
-            PanMsbs = panMsbs;
-            ModulationWheelMsbs = modulationWheelMsbs;
-            ExpressionMsbs = expressionMsbs;
+            PitchWheelValues = pitchWheelValues;
+            PanValues = panValues;
+            ModWheelValues = modWheelValues;
+            ExpressionValues = expressionValues;
         }
 
         public void WriteSVG(SvgWriter w, int channel, int msDuration, CarryMsgs carryMsgs)
         {
             if(carryMsgs.IsStartOfEnvs)
             {
-                PanMsbs = GetDefault(PanMsbs, 64);
-                ModulationWheelMsbs = GetDefault(ModulationWheelMsbs, 0);
-                ExpressionMsbs = GetDefault(ExpressionMsbs, 127);
-                PitchWheelMsbs = GetDefault(PitchWheelMsbs, 64);
+                PanValues = GetValues(PanValues, 64);
+                ModWheelValues = GetValues(ModWheelValues, 0);
+                ExpressionValues = GetValues(ExpressionValues, 127);
+                PitchWheelValues = GetValues(PitchWheelValues, 64);
 
                 carryMsgs.IsStartOfEnvs = false;
             }
 
-            if(DoWriteControl(PanMsbs, carryMsgs.PanState)
-            || DoWriteControl(ModulationWheelMsbs, carryMsgs.ModWheelState)
-            || DoWriteControl(ExpressionMsbs, carryMsgs.ExpressionState)
-            || DoWriteControl(PitchWheelMsbs, carryMsgs.PitchWheelState))
+            if(DoWriteControl(PanValues, carryMsgs.PanState)
+            || DoWriteControl(ModWheelValues, carryMsgs.ModWheelState)
+            || DoWriteControl(ExpressionValues, carryMsgs.ExpressionState)
+            || DoWriteControl(PitchWheelValues, carryMsgs.PitchWheelState))
             {
                 w.WriteStartElement("envs"); // envelopes
 
-                if(DoWriteControl(PanMsbs, carryMsgs.PanState))
+                if(DoWriteControl(PanValues, carryMsgs.PanState))
                 {
-                    carryMsgs.PanState = WriteCCEnv(w, channel, (int)M.CTL.PAN_10, PanMsbs, msDuration);
+                    carryMsgs.PanState = WriteCCEnv(w, channel, (int)M.CTL.PAN_10, PanValues, msDuration);
                 }
 
-                if(DoWriteControl(ModulationWheelMsbs, carryMsgs.ModWheelState))
+                if(DoWriteControl(ModWheelValues, carryMsgs.ModWheelState))
                 {
-                    carryMsgs.ModWheelState = WriteCCEnv(w, channel, (int)M.CTL.MOD_WHEEL_1, ModulationWheelMsbs, msDuration);
                 }
 
-                if(DoWriteControl(ExpressionMsbs, carryMsgs.ExpressionState))
+                if(DoWriteControl(ExpressionValues, carryMsgs.ExpressionState))
                 {
-                    carryMsgs.ExpressionState = WriteCCEnv(w, channel, (int)M.CTL.EXPRESSION_11, ExpressionMsbs, msDuration);
+                    carryMsgs.ExpressionState = WriteCCEnv(w, channel, (int)M.CTL.EXPRESSION_11, ExpressionValues, msDuration);
                 }
 
-                if(DoWriteControl(PitchWheelMsbs, carryMsgs.PitchWheelState))
+                if(DoWriteControl(PitchWheelValues, carryMsgs.PitchWheelState))
                 {
-                    string statusString = null;
                     w.WriteStartElement("env"); // envelope
 
-                    statusString = $"0x{(M.CMD.PITCH_WHEEL_224 + channel).ToString("X")}";
+                    string statusString = $"0x{(M.CMD.PITCH_WHEEL_224 + channel).ToString("X")}";
                     w.WriteAttributeString("s", statusString);
 
-                    carryMsgs.PitchWheelState = WriteD1AndD2VTs(w, PitchWheelMsbs, PitchWheelMsbs, msDuration);
+                    carryMsgs.PitchWheelState = WriteD1AndD2VTs(w, PitchWheelValues, PitchWheelValues, msDuration);
 
                     w.WriteEndElement(); // end env
                 }
@@ -73,10 +71,10 @@ namespace Moritz.Spec
 
         /// <summary>
         /// If the ctlValues are null or empty,
-        /// returns a List of ctlValues containg the single defaultCtlState.
+        /// returns a List of ctlValues containing the single defaultCtlState.
         /// </summary>
         /// <returns></returns>
-        private List<byte> GetDefault(List<byte> ctlValues, int defaultCtlState)
+        private List<byte> GetValues(List<byte> ctlValues, int defaultCtlState)
         {
             if(ctlValues == null || ctlValues.Count == 0)
             {
@@ -86,6 +84,22 @@ namespace Moritz.Spec
                 };
             }
             return ctlValues;
+        }
+
+        /// <summary>
+        /// If the ctlValue is null or empty, returns the defaultCtlValue.
+        /// </summary>
+        /// <returns></returns>
+        private byte GetValue(byte? ctlValue, byte defaultCtlValue)
+        {
+            if(ctlValue == null)
+            {
+                return defaultCtlValue;
+            }
+            else
+            {
+                return (byte) ctlValue;
+            }
         }
 
         private bool DoWriteControl(List<byte> ctlValues, byte currentCtlState)
@@ -250,25 +264,47 @@ namespace Moritz.Spec
             return msDurs;
         }
 
+        #region ResidentSynth slider controls
         /// <summary>
-        /// The PitchWheel Msb values corresonding to the percentages set in the panel.
+        /// The PitchWheel Msb values corresonding to the percentages set in the palette.
         /// This can be set to a single PitchWheelSlider Msb value.
         /// </summary>
-        public List<byte> PitchWheelMsbs = null;
+        public List<byte> PitchWheelValues = null;
         /// <summary>
-        /// The Pan Msb values corresonding to the percentages set in the panel.
+                                                /// The ModulationWheel Msb values corresonding to the percentages set in the palette.
+                                                /// This can be set to a single ModulationWheelSlider Msb value.
+                                                /// </summary>
+        public List<byte> ModWheelValues = null;
+        /// <summary>
+        /// Not used by palettes
+        /// </summary>
+        public List<byte> VolumeValues = null;
+        /// <summary>
+        /// The Pan Msb values corresonding to the percentages set in the palette.
         /// This can be set to a single PanSlider Msb value.
         /// </summary>
-        public List<byte> PanMsbs = null;
+        public List<byte> PanValues = null;
         /// <summary>
-        /// The ModulationWheel Msb values corresonding to the percentages set in the panel.
-        /// This can be set to a single ModulationWheelSlider Msb value.
-        /// </summary>
-        public List<byte> ModulationWheelMsbs = null;
-        /// <summary>
-        /// The Expression Msb values corresonding to the percentages set in the panel.
+        /// The Expression Msb values corresonding to the percentages set in the palette.
         /// This can be set to a single Expression Msb value.
         /// </summary>
-        public List<byte> ExpressionMsbs = null;
+        public List<byte> ExpressionValues = null;
+        /// <summary>
+        /// Not used by palettes
+        /// </summary>public List<byte> MixtureValues = null; // non-standard control
+        public List<byte> TuningValues = null; // non-standard control
+        /// <summary>
+        /// Not used by palettes
+        /// </summary>
+        public List<byte> SemitoneOffsetValues = null; // non-standard control
+        /// <summary>
+        /// Not used by palettes
+        /// </summary>
+        public List<byte> CentOffsetValues = null;  // non-standard control
+        /// <summary>
+        /// Not used by palettes
+        /// </summary>
+        public List<byte> ReverberationValues = null; // non-standard control
+        #endregion 
     }
 }

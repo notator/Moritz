@@ -117,7 +117,7 @@ namespace Moritz.Spec
             }
 
             MsPositionReFirstUD = 0;
-            _pitchWheelDeviation = pitchWheelDeviation;
+            _pitchWheelSensitivity = pitchWheelDeviation;
             HasChordOff = hasChordOff;
             _notatedMidiPitches = rootMidiPitches;
             _notatedMidiVelocities = rootMidiVelocities;
@@ -159,7 +159,7 @@ namespace Moritz.Spec
             MidiChordDef mcd0 = iUniqueDefs[0] as MidiChordDef;
 
             MsPositionReFirstUD = 0;
-            _pitchWheelDeviation = mcd0.PitchWheelDeviation;
+            _pitchWheelSensitivity = mcd0.PitchWheelSensitivity;
             HasChordOff = mcd0.HasChordOff;
             _notatedMidiPitches = new List<byte>(mcd0.NotatedMidiPitches);
             _notatedMidiVelocities = new List<byte>(mcd0.NotatedMidiVelocities);
@@ -202,7 +202,7 @@ namespace Moritz.Spec
                 {
                     BasicMidiChordDef bmcd = mcd.FirstBasicDurationDef;
                     bmcBank = bmcd.BankIndex;
-                    bmcPatch = bmcd.PatchIndex;
+                    bmcPatch = bmcd.PresetIndex;
                     bmcHasChordOff = bmcd.HasChordOff;
                     bmcPitches = new List<byte>(bmcd.Pitches);
                     bmcVelocities = new List<byte>(bmcd.Velocities);
@@ -244,8 +244,8 @@ namespace Moritz.Spec
                 MsPositionReFirstUD = this.MsPositionReFirstUD,
                 // rval.MsDuration must be set after setting BasicMidiChordDefs See below.
                 Bank = this.Bank,
-                Patch = this.Patch,
-                PitchWheelDeviation = this.PitchWheelDeviation,
+                Preset = this.Preset,
+                PitchWheelSensitivity = this.PitchWheelSensitivity,
                 HasChordOff = this.HasChordOff,
                 BeamContinues = this.BeamContinues,
                 Lyric = this.Lyric,
@@ -277,7 +277,7 @@ namespace Moritz.Spec
                 {
                     List<byte> pitches = new List<byte>(bmcd.Pitches);
                     List<byte> velocities = new List<byte>(bmcd.Velocities);
-                    newBdds.Add(new BasicMidiChordDef(bmcd.MsDuration, bmcd.BankIndex, bmcd.PatchIndex, bmcd.HasChordOff, pitches, velocities));
+                    newBdds.Add(new BasicMidiChordDef(bmcd.MsDuration, bmcd.BankIndex, bmcd.PresetIndex, bmcd.HasChordOff, pitches, velocities));
                 }
                 else if(bdd is BasicMidiRestDef bmrd)
                 {
@@ -987,7 +987,7 @@ namespace Moritz.Spec
                 // this constructor checks that pitches are in range 0..127, and velocities are in range 1..127.
                 MidiChordDef mcd = new MidiChordDef(bmcd.Pitches, bmcd.Velocities, bmcd.MsDuration, bmcd.HasChordOff);
                 mcd.FirstBasicDurationDef.BankIndex = bmcd.BankIndex;
-                mcd.FirstBasicDurationDef.PatchIndex = bmcd.PatchIndex;
+                mcd.FirstBasicDurationDef.PresetIndex = bmcd.PresetIndex;
                 mcd.FirstBasicDurationDef.HasChordOff = bmcd.HasChordOff;
                 iuds.Add(mcd);
             }
@@ -1075,13 +1075,13 @@ namespace Moritz.Spec
             {
                 FirstBasicDurationDef.BankIndex = Bank;
             }
-            if(FirstBasicDurationDef.PatchIndex == null && Patch != null)
+            if(FirstBasicDurationDef.PresetIndex == null && Preset != null)
             {
-                FirstBasicDurationDef.PatchIndex = Patch;
+                FirstBasicDurationDef.PresetIndex = Preset;
             }
-            if(FirstBasicDurationDef.PitchWheelDeviation == null && PitchWheelDeviation != null)
+            if(FirstBasicDurationDef.PitchWheelSensitivity == null && PitchWheelSensitivity != null)
             {
-                FirstBasicDurationDef.PitchWheelDeviation = PitchWheelDeviation;
+                FirstBasicDurationDef.PitchWheelSensitivity = PitchWheelSensitivity;
             }
             #endregion
 
@@ -1259,7 +1259,7 @@ namespace Moritz.Spec
                     if(bdd is BasicMidiChordDef bmcd)
                     {
                         // constructor checks that pitches are in range 0..127, and velocities are in range 1..127.
-                        rList.Add(new BasicMidiChordDef(msDurations[i], bmcd.BankIndex, bmcd.PatchIndex, bmcd.HasChordOff, bmcd.Pitches, bmcd.Velocities));
+                        rList.Add(new BasicMidiChordDef(msDurations[i], bmcd.BankIndex, bmcd.PresetIndex, bmcd.HasChordOff, bmcd.Pitches, bmcd.Velocities));
                     }
                     else if(bdd is BasicMidiRestDef bmrd)
                     {
@@ -1358,26 +1358,6 @@ namespace Moritz.Spec
             }
         }
         public int? MsDurationToNextBarline { get; set; } = null;
-        public byte? Bank { get; set; } = null;
-        public byte? Patch { get; set; } = null;
-        public byte? PitchWheelDeviation
-        {
-            get
-            {
-                return _pitchWheelDeviation;
-            }
-            set
-            {
-                if(value == null)
-                    _pitchWheelDeviation = null;
-                else
-                {
-                    int val = (int)value;
-                    _pitchWheelDeviation = MidiValue(val);
-                }
-            }
-        }
-        private byte? _pitchWheelDeviation = null;
         public bool HasChordOff { get; set; } = true;
         public bool BeamContinues { get; set; } = true;
         public string Lyric { get; set; } = null;
