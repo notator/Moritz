@@ -5,7 +5,7 @@ namespace Moritz.Spec
 {
     public class MidiMsg
     {
-        internal MidiMsg(int status, int data1, int? data2)
+        internal MidiMsg(int status, int data1, int? data2 = null)
         {
             Debug.Assert(status >= 0 && status <= 255); // 0x0..0xFF
             Debug.Assert(data1 >= 0 && data1 <= 127);

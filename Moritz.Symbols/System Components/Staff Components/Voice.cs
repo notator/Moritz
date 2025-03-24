@@ -37,7 +37,7 @@ namespace Moritz.Symbols
         /// Writes out an SVG Voice
         /// </summary>
         /// <param name="w"></param>
-        public virtual void WriteSVG(SvgWriter w, List<CarryMsgs> carryMsgsPerChannel)
+        public virtual void WriteSVG(SvgWriter w, List<ChannelCarryMsgs> carryMsgsPerChannel)
         {
             w.SvgStartGroup(CSSObjectClass.voice.ToString());
 

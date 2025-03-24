@@ -973,13 +973,7 @@ namespace Moritz.Globals
             EXPRESSION_11 = 11,
             #region defined but not used in legacy code
             ALL_SOUND_OFF_120 = 120,
-            ALL_CONTROLLERS_OFF = 121,
-            #endregion
-            #region deprecated (used in legacy code Feb. 2025)
-            // Use PITCHWHEEL_SENSITIVITY_16 instead.
-            REGISTERED_PARAMETER_101 = 101,
-            DATA_ENTRY_6 = 6,
-            #endregion deprecated
+            ALL_CONTROLLERS_OFF_121 = 121,
             #endregion
             #region non-standard controls
             // These can only be used by the ResidentSynth, not by the Microsoft GS Wavetable Synth.
@@ -987,7 +981,8 @@ namespace Moritz.Globals
             MIXTURE_17 = 17,
             TUNING_GROUP_18,
             TUNING_19 = 19,
-            ORNAMENT_75 = 75,
+            ORNAMENT_GROUP_75 = 75,
+            ORNAMENT_76 = 76,
             SEMITONE_OFFSET_80 = 80,
             CENT_OFFSET_81 = 81,
             VELOCITY_PITCH_SENSITIVITY_83 = 83,

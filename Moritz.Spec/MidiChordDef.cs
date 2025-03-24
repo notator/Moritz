@@ -7,27 +7,37 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
+using System.Xml;
 
 namespace Moritz.Spec
 {
     ///<summary>
-    /// A MidiChordDef can either be saved and retrieved from voices in an SVG file, or
-    /// retrieved from a palette (whereby the pallete makes a deep clone of its contained values).
+    /// A MidiChordDef can be saved and retrieved from a channel in an SVG file.
+    /// It defines the midi information for a single chord event.
+    /// It does not contain graphic information, but can be used to _construct_ graphic information.
+    /// Each MidiChordDef is part of a sequence of IUniqueDefs stored in a Trk.
+    /// There may be a list of parallel Trks containing alternative definitions of the same events.
+    /// If this is the case, IUniqueDefs in the first Trk will be used to construct the graphics.
+    /// The IUniqueDefs stored in Trks are MidiChordDef, MidiRestDef, CautionaryChordDef, ClefDef.
+    /// A MidiChordDef consists of
+    ///     1. The pitch and velocity information for NoteOn/NoteOff messages,
+    ///     2. The logical duration before the following DurationDef in a Trk,
+    ///     3. Whether or not NoteOffs are sent after its msDuration has elapsed,
+    ///     4. An optional set of (single) midi control messages that will be sent before the NoteOns.
     ///</summary>
     public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
     {
         #region constructors
         /// <summary>
-        /// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
-        /// The pitches argument is used to set both the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
-        /// The velocities argument is used to set the NotatedMIDIVelocities and BasicMidiChordDefs[0].Velocities.
-        /// Velocities must be in range 1..127.
+        /// A MidiChordDef whose optional set of MidiControlMessages is null.
         /// </summary>
         /// <param name="pitches">in range 0..127</param>
         /// <param name="velocities">In range 1..127</param>
         /// <param name="msDuration">greater than zero</param>
         /// <param name="hasChordOff"></param>
-        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
+        /// <param name="midiChordControlDefs">optional controls</param>
+        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff, MidiChordControlDefs midiChordControlDefs = null)
             : base(msDuration)
         {
             #region conditions
@@ -42,194 +52,18 @@ namespace Moritz.Spec
             }
             #endregion conditions
 
+            Pitches = pitches;
+            Velocities = velocities;
+
             MsPositionReFirstUD = 0; // default value
             HasChordOff = hasChordOff;
-            MinimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
+            OrnamentText = null; // could be useful later, but is only a non-functional annotation (2025)
 
-            OrnamentText = null;
-
-            MidiChordSliderDefs = null;
-
-            byte? bank = null;
-            byte? patch = null;
-
-            BasicDurationDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
-
-            SetNotatedValuesFromFirstBMCD();
+            MidiChordControlDefs = midiChordControlDefs;
 
             AssertConsistency(this);
         }
 
-        /// <summary>
-        /// A MidiChordDef having msDuration, and containing an ornament having BasicMidiChordDefs with nPitchesPerChord.
-        /// The notated pitch and the pitch of BasicMidiChordDefs[0] are set to rootNotatedPitch.
-        /// The notated velocity of all pitches is set to 127.
-        /// The root pitches of the BasicMidiChordDefs begin with rootNotatedPitch, and follow the ornamentEnvelope, using
-        /// the ornamentEnvelope's values as indices in the mode. Their durations are as equal as possible, to give the
-        /// overall msDuration. If ornamentEnvelope is null, a single, one-note BasicMidiChordDef will be created.
-        /// This constructor uses Mode.GetChord(rootNotatedPitch, nPitchesPerChord) which returns pitches that are
-        /// vertically spaced differently according to the absolute height of the rootNotatedPitch. The number of pitches
-        /// in a chord may also be less than nPitchesPerChord (see mode.GetChord(...) ).
-        /// An exception is thrown if rootNotatedPitch is not in the mode.
-        /// </summary>        
-        /// <param name="msDuration">The duration of this MidiChordDef</param>
-        /// <param name="mode">The mode containing all the pitches.</param>
-        /// <param name="rootNotatedPitch">The lowest notated pitch. Also the lowest pitch of BasicMidiChordDefs[0].</param>
-        /// <param name="nPitchesPerChord">The chord density (some chords may have less pitches).</param>
-        /// <param name="ornamentEnvelope">The ornament definition.</param>
-        public MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentText = null)
-            : base(msDuration)
-        {
-            NotatedMidiPitches = mode.GetChord(rootNotatedPitch, nPitchesPerChord);
-            var nmVelocities = new List<byte>();
-            foreach(byte pitch in NotatedMidiPitches) // can be less than nPitchesPerChord
-            {
-                nmVelocities.Add(127);
-            }
-            NotatedMidiVelocities = nmVelocities;
-
-            // Sets BasicMidiChords. If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
-            SetOrnament(mode, ornamentEnvelope, ornamentText);
-
-            AssertConsistency(this);
-        }
-
-        /// <summary>
-        /// Constructor used when creating a list of DurationDef templates from a Palette.
-        /// The palette has created new values for all the arguments, so this constructor simply transfers
-        /// those values to the new MidiChordDef. MsPositionReFirstIUD is set to 0, lyric is set to null.
-        /// </summary>
-        public MidiChordDef(
-            int msDuration, // the total duration (this should be the sum of the durations of the basicMidiChordDefs)
-            byte pitchWheelDeviation, // should be set to the default value: M.DEFAULT_PITCHWHEELDEVIATION_2 if unsure.
-            bool hasChordOff, // default is M.DefaultHasChordOff (=true)
-            List<byte> rootMidiPitches, // the pitches defined in the root chord settings (displayed, by default, in the score).
-            List<byte> rootMidiVelocities, // the velocities defined in the root chord settings (displayed, by default, in the score).
-            int ornamentNumber, // the number used to identify the ornament (to the right of the tilde). 0 means that there is no ornament
-            MidiChordSliderDefs midiChordSliderDefs, // can be null or contain empty lists
-            List<BasicMidiChordDef> basicMidiChordDefs)
-            : base(msDuration)
-        {
-            Debug.Assert(rootMidiPitches.Count <= rootMidiVelocities.Count);
-            foreach(byte pitch in rootMidiPitches)
-            {
-                AssertIsMidiValue(pitch);
-            }
-
-            MsPositionReFirstUD = 0;
-            _pitchWheelSensitivity = pitchWheelDeviation;
-            HasChordOff = hasChordOff;
-            _notatedMidiPitches = rootMidiPitches;
-            _notatedMidiVelocities = rootMidiVelocities;
-
-            if(ornamentNumber > 0)
-            {
-                OrnamentText = ornamentNumber.ToString();
-            }
-
-            MidiChordSliderDefs = midiChordSliderDefs;
-
-            foreach(BasicMidiChordDef basicMidiChordDef in basicMidiChordDefs)
-            {
-                BasicDurationDefs.Add(basicMidiChordDef);
-            }
-
-            AssertConsistency(this);
-        }
-
-        /// <summary>
-        /// Returns a new, ornamented MidiChordDef having msDuration, whose BasicDurationDefs are created from the MidiChordDefs
-        /// and RestDefs in the iUniqueDefs argument. Condition: The first iUniqueDef in the iUnqueDefs must be a MidiChordDef.
-        /// BasicDurationDefs created from MidiChordDefs are that MidiChordDef's BasicMidiChordDef[0].
-        /// BasicDurationDefs created from RestDefs are BasicRestDefs.
-        /// The durations of the returned BasicDurationDefs are in proportion to the durations of the MidiChordDefs and RestDefs
-        /// in the iUniqueDefs. This function makes a deep clone of all the required attributes in the iUniqueDefs.
-        /// </summary>
-        /// <param name="msDuration">The duration of the returned MidiChordDef</param>
-        /// <param name="iUniqueDefs">See function summary.</param>
-        /// <param name="ornamentText">Usually a single character. Will be appended to a tilde, and added (usually above) to the chord symbol.</param>
-        public MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs, string ornamentText)
-            : base(msDuration)
-        {
-            if(!(iUniqueDefs[0] is MidiChordDef))
-            {
-                throw new ApplicationException();
-            }
-
-            MidiChordDef mcd0 = iUniqueDefs[0] as MidiChordDef;
-
-            MsPositionReFirstUD = 0;
-            _pitchWheelSensitivity = mcd0.PitchWheelSensitivity;
-            HasChordOff = mcd0.HasChordOff;
-            _notatedMidiPitches = new List<byte>(mcd0.NotatedMidiPitches);
-            _notatedMidiVelocities = new List<byte>(mcd0.NotatedMidiVelocities);
-
-            this.OrnamentText = ornamentText; // usually a single character. Will be appended to a tilde, and added to the chord symbol - usually above.
-
-            MidiChordSliderDefs mcsd = mcd0.MidiChordSliderDefs;
-            if(mcsd != null)
-            {
-                MidiChordSliderDefs = new MidiChordSliderDefs(mcsd.PitchWheelMsbs, mcsd.PanMsbs, mcsd.ModulationWheelMsbs, mcsd.ExpressionMsbs);
-            }
-
-            #region construct BasicMidiChordDefs
-
-            List<int> msDurations = new List<int>();
-            foreach(IUniqueDef iud in iUniqueDefs)
-            {
-                if(iud is MidiChordDef || iud is MidiRestDef)
-                {
-                    msDurations.Add(iud.MsDuration);
-                }
-            }
-
-            // fit the msDurations to total msDuration
-            msDurations = M.IntDivisionSizes(msDuration, msDurations);
-            this.BasicDurationDefs = new List<BasicDurationDef>();
-            for(int i = 0; i < iUniqueDefs.Count; ++i)
-            {
-                IUniqueDef iud = iUniqueDefs[i];
-                int iudMsDuration = msDurations[i];
-
-                // default values (used when iud is a MidiRestDef)
-                byte? bmcBank = null;
-                byte? bmcPatch = null;
-                bool bmcHasChordOff = false;
-                List<byte> bmcPitches = null;
-                List<byte> bmcVelocities = null;
-
-                if(iud is MidiChordDef mcd)
-                {
-                    BasicMidiChordDef bmcd = mcd.FirstBasicDurationDef;
-                    bmcBank = bmcd.BankIndex;
-                    bmcPatch = bmcd.PresetIndex;
-                    bmcHasChordOff = bmcd.HasChordOff;
-                    bmcPitches = new List<byte>(bmcd.Pitches);
-                    bmcVelocities = new List<byte>(bmcd.Velocities);
-                }
-
-                if(bmcPitches != null)
-                {
-                    var basicMidiChordDef = new BasicMidiChordDef(iudMsDuration, bmcBank, bmcPatch, bmcHasChordOff, bmcPitches, bmcVelocities);
-                    BasicDurationDefs.Add(basicMidiChordDef);
-                }
-                else
-                {
-                    var basicMidiRestDef = new BasicMidiRestDef(iudMsDuration);
-                    BasicDurationDefs.Add(basicMidiRestDef);
-                }
-            }
-            #endregion
-
-            AssertConsistency(this);
-        }
-        /// <summary>
-        /// private constructor -- used by Clone()
-        /// </summary>
-        private MidiChordDef()
-            : base(0)
-        {
-        }
         #endregion constructors
 
         #region Clone
@@ -239,62 +73,74 @@ namespace Moritz.Spec
         /// <returns></returns>
         public override object Clone()
         {
-            MidiChordDef rval = new MidiChordDef()
+            MidiChordDef rval = new MidiChordDef(this.Pitches, this.Velocities, this.MsDuration, this.HasChordOff)
             {
                 MsPositionReFirstUD = this.MsPositionReFirstUD,
-                // rval.MsDuration must be set after setting BasicMidiChordDefs See below.
-                Bank = this.Bank,
-                Preset = this.Preset,
-                PitchWheelSensitivity = this.PitchWheelSensitivity,
-                HasChordOff = this.HasChordOff,
-                BeamContinues = this.BeamContinues,
-                Lyric = this.Lyric,
-                MinimumBasicMidiChordMsDuration = MinimumBasicMidiChordMsDuration, // required when changing a midiChord's duration
-                NotatedMidiPitches = _notatedMidiPitches, // a clone of the displayed notehead pitches
-                NotatedMidiVelocities = _notatedMidiVelocities, // a clone of the displayed notehead velocities
-
-                // rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
                 OrnamentText = this.OrnamentText, // the displayed ornament Text (without the tilde)
 
-                MidiChordSliderDefs = null
+                MidiChordControlDefs = this.MidiChordControlDefs.Clone()
             };
-
-            MidiChordSliderDefs m = this.MidiChordSliderDefs;
-            if(m != null)
-            {
-                List<byte> pitchWheelMsbs = NewListByteOrNull(m.PitchWheelMsbs);
-                List<byte> panMsbs = NewListByteOrNull(m.PanMsbs);
-                List<byte> modulationWheelMsbs = NewListByteOrNull(m.ModulationWheelMsbs);
-                List<byte> expressionMsbs = NewListByteOrNull(m.ExpressionMsbs);
-                if(pitchWheelMsbs != null || panMsbs != null || modulationWheelMsbs != null || expressionMsbs != null)
-                    rval.MidiChordSliderDefs = new MidiChordSliderDefs(pitchWheelMsbs, panMsbs, modulationWheelMsbs, expressionMsbs);
-            }
-
-            List<BasicDurationDef> newBdds = new List<BasicDurationDef>();
-            foreach(BasicDurationDef bdd in BasicDurationDefs)
-            {
-                if(bdd is BasicMidiChordDef bmcd)
-                {
-                    List<byte> pitches = new List<byte>(bmcd.Pitches);
-                    List<byte> velocities = new List<byte>(bmcd.Velocities);
-                    newBdds.Add(new BasicMidiChordDef(bmcd.MsDuration, bmcd.BankIndex, bmcd.PresetIndex, bmcd.HasChordOff, pitches, velocities));
-                }
-                else if(bdd is BasicMidiRestDef bmrd)
-                {
-                    newBdds.Add(new BasicMidiRestDef(bmrd.MsDuration));
-                }
-                else
-                {
-                    throw new ApplicationException("Unknown BasicDurationDef type.");
-                }
-            }
-            rval.BasicDurationDefs = newBdds;
-            rval.MsDuration = this.MsDuration;
-
-            AssertConsistency(rval);
 
             return rval;
         }
+
+        /// <summary>
+        /// Note that neither Rests nor Chords have a msDuration attribute.
+        /// Their msDuration is deduced from the contained moment msDurations.
+        /// See: https://github.com/notator/Moritz/issues/2
+        /// </summary>
+        public void WriteSVG(SvgWriter w, int channel, int trkIndex, ChannelCarryMsgs carryMsgs)
+        {
+            w.WriteStartElement("midiChord");
+            w.WriteAttributeString("msDuration", MsDuration.ToString());
+
+            var trkCarryCounts = carryMsgs.TrkCounts;
+            if(trkCarryCounts[trkIndex] > 0)
+            {
+                // writes a noteOffs element
+                carryMsgs.WriteSVG(w, trkIndex); // currently just NoteOffs
+            }
+
+            if(MidiChordControlDefs != null)
+            {
+                // writes the controls element
+                MidiChordControlDefs.WriteSVG(w, channel);
+            }
+            // writes a noteOns element (containing noteOn messages) into the midiChord element
+            WriteNoteOns(w, carryMsgs, channel);
+
+            w.WriteEndElement(); // midiChord
+        }
+
+        private void WriteNoteOns(SvgWriter w, ChannelCarryMsgs carryMessages, int channel)
+        {
+            if(Pitches != null)
+            {
+                Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
+                w.WriteStartElement("noteOns");
+                int status = (int)M.CMD.NOTE_ON_144 + channel; // NoteOn
+                for(int i = 0; i < Pitches.Count; ++i)
+                {
+                    MidiMsg msg = new MidiMsg(status, Pitches[i], Velocities[i]);
+                    msg.WriteSVG(w);
+                }
+                w.WriteEndElement(); // end of noteOns
+
+                if(HasChordOff)
+                {
+                    status = (int)M.CMD.NOTE_OFF_120 + channel;
+                    int data2 = M.DEFAULT_NOTEOFF_VELOCITY_64;
+                    foreach(byte pitch in Pitches)
+                    {
+                        carryMessages.Add(new MidiMsg(status, pitch, data2));
+                    }
+                }
+            }
+        }
+
+        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
+
+
 
 
         /// <summary>
@@ -551,28 +397,28 @@ namespace Moritz.Spec
             }
             #endregion condition
 
-            if(MidiChordSliderDefs == null)
+            if(MidiChordControlDefs == null)
             {
-                MidiChordSliderDefs = new MidiChordSliderDefs(null, null, null, null);
+                MidiChordControlDefs = new MidiChordControlDefs(null, null, null, null);
             }
             if(pitchWheelBytes != null)
             {
-                MidiChordSliderDefs.PitchWheelMsbs = pitchWheelBytes;
+                MidiChordControlDefs.PitchWheelMsbs = pitchWheelBytes;
             }
             else
             if(panBytes != null)
             {
-                MidiChordSliderDefs.PanMsbs = panBytes;
+                MidiChordControlDefs.PanMsbs = panBytes;
             }
             else
             if(modulationBytes != null)
             {
-                MidiChordSliderDefs.ModulationWheelMsbs = modulationBytes;
+                MidiChordControlDefs.ModulationWheelMsbs = modulationBytes;
             }
             else
             if(expressionBytes != null)
             {
-                MidiChordSliderDefs.ExpressionMsbs = expressionBytes;
+                MidiChordControlDefs.ExpressionMsbs = expressionBytes;
             }
         }
         #endregion Sliders
@@ -1002,7 +848,7 @@ namespace Moritz.Spec
 
         public void AdjustExpression(double factor)
         {
-            List<byte> exprs = this.MidiChordSliderDefs.ExpressionMsbs;
+            List<byte> exprs = this.MidiChordControlDefs.ExpressionMsbs;
             for(int i = 0; i < exprs.Count; ++i)
             {
                 exprs[i] = MidiValue((int)(exprs[i] * factor));
@@ -1014,27 +860,27 @@ namespace Moritz.Spec
             get
             {
                 List<byte> rval;
-                if(this.MidiChordSliderDefs == null || this.MidiChordSliderDefs.PanMsbs == null)
+                if(this.MidiChordControlDefs == null || this.MidiChordControlDefs.PanMsbs == null)
                 {
                     rval = new List<byte>();
                 }
                 else
                 {
-                    rval = this.MidiChordSliderDefs.PanMsbs;
+                    rval = this.MidiChordControlDefs.PanMsbs;
                 }
                 return rval;
             }
             set
             {
-                if(this.MidiChordSliderDefs == null)
+                if(this.MidiChordControlDefs == null)
                 {
-                    this.MidiChordSliderDefs = new MidiChordSliderDefs(new List<byte>(), new List<byte>(), new List<byte>(), new List<byte>());
+                    this.MidiChordControlDefs = new MidiChordControlDefs(new List<byte>(), new List<byte>(), new List<byte>(), new List<byte>());
                 }
-                if(this.MidiChordSliderDefs.PanMsbs == null)
+                if(this.MidiChordControlDefs.PanMsbs == null)
                 {
-                    this.MidiChordSliderDefs.PanMsbs = new List<byte>();
+                    this.MidiChordControlDefs.PanMsbs = new List<byte>();
                 }
-                List<byte> pans = this.MidiChordSliderDefs.PanMsbs;
+                List<byte> pans = this.MidiChordControlDefs.PanMsbs;
                 pans.Clear();
                 for(int i = 0; i < value.Count; ++i)
                 {
@@ -1045,7 +891,7 @@ namespace Moritz.Spec
 
         public void AdjustModulationWheel(double factor)
         {
-            List<byte> modWheels = this.MidiChordSliderDefs.ModulationWheelMsbs;
+            List<byte> modWheels = this.MidiChordControlDefs.ModulationWheelMsbs;
             for(int i = 0; i < modWheels.Count; ++i)
             {
                 modWheels[i] = MidiValue((int)(modWheels[i] * factor));
@@ -1054,68 +900,14 @@ namespace Moritz.Spec
 
         public void AdjustPitchWheel(double factor)
         {
-            List<byte> pitchWheels = this.MidiChordSliderDefs.PitchWheelMsbs;
+            List<byte> pitchWheels = this.MidiChordControlDefs.PitchWheelMsbs;
             for(int i = 0; i < pitchWheels.Count; ++i)
             {
                 pitchWheels[i] = MidiValue((int)(pitchWheels[i] * factor));
             }
         }
 
-        /// <summary>
-        /// Note that neither Rests nor Chords have a msDuration attribute.
-        /// Their msDuration is deduced from the contained moment msDurations.
-        /// See: https://github.com/notator/Moritz/issues/2
-        /// </summary>
-        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
-        {
-            #region set BasicMidiChordDefs[0] Bank, Patch and PitchWheelDeviation if necessary
-            Debug.Assert(BasicDurationDefs != null && BasicDurationDefs.Count > 0);
 
-            if(FirstBasicDurationDef.BankIndex == null && Bank != null)
-            {
-                FirstBasicDurationDef.BankIndex = Bank;
-            }
-            if(FirstBasicDurationDef.PresetIndex == null && Preset != null)
-            {
-                FirstBasicDurationDef.PresetIndex = Preset;
-            }
-            if(FirstBasicDurationDef.PitchWheelSensitivity == null && PitchWheelSensitivity != null)
-            {
-                FirstBasicDurationDef.PitchWheelSensitivity = PitchWheelSensitivity;
-            }
-            #endregion
-
-            w.WriteStartElement("midi");
-
-            w.WriteStartElement("moments");
-
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
-            {
-                // writes a single moment element which may contain
-                // noteOffs, bank, patch, pitchWheelDeviation and noteOns elements 
-                bmcd.WriteSVG(w, channel, carryMsgs);
-            }
-
-            w.WriteEndElement(); // end moments
-
-            if(MidiChordSliderDefs != null)
-            {
-                // writes the envs element
-                MidiChordSliderDefs.WriteSVG(w, channel, this.MsDuration, carryMsgs);
-            }
-
-            w.WriteEndElement(); // midi
-
-            if(HasChordOff)
-            {
-                List<byte> hangingPitches = GetHangingPitches(BasicDurationDefs);
-                if(hangingPitches.Count > 0)
-                {
-                    List<MidiMsg> noteOffMsgs = GetNoteOffMsgs(channel, hangingPitches);
-                    carryMsgs.AddRange(noteOffMsgs);
-                }
-            }
-        }
 
         private List<byte> GetHangingPitches(List<BasicDurationDef> basicDurationDefs)
         {
@@ -1357,11 +1149,14 @@ namespace Moritz.Spec
                 AssertConsistency(this);
             }
         }
+
+        public List<byte> Pitches = new List<byte>();
+        public List<byte> Velocities = new List<byte>();
+
         public int? MsDurationToNextBarline { get; set; } = null;
         public bool HasChordOff { get; set; } = true;
         public bool BeamContinues { get; set; } = true;
         public string Lyric { get; set; } = null;
-        public int MinimumBasicMidiChordMsDuration { get; set; } = 1;
 
         /// <summary>
         /// This NotatedMidiPitches field is used when displaying the chord's noteheads.
@@ -1412,26 +1207,9 @@ namespace Moritz.Spec
         /// </summary>
         public string OrnamentText { get; private set; } = null;
 
-        public MidiChordSliderDefs MidiChordSliderDefs = null;
-        public List<BasicDurationDef> BasicDurationDefs = new List<BasicDurationDef>();
-        /// <summary>
-        /// Returns a list of the BasicMidiChordDefs in BasicDurationDefs, simply ignoring any BasicMidiRestDefs.
-        /// </summary>
-        public List<BasicMidiChordDef> BasicMidiChordDefs
-        {
-            get
-            {
-                List<BasicMidiChordDef> bmcds = new List<BasicMidiChordDef>();
-                foreach(BasicDurationDef bdd in BasicDurationDefs)
-                {
-                    if(bdd is BasicMidiChordDef bmcd)
-                    {
-                        bmcds.Add(bmcd);
-                    }
-                }
-                return bmcds;
-            }
-        }
+        public MidiChordControlDefs MidiChordControlDefs = null;
+
+
 
         #endregion properties
     }

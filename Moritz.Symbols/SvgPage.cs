@@ -179,12 +179,13 @@ namespace Moritz.Symbols
                 WritePage1TitleAndAuthor(w, metadata);
             }
 
-            List<CarryMsgs> carryMsgsPerChannel = new List<CarryMsgs>();
+            List<ChannelCarryMsgs> carryMsgsPerChannel = new List<ChannelCarryMsgs>();
+            int channel = 0;
             foreach(Staff staff in Systems[0].Staves)
             {
                 foreach(Voice voice in staff.Voices)
                 {
-                    carryMsgsPerChannel.Add(new CarryMsgs());
+                    carryMsgsPerChannel.Add(new ChannelCarryMsgs(channel++));
                 }
             }
 

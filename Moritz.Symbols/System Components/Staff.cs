@@ -21,7 +21,7 @@ namespace Moritz.Symbols
         /// <summary>
         /// carryMsgsPerChannel is null for InputStaves.
         /// </summary>
-        public virtual void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
+        public virtual void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<ChannelCarryMsgs> carryMsgsPerChannel)
         {
             w.WriteAttributeString("score", "staffName", null, this.Staffname);
 

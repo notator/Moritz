@@ -24,7 +24,7 @@ namespace Moritz.Symbols
         /// Writes out all the SVGSystem's staves. 
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel)
+        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<ChannelCarryMsgs> carryMsgsPerChannel)
         {
             w.SvgStartGroup(this.Metrics.CSSObjectClass.ToString()); // "system"
 

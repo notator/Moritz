@@ -235,7 +235,7 @@ namespace Moritz.Algorithm.Study4
 			var rval = new MidiChordDef(mcd.MsDuration, basicChords, mcd.OrnamentText)
 			{
 				PitchWheelSensitivity = mcd.PitchWheelSensitivity,
-				MidiChordSliderDefs = mcd.MidiChordSliderDefs
+				MidiChordControlDefs = mcd.MidiChordControlDefs
 			};
 
 			return rval;

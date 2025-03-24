@@ -7,66 +7,153 @@ using System.Diagnostics;
 
 namespace Moritz.Spec
 {
-    public class MidiChordSliderDefs
+    public class MidiChordControlDefs
     {
         /// <summary>
         /// Used by the Assistant Composer's palettes
         /// </summary>
-        public MidiChordSliderDefs(List<byte> pitchWheelValues, List<byte> panValues, List<byte> modWheelValues, List<byte> expressionValues)
+        public MidiChordControlDefs()
         {
-            PitchWheelValues = pitchWheelValues;
-            PanValues = panValues;
-            ModWheelValues = modWheelValues;
-            ExpressionValues = expressionValues;
         }
 
-        public void WriteSVG(SvgWriter w, int channel, int msDuration, CarryMsgs carryMsgs)
+        internal MidiChordControlDefs Clone()
         {
-            if(carryMsgs.IsStartOfEnvs)
+            var rval = new MidiChordControlDefs
             {
-                PanValues = GetValues(PanValues, 64);
-                ModWheelValues = GetValues(ModWheelValues, 0);
-                ExpressionValues = GetValues(ExpressionValues, 127);
-                PitchWheelValues = GetValues(PitchWheelValues, 64);
+                Preset = this.Preset,
+                PitchWheel = this.PitchWheel,
+                Bank = this.Bank,
+                ModWheel = this.ModWheel,
+                Volume = this.Volume,
+                Pan = this.Pan,
+                Expression = this.Expression,
+                PitchWheelSensitivity = this.PitchWheelSensitivity,
+                Mixture = this.Mixture,
+                TuningGroup = this.TuningGroup,
+                Tuning = this.Tuning,
+                OrnamentGroup = this.OrnamentGroup,
+                Ornament = this.Ornament,
+                SemitoneOffset = this.SemitoneOffset,
+                CentOffset = this.CentOffset,
+                VelocityPitchSensitivity = this.VelocityPitchSensitivity,
+                Reverberation = this.Reverberation,
+                AllSoundOff = this.AllSoundOff,
+                AllControllersOff = this.AllControllersOff
+            };
 
-                carryMsgs.IsStartOfEnvs = false;
-            }
+            return rval;
+        }
 
-            if(DoWriteControl(PanValues, carryMsgs.PanState)
-            || DoWriteControl(ModWheelValues, carryMsgs.ModWheelState)
-            || DoWriteControl(ExpressionValues, carryMsgs.ExpressionState)
-            || DoWriteControl(PitchWheelValues, carryMsgs.PitchWheelState))
+        public void WriteSVG(SvgWriter w, int channel)
+        {
+            w.WriteStartElement("controls");
+            if(Bank != null)
             {
-                w.WriteStartElement("envs"); // envelopes
-
-                if(DoWriteControl(PanValues, carryMsgs.PanState))
-                {
-                    carryMsgs.PanState = WriteCCEnv(w, channel, (int)M.CTL.PAN_10, PanValues, msDuration);
-                }
-
-                if(DoWriteControl(ModWheelValues, carryMsgs.ModWheelState))
-                {
-                }
-
-                if(DoWriteControl(ExpressionValues, carryMsgs.ExpressionState))
-                {
-                    carryMsgs.ExpressionState = WriteCCEnv(w, channel, (int)M.CTL.EXPRESSION_11, ExpressionValues, msDuration);
-                }
-
-                if(DoWriteControl(PitchWheelValues, carryMsgs.PitchWheelState))
-                {
-                    w.WriteStartElement("env"); // envelope
-
-                    string statusString = $"0x{(M.CMD.PITCH_WHEEL_224 + channel).ToString("X")}";
-                    w.WriteAttributeString("s", statusString);
-
-                    carryMsgs.PitchWheelState = WriteD1AndD2VTs(w, PitchWheelValues, PitchWheelValues, msDuration);
-
-                    w.WriteEndElement(); // end env
-                }
-
-                w.WriteEndElement(); // end envs
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.BANK_0, (int)Bank);
+                msg.WriteSVG(w);
             }
+            if(Preset != null)
+            {
+                int status = (int)(int)M.CMD.PRESET_192 + channel;
+                MidiMsg msg = new MidiMsg(status, (int)Preset);
+                msg.WriteSVG(w);
+            }
+            if(PitchWheel != null)
+            {
+                int status = (int)M.CMD.PITCH_WHEEL_224 + channel;
+                int value = (int)PitchWheel + 64;
+                MidiMsg msg = new MidiMsg(status, value, value);
+                msg.WriteSVG(w);
+            }
+            if(ModWheel != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.MOD_WHEEL_1, (int)ModWheel);
+                msg.WriteSVG(w);
+            }
+            if(Volume != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.VOLUME_7, (int)Volume);
+                msg.WriteSVG(w);
+            }
+            if(Pan != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.PAN_10, (int)Pan);
+                msg.WriteSVG(w);
+            }
+            if(Expression != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.EXPRESSION_11, (int)Expression);
+                msg.WriteSVG(w);
+            }
+            if(PitchWheelSensitivity != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.PITCH_WHEEL_SENSITIVITY_16, (int)PitchWheelSensitivity);
+                msg.WriteSVG(w);
+            }
+            if(Mixture != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.MIXTURE_17, (int)Mixture);
+                msg.WriteSVG(w);
+            }
+            if(TuningGroup != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.TUNING_GROUP_18, (int)TuningGroup);
+                msg.WriteSVG(w);
+            }
+            if(Tuning != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.TUNING_19, (int)Tuning);
+                msg.WriteSVG(w);
+            }
+            if(OrnamentGroup != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.ORNAMENT_GROUP_75, (int)OrnamentGroup);
+                msg.WriteSVG(w);
+            }
+            if(Ornament != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.ORNAMENT_76, (int)Ornament);
+                msg.WriteSVG(w);
+            }
+            if(SemitoneOffset != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.SEMITONE_OFFSET_80, (int)SemitoneOffset + 64);
+                msg.WriteSVG(w);
+            }
+            if(CentOffset != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.SEMITONE_OFFSET_80, (int)CentOffset + 64);
+                msg.WriteSVG(w);
+            }
+            if(VelocityPitchSensitivity != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.SEMITONE_OFFSET_80, (int)VelocityPitchSensitivity);
+                msg.WriteSVG(w);
+            }
+            if(Reverberation != null)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.REVERBERATION_91, (int)Reverberation);
+                msg.WriteSVG(w);
+            }
+            if(AllSoundOff)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.ALL_SOUND_OFF_120, 0);
+                msg.WriteSVG(w);
+            }
+            if(AllControllersOff)
+            {
+                MidiMsg msg = ControlMessage(channel, (int)M.CTL.ALL_CONTROLLERS_OFF_121, 0);
+                msg.WriteSVG(w);
+            }
+            w.WriteEndElement(); // controls
+        }
+
+        private MidiMsg ControlMessage(int channel, int controlType, int value)
+        {
+            int status = (int)M.CMD.CONTROL_CHANGE_176 + channel;
+            MidiMsg msg = new MidiMsg(status, controlType, value);
+
+            return msg;
         }
 
         /// <summary>
@@ -264,47 +351,81 @@ namespace Moritz.Spec
             return msDurs;
         }
 
-        #region ResidentSynth slider controls
+
+
+        #region ResidentSynth controls
+        // These messages are only sent if their value is not null.
         /// <summary>
-        /// The PitchWheel Msb values corresonding to the percentages set in the palette.
-        /// This can be set to a single PitchWheelSlider Msb value.
+        /// Range 0..127
         /// </summary>
-        public List<byte> PitchWheelValues = null;
+        public sbyte? Preset { get; set; } = null;
         /// <summary>
-                                                /// The ModulationWheel Msb values corresonding to the percentages set in the palette.
-                                                /// This can be set to a single ModulationWheelSlider Msb value.
-                                                /// </summary>
-        public List<byte> ModWheelValues = null;
-        /// <summary>
-        /// Not used by palettes
+        /// Range -64..63 
         /// </summary>
-        public List<byte> VolumeValues = null;
+        public sbyte? PitchWheel { get; set; } = null;
         /// <summary>
-        /// The Pan Msb values corresonding to the percentages set in the palette.
-        /// This can be set to a single PanSlider Msb value.
+        /// Range 0.. nBanks 
         /// </summary>
-        public List<byte> PanValues = null;
+        public sbyte? Bank { get; set; } = null;
         /// <summary>
-        /// The Expression Msb values corresonding to the percentages set in the palette.
-        /// This can be set to a single Expression Msb value.
+        /// Range 0..127
         /// </summary>
-        public List<byte> ExpressionValues = null;
+        public sbyte? ModWheel { get; set; } = null;
         /// <summary>
-        /// Not used by palettes
-        /// </summary>public List<byte> MixtureValues = null; // non-standard control
-        public List<byte> TuningValues = null; // non-standard control
-        /// <summary>
-        /// Not used by palettes
+        /// Range 0..127 
         /// </summary>
-        public List<byte> SemitoneOffsetValues = null; // non-standard control
+        public sbyte? Volume { get; set; } = null;
         /// <summary>
-        /// Not used by palettes
+        /// Range 0..127 
         /// </summary>
-        public List<byte> CentOffsetValues = null;  // non-standard control
+        public sbyte? Pan { get; set; } = null;
         /// <summary>
-        /// Not used by palettes
+        /// Range 0..127
         /// </summary>
-        public List<byte> ReverberationValues = null; // non-standard control
+        public sbyte? Expression { get; set; } = null;
+        /// <summary>
+        /// Range 0..127 (non-standard midi control)
+        /// </summary>
+        public sbyte? PitchWheelSensitivity { get; set; } = null;
+        /// <summary>
+        /// Range 0..nMixtures (non-standard midi control)
+        /// </summary>
+        public sbyte? Mixture { get; set; } = null;
+        /// <summary>
+        /// Range 0..nTuningGroups (non-standard midi control) 
+        /// </summary>
+        public sbyte? TuningGroup { get; set; } = null;
+        /// <summary>
+        /// Range 0..nTunings (non-standard midi control)  
+        /// </summary>
+        public sbyte? Tuning { get; set; } = null;
+        /// <summary>
+        /// Range 0..nOrnamentGroups (non-standard midi control) 
+        /// <para>(TODO in ResidentSynth and ResidentSynthHost)</para>
+        /// </summary>
+        public sbyte? OrnamentGroup { get; set; } = null;
+        /// <summary>
+        /// Range 0..nOrnaments (non-standard midi control) 
+        /// </summary>
+        public sbyte? Ornament { get; set; } = null;
+        /// <summary>
+        /// Range -64..63 (non-standard midi control)  
+        /// </summary>
+        public sbyte? SemitoneOffset { get; set; } = null;
+        /// <summary>
+        /// Range -64..63 (non-standard midi control)  
+        /// </summary>
+        public sbyte? CentOffset { get; set; } = null;
+        /// <summary>
+        /// Range 0..127 (non-standard midi control) 
+        /// </summary>
+        public sbyte? VelocityPitchSensitivity { get; set; } = null;
+        /// <summary>
+        /// Range 0..127 (non-standard midi control)  
+        /// </summary>
+        public sbyte? Reverberation { get; set; } = null; // non-standard control
+        public bool AllSoundOff { get; set; } = false;
+        public bool AllControllersOff { get; set; } = false;
         #endregion 
     }
 }

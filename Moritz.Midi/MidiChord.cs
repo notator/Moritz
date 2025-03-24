@@ -64,13 +64,13 @@ namespace Moritz.Midi
             {
                 _pitchWheelSensitivity = new SSPitchWheelSensitivityMsg(channel, (byte)midiChordDef.PitchWheelSensitivity);
             }
-            if(midiChordDef.MidiChordSliderDefs != null)
-                CreateSliders(channel, midiChordDef.MidiChordSliderDefs, MsDuration);
+            if(midiChordDef.MidiChordControlDefs != null)
+                CreateSliders(channel, midiChordDef.MidiChordControlDefs, MsDuration);
 
             SetMessagesDict();
         }
 
-        private void CreateSliders(int channel, MidiChordSliderDefs sliderDefs, int msDuration)
+        private void CreateSliders(int channel, MidiChordControlDefs sliderDefs, int msDuration)
         {
             if(sliderDefs.ModulationWheelMsbs != null && sliderDefs.ModulationWheelMsbs.Count > 0)
                 this._modulationWheelSlider = new MidiModulationWheelSlider(sliderDefs.ModulationWheelMsbs, channel, msDuration);

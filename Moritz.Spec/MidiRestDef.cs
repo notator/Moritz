@@ -25,24 +25,14 @@ namespace Moritz.Spec
             return umrd;
         }
 
-        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
+        public void WriteSVG(SvgWriter w, int channel, ChannelCarryMsgs carryMsgs)
         {
             w.WriteStartElement("score", "midi", null);
 
-            w.WriteStartElement("moments");
-            w.WriteStartElement("moment");
+            w.WriteStartElement("rest");
             w.WriteAttributeString("msDuration", _msDuration.ToString());
 
-            if(carryMsgs.Count > 0)
-            {
-                carryMsgs.WriteSVG(w);
-                carryMsgs.Clear();
-            }
-
-            w.WriteEndElement(); // moment
-            w.WriteEndElement(); // moments
-
-            // Moritz never writes an envs element here, but other applications might.
+            w.WriteEndElement(); // rest
 
             w.WriteEndElement(); // score:midi
         }

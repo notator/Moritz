@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="Bar.cs" />
-    <Compile Include="CarryMsgs.cs" />
+    <Compile Include="ChannelCarryMsgs.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="GamutVector.cs" />
     <Compile Include="ModeProximity.cs" />
@@ -74,7 +74,7 @@
     <Compile Include="IUniqueDef.cs" />
     <Compile Include="IUniqueSplittableChordDef.cs" />
     <Compile Include="MidiChordDef.cs" />
-    <Compile Include="MidiChordSliderDefs.cs" />
+    <Compile Include="MidiChordControlDefs.cs" />
     <Compile Include="MomentDef.cs" />
     <Compile Include="Trk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

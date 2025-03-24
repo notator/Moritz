@@ -44,7 +44,7 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
+        public void WriteSVG(SvgWriter w, int channel, ChannelCarryMsgs carryMsgs)
         {
             if(LocalCautionaryChordDef == null)
             {
