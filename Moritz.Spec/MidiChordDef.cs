@@ -25,6 +25,7 @@ namespace Moritz.Spec
     ///     2. The logical duration before the following DurationDef in a Trk,
     ///     3. Whether or not NoteOffs are sent after its msDuration has elapsed,
     ///     4. An optional set of (single) midi control messages that will be sent before the NoteOns.
+    ///     5. An optional control envelope that will be sent over the duration of the midiChord.
     ///</summary>
     public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
     {
@@ -1209,8 +1210,7 @@ namespace Moritz.Spec
 
         public MidiChordControlDefs MidiChordControlDefs = null;
 
-
-
+        public int EnvelopeControlType { get; private set; } = -1;  
         #endregion properties
     }
 }

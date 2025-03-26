@@ -30,11 +30,13 @@ namespace Moritz.Algorithm.Study1
 
             Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
+            
             Trk track = GetTrack(trackChordNumbers, trackRootPitches);
-            Bar mainSeq = new Seq(0, new List<Trk>() { track }, NumberOfMidiChannels);
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq, NumberOfBars);
+            ChannelDef channelDef = new ChannelDef(new List<Trk>() { track });
+            Bar mainBar = new Bar(0, new List<ChannelDef>() { channelDef });
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(channelDef.Trks, NumberOfBars);
 
-            List<Bar> bars = GetBars(mainSeq, barlineMsPositions, null, null);
+            List<Bar> bars = GetBars(mainBar, barlineMsPositions, null, null);
 
             SetPatch0InTheFirstChord(bars[0].ChannelDefs[0]);
 
@@ -73,7 +75,7 @@ namespace Moritz.Algorithm.Study1
 
         private Trk GetTrack(List<byte> trackChordNumbers, List<byte> trackRootPitches)
         {
-            Trk track = new Trk(0, 0, new List<IUniqueDef>());
+            Trk track = new Trk(new List<IUniqueDef>());
             List<List<byte>> chordIntervals = GetChordIntervals();
             List<byte> chordVelocities = GetChordVelocities();
             List<int> chordDurations = GetChordMsDurations();
@@ -203,12 +205,12 @@ namespace Moritz.Algorithm.Study1
         private void SetPatch0InTheFirstChord(ChannelDef channelDef)
         {
             MidiChordDef firstMidiChordDef = null;
-            foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
+            foreach(IUniqueDef iUniqueDef in channelDef.Trks[0].UniqueDefs)
             {
                 firstMidiChordDef = iUniqueDef as MidiChordDef;
                 if(firstMidiChordDef != null)
                 {
-                    firstMidiChordDef.Preset = 0;
+                    firstMidiChordDef.MidiChordControlDefs.Preset = 0;
                     break;
                 }
             }

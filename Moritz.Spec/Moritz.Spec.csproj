@@ -51,8 +51,10 @@
     <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="ChannelCarryMsgs.cs" />
+    <Compile Include="ControlEnvelope.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="GamutVector.cs" />
+    <Compile Include="MidiChordSliderDefs.cs" />
     <Compile Include="ModeProximity.cs" />
     <Compile Include="MidiMsg.cs" />
     <Compile Include="MidiRestDef.cs" />

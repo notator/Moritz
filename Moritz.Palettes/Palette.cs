@@ -140,8 +140,8 @@ namespace Moritz.Palettes
                 List<byte> modulationWheelEnvelope = ListByte(_modulationWheelEnvelopes, index);
                 List<byte> expressionEnvelope = ListByte(_expressionEnvelopes, index);
 
-                MidiChordControlDefs midiChordControlDefs =
-                    new MidiChordControlDefs(pitchwheelEnvelope,
+                MidiChordSliderDefs midiChordSliderDefs =
+                    new MidiChordSliderDefs(pitchwheelEnvelope,
                                             panEnvelope,
                                             modulationWheelEnvelope,
                                             expressionEnvelope);
@@ -222,7 +222,7 @@ namespace Moritz.Palettes
                     rootMidiPitches,
                     rootMidiVelocities,
                     ornamentNumber,
-                    midiChordControlDefs,
+                    midiChordSliderDefs,
                     basicMidiChordDefs);
             }
             return (IUniqueDef)rval;

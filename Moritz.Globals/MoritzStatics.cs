@@ -971,6 +971,7 @@ namespace Moritz.Globals
             VOLUME_7 = 7,
             PAN_10 = 10,
             EXPRESSION_11 = 11,
+            #endregion standard controls
             #region defined but not used in legacy code
             ALL_SOUND_OFF_120 = 120,
             ALL_CONTROLLERS_OFF_121 = 121,
