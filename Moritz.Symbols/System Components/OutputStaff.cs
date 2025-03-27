@@ -15,7 +15,7 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the stafflines and noteObjects of an OutputStaff.
         /// </summary>
-        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<ChannelCarryMsgs> carryMsgsPerChannel)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
             w.SvgStartGroup(CSSObjectClass.staff.ToString()); // "staff"
 
@@ -25,7 +25,7 @@ namespace Moritz.Symbols
                 w.WriteAttributeString("score", "invisible", null, "invisible");
             }
 
-            base.WriteSVG(w, systemNumber, staffNumber, carryMsgsPerChannel);
+            base.WriteSVG(w, systemNumber, staffNumber);
 
             w.SvgEndGroup(); // outputStaff
         }

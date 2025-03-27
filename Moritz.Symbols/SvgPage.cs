@@ -179,20 +179,10 @@ namespace Moritz.Symbols
                 WritePage1TitleAndAuthor(w, metadata);
             }
 
-            List<ChannelCarryMsgs> carryMsgsPerChannel = new List<ChannelCarryMsgs>();
-            int channel = 0;
-            foreach(Staff staff in Systems[0].Staves)
-            {
-                foreach(Voice voice in staff.Voices)
-                {
-                    carryMsgsPerChannel.Add(new ChannelCarryMsgs(channel++));
-                }
-            }
-
             int systemNumber = 1;
             foreach(SvgSystem system in Systems)
             {
-                system.WriteSVG(w, systemNumber++, _pageFormat, carryMsgsPerChannel);
+                system.WriteSVG(w, systemNumber++, _pageFormat);
             }
 
             w.WriteEndElement(); // end layer

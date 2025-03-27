@@ -133,7 +133,7 @@ namespace Moritz.Spec
         /// NoteOffs, bank, patch, pitchWheelDeviation, NoteOns.
         /// Moritz never writes SysEx messages.
         /// </summary>
-        public void WriteSVG(XmlWriter w, int channel, ChannelCarryMsgs carryMsgs)
+        public void WriteSVG(XmlWriter w, int channel)
         {
             w.WriteStartElement("moment");
             w.WriteAttributeString("msDuration", MsDuration.ToString());

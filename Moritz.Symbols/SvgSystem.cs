@@ -24,7 +24,7 @@ namespace Moritz.Symbols
         /// Writes out all the SVGSystem's staves. 
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<ChannelCarryMsgs> carryMsgsPerChannel)
+        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat)
         {
             w.SvgStartGroup(this.Metrics.CSSObjectClass.ToString()); // "system"
 
@@ -32,7 +32,7 @@ namespace Moritz.Symbols
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
-                Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1, carryMsgsPerChannel);
+                Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1);
             }
 
             w.SvgStartGroup(CSSObjectClass.staffConnectors.ToString());

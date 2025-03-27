@@ -37,7 +37,7 @@ namespace Moritz.Symbols
         /// Writes out an SVG Voice
         /// </summary>
         /// <param name="w"></param>
-        public virtual void WriteSVG(SvgWriter w, List<ChannelCarryMsgs> carryMsgsPerChannel)
+        public virtual void WriteSVG(SvgWriter w)
         {
             w.SvgStartGroup(CSSObjectClass.voice.ToString());
 
@@ -67,12 +67,10 @@ namespace Moritz.Symbols
                 }
                 else if(chordSymbol != null)
                 {
-                    Debug.Assert(carryMsgsPerChannel != null);
                     chordSymbol.WriteSVG(w, this.MidiChannel);
                 }
                 else if(restSymbol != null)
                 {
-                    Debug.Assert(carryMsgsPerChannel != null);
                     restSymbol.WriteSVG(w, this.MidiChannel);
                 }
                 else if(clef != null) // clef

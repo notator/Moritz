@@ -67,8 +67,6 @@ namespace Moritz.Symbols
 
                 w.WriteEndElement(); // end score:midiChords
 
-                _midiRestDef.WriteSVG(w, channel);
-
                 if(this.Metrics != null)
                 {
                     ((RestMetrics)this.Metrics).WriteSVG(w);
