@@ -71,9 +71,7 @@
     <Compile Include="SvgPage.cs" />
     <Compile Include="SvgScore.cs" />
     <Compile Include="SvgSystem.cs" />
-    <Compile Include="System Components\InputStaff.cs" />
     <Compile Include="System Components\NoteObjectMoment.cs" />
-    <Compile Include="System Components\OutputStaff.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\AnchorageSymbol.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\Barline.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\CautionaryChordSymbol.cs" />

@@ -25,19 +25,13 @@ namespace Moritz.Symbols
             Staff = staff;
         }
 
-        public Voice(OutputStaff outputStaff, int midiChannel)
-            : this(outputStaff)
-        {
-            MidiChannel = midiChannel;
-        }
-
         //public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
 
         /// <summary>
         /// Writes out an SVG Voice
         /// </summary>
         /// <param name="w"></param>
-        public virtual void WriteSVG(SvgWriter w)
+        public virtual void WriteSVG(SvgWriter w, int channelIndex)
         {
             w.SvgStartGroup(CSSObjectClass.voice.ToString());
 
@@ -67,11 +61,11 @@ namespace Moritz.Symbols
                 }
                 else if(chordSymbol != null)
                 {
-                    chordSymbol.WriteSVG(w, this.MidiChannel);
+                    chordSymbol.WriteSVG(w, channelIndex);
                 }
                 else if(restSymbol != null)
                 {
-                    restSymbol.WriteSVG(w, this.MidiChannel);
+                    restSymbol.WriteSVG(w, channelIndex);
                 }
                 else if(clef != null) // clef
                 {
@@ -421,23 +415,6 @@ namespace Moritz.Symbols
             }
         }
         #endregion
-
-        private int _midiChannel = int.MaxValue;
-        /// <summary>
-        /// A MidiChannel attribute is always written for every OutputVoice in the first system in a score.
-        /// No other OutputVoice MidiChannels are written.
-        /// InputVoice MidiChannel attributes are omitted altogether unless explicitly set (in an InputVoiceDef) by an algorithm.
-        /// If they are set, InputVoice MidiChannel attributes are also only written in the first system in the score.
-        /// </summary>
-        public int MidiChannel
-        {
-            get { return _midiChannel; }
-            set
-            {
-                Debug.Assert(value >= 0 && value <= 15);
-                _midiChannel = value;
-            }
-        }
 
         public ChannelDef ChannelDef = null;
 

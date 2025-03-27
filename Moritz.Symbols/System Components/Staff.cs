@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Moritz.Symbols
 {
-    public abstract class Staff
+    public class Staff
     {
         public Staff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap, float stafflineStemStrokeWidth)
         {
@@ -18,11 +18,16 @@ namespace Moritz.Symbols
             StafflineStemStrokeWidth = stafflineStemStrokeWidth;
         }
 
-        /// <summary>
-        /// carryMsgsPerChannel is null for InputStaves.
-        /// </summary>
         public virtual void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
+            w.SvgStartGroup(CSSObjectClass.staff.ToString()); // "staff"
+
+            // if this.Metrics != null, the staff is invisible (but MIDI info is still written).
+            if(this.Metrics == null)
+            {
+                w.WriteAttributeString("score", "invisible", null, "invisible");
+            }
+
             w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
             w.SvgStartGroup(CSSObjectClass.stafflines.ToString());
@@ -36,12 +41,12 @@ namespace Moritz.Symbols
             }
             w.SvgEndGroup();
 
-            //int voiceNumber = 1;
-            foreach(Voice voice in Voices)
-            {
-                //voice.WriteSVG(w, systemNumber, staffNumber, voiceNumber++, carryMsgsPerChannel);
-                voice.WriteSVG(w);
+            for(var voiceIndex = 0; voiceIndex < Voices.Count; voiceIndex++)
+            { 
+                Voices[voiceIndex].WriteSVG(w, voiceIndex);
             }
+
+            w.SvgEndGroup(); // staff
         }
 
         #region composition
