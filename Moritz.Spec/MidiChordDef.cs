@@ -94,7 +94,7 @@ namespace Moritz.Spec
             {
                 envelopeMessages = GetEnvelopeMessages(channel, EnvelopeTypeDef, MsDuration);
 
-                MidiChordControlDefs = (MidiChordControlDefs == null) ? MidiChordControlDefs = new MidiChordControlDefs() : MidiChordControlDefs;
+                MidiChordControlDefs = MidiChordControlDefs ?? (MidiChordControlDefs = new MidiChordControlDefs());
                 var envMsg0 = envelopeMessages[0];                
                 MidiChordControlDefs.SetMsg(EnvelopeTypeDef.Item1, (int)envMsg0.Item1.Data2);
                 noteOnsMsDuration = envMsg0.Item2;               
@@ -125,7 +125,7 @@ namespace Moritz.Spec
 
             if(HasChordOff)
             {
-                this.writeNoteOffs(w, channel);   // writes a "noteOffs" element containing midi msgs
+                this.WriteNoteOffs(w, channel);   // writes a "noteOffs" element containing midi msgs
             }
 
             w.WriteEndElement(); // midiChord
@@ -170,7 +170,7 @@ namespace Moritz.Spec
             return msgDurs;
         }
 
-        private void writeNoteOffs(SvgWriter w, int channel)
+        private void WriteNoteOffs(SvgWriter w, int channel)
         {
             Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
             w.WriteStartElement("noteOffs");
@@ -860,7 +860,6 @@ namespace Moritz.Spec
         }
 
         #region IUniqueDef
-        public override string ToString() => $"MidiChordDef: MsPositionReFirstIUD={MsPositionReFirstUD} MsDuration={MsDuration} BasePitch={NotatedMidiPitches[0]}";
 
         /// <summary>
         /// Multiplies the MsDuration by the given factor.

@@ -181,19 +181,6 @@ namespace Moritz.Composer
             return lowerVoiceIndices;
         }
 
-        private int NOutputVoices(List<ChannelDef> bar1)
-        {
-            int nOutputVoices = 0;
-            foreach(ChannelDef channelDef in bar1)
-            {
-                if(channelDef is Trk)
-                {
-                    nOutputVoices++;
-                }
-            }
-            return nOutputVoices;
-        }
-
         #endregion
 
         /// <summary>

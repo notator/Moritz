@@ -324,7 +324,7 @@ namespace Moritz.Spec
             }
         }
 
-        public override string ToString() => $"BasicMidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
+        public override string ToString() => $"BasicMidiChordDef: MsDuration={MsDuration} BasePitch={Pitches[0]} ";
 
         public List<byte> Pitches = new List<byte>();
         public List<byte> Velocities = new List<byte>();
