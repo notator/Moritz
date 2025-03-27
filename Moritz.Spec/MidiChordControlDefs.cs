@@ -351,7 +351,108 @@ namespace Moritz.Spec
             return msDurs;
         }
 
-
+        internal void SetMsg(int controlType, int controlValue)
+        {
+            sbyte ctlValue = (sbyte)controlValue;
+            switch(controlType)
+            {
+                case ((int)M.CMD.PRESET_192):
+                {
+                    Preset = ctlValue;
+                    break;
+                }
+                case ((int)M.CMD.PITCH_WHEEL_224):
+                {
+                    PitchWheel = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.BANK_0):
+                {
+                    Bank = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.MOD_WHEEL_1):
+                {
+                    ModWheel = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.VOLUME_7):
+                {
+                    Volume = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.PAN_10):
+                {
+                    Pan = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.EXPRESSION_11):
+                {
+                    Expression = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.PITCH_WHEEL_SENSITIVITY_16):
+                {
+                    PitchWheelSensitivity = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.MIXTURE_17):
+                {
+                    Mixture = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.TUNING_GROUP_18):
+                {
+                    TuningGroup = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.TUNING_19):
+                {
+                    Tuning = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.ORNAMENT_GROUP_75):
+                {
+                    OrnamentGroup = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.ORNAMENT_76):
+                {
+                    Ornament = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.SEMITONE_OFFSET_80):
+                {
+                    SemitoneOffset = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.CENT_OFFSET_81):
+                {
+                    CentOffset = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.VELOCITY_PITCH_SENSITIVITY_83):
+                {
+                    VelocityPitchSensitivity = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.REVERBERATION_91):
+                {
+                    Reverberation = ctlValue;
+                    break;
+                }
+                case ((int)M.CTL.ALL_SOUND_OFF_120):
+                {
+                    AllSoundOff = true;
+                    break;
+                }
+                case ((int)M.CTL.ALL_CONTROLLERS_OFF_121):
+                {
+                    AllControllersOff = true;
+                    break;
+                }
+            }
+        }
 
         #region ResidentSynth controls
         // These messages are only sent if their value is not null.

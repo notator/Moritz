@@ -68,12 +68,12 @@ namespace Moritz.Symbols
                 else if(chordSymbol != null)
                 {
                     Debug.Assert(carryMsgsPerChannel != null);
-                    chordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+                    chordSymbol.WriteSVG(w, this.MidiChannel);
                 }
                 else if(restSymbol != null)
                 {
                     Debug.Assert(carryMsgsPerChannel != null);
-                    restSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+                    restSymbol.WriteSVG(w, this.MidiChannel);
                 }
                 else if(clef != null) // clef
                 {

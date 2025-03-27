@@ -3,6 +3,7 @@ using Moritz.Spec;
 using Moritz.Xml;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Moritz.Symbols
@@ -20,11 +21,11 @@ namespace Moritz.Symbols
         }
 
         public RestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, PageFormat pageFormat)
-    : this(voice, iumdd, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight)
+            : this(voice, iumdd, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight)
         {
             if(iumdd is MidiRestDef mrd)
             {
-                _midiRestDef = mrd;
+                _midiRestDefs.Add(mrd);
             }
 
             // This needs testing!!
@@ -44,7 +45,7 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, int channel, ChannelCarryMsgs carryMsgs)
+        public void WriteSVG(SvgWriter w, int channel)
         {
             if(LocalCautionaryChordDef == null)
             {
@@ -54,7 +55,19 @@ namespace Moritz.Symbols
 
                 w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 
-                _midiRestDef.WriteSVG(w, channel, carryMsgs);
+                w.WriteStartElement("score", "midiRests", null);
+
+                // write a list of alternative <midiRest> elements
+                for(var trkIndex = 0; trkIndex < _midiRestDefs.Count; trkIndex++)
+                {
+                    var midiRestDef = _midiRestDefs[trkIndex];
+                    // writes a "midiRest" element
+                    midiRestDef.WriteSVG(w);  // writes a midiRest element (contains no midi mesages, just an msDuration attribute
+                }
+
+                w.WriteEndElement(); // end score:midiChords
+
+                _midiRestDef.WriteSVG(w, channel);
 
                 if(this.Metrics != null)
                 {
@@ -67,7 +80,6 @@ namespace Moritz.Symbols
 
         public override string ToString() => "outputRest " + InfoString;
 
-        MidiRestDef _midiRestDef = null;
 
         #region display attributes
         /// <summary>
@@ -102,5 +114,7 @@ namespace Moritz.Symbols
             get { return _msDuration; }
             set { _msDuration = value; }
         }
+
+        private List<MidiRestDef> _midiRestDefs = new List<MidiRestDef>();
     }
 }

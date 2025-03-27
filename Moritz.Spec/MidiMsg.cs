@@ -16,7 +16,7 @@ namespace Moritz.Spec
             _data2 = data2;
         }
 
-        internal void WriteSVG(XmlWriter w)
+        internal void WriteSVG(XmlWriter w, int? msDuration = null)
         {
             string mString = null;
             if(_data2 == null)
@@ -29,6 +29,10 @@ namespace Moritz.Spec
             }
             w.WriteStartElement("msg");
             w.WriteAttributeString("m", mString);
+            if(msDuration != null)
+            {
+                w.WriteAttributeString("msDur", msDuration.ToString());
+            }
             w.WriteEndElement(); // end of msg
         }
 

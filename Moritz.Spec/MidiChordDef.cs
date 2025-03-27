@@ -85,58 +85,118 @@ namespace Moritz.Spec
             return rval;
         }
 
-        /// <summary>
-        /// Note that neither Rests nor Chords have a msDuration attribute.
-        /// Their msDuration is deduced from the contained moment msDurations.
-        /// See: https://github.com/notator/Moritz/issues/2
-        /// </summary>
-        public void WriteSVG(SvgWriter w, int channel, int trkIndex, ChannelCarryMsgs carryMsgs)
-        {
-            w.WriteStartElement("midiChord");
-            w.WriteAttributeString("msDuration", MsDuration.ToString());
-
-            var trkCarryCounts = carryMsgs.TrkCounts;
-            if(trkCarryCounts[trkIndex] > 0)
+        public void WriteSVG(SvgWriter w, int channel)
+        {             
+            List<Tuple<MidiMsg, int>> envelopeMessages = null;
+            #region set envelopeMessages
+            int noteOnsMsDuration = 0;
+            if(EnvelopeTypeDef != null)
             {
-                // writes a noteOffs element
-                carryMsgs.WriteSVG(w, trkIndex); // currently just NoteOffs
-            }
+                envelopeMessages = GetEnvelopeMessages(channel, EnvelopeTypeDef, MsDuration);
 
+                MidiChordControlDefs = (MidiChordControlDefs == null) ? MidiChordControlDefs = new MidiChordControlDefs() : MidiChordControlDefs;
+                var envMsg0 = envelopeMessages[0];                
+                MidiChordControlDefs.SetMsg(EnvelopeTypeDef.Item1, (int)envMsg0.Item1.Data2);
+                noteOnsMsDuration = envMsg0.Item2;               
+
+                envelopeMessages.RemoveAt(0);
+            }
+            #endregion
+            
+            w.WriteStartElement("midiChord");
+            
             if(MidiChordControlDefs != null)
             {
-                // writes the controls element
-                MidiChordControlDefs.WriteSVG(w, channel);
+                MidiChordControlDefs.WriteSVG(w, channel); // writes a "controls" element containing midi msgs
             }
-            // writes a noteOns element (containing noteOn messages) into the midiChord element
-            WriteNoteOns(w, carryMsgs, channel);
+
+            noteOnsMsDuration = (noteOnsMsDuration > 0) ? noteOnsMsDuration : MsDuration;
+            this.WriteNoteOns(w, channel, noteOnsMsDuration);  // writes a "noteOns" element containing midi msgs
+
+            if(envelopeMessages != null && envelopeMessages.Count > 0)
+            {
+                w.SvgStartGroup("envelope"); // "envelope"
+                foreach(var envMsg in envelopeMessages)
+                {
+                    envMsg.Item1.WriteSVG(w, envMsg.Item2);
+                }
+                w.SvgEndGroup(); // "envelope"
+            }
+
+            if(HasChordOff)
+            {
+                this.writeNoteOffs(w, channel);   // writes a "noteOffs" element containing midi msgs
+            }
 
             w.WriteEndElement(); // midiChord
         }
 
-        private void WriteNoteOns(SvgWriter w, ChannelCarryMsgs carryMessages, int channel)
+        /// <summary>
+        /// Returns a list of (MidiMsg, msDuration) Tuples whose total duration is exactly msDuration
+        /// The default MidiMsg duration is 50ms.
+        /// </summary>
+        /// <param name="envelopeTypeDef">Item1 is the control type, Item2 is an envelope definition</param>
+        /// <returns>A list of Tuples: Each Tuple.Item1 is a MidiMsg, Item2 is its msDuration</returns>
+        private List<Tuple<MidiMsg, int>> GetEnvelopeMessages(int channel, Tuple<int, List<int>> envelopeTypeDef, int msDuration)
         {
-            if(Pitches != null)
-            {
-                Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
-                w.WriteStartElement("noteOns");
-                int status = (int)M.CMD.NOTE_ON_144 + channel; // NoteOn
-                for(int i = 0; i < Pitches.Count; ++i)
-                {
-                    MidiMsg msg = new MidiMsg(status, Pitches[i], Velocities[i]);
-                    msg.WriteSVG(w);
-                }
-                w.WriteEndElement(); // end of noteOns
+            int status = (int)M.CMD.CONTROL_CHANGE_176 + channel;
+            int control = envelopeTypeDef.Item1;
+            int defaultMsgMsDuration = 50;
 
-                if(HasChordOff)
-                {
-                    status = (int)M.CMD.NOTE_OFF_120 + channel;
-                    int data2 = M.DEFAULT_NOTEOFF_VELOCITY_64;
-                    foreach(byte pitch in Pitches)
-                    {
-                        carryMessages.Add(new MidiMsg(status, pitch, data2));
-                    }
-                }
+            var envDef = envelopeTypeDef.Item2;
+            int count = (int)Math.Round((double)msDuration / defaultMsgMsDuration);
+            List<int> msPositions = M.IntDivisionSizes(msDuration, count);
+
+            Envelope env = new Envelope(envDef, 127, 127, count);
+            Dictionary<int, int> msPosValues = env.GetValuePerMsPosition(msPositions);
+
+            List<int> msDurations = new List<int>();
+            for(int i = 0; i < msPositions.Count - 1; ++i)
+            {
+                var msDur = msPositions[i + 1] - msPositions[i];
+                msDurations.Add(msDur);
             }
+            msDurations.Add(msDuration - msPositions[msPositions.Count - 1]);
+
+            List<Tuple<MidiMsg, int>> msgDurs = new List<Tuple<MidiMsg, int>>();
+            for(int i = 0; i < msPosValues.Count; ++i)
+            {
+                MidiMsg msg = new MidiMsg(status, control, msPosValues[i]);
+                int msDur = msDurations[i];
+                Tuple<MidiMsg, int> msgDur = new Tuple<MidiMsg, int>(msg, msDur);
+                msgDurs.Add(msgDur);
+            }
+
+            return msgDurs;
+        }
+
+        private void writeNoteOffs(SvgWriter w, int channel)
+        {
+            Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
+            w.WriteStartElement("noteOffs");
+            int status = (int)M.CMD.NOTE_OFF_120 + channel; // NoteOff 
+            for(int i = 0; i < Pitches.Count; ++i)
+            {
+                // The ResidentSynth ignores noteOff velocity, so it is not written to SVG.
+                MidiMsg msg = new MidiMsg(status, Pitches[i]);
+                msg.WriteSVG(w);
+            }
+            w.WriteEndElement(); // end of noteOns
+        }
+
+        private void WriteNoteOns(SvgWriter w, int channel, int msDuration)
+        {
+            Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
+            w.WriteStartElement("noteOns");
+            w.WriteAttributeString("msDuration", msDuration.ToString());
+
+            int status = (int)M.CMD.NOTE_ON_144 + channel; // NoteOn
+            for(int i = 0; i < Pitches.Count; ++i)
+            {
+                MidiMsg msg = new MidiMsg(status, Pitches[i], Velocities[i]);
+                msg.WriteSVG(w);
+            }
+            w.WriteEndElement(); // end of noteOns
         }
 
         public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
@@ -1210,7 +1270,7 @@ namespace Moritz.Spec
 
         public MidiChordControlDefs MidiChordControlDefs = null;
 
-        public int EnvelopeControlType { get; private set; } = -1;  
+        public Tuple<int, List<int>> EnvelopeTypeDef { get; private set; } = null;
         #endregion properties
     }
 }

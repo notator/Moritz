@@ -25,16 +25,13 @@ namespace Moritz.Spec
             return umrd;
         }
 
-        public void WriteSVG(SvgWriter w, int channel, ChannelCarryMsgs carryMsgs)
+        public void WriteSVG(SvgWriter w)
         {
-            w.WriteStartElement("score", "midi", null);
+            w.WriteStartElement("midiRest");
 
-            w.WriteStartElement("rest");
             w.WriteAttributeString("msDuration", _msDuration.ToString());
 
-            w.WriteEndElement(); // rest
-
-            w.WriteEndElement(); // score:midi
+            w.WriteEndElement(); // score:midiRest
         }
     }
 }

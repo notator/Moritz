@@ -183,7 +183,7 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, int channel, ChannelCarryMsgs carryMsgs)
+        public void WriteSVG(SvgWriter w, int channel)
         {
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
@@ -191,22 +191,21 @@ namespace Moritz.Symbols
             w.SvgStartGroup(CSSObjectClass.chord.ToString()); // "chord"
             w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 
-            w.WriteStartElement("score", "midi", null);
+            w.SvgStartGroup(CSSObjectClass.graphics.ToString());
+            ChordMetrics.WriteSVG(w);
+            w.SvgEndGroup(); // "graphics"
+
+            w.WriteStartElement("score", "midiChords", null);
 
             // write a list of alternative <midiChord> elements
             for(var trkIndex = 0; trkIndex < _midiChordDefs.Count; trkIndex++)
-            { 
+            {                 
                 var midiChordDef = _midiChordDefs[trkIndex];
                 // writes a "midiChord" element
-                midiChordDef.WriteSVG(w, channel, trkIndex, carryMsgs);
+                midiChordDef.WriteSVG(w, channel);  // writes a midiChord element
             }
 
-            w.WriteEndElement(); // end score:midi
-
-            w.SvgStartGroup(CSSObjectClass.graphics.ToString());
-            ChordMetrics.WriteSVG(w);
-            w.SvgEndGroup();
-
+            w.WriteEndElement(); // end score:midiChords
             w.SvgEndGroup(); // "chord"
         }
 
