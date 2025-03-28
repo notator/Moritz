@@ -8,10 +8,10 @@ using System.Collections.Generic;
 
 namespace Moritz.Composer
 {
-    public class KrystalPaletteScore : ComposableScore
+    public class KrystalScore : ComposableScore
     {
 
-        public KrystalPaletteScore(string scoreFolderName, CompositionAlgorithm algorithm, PageFormat pageFormat,
+        public KrystalScore(string scoreFolderName, CompositionAlgorithm algorithm, PageFormat pageFormat,
             List<Krystal> krystals, List<Palette> palettes, string folder,
             string keywords, string comment)
             : base(folder, scoreFolderName, algorithm, keywords, comment, pageFormat)

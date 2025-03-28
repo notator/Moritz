@@ -1,7 +1,6 @@
 using Krystals5ObjectLibrary;
 
 using Moritz.Algorithm;
-using Moritz.Palettes;
 using Moritz.Spec;
 using Moritz.Symbols;
 using Moritz.Xml;
@@ -23,9 +22,9 @@ namespace Moritz.Composer
         /// Called by the derived class after setting _algorithm and Notator.
         /// Returns false if systems cannot be fit vertically on the page. Otherwise true.
         /// </summary>
-        protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
+        protected bool CreateScore(List<Krystal> krystals)
         {
-            List<Bar> bars = _algorithm.DoAlgorithm(krystals, palettes);
+            List<Bar> bars = _algorithm.DoAlgorithm(krystals);
 
             CheckBars(bars);
 
