@@ -20,8 +20,6 @@ namespace Moritz.Spec
         /// </summary>
         new object Clone();
 
-        void AdjustMsDuration(double factor);
-
         int MsDuration { get; set; }
         int MsPositionReFirstUD { get; set; }
     }

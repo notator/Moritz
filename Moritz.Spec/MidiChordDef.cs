@@ -10,6 +10,8 @@ using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Xml;
 
+using static Moritz.Globals.M;
+
 namespace Moritz.Spec
 {
     ///<summary>
@@ -38,7 +40,7 @@ namespace Moritz.Spec
         /// <param name="msDuration">greater than zero</param>
         /// <param name="hasChordOff"></param>
         /// <param name="midiChordControlDefs">optional controls</param>
-        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff, MidiChordControlDefs midiChordControlDefs = null)
+        public MidiChordDef(List<int> pitches, List<int> velocities, int msDuration, bool hasChordOff, MidiChordControlDefs midiChordControlDefs = null)
             : base(msDuration)
         {
             #region conditions
@@ -74,8 +76,9 @@ namespace Moritz.Spec
         /// <returns></returns>
         public override object Clone()
         {
+            Debug.Assert(false, "To be completed.");
             MidiChordDef rval = new MidiChordDef(this.Pitches, this.Velocities, this.MsDuration, this.HasChordOff)
-            {
+            { 
                 MsPositionReFirstUD = this.MsPositionReFirstUD,
                 OrnamentText = this.OrnamentText, // the displayed ornament Text (without the tilde)
 
@@ -210,44 +213,17 @@ namespace Moritz.Spec
         /// </summary>
         private void AssertConsistency(MidiChordDef mcd)
         {
-            //Debug.Assert(mcd.BasicDurationDefs != null && mcd.BasicDurationDefs.Count > 0
-            //		&& mcd.BasicDurationDefs[0] is BasicMidiChordDef);
-            if(mcd.BasicDurationDefs == null || mcd.BasicDurationDefs.Count == 0 || !(mcd.BasicDurationDefs[0] is BasicMidiChordDef))
-            {
-                throw new ApplicationException();
-            }
-
-            foreach(BasicDurationDef bdd in mcd.BasicDurationDefs)
-            {
-                if(bdd is BasicMidiChordDef bmcd)
-                {
-                    bmcd.AssertConsistency();
-                }
-            }
-
-            List<int> basicDurations = BasicDurations;
-            int sumDurations = 0;
-            foreach(int basicDuration in basicDurations)
-            {
-                sumDurations += basicDuration;
-            }
-
-            //Debug.Assert(mcd.MsDuration == sumDurations);
-            if(mcd.MsDuration != sumDurations)
-            {
-                throw new ApplicationException();
-            }
-
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Used by Clone(). Returns null if listToClone is null, otherwise returns a clone of the listToClone.
         /// </summary>
-        private List<byte> NewListByteOrNull(List<byte> listToClone)
+        private List<int> NewListByteOrNull(List<int> listToClone)
         {
-            List<byte> newListByte = null;
+            List<int> newListByte = null;
             if(listToClone != null)
-                newListByte = new List<byte>(listToClone);
+                newListByte = new List<int>(listToClone);
             return newListByte;
         }
         #endregion Clone
@@ -275,16 +251,12 @@ namespace Moritz.Spec
             #endregion conditions
 
             // Substitute the oppositeMCD's pitches by the equivalent pitches in the oppositeMode.
-            OppositePitches(mode, oppositeMode, oppositeMCD.NotatedMidiPitches);
-            foreach(BasicMidiChordDef bmcd in oppositeMCD.BasicDurationDefs)
-            {
-                OppositePitches(mode, oppositeMode, bmcd.Pitches);
-            }
+            OppositePitches(mode, oppositeMode, oppositeMCD.Pitches);
 
             return oppositeMCD;
         }
 
-        private void OppositePitches(Mode mode, Mode oppositeMode, List<byte> pitches)
+        private void OppositePitches(Mode mode, Mode oppositeMode, List<int> pitches)
         {
             for(int i = 0; i < pitches.Count; ++i)
             {
@@ -314,15 +286,11 @@ namespace Moritz.Spec
             Debug.Assert(nPitchesToShiftArg >= 0);
             #endregion conditions
 
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
-            {
-                InvertPitches(bmcd.Pitches, nPitchesToShiftArg);
-                RemoveDuplicateNotes(bmcd.Pitches, bmcd.Velocities);
-            }
-            SetNotatedValuesFromFirstBMCD();
+            InvertPitches(Pitches, nPitchesToShiftArg);
+            RemoveDuplicateNotes(Pitches, Velocities);
         }
 
-        private void InvertPitches(List<byte> pitches, int nPitchesToShiftArg)
+        private void InvertPitches(List<int> pitches, int nPitchesToShiftArg)
         {
             int nPitchesToShift = nPitchesToShiftArg % pitches.Count;
             for(int i = 0; i < nPitchesToShift; ++i)
@@ -334,155 +302,10 @@ namespace Moritz.Spec
             pitches.Sort();
         }
         #endregion Invert (shift lowest notes up by one octave)
-
-        #region Functions that use Envelopes
-        /// <summary>
-        /// Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef. Has no effect on Sliders.
-        /// ArgumentExceptions are thrown if BasicMidiChordDefs.Count==0 or distortion is less than 1.
-        /// A Debug.Assertion fails if an attempt is made to set a BasicMidiChordDef.MsDuration less than _minimumBasicMidiChordMsDuration. 
-        /// See Envelope.TimeWarp() for a description of the arguments.
-        /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="distortion"></param>
-        public void TimeWarp(Envelope envelope, double distortion)
+        private void SetEnvelopeTypeDef(int controlType, List<int> values)
         {
-            #region conditions
-            if(BasicDurationDefs.Count == 0)
-            {
-                throw new ArgumentException($"{nameof(BasicDurationDefs)}.Count must be greater than 0.");
-            }
-            if(distortion < 1)
-            {
-                throw new ArgumentException($"{nameof(distortion)} may not be less than 1.");
-            }
-            #endregion conditions
-
-            // if BasicMidiChordDefs.Count == 1, do nothing.
-            if(BasicDurationDefs.Count > 1)
-            {
-                int originalMsDuration = MsDuration;
-
-                List<int> originalPositions = new List<int>();
-                #region 1. create originalPositions
-                // originalPositions contains the msPositions of the BasicMidiChordDefs re the MidiChordDef
-                // plus the end msPosition of the final BasicMidiChordDef.
-                int msPos = 0;
-                foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
-                {
-                    originalPositions.Add(msPos);
-                    msPos += bmcd.MsDuration;
-                }
-                originalPositions.Add(msPos); // end position of duration to warp.
-                #endregion
-                List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
-
-                for(int i = 0; i < BasicDurationDefs.Count; ++i)
-                {
-                    BasicDurationDef bmdd = BasicDurationDefs[i];
-                    bmdd.MsDuration = newPositions[i + 1] - newPositions[i];
-                    Debug.Assert(MinimumBasicMidiChordMsDuration <= bmdd.MsDuration);
-                }
-            }
+            throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// Calls the other SetOrnament function
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <param name="ornamentShape"></param>
-        /// <param name="nOrnamentChords"></param>
-        /// <param name="ornamentText">The string that will follow the tilde. Cannot be null or empty.</param>
-        public void SetOrnament(Mode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords, string ornamentText)
-        {
-            Debug.Assert(!String.IsNullOrEmpty(ornamentText));
-            int nPitchesPerOctave = mode.NPitchesPerOctave;
-            Envelope ornamentEnvelope = new Envelope(new List<byte>(ornamentShape), 127, nPitchesPerOctave, nOrnamentChords);
-            SetOrnament(mode, ornamentEnvelope, ornamentText);
-        }
-
-        /// <summary>
-        /// Sets an ornament having the shape and number of elements in the ornamentEnvelope.
-		/// The ornament will only contain BasicMidiChordDefs (i.e. no BasicMidiRestDefs)
-        /// If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord using the NotatedMidiPitches as the first chord.
-        /// Uses the current Mode.
-        /// Replaces any existing ornament.
-        /// Sets OrnamentText to ornamentText. Note that OrnamentText is a property that has a private setter.
-		/// (usually to a single character).
-        /// </summary>
-        /// <param name="ornamentEnvelope"></param>
-        public void SetOrnament(Mode mode, Envelope ornamentEnvelope = null, string ornamentText = null)
-        {
-            Debug.Assert(mode != null);
-            Debug.Assert((ornamentEnvelope == null && ornamentText == null) || (ornamentEnvelope != null && ornamentText != null));
-
-            List<int> basicMidiChordRootPitches = mode.PitchSequence(_notatedMidiPitches[0], ornamentEnvelope);
-            // If ornamentEnvelope is null, basicMidiChordRootPitches will only contain rootNotatedpitch.
-
-            BasicDurationDefs = new List<BasicDurationDef>();
-            foreach(int rootPitch in basicMidiChordRootPitches)
-            {
-                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, mode, rootPitch, _notatedMidiPitches.Count);
-                BasicDurationDefs.Add(bmcd);
-            }
-            this.MsDuration = _msDuration; // resets the BasicMidiChordDef msDurations.
-
-            if(basicMidiChordRootPitches.Count > 1)
-            {
-                OrnamentText = ornamentText;
-            }
-        }
-
-        #region Sliders
-        public void SetPitchWheelEnvelope(Envelope envelope)
-        {
-            SetSliderEnvelope(envelope.Domain, envelope.OriginalAsBytes, null, null, null);
-        }
-        public void SetPanEnvelope(Envelope envelope)
-        {
-            SetSliderEnvelope(envelope.Domain, null, envelope.OriginalAsBytes, null, null);
-        }
-        public void SetModulationWheelEnvelope(Envelope envelope)
-        {
-            SetSliderEnvelope(envelope.Domain, null, null, envelope.OriginalAsBytes, null);
-        }
-        public void SetExpressionEnvelope(Envelope envelope)
-        {
-            SetSliderEnvelope(envelope.Domain, null, null, null, envelope.OriginalAsBytes);
-        }
-        private void SetSliderEnvelope(int domain, List<byte> pitchWheelBytes, List<byte> panBytes, List<byte> modulationBytes, List<byte> expressionBytes)
-        {
-            #region condition
-            if(domain != 127)
-            {
-                throw new ArgumentException($"{nameof(domain)} must be 127.");
-            }
-            #endregion condition
-
-            if(MidiChordControlDefs == null)
-            {
-                MidiChordControlDefs = new MidiChordControlDefs(null, null, null, null);
-            }
-            if(pitchWheelBytes != null)
-            {
-                MidiChordControlDefs.PitchWheelMsbs = pitchWheelBytes;
-            }
-            else
-            if(panBytes != null)
-            {
-                MidiChordControlDefs.PanMsbs = panBytes;
-            }
-            else
-            if(modulationBytes != null)
-            {
-                MidiChordControlDefs.ModulationWheelMsbs = modulationBytes;
-            }
-            else
-            if(expressionBytes != null)
-            {
-                MidiChordControlDefs.ExpressionMsbs = expressionBytes;
-            }
-        }
-        #endregion Sliders
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
@@ -492,7 +315,7 @@ namespace Moritz.Spec
         /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
-        public void SetVelocityPerAbsolutePitch(IReadOnlyList<byte> velocityPerAbsolutePitch)
+        public void SetVelocityPerAbsolutePitch(IReadOnlyList<int> velocityPerAbsolutePitch)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -501,15 +324,12 @@ namespace Moritz.Spec
                 int v = velocityPerAbsolutePitch[i];
                 AssertIsVelocityValue(v);
             }
-            Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
+            Debug.Assert(this.Pitches.Count == Velocities.Count);
             #endregion conditions
 
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
-            {
-                bmcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-            }
-            CheckAllBasicMidiChordDefVelocities();
-            SetNotatedValuesFromFirstBMCD();
+            SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+       
+            CheckAllVelocities();
         }
 
         /// <summary>
@@ -517,24 +337,12 @@ namespace Moritz.Spec
         /// If a function can set velocities, then it should call this function.
         /// It should probably also call SetNotatedValuesFromFirstBMCD().
         /// </summary>
-        private void CheckAllBasicMidiChordDefVelocities()
+        private void CheckAllVelocities()
         {
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
+            foreach(int velocity in Velocities)
             {
-                foreach(byte velocity in bmcd.Velocities)
-                {
-                    AssertIsVelocityValue(velocity);
-                }
+                AssertIsVelocityValue(velocity);
             }
-        }
-
-        private void SetNotatedValuesFromFirstBMCD()
-        {
-            AssertConsistency(this);
-
-            BasicMidiChordDef firstBMCD = BasicDurationDefs[0] as BasicMidiChordDef;
-            _notatedMidiPitches = firstBMCD.Pitches;
-            _notatedMidiVelocities = firstBMCD.Velocities;
         }
 
         #endregion SetVelocityPerAbsolutePitch
@@ -557,7 +365,7 @@ namespace Moritz.Spec
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
         public void SetVelocityFromDuration(int msDurationRangeMin, int msDurationRangeMax, byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
         {
-            Debug.Assert(_msDuration >= msDurationRangeMin && _msDuration <= msDurationRangeMax);
+            Debug.Assert(MsDuration >= msDurationRangeMin && MsDuration <= msDurationRangeMax);
             Debug.Assert(msDurationRangeMin <= msDurationRangeMax);
             // velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
             AssertIsVelocityValue(velocityForMinMsDuration);
@@ -569,7 +377,7 @@ namespace Moritz.Spec
 
             double msDurationRange = msDurationRangeMax - msDurationRangeMin;
             double velocityRange = velocityForMaxMsDuration - velocityForMinMsDuration;
-            byte newVelocity = velocityForMinMsDuration;
+            int newVelocity = velocityForMinMsDuration;
             if(msDurationRange != 0)
             {
                 double factor = ((double)(MsDuration - msDurationRangeMin)) / msDurationRange;
@@ -577,34 +385,23 @@ namespace Moritz.Spec
                 newVelocity = VelocityValue(velocityForMinMsDuration + increment);
             }
 
-            for(int i = 0; i < BasicDurationDefs.Count; ++i)
+            for(int j = 0; j < Velocities.Count; ++j)
             {
-                if(BasicDurationDefs[i] is BasicMidiChordDef bmcd)
-                {
-                    List<byte> bmcdVelocities = bmcd.Velocities;
-                    for(int j = 0; j < bmcdVelocities.Count; ++j)
-                    {
-                        byte oldVelocity = bmcdVelocities[j];
-                        byte valueToSet = VelocityValue((int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue)));
-                        bmcdVelocities[j] = valueToSet;
-                    }
-                }
+                int oldVelocity = Velocities[j];
+                int valueToSet = VelocityValue((int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue)));
+                Velocities[j] = valueToSet;
             }
-
-            SetNotatedValuesFromFirstBMCD();
         }
 
         #region SetVerticalVelocityGradient
         /// <summary>
         /// The arguments must both be in range [1..127].
-        /// This function changes the velocities in both the notated chord and the BasicChordDefs.
         /// The velocities of the root and top notes in the chord are set to the argument values, and the other velocities
         /// are interpolated linearly.
-        /// The root velocities of all the BasicMidiChordDefs change proportionaly to any change in NotatedMidiVelocities[0].
-        /// The verticalVelocityFactor is (((double)topVelocity) / rootVelocity), and is the same for the NotatedMidiVelocities
-        /// and all the BasicMidiChordDef velocities. 
+        /// The root velocities change proportionaly to any change in Velocities[0].
+        /// The verticalVelocityFactor is (((double)topVelocity) / rootVelocity). 
         /// </summary>
-        public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+        public void SetVerticalVelocityGradient(int rootVelocity, int topVelocity)
         {
             #region conditions
             AssertIsVelocityValue(rootVelocity);
@@ -612,31 +409,23 @@ namespace Moritz.Spec
             AssertConsistency(this);
             #endregion conditions
 
-            BasicMidiChordDef firstBMCD = BasicDurationDefs[0] as BasicMidiChordDef;
-
-            List<byte> velocities0 = firstBMCD.Velocities;
-            int nVelocities0 = velocities0.Count;
-            double increment = (((double)(topVelocity - rootVelocity)) / (nVelocities0 - 1));
+            int nVelocities = Velocities.Count;
+            double increment = (((double)(topVelocity - rootVelocity)) / (nVelocities - 1));
             double newVelocity = rootVelocity;
-            for(int velocityIndex = 0; velocityIndex < nVelocities0; ++velocityIndex)
+            for(int velocityIndex = 0; velocityIndex < nVelocities; ++velocityIndex)
             {
-                byte newVel = (byte)Math.Round(newVelocity);
+                int newVel = (byte)Math.Round(newVelocity);
                 newVel = VelocityValue(newVel);
-                velocities0[velocityIndex] = newVel;
+                Velocities[velocityIndex] = newVel;
                 newVelocity += increment;
             }
 
-            double rootVelocityFactor = ((double)rootVelocity) / velocities0[0];
+            double rootVelocityFactor = ((double)rootVelocity) / Velocities[0];
             double verticalVelocityFactor = ((double)topVelocity) / rootVelocity;
 
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
-            {
-                byte bmcdRootVelocity = VelocityValue((int)(Math.Round(bmcd.Velocities[0] * rootVelocityFactor)));
-                byte bmcdTopVelocity = VelocityValue((int)(Math.Round(bmcdRootVelocity * verticalVelocityFactor)));
-                bmcd.SetVerticalVelocityGradient(bmcdRootVelocity, bmcdTopVelocity);
-            }
-
-            SetNotatedValuesFromFirstBMCD();
+            rootVelocity = VelocityValue((int)(Math.Round(Velocities[0] * rootVelocityFactor)));
+            topVelocity = VelocityValue((int)(Math.Round(rootVelocity * verticalVelocityFactor)));
+            SetVerticalVelocityGradient(rootVelocity, topVelocity);
         }
         #endregion SetVerticalVelocityGradient
 
@@ -660,54 +449,45 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns the argument as a byte coerced to the range 0..127.
         /// </summary>
-        private byte MidiValue(int value)
+        private static int MidiValue(int value)
         {
             value = (value >= 0) ? value : 1;
             value = (value <= 127) ? value : 127;
-            return (byte)value;
+            return value;
         }
 
         /// <summary>
         /// Returns the argument as a byte coerced to the range 1..127.
         /// </summary>
-        private byte VelocityValue(int velocity)
+        private int VelocityValue(int velocity)
         {
             velocity = (velocity >= 1) ? velocity : 1;
             velocity = (velocity <= 127) ? velocity : 127;
-            return (byte)velocity;
+            return velocity;
         }
         #endregion utilities
 
-        #endregion Functions that use Envelopes 
-
         #region IUniqueChordDef
         /// <summary>
-        /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by the number of semitones
-        /// given in the argument interval. Negative interval values transpose down.
+        /// Transposes the Pitches by the number of semitones given in the argument interval.
+        /// Negative interval values transpose down.
         /// It is not an error if Midi values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// If pitches become duplicated at the extremes, the duplicates are removed.
         /// </summary>
         public void Transpose(int interval)
         {
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
+            for(int i = 0; i < Pitches.Count; ++i)
             {
-                List<byte> pitches = bmcd.Pitches;
-                List<byte> velocities = bmcd.Velocities;
-                for(int i = 0; i < pitches.Count; ++i)
-                {
-                    pitches[i] = MidiValue(pitches[i] + interval);
-                }
-                RemoveDuplicateNotes(pitches, velocities);
+                Pitches[i] = MidiValue(Pitches[i] + interval);
             }
-
-            SetNotatedValuesFromFirstBMCD();
+            RemoveDuplicateNotes(Pitches, Velocities);
         }
 
         /// <summary>
         /// All the pitches in the MidiChordDef must be contained in the mode.
-        /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by
-        /// the number of steps in the mode. Negative values transpose down.
+        /// Transposes the Pitches by the number of steps in the mode.
+        /// Negative values transpose down.
         /// The vertical velocity sequence remains unchanged except when notes are removed.
         /// It is not an error if Midi values would exceed the range of the mode.
         /// In this case, they are silently coerced to the bottom or top notes of the mode respectively.
@@ -717,30 +497,20 @@ namespace Moritz.Spec
         {
             #region conditions
             Debug.Assert(mode != null);
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
+            foreach(int pitch in Pitches)
             {
-                foreach(int pitch in bmcd.Pitches)
-                {
-                    Debug.Assert(mode.Gamut.Contains(pitch));
-                }
+                Debug.Assert(mode.Gamut.Contains(pitch));
             }
             #endregion conditions
 
             int bottomMostPitch = mode.Gamut[0];
             int topMostPitch = mode.Gamut[mode.Gamut.Count - 1];
 
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
+            for(int i = 0; i < Pitches.Count; ++i)
             {
-                List<byte> pitches = bmcd.Pitches;
-                List<byte> velocities = bmcd.Velocities;
-                for(int i = 0; i < pitches.Count; ++i)
-                {
-                    pitches[i] = TransposedPitchInModeGamut(pitches[i], mode, steps);
-                }
-                RemoveDuplicateNotes(pitches, velocities);
+                Pitches[i] = TransposedPitchInModeGamut(Pitches[i], mode, steps);
             }
-
-            SetNotatedValuesFromFirstBMCD();
+            RemoveDuplicateNotes(Pitches, Velocities);
         }
 
         /// <summary>
@@ -752,21 +522,20 @@ namespace Moritz.Spec
         public void TransposeToRootInModeGamut(Mode mode, int rootPitch)
         {
             AssertConsistency(this);
-            BasicMidiChordDef bmcd = BasicDurationDefs[0] as BasicMidiChordDef;
 
             #region conditions
             Debug.Assert(mode != null);
             Debug.Assert(mode.Gamut.Contains(rootPitch));
-            Debug.Assert(mode.Gamut.Contains(bmcd.Pitches[0]));
+            Debug.Assert(mode.Gamut.Contains(Pitches[0]));
             #endregion conditions
 
-            int stepsToTranspose = mode.IndexInGamut(rootPitch) - mode.IndexInGamut(bmcd.Pitches[0]);
+            int stepsToTranspose = mode.IndexInGamut(rootPitch) - mode.IndexInGamut(Pitches[0]);
 
             // checks that all the pitches are in the mode.
             TransposeStepsInModeGamut(mode, stepsToTranspose);
         }
 
-        private byte TransposedPitchInModeGamut(byte initialPitch, Mode mode, int steps)
+        private int TransposedPitchInModeGamut(int initialPitch, Mode mode, int steps)
         {
             int index = mode.IndexInGamut(initialPitch);
             int newIndex = index + steps;
@@ -775,10 +544,10 @@ namespace Moritz.Spec
             newIndex = (newIndex >= 0) ? newIndex : 0;
             newIndex = (newIndex < modeGamutCount) ? newIndex : modeGamutCount - 1;
 
-            return (byte)mode.Gamut[newIndex];
+            return mode.Gamut[newIndex];
         }
 
-        private void RemoveDuplicateNotes(List<byte> pitches, List<byte> velocities)
+        private void RemoveDuplicateNotes(List<int> pitches, List<int> velocities)
         {
             Debug.Assert(pitches.Count == velocities.Count);
             pitches.Sort(); // just to be sure
@@ -801,474 +570,32 @@ namespace Moritz.Spec
             Debug.Assert(pitches.Count == velocities.Count);
         }
 
-        /// <summary>
-        /// Multiplies the velocities in NotatedMidiVelocities, and all BasicMidiChordDef.Velocities by the argument factor.
-        /// The resulting velocities are in range 1..127.
-        /// If a resulting velocity would have been less than 1, it is silently coerced to 1.
-        /// If it would have been greater than 127, it is silently coerced to 127.
-        /// </summary>
-        /// <param name="factor">greater than 0</param>
-        public void AdjustVelocities(double factor)
+        internal void AdjustVelocities(double factor)
         {
-            Debug.Assert(factor > 0.0);
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
+            for(int j = 0; j < Velocities.Count; ++j)
             {
-                bmcd.AdjustVelocities(factor);
+                mcd.Velocities[j] = (int)(Velocities[j] * factor);
             }
-            CheckAllBasicMidiChordDefVelocities();
-            SetNotatedValuesFromFirstBMCD();
         }
 
-        /// <summary>
-        /// Velocities having originalVelocity are changed to newVelocity.
-        /// Velocity values above originalVelocity are changed proportionally with max possible velocity at 127.
-        /// Velocity values below originalVelocity are changed proportionally with min possible velocity at 1.
-        /// </summary>
-        /// <param name="factor">greater than 0</param>
-        public void AdjustVelocities(byte originalVelocity, byte newVelocity)
-        {
-            AssertIsVelocityValue(originalVelocity);
-            AssertIsVelocityValue(newVelocity);
-
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
-            {
-                bmcd.AdjustVelocities(originalVelocity, newVelocity);
-            }
-            CheckAllBasicMidiChordDefVelocities();
-            SetNotatedValuesFromFirstBMCD();
-        }
-
-        /// <summary>
-        /// Truncates the number of notes in all BasicMidiChordDefs by removing the upper notes as necessary.
-        /// If the original number of notes in a BasicMidiChordDef is less than newDensity, that bmcd is not changed.
-        /// </summary>
-        /// <param name="newDensity">Must be greater than 0</param>
-        public void SetVerticalDensity(int newDensity)
-        {
-            Debug.Assert(newDensity > 0);
-
-            foreach(BasicMidiChordDef bmcd in BasicDurationDefs)
-            {
-                int nElementsToRemove = bmcd.Pitches.Count - newDensity;
-                if(nElementsToRemove > 0)
-                {
-                    bmcd.Pitches.RemoveRange(newDensity, nElementsToRemove);
-                    bmcd.Velocities.RemoveRange(newDensity, nElementsToRemove);
-                }
-            }
-            SetNotatedValuesFromFirstBMCD();
-        }
-
-        #region IUniqueDef
-
-        /// <summary>
-        /// Multiplies the MsDuration by the given factor.
-        /// </summary>
-        /// <param name="factor"></param>
-        public void AdjustMsDuration(double factor)
-        {
-            MsDuration = (int)(_msDuration * factor);
-            Debug.Assert(MsDuration > 0, "A UniqueDef's MsDuration may not be set to zero!");
-        }
-
-        #endregion IUniqueDef
         #endregion IUniqueChordDef
 
-        /// <summary>
-        /// Returns a new Trk having msDuration and midiChannel, whose MidiChordDefs are created from this MidiChordDef's BasicMidiChordDefs.
-        /// If a non-null mode argument is given, a check is made (in the Trk constructor) to ensure that it contains
-        /// all the pitches (having velocity greater than 1) in this MidiChordDef.
-        /// Each new MidiChordDef has one BasicMidiChordDef, which is a copy of a BasicMidiChordDef from this MidiChordDef.
-        /// The new MidiChordDef's notated pitches and velocities are the same as its BasicMidiChordDef's.
-        /// The durations of the returned MidiChordDefs are in proportion to the durations of the original BasicMidichordDefs.
-        /// This MidiChordDef is not changed by calling this function.
-        /// </summary>
-        /// <param name="msDuration">The duration of the returned Trk</param>
-        /// <param name="midiChannel">The channel of the returned Trk</param>
-        public Trk ToTrk(int msDuration, int midiChannel)
-        {
-            List<IUniqueDef> iuds = new List<IUniqueDef>();
-            foreach(BasicMidiChordDef bmcd in this.BasicDurationDefs)
-            {
-                // this constructor checks that pitches are in range 0..127, and velocities are in range 1..127.
-                MidiChordDef mcd = new MidiChordDef(bmcd.Pitches, bmcd.Velocities, bmcd.MsDuration, bmcd.HasChordOff);
-                mcd.FirstBasicDurationDef.BankIndex = bmcd.BankIndex;
-                mcd.FirstBasicDurationDef.PresetIndex = bmcd.PresetIndex;
-                mcd.FirstBasicDurationDef.HasChordOff = bmcd.HasChordOff;
-                iuds.Add(mcd);
-            }
-
-            Trk trk = new Trk(iuds)
-            {
-                MsDuration = msDuration // calls Trk.SetMsPositionsReFirstUD();
-            };
-
-            return trk;
-        }
-
-        public void AdjustExpression(double factor)
-        {
-            List<byte> exprs = this.MidiChordControlDefs.ExpressionMsbs;
-            for(int i = 0; i < exprs.Count; ++i)
-            {
-                exprs[i] = MidiValue((int)(exprs[i] * factor));
-            }
-        }
-
-        public List<byte> PanMsbs
-        {
-            get
-            {
-                List<byte> rval;
-                if(this.MidiChordControlDefs == null || this.MidiChordControlDefs.PanMsbs == null)
-                {
-                    rval = new List<byte>();
-                }
-                else
-                {
-                    rval = this.MidiChordControlDefs.PanMsbs;
-                }
-                return rval;
-            }
-            set
-            {
-                if(this.MidiChordControlDefs == null)
-                {
-                    this.MidiChordControlDefs = new MidiChordControlDefs(new List<byte>(), new List<byte>(), new List<byte>(), new List<byte>());
-                }
-                if(this.MidiChordControlDefs.PanMsbs == null)
-                {
-                    this.MidiChordControlDefs.PanMsbs = new List<byte>();
-                }
-                List<byte> pans = this.MidiChordControlDefs.PanMsbs;
-                pans.Clear();
-                for(int i = 0; i < value.Count; ++i)
-                {
-                    pans.Add(MidiValue((int)(value[i])));
-                }
-            }
-        }
-
-        public void AdjustModulationWheel(double factor)
-        {
-            List<byte> modWheels = this.MidiChordControlDefs.ModulationWheelMsbs;
-            for(int i = 0; i < modWheels.Count; ++i)
-            {
-                modWheels[i] = MidiValue((int)(modWheels[i] * factor));
-            }
-        }
-
-        public void AdjustPitchWheel(double factor)
-        {
-            List<byte> pitchWheels = this.MidiChordControlDefs.PitchWheelMsbs;
-            for(int i = 0; i < pitchWheels.Count; ++i)
-            {
-                pitchWheels[i] = MidiValue((int)(pitchWheels[i] * factor));
-            }
-        }
-
-
-
-        private List<byte> GetHangingPitches(List<BasicDurationDef> basicDurationDefs)
-        {
-            List<byte> hangingPitches = new List<byte>();
-            foreach(BasicDurationDef bmdd in basicDurationDefs)
-            {
-                if(bmdd is BasicMidiChordDef bmcd && !bmcd.HasChordOff)
-                {
-                    foreach(byte pitch in bmcd.Pitches)
-                    {
-                        if(!hangingPitches.Contains(pitch))
-                        {
-                            hangingPitches.Add(pitch);
-                        }
-                    }
-                }
-            }
-            return hangingPitches;
-        }
-
-        private List<MidiMsg> GetNoteOffMsgs(int channel, List<byte> hangingPitches)
-        {
-            List<MidiMsg> noteOffMsgs = new List<MidiMsg>();
-            foreach(byte pitch in hangingPitches)
-            {
-                MidiMsg msg = new MidiMsg((int)M.CMD.NOTE_OFF_120 + channel, pitch, M.DEFAULT_NOTEOFF_VELOCITY_64);
-                noteOffMsgs.Add(msg);
-            }
-            return noteOffMsgs;
-        }
-
-        private static List<int> GetBasicDurations(List<BasicDurationDef> bdds)
-        {
-            List<int> returnList = new List<int>();
-            foreach(BasicDurationDef bdd in bdds)
-            {
-                returnList.Add(bdd.MsDuration);
-            }
-            return returnList;
-        }
-
-        ///// <summary>
-        ///// This function returns the maximum number of ornament chords that can be fit into the given msDuration
-        ///// using the given relativeDurations and minimumOrnamentChordMsDuration.
-        ///// </summary>
-        //private static int GetNumberOfBasicDurations(int msDuration, List<int> relativeDurations, int minimumOrnamentChordMsDuration)
-        //{
-        //    bool okay = true;
-        //    int numberOfOrnamentChords = 1;
-        //    float factor = 1.0F;
-        //    // try each ornament length in turn until okay is true
-        //    for(int numChords = relativeDurations.Count; numChords > 0; --numChords)
-        //    {
-        //        okay = true;
-        //        int sum = 0;
-        //        for(int i = 0; i < numChords; ++i)
-        //            sum += relativeDurations[i];
-        //        factor = ((float)msDuration / (float)sum);
-
-        //        for(int i = 0; i < numChords; ++i)
-        //        {
-        //            if((relativeDurations[i] * factor) < (float)minimumOrnamentChordMsDuration)
-        //                okay = false;
-        //        }
-        //        if(okay)
-        //        {
-        //            numberOfOrnamentChords = numChords;
-        //            break;
-        //        }
-        //    }
-        //    Debug.Assert(okay);
-        //    return numberOfOrnamentChords;
-        //}
-
-        /// <summary>
-        /// Returns a list of (millisecond) durations whose sum is outerMsDuration.
-        /// The first msDuration in the returned list is guaranteed not to be 0, but otherwise an msDuration
-        /// that would have been less than minimumOutputMsDuration will be 0 in the returned list.
-        /// </summary>
-        /// <param name="outerMsDuration"></param>
-        /// <param name="relativeDurations">Must contain at least one value.</param>
-        /// <param name="minimumOutputMsDuration"></param>
-        /// <returns></returns>
-        private static List<int> GetDurations(int outerMsDuration, List<int> relativeDurations, int minimumOutputMsDuration)
-        {
-            Debug.Assert(relativeDurations.Count > 0);
-            if(relativeDurations.Count == 1)
-            {
-                Debug.Assert(outerMsDuration >= minimumOutputMsDuration);
-            }
-
-            List<int> intDurations = M.IntDivisionSizes(outerMsDuration, relativeDurations);
-
-            for(int i = 0; i < intDurations.Count; ++i)
-            {
-                int msDur = intDurations[i];
-                if(msDur < minimumOutputMsDuration)
-                {
-                    if(i == 0)
-                    {
-                        int diff = minimumOutputMsDuration - intDurations[0];
-                        intDurations[0] = minimumOutputMsDuration; // the first duration may not be zero!
-                        intDurations[1] -= diff;
-                    }
-                    else
-                    {
-                        intDurations[i - 1] += intDurations[i];
-                        intDurations[i] = 0;
-                    }
-                }
-            }
-
-            return intDurations;
-        }
-
-        /// <summary>
-        /// Returns a new list of BasicDurationDefs having the msOuterDuration, shortening the list if necessary.
-        /// </summary>
-        /// <param name="basicDurationDefs"></param>
-        /// <param name="outerMsDuration"></param>
-        /// <param name="minimumMsDuration"></param>
-        /// <returns></returns>
-        public static List<BasicDurationDef> FitToDuration(List<BasicDurationDef> basicDurationDefs, int outerMsDuration, int minimumMsDuration)
-        {
-            List<int> originalDurations = GetBasicDurations(basicDurationDefs);
-
-            List<int> msDurations = GetDurations(outerMsDuration, originalDurations, minimumMsDuration);
-
-            Debug.Assert(originalDurations.Count == msDurations.Count);
-            Debug.Assert(msDurations[0] > 0);
-
-            List<BasicDurationDef> rList = new List<BasicDurationDef>();
-
-            for(int i = 0; i < msDurations.Count; ++i)
-            {
-                BasicDurationDef bdd = basicDurationDefs[i];
-                int msDuration = msDurations[i];
-                // Only create an output BasicDurationDef if its duration is going to be > 0ms.
-                if(msDuration > 0)
-                {
-                    if(bdd is BasicMidiChordDef bmcd)
-                    {
-                        // constructor checks that pitches are in range 0..127, and velocities are in range 1..127.
-                        rList.Add(new BasicMidiChordDef(msDurations[i], bmcd.BankIndex, bmcd.PresetIndex, bmcd.HasChordOff, bmcd.Pitches, bmcd.Velocities));
-                    }
-                    else if(bdd is BasicMidiRestDef bmrd)
-                    {
-                        rList.Add(new BasicMidiRestDef(msDurations[i]));
-                    }
-                    else
-                    {
-                        throw new ApplicationException("Unknown BasicDurationDef type.");
-                    }
-                }
-            }
-
-            return rList;
-        }
-
-        /// <summary>
-        /// This version for use in legacy Palette code.
-        /// </summary>
-        /// <param name="basicMidiChordDefs"></param>
-        /// <param name="outerMsDuration"></param>
-        /// <param name="minimumMsDuration"></param>
-        /// <returns></returns>
-        public static List<BasicMidiChordDef> FitToDuration(List<BasicMidiChordDef> basicMidiChordDefs, int outerMsDuration, int minimumMsDuration)
-        {
-            List<BasicDurationDef> basicDurationDefs = new List<BasicDurationDef>();
-            foreach(BasicMidiChordDef bmcd in basicMidiChordDefs)
-            {
-                basicDurationDefs.Add(bmcd);
-            }
-
-            List<BasicDurationDef> bdds = FitToDuration(basicDurationDefs, outerMsDuration, minimumMsDuration);
-
-            List<BasicMidiChordDef> bmcds = new List<BasicMidiChordDef>();
-            foreach(BasicDurationDef bdd in bdds)
-            {
-                if(bdd is BasicMidiChordDef bmcd)
-                {
-                    bmcds.Add(bmcd);
-                }
-                else
-                {
-                    throw new ApplicationException("error: bdd must be a BasicMidiChordDef here.");
-                }
-            }
-
-            return bmcds;
-        }
         #region properties
-
-        public List<int> BasicDurations
-        {
-            get
-            {
-                List<int> rList = new List<int>();
-                foreach(BasicDurationDef bdd in BasicDurationDefs)
-                {
-                    rList.Add(bdd.MsDuration);
-                }
-                return rList;
-            }
-        }
-
-        public BasicMidiChordDef FirstBasicDurationDef
-        {
-            get
-            {
-                AssertConsistency(this);
-
-                return BasicDurationDefs[0] as BasicMidiChordDef;
-            }
-        }
-
-        /****************************************************************************/
-
-        public int MsPositionReFirstUD { get; set; } = 0;
-        public override int MsDuration
-        {
-            get
-            {
-                return _msDuration;
-            }
-            set
-            {
-                Debug.Assert(BasicDurationDefs != null && BasicDurationDefs.Count > 0);
-
-                _msDuration = value;
-                int sumDurations = 0;
-                foreach(int bcd in BasicDurations)
-                    sumDurations += bcd;
-                if(_msDuration != sumDurations)
-                {
-                    BasicDurationDefs = FitToDuration(BasicDurationDefs, _msDuration, MinimumBasicMidiChordMsDuration);
-                }
-
-                AssertConsistency(this);
-            }
-        }
-
-        public List<byte> Pitches = new List<byte>();
-        public List<byte> Velocities = new List<byte>();
+        public List<int> Pitches { get; set; } = new List<int>();
+        public List<int> Velocities { get; set; } = new List<int>();
 
         public int? MsDurationToNextBarline { get; set; } = null;
         public bool HasChordOff { get; set; } = true;
         public bool BeamContinues { get; set; } = true;
         public string Lyric { get; set; } = null;
-
         /// <summary>
-        /// This NotatedMidiPitches field is used when displaying the chord's noteheads.
-        /// Setting this field creates a clone of the supplied list, and does not affect the pitches in the BasicMidiChordDefs.
-        /// </summary>
-        public List<byte> NotatedMidiPitches
-        {
-            get { return _notatedMidiPitches; }
-            set
-            {
-                // N.B. this value can be set even if value.Count != _notatedMidiVelocities.Count
-                // If the Count is changed, the _notatedMidiVelocities must subsequently be reset,
-                // otherwise a Debug.Assert will fail when the _notatedMidiVelocities are retrieved.
-                foreach(byte pitch in value)
-                {
-                    AssertIsMidiValue(pitch);
-                }
-                _notatedMidiPitches = new List<byte>(value);
-            }
-        }
-        private List<byte> _notatedMidiPitches = null;
-
-        /// <summary>
-        /// This NotatedMidiVelocities field is used when displaying the chord's noteheads.
-        /// Setting this field creates a clone of the supplied list, and does not affect the velocities in the BasicMidiChordDefs.
-        /// </summary>
-        public List<byte> NotatedMidiVelocities
-        {
-            get
-            {
-                Debug.Assert(_notatedMidiVelocities.Count == _notatedMidiPitches.Count);
-                return _notatedMidiVelocities;
-            }
-            set
-            {
-                Debug.Assert(value.Count == _notatedMidiPitches.Count);
-                foreach(byte velocity in value)
-                {
-                    AssertIsVelocityValue(velocity);
-                }
-                _notatedMidiVelocities = new List<byte>(value);
-            }
-        }
-        private List<byte> _notatedMidiVelocities = null;
-
-        /// <summary>
-        /// If not null, this string is printed after a tilde, above or below the chord.
+        /// If not null, this is simply a string that is printed after a tilde, above or below the chord.
         /// </summary>
         public string OrnamentText { get; private set; } = null;
-
-        public MidiChordControlDefs MidiChordControlDefs = null;
-
+        public MidiChordControlDefs MidiChordControlDefs { get; private set; } = null;
+        /// <summary>
+        /// See ControlEnvelope: a class that converts an EnvelopeTypeDef into a series of control values with a specific Count.
+        /// </summary>
         public Tuple<int, List<int>> EnvelopeTypeDef { get; private set; } = null;
         #endregion properties
     }

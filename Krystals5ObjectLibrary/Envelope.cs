@@ -21,7 +21,7 @@ namespace Krystals5ObjectLibrary
         /// <param name="inputDomain">Greater than or equal to 0</param>
         /// <param name="domain">Greater than or equal to 0</param>
         /// <param name="count">Greater than 0</param>
-        public Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
+        public Envelope(List<int> inputValues, int inputDomain, int domain, int count)
         {
             #region conditions
             List<int> inputBytesAsInts = new List<int>();
@@ -32,24 +32,6 @@ namespace Krystals5ObjectLibrary
             #endregion conditions
 
             CompleteConstructor(inputBytesAsInts, inputDomain, domain, count);
-        }
-
-        /// <summary> 
-        /// An envelope is a list of integral values that are greater than or equal to 0, and less than
-        /// or equal to the envelope's Domain.
-        /// The list's Count must be greater than 0, but is otherwise unlimited.
-        /// Domain must be >= 0. MidiChordDef Sliders use envelopes having Domain==127.
-        /// The list's values can repeat. Not all values in range have to be present.
-        /// Values that are set to 0 in envelope.Original are set to Domain in envelope.Inversion.
-        /// Values that are set to Domain in envelope.Original are set to 0 in envelope.Inversion.
-        /// </summary>
-        /// <param name="inputValues">At least one value. All values in range [0..inputDomain]</param>
-        /// <param name="inputDomain">Greater than or equal to 0</param>
-        /// <param name="domain">Greater than or equal to 0</param>
-        /// <param name="count">Greater than 0</param>
-        public Envelope(List<int> inputValues, int inputDomain, int domain, int count)
-        {
-            CompleteConstructor(inputValues, inputDomain, domain, count);
         }
 
         private void CompleteConstructor(List<int> inputValues, int inputDomain, int domain, int count)
@@ -306,11 +288,11 @@ namespace Krystals5ObjectLibrary
             }
         }
 
-        public List<byte> OriginalAsBytes
+        public List<int> OriginalAsBytes
         {
             get
             {
-                List<byte> originalAsBytes = new List<byte>();
+                List<int> originalAsBytes = new List<int>();
                 foreach(int b in _original)
                 {
                     originalAsBytes.Add((byte)b);
@@ -319,12 +301,12 @@ namespace Krystals5ObjectLibrary
                 return originalAsBytes;
             }
         }
-        public List<byte> InversionAsBytes
+        public List<int> InversionAsBytes
         {
             get
             {
-                List<byte> originalBytes = OriginalAsBytes;
-                List<byte> inversion = new List<byte>();
+                List<int> originalBytes = OriginalAsBytes;
+                List<int> inversion = new List<int>();
                 foreach(byte b in originalBytes)
                 {
                     inversion.Add((byte)(_domain - b));
@@ -332,20 +314,20 @@ namespace Krystals5ObjectLibrary
                 return inversion;
             }
         }
-        public List<byte> RetrogradeAsBytes
+        public List<int> RetrogradeAsBytes
         {
             get
             {
-                List<byte> retrograde = OriginalAsBytes;
+                List<int> retrograde = OriginalAsBytes;
                 retrograde.Reverse();
                 return retrograde;
             }
         }
-        public List<byte> RetrogradeInversionAsBytes
+        public List<int> RetrogradeInversionAsBytes
         {
             get
             {
-                List<byte> ri = OriginalAsBytes;
+                List<int> ri = OriginalAsBytes;
                 ri.Reverse();
                 for(int i = 0; i < ri.Count; ++i)
                 {

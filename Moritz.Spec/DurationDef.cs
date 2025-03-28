@@ -7,7 +7,7 @@ namespace Moritz.Spec
     {
         protected DurationDef(int msDuration)
         {
-            _msDuration = msDuration;
+            MsDuration = msDuration;
         }
 
         /// <summary>
@@ -16,7 +16,7 @@ namespace Moritz.Spec
         /// <returns>A deep clone</returns>
         public abstract object Clone();
 
-        public virtual int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
-        protected int _msDuration = 0;
+        public int MsDuration { get; set; } = 0;
+        public int MsPositionReFirstUD { get; set; } = 0;
     }
 }

@@ -433,7 +433,7 @@ namespace Moritz.Spec
             {
                 if(iud is IUniqueChordDef iucd)
                 {
-                    List<byte> midiPitches = iucd.NotatedMidiPitches;
+                    List<int> midiPitches = iucd.Pitches;
                     for(int i = 0; i < midiPitches.Count; ++i)
                     {
                         midiPitches[i] = M.MidiValue(midiPitches[i] + semitonesToTranspose);
@@ -805,7 +805,7 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                _uniqueDefs[i].AdjustMsDuration(factor);
+                _uniqueDefs[i].MsDuration = (int)Math.Round(_uniqueDefs[i].MsDuration * factor);
                 factor += basicIncrement;
             }
 
@@ -985,21 +985,6 @@ namespace Moritz.Spec
 
         #region Envelopes
 
-        public void SetPitchWheelSliders(Envelope envelope)
-        {
-            #region condition
-            if(envelope.Domain != 127)
-            {
-                throw new ArgumentException($"{nameof(envelope.Domain)} must be 127.");
-            }
-            #endregion condition
-
-            List<int> msPositions = GetMsPositions();
-
-            Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
-
-            SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
-        }
         public List<int> GetMsPositions()
         {
             int originalMsDuration = MsDuration;
@@ -1014,44 +999,13 @@ namespace Moritz.Spec
             return originalMsPositions;
         }
 
-        /// <summary>
-        /// Also used by Trks in Seq and Bar
-        /// </summary>
-        public void SetPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
-        {
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                if(iud is MidiChordDef mcd)
-                {
-                    int startMsPos = mcd.MsPositionReFirstUD;
-                    int endMsPos = startMsPos + mcd.MsDuration;
-                    List<int> mcdEnvelope = new List<int>();
-                    foreach(int msPos in pitchWheelValuesPerMsPosition.Keys)
-                    {
-                        if(msPos >= startMsPos)
-                        {
-                            if(msPos <= endMsPos)
-                            {
-                                mcdEnvelope.Add(pitchWheelValuesPerMsPosition[msPos]);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    mcd.SetPitchWheelEnvelope(new Envelope(mcdEnvelope, 127, 127, mcdEnvelope.Count));
-                }
-            }
-        }
-
         #region SetVelocityPerAbsolutePitch
         /// <summary>
         /// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
         /// See the MidiChordDef documentation for details.
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
-        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
+        public virtual void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -1065,7 +1019,7 @@ namespace Moritz.Spec
                 if(UniqueDefs[i] is MidiChordDef mcd)
                 {
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-                    Debug.Assert(mcd.NotatedMidiPitches.Count > 0);
+                    Debug.Assert(mcd.Pitches.Count > 0);
                 }
             }
         }
@@ -1153,13 +1107,13 @@ namespace Moritz.Spec
         {
             Debug.Assert(percent >= 0 && percent <= 100);
 
-            List<byte> pitches = new List<byte>();
+            List<int> pitches = new List<int>();
             #region get pitches
             foreach(IUniqueDef iud in _uniqueDefs)
             {
                 if(iud is MidiChordDef mcd)
                 {
-                    byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
+                    int pitch = (useBottomPitch == true) ? mcd.Pitches[0] : mcd.Pitches[mcd.Pitches.Count - 1];
                     if(!pitches.Contains(pitch))
                     {
                         pitches.Add(pitch);
@@ -1196,7 +1150,7 @@ namespace Moritz.Spec
                 Debug.Assert(msDurations[msDurations.Count - 1] == durationForHighestPitch);
                 #endregion get durations
                 #region get duration per pitch dictionary
-                Dictionary<byte, int> msDurPerPitch = new Dictionary<byte, int>();
+                Dictionary<int, int> msDurPerPitch = new Dictionary<int, int>();   // pitch, msDuration
                 for(int i = 0; i < nPitches; ++i)
                 {
                     msDurPerPitch.Add(pitches[i], msDurations[i]);
@@ -1210,7 +1164,7 @@ namespace Moritz.Spec
                 {
                     if(iud is MidiChordDef mcd)
                     {
-                        byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
+                        int pitch = (useBottomPitch == true) ? mcd.Pitches[0] : mcd.Pitches[mcd.Pitches.Count - 1];
                         int oldDuration = mcd.MsDuration;
                         int durPerPitch = msDurPerPitch[pitch];
                         mcd.MsDuration = (int)Math.Round((oldDuration * factorForOldValue) + (durPerPitch * factorForNewValue));
@@ -1233,21 +1187,12 @@ namespace Moritz.Spec
                 {
                     if(_uniqueDefs[i] is MidiChordDef iumdd)
                     {
-                        iumdd.AdjustExpression(factor);
+                        iumdd.MidiChordControlDefs.Expression = (int)Math.Round((int)iumdd.MidiChordControlDefs.Expression * factor);
                     }
                 }
             }
         }
-        /// <summary>
-        /// Multiplies each expression value in the UniqueDefs by the argument factor.
-        /// </summary>
-        public void AdjustExpression(double factor)
-        {
-            foreach(MidiChordDef mcd in MidiChordDefs)
-            {
-                mcd.AdjustExpression(factor);
-            }
-        }
+
         /// <summary>
         /// Multiplies each velocity value in the MidiChordDefs from beginIndex to (exclusive) endIndex by
         /// the argument factor (which must be greater than zero).
@@ -1303,7 +1248,7 @@ namespace Moritz.Spec
                 if(UniqueDefs[i] is MidiChordDef mcd)
                 {
                     mcd.AdjustVelocities(factor);
-                    if(mcd.NotatedMidiPitches.Count == 0)
+                    if(mcd.Pitches.Count == 0)
                     {
                         Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                     }
@@ -1345,7 +1290,7 @@ namespace Moritz.Spec
                             mcd.AdjustVelocities(factor);
                             factor += factorIncrement;
                         }
-                        if(mcd.NotatedMidiPitches.Count == 0)
+                        if(mcd.Pitches.Count == 0)
                         {
                             Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                         }
@@ -1383,8 +1328,8 @@ namespace Moritz.Spec
                     {
                         if(_uniqueDefs[i] is MidiChordDef iumdd)
                         {
-                            byte panMsb = (byte)Math.Round(panValue);
-                            iumdd.PanMsbs = new List<byte>() { panMsb };
+                            int intPan = (int)Math.Round(panValue);
+                            iumdd.MidiChordControlDefs.Pan = intPan;
                             panValue += increment;
                         }
                     }

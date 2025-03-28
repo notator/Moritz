@@ -22,11 +22,8 @@ namespace Moritz.Spec
         /// <param name="factor"></param>
         public void AdjustMsDuration(double factor)
         {
-            MsDuration = (int)(_msDuration * factor);
+            MsDuration = (int)(MsDuration * factor);
             Debug.Assert(MsDuration > 0, "A UniqueDef's MsDuration may not be set to zero!");
         }
-
-        public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
-        private int _msPositionReFirstIUD = 0;
     }
 }

@@ -20,9 +20,55 @@ namespace Moritz.Spec
             ExpressionMsbs = expressionMsbs;
         }
 
-        public void WriteSVG(SvgWriter w, int channel, int msDuration)
+        public void WriteSVG(SvgWriter w, int channel, int msDuration, CarryMsgs carryMsgs)
         {
-            
+            if(carryMsgs.IsStartOfEnvs)
+            {
+                PanMsbs = GetDefault(PanMsbs, 64);
+                ModulationWheelMsbs = GetDefault(ModulationWheelMsbs, 0);
+                ExpressionMsbs = GetDefault(ExpressionMsbs, 127);
+                PitchWheelMsbs = GetDefault(PitchWheelMsbs, 64);
+
+                carryMsgs.IsStartOfEnvs = false;
+            }
+
+            if(DoWriteControl(PanMsbs, carryMsgs.PanState)
+            || DoWriteControl(ModulationWheelMsbs, carryMsgs.ModWheelState)
+            || DoWriteControl(ExpressionMsbs, carryMsgs.ExpressionState)
+            || DoWriteControl(PitchWheelMsbs, carryMsgs.PitchWheelState))
+            {
+                w.WriteStartElement("envs"); // envelopes
+
+                if(DoWriteControl(PanMsbs, carryMsgs.PanState))
+                {
+                    carryMsgs.PanState = WriteCCEnv(w, channel, M.CTL_PAN_10, PanMsbs, msDuration);
+                }
+
+                if(DoWriteControl(ModulationWheelMsbs, carryMsgs.ModWheelState))
+                {
+                    carryMsgs.ModWheelState = WriteCCEnv(w, channel, M.CTL_MODWHEEL_1, ModulationWheelMsbs, msDuration);
+                }
+
+                if(DoWriteControl(ExpressionMsbs, carryMsgs.ExpressionState))
+                {
+                    carryMsgs.ExpressionState = WriteCCEnv(w, channel, M.CTL_EXPRESSION_11, ExpressionMsbs, msDuration);
+                }
+
+                if(DoWriteControl(PitchWheelMsbs, carryMsgs.PitchWheelState))
+                {
+                    string statusString = null;
+                    w.WriteStartElement("env"); // envelope
+
+                    statusString = $"0x{(M.CMD_PITCH_WHEEL_0xE0 + channel).ToString("X")}";
+                    w.WriteAttributeString("s", statusString);
+
+                    carryMsgs.PitchWheelState = WriteD1AndD2VTs(w, PitchWheelMsbs, PitchWheelMsbs, msDuration);
+
+                    w.WriteEndElement(); // end env
+                }
+
+                w.WriteEndElement(); // end envs
+            }
         }
 
         /// <summary>
@@ -65,7 +111,7 @@ namespace Moritz.Spec
         /// <returns>The last controller value</returns>
         private byte WriteCCEnv(SvgWriter w, int channel, int d1, List<byte> d2s, int msDuration)
         {
-            string statusString = $"0x{(M.CMD.CONTROL_CHANGE_176 + channel).ToString("X")}"; ;
+            string statusString = $"0x{(M.CMD_CONTROL_CHANGE_0xB0 + channel).ToString("X")}"; ;
             w.WriteStartElement("env"); // envelope
             w.WriteAttributeString("s", statusString);
             w.WriteAttributeString("d1", d1.ToString());

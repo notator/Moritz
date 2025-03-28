@@ -14,10 +14,10 @@ namespace Moritz.Spec
     {
         public CautionaryChordDef(IUniqueChordDef chordDef, int msPositionReFirstIUD, int msDuration)
         {
-            NotatedMidiPitches = chordDef.NotatedMidiPitches;
+            Pitches = chordDef.Pitches;
             if(chordDef is MidiChordDef midiChordDef)
             {
-                NotatedMidiVelocities = chordDef.NotatedMidiVelocities;
+                Velocities = chordDef.Velocities;
             }
 
             MsPositionReFirstUD = msPositionReFirstIUD;
@@ -33,7 +33,7 @@ namespace Moritz.Spec
         /// <summary>
         /// This NotatedMidiPitches field is used when displaying the chord's noteheads.
         /// </summary>
-        public List<byte> NotatedMidiPitches
+        public List<int> Pitches
         {
             get { return _notatedMidiPitches; }
             set
@@ -42,15 +42,15 @@ namespace Moritz.Spec
                 {
                     Debug.Assert(pitch == M.MidiValue(pitch));
                 }
-                _notatedMidiPitches = new List<byte>(value);
+                _notatedMidiPitches = new List<int>(value);
             }
         }
-        private List<byte> _notatedMidiPitches = null;
+        private List<int> _notatedMidiPitches = null;
 
         /// <summary>
         /// This NotatedMidiVelocities field is used when displaying the chord's noteheads.
         /// </summary>
-        public List<byte> NotatedMidiVelocities
+        public List<int> Velocities
         {
             get
             {
@@ -62,10 +62,10 @@ namespace Moritz.Spec
                 {
                     Debug.Assert(velocity == M.MidiValue(velocity));
                 }
-                _notatedMidiVelocities = new List<byte>(value);
+                _notatedMidiVelocities = new List<int>(value);
             }
         }
-        private List<byte> _notatedMidiVelocities = null;
+        private List<int> _notatedMidiVelocities = null;
 
         #region IUniqueDef
         public override string ToString()

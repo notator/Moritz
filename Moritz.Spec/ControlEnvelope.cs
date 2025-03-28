@@ -19,7 +19,7 @@ namespace Moritz.Spec
             /// <param name="midiControlType">The control index for the messages in the envelope.</param>
             /// <param name="envDefinition">A list of values defining equidistant peaks and troughs in the envelope. The first and last values are the boundary values.</param>
             /// <param name="count">The maximum number of values</param>
-            ControlEnvelope(int midiControlType, List<int> envDefinition )
+            ControlEnvelope(int midiControlType, List<int> envDefinition, int count )
                 :base(envDefinition, 127, 127, count)
             {
                 _midiControlType = midiControlType;

@@ -388,13 +388,13 @@ namespace Moritz.Algorithm
                     if(clefChanges.Count > 0)
                     {
                         ChannelDef channelDef = barVoiceDefs[voiceDefIndex];
-                        InsertClefChangesInChannelDef(channelDef, clefChanges);
+                        InsertClefChangesInChannelDef(channelDef, trkIndex, clefChanges);
                     }
                 }
             }
         }
 
-        private static void InsertClefChangesInChannelDef(ChannelDef channelDef, SortedDictionary<int, string> clefChanges)
+        private static void InsertClefChangesInChannelDef(ChannelDef channelDef, int trkIndex, SortedDictionary<int, string> clefChanges)
         {
             List<int> reversedKeys = new List<int>();
             foreach(int key in clefChanges.Keys)

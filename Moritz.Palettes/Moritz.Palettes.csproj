@@ -49,8 +49,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="IPaletteFormsHostForm.cs" />
     <Compile Include="GenericPalette.cs" />
+    <Compile Include="MidiChordSliderDefs.cs" />
     <Compile Include="PaletteButtonsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

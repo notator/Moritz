@@ -298,27 +298,6 @@ namespace Moritz.Spec
             return originalMsPositions;
         }
 
-        public void SetPitchWheelSliders(Envelope envelope)
-        {
-            #region condition
-            if(envelope.Domain != 127)
-            {
-                throw new ArgumentException($"{nameof(envelope.Domain)} must be 127.");
-            }
-            #endregion condition
-
-            List<int> msPositions = GetMsPositions();
-            Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
-
-            foreach(ChannelDef channelDef in ChannelDefs)
-            {
-                foreach(var trk in channelDef.Trks)
-                {
-                    trk.SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
-                }
-            }
-        }
-
         #endregion envelopes
 
         public void SetMsPositionsReFirstUD()

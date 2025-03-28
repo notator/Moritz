@@ -10,7 +10,7 @@ namespace Moritz.Symbols
         public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, int absMsPosition, PageFormat pageFormat)
             : base(voice, lccd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight * pageFormat.SmallSizeFactor)
         {
-            SetNoteheadPitchesAndVelocities(lccd.NotatedMidiPitches, lccd.NotatedMidiVelocities);
+            SetNoteheadPitchesAndVelocities(lccd.Pitches, lccd.Velocities);
 
             _durationClass = DurationClass.cautionary;
             _msDuration = 0;

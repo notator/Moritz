@@ -48,7 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="ControlEnvelope.cs" />
     <Compile Include="Gamut.cs" />

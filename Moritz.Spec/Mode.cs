@@ -73,16 +73,14 @@ namespace Moritz.Spec
         /// </summary>
         public bool ContainsAllPitches(MidiChordDef mcd)
         {
-            foreach(BasicMidiChordDef bmcd in mcd.BasicDurationDefs)
+            for(int i = 0; i < mcd.Pitches.Count; ++i)
             {
-                for(int i = 0; i < bmcd.Pitches.Count; ++i)
+                if(this.Gamut.Contains(mcd.Pitches[i]) == false)
                 {
-                    if(this.Gamut.Contains(bmcd.Pitches[i]) == false)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
+
             return true;
         }
 

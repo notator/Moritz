@@ -459,72 +459,72 @@ namespace Moritz.Spec
         /// <summary>
         /// Range 0..127
         /// </summary>
-        public sbyte? Preset { get; set; } = null;
+        public int? Preset { get; set; } = null;
         /// <summary>
         /// Range -64..63 
         /// </summary>
-        public sbyte? PitchWheel { get; set; } = null;
+        public int? PitchWheel { get; set; } = null;
         /// <summary>
         /// Range 0.. nBanks 
         /// </summary>
-        public sbyte? Bank { get; set; } = null;
+        public int? Bank { get; set; } = null;
         /// <summary>
         /// Range 0..127
         /// </summary>
-        public sbyte? ModWheel { get; set; } = null;
+        public int? ModWheel { get; set; } = null;
         /// <summary>
         /// Range 0..127 
         /// </summary>
-        public sbyte? Volume { get; set; } = null;
+        public int? Volume { get; set; } = null;
         /// <summary>
         /// Range 0..127 
         /// </summary>
-        public sbyte? Pan { get; set; } = null;
+        public int? Pan { get; set; } = null;
         /// <summary>
         /// Range 0..127
         /// </summary>
-        public sbyte? Expression { get; set; } = null;
+        public int? Expression { get; set; } = null;
         /// <summary>
         /// Range 0..127 (non-standard midi control)
         /// </summary>
-        public sbyte? PitchWheelSensitivity { get; set; } = null;
+        public int? PitchWheelSensitivity { get; set; } = null;
         /// <summary>
         /// Range 0..nMixtures (non-standard midi control)
         /// </summary>
-        public sbyte? Mixture { get; set; } = null;
+        public int? Mixture { get; set; } = null;
         /// <summary>
         /// Range 0..nTuningGroups (non-standard midi control) 
         /// </summary>
-        public sbyte? TuningGroup { get; set; } = null;
+        public int? TuningGroup { get; set; } = null;
         /// <summary>
         /// Range 0..nTunings (non-standard midi control)  
         /// </summary>
-        public sbyte? Tuning { get; set; } = null;
+        public int? Tuning { get; set; } = null;
         /// <summary>
         /// Range 0..nOrnamentGroups (non-standard midi control) 
         /// <para>(TODO in ResidentSynth and ResidentSynthHost)</para>
         /// </summary>
-        public sbyte? OrnamentGroup { get; set; } = null;
+        public int? OrnamentGroup { get; set; } = null;
         /// <summary>
         /// Range 0..nOrnaments (non-standard midi control) 
         /// </summary>
-        public sbyte? Ornament { get; set; } = null;
+        public int? Ornament { get; set; } = null;
         /// <summary>
         /// Range -64..63 (non-standard midi control)  
         /// </summary>
-        public sbyte? SemitoneOffset { get; set; } = null;
+        public int? SemitoneOffset { get; set; } = null;
         /// <summary>
         /// Range -64..63 (non-standard midi control)  
         /// </summary>
-        public sbyte? CentOffset { get; set; } = null;
+        public int? CentOffset { get; set; } = null;
         /// <summary>
         /// Range 0..127 (non-standard midi control) 
         /// </summary>
-        public sbyte? VelocityPitchSensitivity { get; set; } = null;
+        public int? VelocityPitchSensitivity { get; set; } = null;
         /// <summary>
         /// Range 0..127 (non-standard midi control)  
         /// </summary>
-        public sbyte? Reverberation { get; set; } = null; // non-standard control
+        public int? Reverberation { get; set; } = null; // non-standard control
         public bool AllSoundOff { get; set; } = false;
         public bool AllControllersOff { get; set; } = false;
         #endregion 

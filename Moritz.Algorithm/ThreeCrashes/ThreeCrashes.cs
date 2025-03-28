@@ -490,9 +490,9 @@ namespace Moritz.Algorithm.ThreeCrashes
             {
                 if(iud is MidiChordDef mcd)
                 {
-                    byte originalVelocity = mcd.NotatedMidiVelocities[0];
+                    byte originalVelocity = mcd.Velocities[0];
                     byte newVelocity = (byte)Math.Round(originalVelocity * warpFactor);
-                    mcd.NotatedMidiVelocities[0] = newVelocity;
+                    mcd.Velocities[0] = newVelocity;
                 }
             }
 

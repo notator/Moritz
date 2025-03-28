@@ -28,7 +28,7 @@ namespace Moritz.Symbols
 
             _msDurationToNextBarline = umcd.MsDurationToNextBarline;
 
-            SetNoteheadPitchesAndVelocities(umcd.NotatedMidiPitches, umcd.NotatedMidiVelocities);
+            SetNoteheadPitchesAndVelocities(umcd.Pitches, umcd.Velocities);
 
             if(!String.IsNullOrEmpty(umcd.OrnamentText))
             {
@@ -66,7 +66,7 @@ namespace Moritz.Symbols
         /// The midiPitches argument must be in order of size (ascending), but Heads are created in top-down order.
         /// </summary>
         /// <param name="midiPitches"></param>
-        public void SetNoteheadPitchesAndVelocities(List<byte> midiPitches, List<byte> midiVelocities)
+        public void SetNoteheadPitchesAndVelocities(List<int> midiPitches, List<int> midiVelocities)
         {
             #region check inputs
             Debug.Assert(midiPitches.Count == midiVelocities.Count);
@@ -258,7 +258,7 @@ namespace Moritz.Symbols
         /// </summary>
         /// <param name="midiPitches"></param>
         /// <returns></returns>
-        internal bool UseSharps(List<byte> midiPitches, List<byte> midiVelocities)
+        internal bool UseSharps(List<int> midiPitches, List<int> midiVelocities)
         {
             for(int i = 0; i < midiPitches.Count; i++)
             {

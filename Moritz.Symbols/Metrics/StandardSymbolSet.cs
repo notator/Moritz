@@ -538,10 +538,10 @@ namespace Moritz.Symbols
                 {
                     chordSymbol.SetNoteheadColorClasses();
                 }
-                else if(midiChordDef.NotatedMidiVelocities[0] != currentVelocity)
+                else if(midiChordDef.Velocities[0] != currentVelocity)
                 {
-                    chordSymbol.AddDynamic(midiChordDef.NotatedMidiVelocities[0], currentVelocity);
-                    currentVelocity = midiChordDef.NotatedMidiVelocities[0];
+                    chordSymbol.AddDynamic(midiChordDef.Velocities[0], currentVelocity);
+                    currentVelocity = midiChordDef.Velocities[0];
                 }
                 noteObject = chordSymbol;
             }
