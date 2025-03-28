@@ -983,7 +983,6 @@ namespace Moritz.Spec
 
         #region Changing MidiChordDef attributes
 
-
         #region Envelopes
 
         public void SetPitchWheelSliders(Envelope envelope)
@@ -1354,6 +1353,106 @@ namespace Moritz.Spec
                 }
             }
         }
+
+        /// <summary>
+        /// Creates a moving pan from startPanValue at beginIndex to endPanValue at (beginIndex + count - 1).
+        /// (In other words, it sets count MidiChordDefs.)
+        /// Implemented using one pan value per MidiChordDef.
+        /// This function does NOT change pan values outside the position range given in its arguments.
+        /// </summary>
+        /// <param name="beginIndex">The index at which to start setting pan values</param>
+        /// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
+        /// <param name="startPanValue">The MSB of the initial pan value (in range 0..127)</param>
+        /// <param name="endPanValue">The MSB of the final pan value (in range 0..127)</param>
+        public void SetPanGliss(int beginIndex, int count, int startPanValue, int endPanValue)
+        {
+            int endIndex = beginIndex + count;
+            if(CheckIndices(beginIndex, endIndex))
+            {
+                Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
+
+                int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+                int steps = (endIndex - 1 - beginIndex - nNonMidiChordDefs);
+                if(steps > 0)
+                {
+                    double increment = ((double)(endPanValue - startPanValue)) / steps;
+                    double panValue = startPanValue;
+                    List<IUniqueDef> lmdds = _uniqueDefs;
+
+                    for(int i = beginIndex; i < endIndex; ++i)
+                    {
+                        if(_uniqueDefs[i] is MidiChordDef iumdd)
+                        {
+                            byte panMsb = (byte)Math.Round(panValue);
+                            iumdd.PanMsbs = new List<byte>() { panMsb };
+                            panValue += increment;
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Sets the pitchwheelDeviation for MidiChordDefs in the defined range.
+        /// Rests in the range dont change.
+        /// </summary>
+        /// <param name="beginIndex">The index at which to start setting pitchWheelDeviations</param>
+        /// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
+        public void SetPitchWheelDeviation(int beginIndex, int count, int deviation)
+        {
+            int endIndex = beginIndex + count;
+            if(CheckIndices(beginIndex, endIndex))
+            {
+                for(int i = beginIndex; i < endIndex; ++i)
+                {
+                    if(this[i] is MidiChordDef mcd)
+                    {
+                        mcd.MidiChordControlDefs.VelocityPitchSensitivity = (sbyte)M.MidiValue(deviation);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Removes the pitchwheel commands (not the pitchwheelDeviations)
+        /// from chords in the range beginIndex to endIndex inclusive.
+        /// Rests in the range are not changed.
+        /// </summary>
+        public void RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
+        {
+            if(CheckIndices(beginIndex, endIndex))
+            {
+                for(int i = beginIndex; i < endIndex; ++i)
+                {
+                    if(this[i] is MidiChordDef umcd)
+                    {
+                        umcd.MidiChordControlDefs.PitchWheel = null;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates an exponential change (per index) of pitchwheelDeviation from beginIndex to endIndex,
+        /// </summary>
+        /// <param name="finale"></param>
+        protected void AdjustPitchWheelDeviations(int beginIndex, int endIndex, int pwValueAtBeginIndex, int pwValueAtEndIndex)
+        {
+            Debug.Assert(beginIndex >= 0 && beginIndex < endIndex && endIndex < Count);
+            Debug.Assert(pwValueAtBeginIndex >= 0 && pwValueAtEndIndex >= 0);
+            Debug.Assert(pwValueAtBeginIndex <= 127 && pwValueAtEndIndex <= 127);
+
+            int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+
+            double pwdfactor = Math.Pow(pwValueAtEndIndex / pwValueAtBeginIndex, (double)1 / (endIndex - beginIndex - nNonMidiChordDefs)); // f13.Count'th root of furies1EndPwdValue/furies1StartPwdValue -- the last pwd should be furies1EndPwdValue
+
+            for(int i = beginIndex; i < endIndex; ++i)
+            {
+                if(_uniqueDefs[i] is MidiChordDef umc)
+                {
+                    umc.MidiChordControlDefs.PitchWheelSensitivity = (sbyte)M.MidiValue((int)(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i))));
+                }
+            }
+        }
+
 
         #endregion Changing MidiChordDef attributes
 
