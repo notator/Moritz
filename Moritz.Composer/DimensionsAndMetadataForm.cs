@@ -1,5 +1,4 @@
 ﻿using Moritz.Globals;
-using Moritz.Palettes;
 
 using System;
 using System.Collections.Generic;

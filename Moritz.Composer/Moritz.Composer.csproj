@@ -63,13 +63,14 @@
     <Compile Include="DimensionsAndMetadataForm.Designer.cs">
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormStateFunctions.cs" />
     <Compile Include="NewPaletteDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="NewPaletteDialog.Designer.cs">
       <DependentUpon>NewPaletteDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="KrystalPaletteScore.cs" />
+    <Compile Include="KrystalScore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
