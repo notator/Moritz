@@ -523,16 +523,14 @@ namespace Moritz.Symbols
         {
             NoteObject noteObject = null;
             CautionaryChordDef cautionaryChordDef = iud as CautionaryChordDef;
-            MidiChordDef midiChordDef = iud as MidiChordDef;
             MidiRestDef midiRestDef = iud as MidiRestDef;
-            ClefDef clefDef = iud as ClefDef;
 
             if(cautionaryChordDef != null && iudIndex == 1)
             {
                 CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, absMsPosition, pageFormat);
                 noteObject = cautionaryChordSymbol;
             }
-            else if(midiChordDef != null)
+            else if(iud is MidiChordDef midiChordDef)
             {
                 ChordSymbol chordSymbol = new ChordSymbol(voice, midiChordDef, absMsPosition, pageFormat);
 
@@ -552,7 +550,7 @@ namespace Moritz.Symbols
                 RestSymbol restSymbol = new RestSymbol(voice, iud, absMsPosition, pageFormat);
                 noteObject = restSymbol;
             }
-            else if(clefDef != null)
+            else if(iud is ClefDef clefDef)
             {
                 if(iudIndex == 0)
                 {

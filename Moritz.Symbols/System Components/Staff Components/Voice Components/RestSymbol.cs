@@ -36,16 +36,7 @@ namespace Moritz.Symbols
             }
         }
 
-        /// <summary>
-        /// Dont use this function, use the other WriteSVG().
-        /// </summary>
-        /// <param name="w"></param>
         public override void WriteSVG(SvgWriter w)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void WriteSVG(SvgWriter w, int channel)
         {
             if(LocalCautionaryChordDef == null)
             {
@@ -55,6 +46,11 @@ namespace Moritz.Symbols
 
                 w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 
+                if(this.Metrics != null)
+                {
+                    ((RestMetrics)this.Metrics).WriteSVG(w);
+                }
+                
                 w.WriteStartElement("score", "midiRests", null);
 
                 // write a list of alternative <midiRest> elements
@@ -65,12 +61,9 @@ namespace Moritz.Symbols
                     midiRestDef.WriteSVG(w);  // writes a midiRest element (contains no midi mesages, just an msDuration attribute
                 }
 
-                w.WriteEndElement(); // end score:midiChords
+                w.WriteEndElement(); // end score:midiRests
 
-                if(this.Metrics != null)
-                {
-                    ((RestMetrics)this.Metrics).WriteSVG(w);
-                }
+
 
                 w.SvgEndGroup(); // "rest"
             }

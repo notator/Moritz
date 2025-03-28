@@ -65,7 +65,7 @@ namespace Moritz.Symbols
                 }
                 else if(restSymbol != null)
                 {
-                    restSymbol.WriteSVG(w, channelIndex);
+                    restSymbol.WriteSVG(w);
                 }
                 else if(clef != null) // clef
                 {
