@@ -1,6 +1,5 @@
 ﻿using Krystals5ObjectLibrary;
 
-using Moritz.Palettes;
 using Moritz.Spec;
 using Moritz.Symbols;
 
@@ -63,22 +62,6 @@ namespace Moritz.Algorithm
 
         public virtual ScoreData SetScoreRegionsData(List<Bar> bars) { return null; }
 
-        protected Palette GetPaletteByName(string paletteName)
-        {
-            Debug.Assert(_palettes != null && _palettes.Count > 0);
-            Palette rval = null;
-            foreach(Palette palette in _palettes)
-            {
-                if(string.Compare(palette.Name, paletteName) == 0)
-                {
-                    rval = palette;
-                    break;
-                }
-            }
-            Debug.Assert(rval != null);
-            return rval;
-        }
-
         /// <summary>
         /// Defines the number of MIDI channels used by the algorithm.
         /// This number must be in range [1..16].
@@ -138,7 +121,7 @@ namespace Moritz.Algorithm
         /// Algorithms simply set the InputVoice references to OutputVoices (voiceIDs) by using their index
         /// in the default bar layout being created.
         /// </summary>
-        public abstract List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
+        public abstract List<Bar> DoAlgorithm(List<Krystal> krystals);
 
         /// <summary>
         /// This function returns null or a SortedDictionary per ChannelDef in each bar.
@@ -443,6 +426,5 @@ namespace Moritz.Algorithm
         }
 
         protected List<Krystal> _krystals;
-        protected List<Palette> _palettes;
     }
 }

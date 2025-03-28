@@ -1,6 +1,5 @@
 ﻿using Krystals5ObjectLibrary;
 
-using Moritz.Palettes;
 using Moritz.Spec;
 
 using System.Collections.Generic;
@@ -19,8 +18,8 @@ namespace Moritz.Algorithm.PianolaMusic
         public override int NumberOfMidiChannels { get { return 6; } }
         public override int NumberOfBars { get { return 8; } }
 
-        // Neither the krystals, nor the palettes argument is used.
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        // The krystals argument is not used.
+        public override List<Bar> DoAlgorithm(List<Krystal> krystals)
         {
             List<Trk> tracks1and6 = GetTracks1and6();
             List<Trk> tracks2and5 = GetTracks2and5();

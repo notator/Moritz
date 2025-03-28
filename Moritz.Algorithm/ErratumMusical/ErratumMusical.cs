@@ -1,7 +1,6 @@
 ﻿using Krystals5ObjectLibrary;
 
 using Moritz.Globals;
-using Moritz.Palettes;
 using Moritz.Spec;
 
 using System;
@@ -105,8 +104,8 @@ namespace Moritz.Algorithm.ErratumMusical
               82, 81, 84, 85, 83 }
         };
 
-        // Neither the krystals, nor the palettes argument is used.
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        // The krystals argument is not used.
+        public override List<Bar> DoAlgorithm(List<Krystal> krystals)
         {
             List<int> endBarlinePositions = new List<int>();
             List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };

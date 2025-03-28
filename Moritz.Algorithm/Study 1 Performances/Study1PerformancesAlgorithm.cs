@@ -1,7 +1,6 @@
 ﻿using Krystals5ObjectLibrary;
 
 using Moritz.Globals;
-using Moritz.Palettes;
 using Moritz.Spec;
 
 using System;
@@ -24,8 +23,8 @@ namespace Moritz.Algorithm.Study1
         public override int NumberOfMidiChannels { get { return 1; } }
         public override int NumberOfBars { get { return 68; } }
 
-        // Neither the krystals, nor the palettes argument is used.
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        // The krystals argument is not used.
+        public override List<Bar> DoAlgorithm(List<Krystal> krystals)
         {
             List<byte> trackChordNumbers = GetTrackChordNumbers();
             List<byte> trackRootPitches = GetTrackRootPitches();

@@ -1,6 +1,4 @@
 ﻿using Krystals5ObjectLibrary;
-
-using Moritz.Palettes;
 using Moritz.Spec;
 
 using System;
@@ -132,8 +130,8 @@ namespace Moritz.Algorithm.ThreeCrashes
 
         /****************************************************************************************/
 
-        // Neither the krystals, nor the palettes argument is used.
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        // The krystals argument is not used.
+        public override List<Bar> DoAlgorithm(List<Krystal> krystals)
         {
             ///*********************************************/
             List<Trk> crashATrks = GetElevenCrashTrks(0, crashAWagons, 0); // angular position in range [0..10]
