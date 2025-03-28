@@ -117,7 +117,7 @@ namespace Moritz.Globals
             return folder;
         }
 
-        public static string MoritzAppDataFolder = @"C:\Users\James\OneDrive\Moritz";
+        public static string MoritzAppDataFolder = @"C:\Users\James\OneDrive\Moritz_2025";
 
         public static string MoritzPreferencesPath = MoritzAppDataFolder + @"\Preferences.mzpf";
         public static string MoritzAudioFolder = MoritzAppDataFolder + @"\audio";
@@ -996,22 +996,6 @@ namespace Moritz.Globals
         public static readonly byte DEFAULT_PITCHWHEELDEVIATION_2 = 2;
         public static readonly int DEFAULT_NOTEOFF_VELOCITY_64 = 64;
         #endregion
-        /// <summary>
-        /// The following values are (supposed to be) set by AllControllersOff.
-        /// </summary>
-        //public static readonly byte DEFAULT_BANKAndPATCH_0 = 0;
-        //public static readonly byte DEFAULT_VOLUME_100 = 100;
-        //public static readonly byte DEFAULT_EXPRESSION_127 = 127;
-
-        //public static readonly byte DEFAULT_PITCHWHEEL_64 = 64;
-        //public static readonly byte DEFAULT_PAN_64 = 64;
-        //public static readonly byte DEFAULT_MODWHEEL_0 = 0;
-        /// <summary>
-        /// Constants that are set when palette fields are empty
-        /// </summary>
-        public static readonly bool DEFAULT_HAS_CHORDOFF_true = true;
-        public static readonly bool DEFAULT_CHORDREPEATS_false = false;
-        public static readonly int DEFAULT_ORNAMENT_MINIMUMDURATION_1 = 1;
 
         /// <summary>
         /// Called in the above constructor
