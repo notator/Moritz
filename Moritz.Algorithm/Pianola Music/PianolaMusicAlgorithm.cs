@@ -29,11 +29,20 @@ namespace Moritz.Algorithm.PianolaMusic
             List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
             Debug.Assert(trks.Count == NumberOfMidiChannels);
 
-            Bar bar = new Seq(0, trks, NumberOfMidiChannels);
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(bar, 8);
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, bar.ChannelDefs.Count);
+            List<ChannelDef> channelDefs = new List<ChannelDef>();
+            foreach(var trk in trks)
+            {
+                channelDefs.Add(new ChannelDef(new List<Trk>() { trk }));
+            }
 
-            List<Bar> bars = GetBars(bar, barlineMsPositions, clefChangesPerBar, null);
+            Bar singleBar = new Bar(0, channelDefs);
+
+            singleBar.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
+
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(trks, 8);
+            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, singleBar.ChannelDefs.Count);
+
+            List<Bar> bars = GetBars(singleBar, barlineMsPositions, clefChangesPerBar, null);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
@@ -110,10 +119,10 @@ namespace Moritz.Algorithm.PianolaMusic
         private List<Trk> GetTrks(int upperChannel, List<int> upperTrackPitches, int lowerChannel, List<int> lowerTrackPitches, List<List<int>> durations)
         {
             List<IUniqueDef> t1MidiChordDefs = GetMidiChordDefs(upperTrackPitches, durations[0]);
-            Trk trk1 = new Trk((byte)upperChannel, 0, t1MidiChordDefs);
+            Trk trk1 = new Trk(t1MidiChordDefs);
 
             List<IUniqueDef> t6MidiChordDefs = GetMidiChordDefs(lowerTrackPitches, durations[1]);
-            Trk trk6 = new Trk((byte)lowerChannel, 0, t6MidiChordDefs);
+            Trk trk6 = new Trk(t6MidiChordDefs);
 
             List<Trk> trks = new List<Trk>
             {
@@ -200,27 +209,6 @@ namespace Moritz.Algorithm.PianolaMusic
             #endregion durations
 
             return GetTrks(2, t3Pitches, 3, t4Pitches, durations);
-        }
-
-        /// <summary>
-        /// The patch only needs to be set in the first chord in each voice,
-        /// since it will be set by shunting if the Assistant Performer starts later.
-        /// </summary>
-        private void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
-        {
-            MidiChordDef midiChordDef = null;
-            foreach(ChannelDef channelDef in bar1.ChannelDefs)
-            {
-                foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
-                {
-                    midiChordDef = iUniqueDef as MidiChordDef;
-                    if(midiChordDef != null)
-                    {
-                        midiChordDef.Preset = 0;
-                        break;
-                    }
-                }
-            }
         }
     }
 }

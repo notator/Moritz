@@ -134,9 +134,9 @@ namespace Moritz.Algorithm.ThreeCrashes
         public override List<Bar> DoAlgorithm(List<Krystal> krystals)
         {
             ///*********************************************/
-            List<Trk> crashATrks = GetElevenCrashTrks(0, crashAWagons, 0); // angular position in range [0..10]
-            List<Trk> crashBTrks = GetElevenCrashTrks(1, crashBWagons, 3); // angular position in range [0..10]	
-            List<Trk> crashCTrks = GetElevenCrashTrks(2, crashCWagons, 7); // angular position in range [0..10]
+            List<Trk> crashATrks = GetElevenCrashTrks(crashAWagons, 0); // angular position in range [0..10]
+            List<Trk> crashBTrks = GetElevenCrashTrks(crashBWagons, 3); // angular position in range [0..10]	
+            List<Trk> crashCTrks = GetElevenCrashTrks(crashCWagons, 7); // angular position in range [0..10]
 
             crashATrks = ReverseAlternateTrks(crashATrks, false);
             crashBTrks = ReverseAlternateTrks(crashBTrks, false);
@@ -161,8 +161,15 @@ namespace Moritz.Algorithm.ThreeCrashes
             ///*******************************************/
 
             List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
+            Debug.Assert(trks.Count == NumberOfMidiChannels);
+            List<ChannelDef> channelDefs = new List<ChannelDef>();
+            foreach(var trk in trks)
+            {
+                channelDefs.Add(new ChannelDef(new List<Trk>() { trk }));
+            }
 
-            Bar mainSeq = new Seq(0, trks, NumberOfMidiChannels);
+            Bar singleBar = new Bar(0, channelDefs);
+            singleBar.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
             //List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
 
@@ -170,9 +177,9 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, mainSeq.Trks.Count);
+            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, singleBar.Trks.Count);
 
-            List<Bar> bars = GetBars(mainSeq, endBarlinePositions, clefChangesPerBar, null);
+            List<Bar> bars = GetBars(singleBar, endBarlinePositions, clefChangesPerBar, null);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
@@ -213,7 +220,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         /// <param name="crashWagons"></param>
         /// <param name="initialAngularPosition"></param>
         /// <returns></returns>
-        private List<Trk> GetElevenCrashTrks(int midiChannel, IReadOnlyList<IReadOnlyList<byte>> crashWagons, int initialAngularPosition)
+        private List<Trk> GetElevenCrashTrks(IReadOnlyList<IReadOnlyList<byte>> crashWagons, int initialAngularPosition)
         {
             List<Trk> crashTrks = new List<Trk>();
 
@@ -229,7 +236,7 @@ namespace Moritz.Algorithm.ThreeCrashes
                     List<int> pitchDurations = GetBasicPitchDurations(wagonValues);
                     List<byte> midiPitches = GetBasicMidiPitches(wagonValues);
 
-                    Trk wagonTrk = GetWagonTrk(midiChannel, midiPitches, velocities, pitchDurations);
+                    Trk wagonTrk = GetWagonTrk(midiPitches, velocities, pitchDurations);
 
                     wagonTrks.Add(wagonTrk);
                 }
@@ -310,9 +317,9 @@ namespace Moritz.Algorithm.ThreeCrashes
             return durations as IReadOnlyList<int>;
         }
 
-        private Trk GetWagonTrk(int midiChannel, List<byte> pitches, List<byte> velocities, List<int> durations)
+        private Trk GetWagonTrk(List<byte> pitches, List<byte> velocities, List<int> durations)
         {
-            Trk trk = new Trk(midiChannel);
+            Trk trk = new Trk();
             List<IUniqueDef> midiChordDefs = GetMidiChordDefs(pitches, velocities, durations);
             trk.UniqueDefs.AddRange(midiChordDefs);
 
@@ -351,7 +358,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         /// <returns></returns>
         private Trk GetInterspersedTrk(List<Trk> wagonTrks, List<List<byte>> iudIndicesList)
         {
-            Trk rval = new Trk(wagonTrks[0].MidiChannel);
+            Trk rval = new Trk();
 
             for(byte iudIndex = 0; iudIndex < 85; ++iudIndex)
             {
@@ -481,12 +488,11 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             foreach(IUniqueDef iud in crashTrk.UniqueDefs)
             {
-                if(iud is MidiChordDef mcd && mcd.BasicDurationDefs[0] is BasicMidiChordDef bmcd)
+                if(iud is MidiChordDef mcd)
                 {
-                    byte originalVelocity = bmcd.Velocities[0];
+                    byte originalVelocity = mcd.NotatedMidiVelocities[0];
                     byte newVelocity = (byte)Math.Round(originalVelocity * warpFactor);
-                    bmcd.AdjustVelocities(originalVelocity, newVelocity);
-                    mcd.NotatedMidiVelocities[0] = bmcd.Velocities[0];
+                    mcd.NotatedMidiVelocities[0] = newVelocity;
                 }
             }
 
@@ -544,14 +550,13 @@ namespace Moritz.Algorithm.ThreeCrashes
         private List<Trk> ReverseAlternateTrks(List<Trk> crashTrks, bool reverseFirstTrk)
         {
             List<Trk> reversedTrks = new List<Trk>();
-            int midiChannel = crashTrks[0].MidiChannel;
             bool doReverse = reverseFirstTrk;
 
             foreach(Trk trk in crashTrks)
             {
                 if(doReverse)
                 {
-                    Trk newTrk = new Trk(midiChannel);
+                    Trk newTrk = new Trk();
                     for(int i = trk.UniqueDefs.Count - 1; i >= 0; --i)
                     {
                         newTrk.Add((IUniqueDef)trk.UniqueDefs[i].Clone());
@@ -593,7 +598,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         {
             Debug.Assert(crashTrks.Count == 11);
 
-            Trk crashTrk = new Trk(crashTrks[0].MidiChannel);
+            Trk crashTrk = new Trk();
 
             foreach(Trk trk in crashTrks)
             {
@@ -651,27 +656,6 @@ namespace Moritz.Algorithm.ThreeCrashes
         protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
         {
             return null;
-        }
-
-        /// <summary>
-        /// The patch only needs to be set in the first chord in each voice,
-        /// since it will be set by shunting if the Assistant Performer starts later.
-        /// </summary>
-        private void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
-        {
-            MidiChordDef midiChordDef = null;
-            foreach(ChannelDef channelDef in bar1.ChannelDefs)
-            {
-                foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
-                {
-                    midiChordDef = iUniqueDef as MidiChordDef;
-                    if(midiChordDef != null)
-                    {
-                        midiChordDef.Preset = 0;
-                        break;
-                    }
-                }
-            }
         }
     }
 }

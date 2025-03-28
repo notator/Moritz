@@ -349,6 +349,30 @@ namespace Moritz.Algorithm
             return bars;
         }
 
+        /// <summary>
+        /// The patch only needs to be set in the first chord in each trk,
+        /// since it will be set by shunting if the Assistant Performer starts later.
+        /// </summary>
+        protected void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
+        {
+            MidiChordDef midiChordDef = null;
+            foreach(ChannelDef channelDef in bar1.ChannelDefs)
+            {
+                foreach(var trk in channelDef.Trks)
+                {
+                    foreach(IUniqueDef iUniqueDef in trk.UniqueDefs)
+                    {
+                        midiChordDef = iUniqueDef as MidiChordDef;
+                        if(midiChordDef != null)
+                        {
+                            midiChordDef.MidiChordControlDefs.Preset = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
         private void InsertClefChangesInBars(List<Bar> bars, List<List<SortedDictionary<int, string>>> clefChangesPerBar)
         {
             Debug.Assert(bars.Count == clefChangesPerBar.Count);

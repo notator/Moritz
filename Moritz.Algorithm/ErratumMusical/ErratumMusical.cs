@@ -107,14 +107,19 @@ namespace Moritz.Algorithm.ErratumMusical
         // The krystals argument is not used.
         public override List<Bar> DoAlgorithm(List<Krystal> krystals)
         {
-            List<int> endBarlinePositions = new List<int>();
+            List<int> endBarlinePositions;
             List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
+            List<ChannelDef> channelDefs = new List<ChannelDef>() { new ChannelDef(trks) };
 
-            Bar seq = new Seq(0, trks, NumberOfMidiChannels);
+            Debug.Assert(channelDefs.Count == NumberOfMidiChannels);
 
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, seq.ChannelDefs.Count);
+            Bar singleBar = new Bar(0, channelDefs);
 
-            List<Bar> bars = GetBars(seq, endBarlinePositions, clefChangesPerBar, null);
+            singleBar.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
+
+            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, singleBar.ChannelDefs.Count);
+
+            List<Bar> bars = GetBars(singleBar, endBarlinePositions, clefChangesPerBar, null);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
@@ -178,7 +183,7 @@ namespace Moritz.Algorithm.ErratumMusical
 
             endBarlinePositions = new List<int>();
             int endBarlinePosition = 0;
-            Trk allSelectionsTrk = new Trk(0);
+            Trk allSelectionsTrk = new Trk();
             for(int i = 0; i < erratumMusicalGraphPitches.Count; ++i)
             {
                 IReadOnlyList<byte> graphPitches = erratumMusicalGraphPitches[i];
@@ -349,27 +354,6 @@ namespace Moritz.Algorithm.ErratumMusical
                 durations.Add((int)dDuration);
             }
             return durations as IReadOnlyList<int>;
-        }
-
-        /// <summary>
-        /// The patch only needs to be set in the first chord in each voice,
-        /// since it will be set by shunting if the Assistant Performer starts later.
-        /// </summary>
-        private void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
-        {
-            MidiChordDef midiChordDef = null;
-            foreach(ChannelDef channelDef in bar1.ChannelDefs)
-            {
-                foreach(IUniqueDef iUniqueDef in channelDef.UniqueDefs)
-                {
-                    midiChordDef = iUniqueDef as MidiChordDef;
-                    if(midiChordDef != null)
-                    {
-                        midiChordDef.Preset = 0;
-                        break;
-                    }
-                }
-            }
         }
     }
 }
