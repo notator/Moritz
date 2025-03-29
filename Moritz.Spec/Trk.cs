@@ -1216,27 +1216,6 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Calls MidiChordDef.AdjustVelocities(byte originalVelocity, byte newVelocity) on each MidiChordDef
-        /// in range beginIndex to (exclusive) endIndex.
-        /// The resulting velocities are in range 1..127.
-        /// Velocities having originalVelocity are changed to newVelocity.
-        /// Velocity values above originalVelocity are changed proportionally with max possible velocity at 127.
-        /// Velocity values below originalVelocity are changed proportionally with min possible velocity at 1.
-        /// </summary>
-        public void AdjustVelocities(int beginIndex, int nonInclusiveEndIndex, byte originalVelocity, byte newVelocity)
-        {
-            if(CheckIndices(beginIndex, nonInclusiveEndIndex))
-            {
-                for(int i = beginIndex; i < nonInclusiveEndIndex; ++i)
-                {
-                    if(_uniqueDefs[i] is MidiChordDef mcd)
-                    {
-                        mcd.AdjustVelocities(originalVelocity, newVelocity);
-                    }
-                }
-            }
-        }
-        /// <summary>
         /// Multiplies each velocity value in the MidiChordDefs by the argument factor (must be greater than zero).
         /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
         /// </summary>
@@ -1351,7 +1330,7 @@ namespace Moritz.Spec
                 {
                     if(this[i] is MidiChordDef mcd)
                     {
-                        mcd.MidiChordControlDefs.VelocityPitchSensitivity = (sbyte)M.MidiValue(deviation);
+                        mcd.MidiChordControlDefs.VelocityPitchSensitivity = M.MidiValue(deviation);
                     }
                 }
             }
@@ -1393,7 +1372,7 @@ namespace Moritz.Spec
             {
                 if(_uniqueDefs[i] is MidiChordDef umc)
                 {
-                    umc.MidiChordControlDefs.PitchWheelSensitivity = (sbyte)M.MidiValue((int)(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i))));
+                    umc.MidiChordControlDefs.PitchWheelSensitivity = M.MidiValue(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i)));
                 }
             }
         }

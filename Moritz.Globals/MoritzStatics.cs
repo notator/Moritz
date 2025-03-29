@@ -793,21 +793,55 @@ namespace Moritz.Globals
         }
 
         /// <summary>
-        /// Returns the value argument as a byte, coerced to the range [0..127] 
+        /// Returns the value argument as an int, coerced to the range [0..127] 
         /// </summary>
-        public static byte MidiValue(int value)
+        public static int MidiValue(int value)
         {
             int rval;
 
             if(value > 127)
+            {
                 rval = 127;
+                Debug.WriteLine("Warning: value above limit.");
+            }
             else if(value < 0)
+            {
                 rval = 0;
+                Debug.WriteLine("Warning: value below limit.");
+            }
             else
                 rval = value;
 
-            return (byte)rval;
+            return rval;
         }
+        public static int MidiValue(double value)
+        {
+            return MidiValue((int)value);
+        }
+
+        /// <summary>
+        /// Returns the value argument as an int, coerced to the range [-64..63] 
+        /// </summary>
+        public static int MidiOffsetValue(int value)
+        {
+            int rval;
+
+            if(value > 63)
+            {
+                rval = 63;
+                Debug.WriteLine("Warning: value above limit.");
+            }
+            else if(value < -64)
+            {
+                rval = -64;
+                Debug.WriteLine("Warning: value below limit.");
+            }
+            else
+                rval = value;
+
+            return rval;
+        }
+
 
         public static List<byte> MidiList(List<int> values)
         {

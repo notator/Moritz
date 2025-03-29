@@ -78,11 +78,11 @@ namespace Moritz.Spec
         {
             Debug.Assert(false, "To be completed.");
             MidiChordDef rval = new MidiChordDef(this.Pitches, this.Velocities, this.MsDuration, this.HasChordOff)
-            { 
+            {
                 MsPositionReFirstUD = this.MsPositionReFirstUD,
                 OrnamentText = this.OrnamentText, // the displayed ornament Text (without the tilde)
 
-                MidiChordControlDefs = this.MidiChordControlDefs.Clone()
+                MidiChordControlDefs = (MidiChordControlDefs)MidiChordControlDefs.Clone()
             };
 
             return rval;
@@ -574,15 +574,26 @@ namespace Moritz.Spec
         {
             for(int j = 0; j < Velocities.Count; ++j)
             {
-                mcd.Velocities[j] = (int)(Velocities[j] * factor);
+                Velocities[j] = M.MidiValue(Velocities[j] * factor);
             }
         }
 
         #endregion IUniqueChordDef
 
         #region properties
-        public List<int> Pitches { get; set; } = new List<int>();
-        public List<int> Velocities { get; set; } = new List<int>();
+        public List<int> Pitches = new List<int>();
+        List<int> IUniqueChordDef.Pitches
+        {
+            get => Pitches;
+            set => Pitches = value;
+        }
+
+        public List<int> Velocities = new List<int>();
+        List<int> IUniqueChordDef.Velocities
+        {
+            get => Velocities;
+            set => Velocities = value;
+        }
 
         public int? MsDurationToNextBarline { get; set; } = null;
         public bool HasChordOff { get; set; } = true;
@@ -597,6 +608,7 @@ namespace Moritz.Spec
         /// See ControlEnvelope: a class that converts an EnvelopeTypeDef into a series of control values with a specific Count.
         /// </summary>
         public Tuple<int, List<int>> EnvelopeTypeDef { get; private set; } = null;
+
         #endregion properties
     }
 }
