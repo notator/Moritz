@@ -7,13 +7,18 @@ using System.Diagnostics;
 
 namespace Moritz.Spec
 {
-    public class MidiChordControlDefs
+    public class MidiChordControlDefs : ICloneable
     {
         /// <summary>
         /// Used by the Assistant Composer's palettes
         /// </summary>
         public MidiChordControlDefs()
         {
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
         }
 
         internal MidiChordControlDefs Clone()
@@ -457,74 +462,360 @@ namespace Moritz.Spec
         #region ResidentSynth controls
         // These messages are only sent if their value is not null.
         /// <summary>
-        /// Range 0..127
+        /// null or silently coerced to Range 0..127
         /// </summary>
-        public int? Preset { get; set; } = null;
+        public int? Preset
+        {
+            get => _preset;
+            set
+            {
+                if(value == null)
+                {
+                    _preset = null;
+                }
+                else
+                {
+                    _preset = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _preset = null;
+        
         /// <summary>
-        /// Range -64..63 
+        /// null or silently coerced to range -64..63  
         /// </summary>
-        public int? PitchWheel { get; set; } = null;
+        public int? PitchWheel
+        {
+            get => _pitchWheel;
+            set
+            {
+                if(value == null)
+                {
+                    _pitchWheel = null;
+                }
+                else
+                {
+                    _pitchWheel = M.MidiOffsetValue((int)value);
+                }
+            }
+        }
+        private int? _pitchWheel = null;
+
         /// <summary>
-        /// Range 0.. nBanks 
+        /// null or silently coerced to Range 0..127
+        /// Legal range is actually 0..nBanks.
         /// </summary>
-        public int? Bank { get; set; } = null;
+        public int? Bank
+        {
+            get => _bank;
+            set
+            {
+                if(value == null)
+                {
+                    _bank = null;
+                }
+                else
+                {
+                    _bank = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _bank = null;
+
         /// <summary>
-        /// Range 0..127
+        /// null or silently coerced to Range 0..127
         /// </summary>
-        public int? ModWheel { get; set; } = null;
+        public int? ModWheel
+        {
+            get => _modWheel;
+            set
+            {
+                if(value == null)
+                {
+                    _modWheel = null;
+                }
+                else
+                {
+                    _modWheel = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _modWheel = null;
+
         /// <summary>
-        /// Range 0..127 
+        /// null or silently coerced to Range 0..127
         /// </summary>
-        public int? Volume { get; set; } = null;
+        public int? Volume
+        {
+            get => _volume;
+            set
+            {
+                if(value == null)
+                {
+                    _volume = null;
+                }
+                else
+                {
+                    _volume = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _volume = null;
+
         /// <summary>
-        /// Range 0..127 
+        /// null or silently coerced to Range 0..127
         /// </summary>
-        public int? Pan { get; set; } = null;
+        public int? Pan
+        {
+            get => _pan;
+            set
+            {
+                if(value == null)
+                {
+                    _pan = null;
+                }
+                else
+                {
+                    _pan = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _pan = null;
+
         /// <summary>
-        /// Range 0..127
+        /// null or silently coerced to Range 0..127
         /// </summary>
-        public int? Expression { get; set; } = null;
+        public int? Expression
+        {
+            get => _expression;
+            set
+            {
+                if(value == null)
+                {
+                    _expression = null;
+                }
+                else
+                {
+                    _expression = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _expression = null;
+
         /// <summary>
-        /// Range 0..127 (non-standard midi control)
+        /// null or silently coerced to Range 0..127
+        /// (non-standard midi control)
         /// </summary>
-        public int? PitchWheelSensitivity { get; set; } = null;
+        public int? PitchWheelSensitivity
+        {
+            get => _pitchWheelSensitivity;
+            set
+            {
+                if(value == null)
+                {
+                    _pitchWheelSensitivity = null;
+                }
+                else
+                {
+                    _pitchWheelSensitivity = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _pitchWheelSensitivity = null;
+
         /// <summary>
-        /// Range 0..nMixtures (non-standard midi control)
+        /// null or silently coerced to Range 0..127
+        /// Legal range is actually 0..nMixtures
+        /// (non-standard midi control)
         /// </summary>
-        public int? Mixture { get; set; } = null;
+        public int? Mixture
+        {
+            get => _mixture;
+            set
+            {
+                if(value == null)
+                {
+                    _mixture = null;
+                }
+                else
+                {
+                    _mixture = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _mixture = null;
+
         /// <summary>
-        /// Range 0..nTuningGroups (non-standard midi control) 
+        /// null or silently coerced to Range 0..127
+        /// Legal range is actually 0..nTuningGroups
+        /// (non-standard midi control)
         /// </summary>
-        public int? TuningGroup { get; set; } = null;
+        public int? TuningGroup
+        {
+            get => _tuningGroup;
+            set
+            {
+                if(value == null)
+                {
+                    _tuningGroup = null;
+                }
+                else
+                {
+                    _tuningGroup = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _tuningGroup = null;
+
         /// <summary>
-        /// Range 0..nTunings (non-standard midi control)  
+        /// null or silently coerced to Range 0..127
+        /// (non-standard midi control)
         /// </summary>
-        public int? Tuning { get; set; } = null;
+        public int? Tuning
+        {
+            get => _tuning;
+            set
+            {
+                if(value == null)
+                {
+                    _tuning = null;
+                }
+                else
+                {
+                    _tuning = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _tuning = null;
+
         /// <summary>
-        /// Range 0..nOrnamentGroups (non-standard midi control) 
+        /// null or silently coerced to Range 0..127
+        /// Legal range is actually 0..nOrnamentGroups
+        /// (non-standard midi control)
         /// <para>(TODO in ResidentSynth and ResidentSynthHost)</para>
         /// </summary>
-        public int? OrnamentGroup { get; set; } = null;
+        public int? OrnamentGroup
+        {
+            get => _ornamentGroup;
+            set
+            {
+                if(value == null)
+                {
+                    _ornamentGroup = null;
+                }
+                else
+                {
+                    _ornamentGroup = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _ornamentGroup = null;
+
         /// <summary>
-        /// Range 0..nOrnaments (non-standard midi control) 
+        /// null or silently coerced to Range 0..127
+        /// Legal range is actually 0..nOrnaments
+        /// (non-standard midi control)
         /// </summary>
-        public int? Ornament { get; set; } = null;
+        public int? Ornament
+        {
+            get => _ornament;
+            set
+            {
+                if(value == null)
+                {
+                    _ornament = null;
+                }
+                else
+                {
+                    _ornament = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _ornament = null;
+
         /// <summary>
-        /// Range -64..63 (non-standard midi control)  
+        /// null or silently coerced to range -64..63
+        /// (non-standard midi control)  
         /// </summary>
-        public int? SemitoneOffset { get; set; } = null;
+        public int? SemitoneOffset
+        {
+            get => _semitoneOffset;
+            set
+            {
+                if(value == null)
+                {
+                    _semitoneOffset = null;
+                }
+                else
+                {
+                    _semitoneOffset = M.MidiOffsetValue((int)value);
+                }
+            }
+        }
+        private int? _semitoneOffset = null;
+
         /// <summary>
-        /// Range -64..63 (non-standard midi control)  
+        /// null or silently coerced to range -64..63
+        /// (non-standard midi control)  
         /// </summary>
-        public int? CentOffset { get; set; } = null;
+        public int? CentOffset
+        {
+            get => _centOffset;
+            set
+            {
+                if(value == null)
+                {
+                    _centOffset = null;
+                }
+                else
+                {
+                    _centOffset = M.MidiOffsetValue((int)value);
+                }
+            }
+        }
+        private int? _centOffset = null;
+
         /// <summary>
-        /// Range 0..127 (non-standard midi control) 
+        /// null or silently coerced to Range 0..127
+        /// (non-standard midi control)
         /// </summary>
-        public int? VelocityPitchSensitivity { get; set; } = null;
+        public int? VelocityPitchSensitivity
+        {
+            get => _velocityPitchSensitivity;
+            set
+            {
+                if(value == null)
+                {
+                    _velocityPitchSensitivity = null;
+                }
+                else
+                {
+                    _velocityPitchSensitivity = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _velocityPitchSensitivity = null;
+
         /// <summary>
-        /// Range 0..127 (non-standard midi control)  
+        /// null or silently coerced to Range 0..127
+        /// (non-standard midi control)
         /// </summary>
-        public int? Reverberation { get; set; } = null; // non-standard control
+        public int? Reverberation
+        {
+            get => _reverberation;
+            set
+            {
+                if(value == null)
+                {
+                    _reverberation = null;
+                }
+                else
+                {
+                    _reverberation = M.MidiValue((int)value);
+                }
+            }
+        }
+        private int? _reverberation = null;
         public bool AllSoundOff { get; set; } = false;
         public bool AllControllersOff { get; set; } = false;
         #endregion 
