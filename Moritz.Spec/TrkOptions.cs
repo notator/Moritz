@@ -147,8 +147,8 @@ namespace Moritz.Spec
             get { return _velocityOption; }
         }
         private VelocityOption _velocityOption = VelocityOption.inherit;
-        public byte? MinimumVelocity { get { return _minimumVelocity; } }
-        private byte? _minimumVelocity = null; // must be set if a velocity option is being used
+        public int? MinimumVelocity { get { return _minimumVelocity; } }
+        private int? _minimumVelocity = null; // must be set if a velocity option is being used
     }
 
     public class TrkOption
@@ -216,7 +216,7 @@ namespace Moritz.Spec
     };
     public class VelocityTrkOption : TrkOption
     {
-        protected VelocityTrkOption(VelocityOption velocityOption, byte minVelocity)
+        protected VelocityTrkOption(VelocityOption velocityOption, int minVelocity)
         {
             Debug.Assert(minVelocity > 0 && minVelocity < 128);
             _minVelocity = minVelocity;
@@ -225,26 +225,26 @@ namespace Moritz.Spec
 
         public VelocityOption VelocityOption { get { return _velocityOption; } }
         private readonly VelocityOption _velocityOption;
-        public byte MinimumVelocity { get { return _minVelocity; } }
-        private readonly byte _minVelocity;
+        public int MinimumVelocity { get { return _minVelocity; } }
+        private readonly int _minVelocity;
     }
     public class VelocityScaledControl : VelocityTrkOption
     {
-        public VelocityScaledControl(byte minVelocity)
+        public VelocityScaledControl(int minVelocity)
             : base(VelocityOption.scaled, minVelocity)
         {
         }
     }
     public class VelocitySharedControl : VelocityTrkOption
     {
-        public VelocitySharedControl(byte minVelocity)
+        public VelocitySharedControl(int minVelocity)
             : base(VelocityOption.shared, minVelocity)
         {
         }
     }
     public class VelocityOverriddenControl : VelocityTrkOption
     {
-        public VelocityOverriddenControl(byte minVelocity)
+        public VelocityOverriddenControl(int minVelocity)
             : base(VelocityOption.overridden, minVelocity)
         {
         }

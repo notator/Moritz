@@ -152,7 +152,7 @@ namespace Moritz.Spec
         /// <param name="rootPitch">In range [0..127]</param>
         /// <param name="nPitches">In range [1..12]</param>
         /// <returns></returns>
-        public List<byte> GetChord(int rootPitch, int nPitches)
+        public List<int> GetChord(int rootPitch, int nPitches)
         {
             Debug.Assert(nPitches > 0 && nPitches <= 12);
             Debug.Assert(Gamut.Contains(rootPitch));
@@ -186,13 +186,13 @@ namespace Moritz.Spec
                     }
                 }
             }
-            List<byte> bytePitches = new List<byte>();
+            List<int> intPitches = new List<int>();
             foreach(int pitch in pitches)
             {
-                bytePitches.Add((byte)pitch);
+                intPitches.Add((int)pitch);
             }
 
-            return bytePitches;
+            return intPitches;
         }
 
         private int MinimumInterval(int lowerPitch)
@@ -245,11 +245,11 @@ namespace Moritz.Spec
             return minimumInterval;
         }
 
-        private static void AssertVelocityPerAbsolutePitchValidity(IReadOnlyList<byte> velocityPerAbsolutePitch)
+        private static void AssertVelocityPerAbsolutePitchValidity(IReadOnlyList<int> velocityPerAbsolutePitch)
         {
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
 
-            foreach(byte velocity in velocityPerAbsolutePitch)
+            foreach(int velocity in velocityPerAbsolutePitch)
             {
                 M.AssertIsVelocityValue(velocity);
             }
@@ -266,7 +266,7 @@ namespace Moritz.Spec
         /// 2. in a linear progression per AbsolutePitchHierarchy value.
         /// 3. sorted, so that the velocity for C natural (absolute pitch 0) is at position 0, C# (absolute pitch 1) is at position 1, etc.
         /// </summary>
-        public List<byte> GetDefaultVelocityPerAbsolutePitch()
+        public List<int> GetDefaultVelocityPerAbsolutePitch()
         {
             const int maximumVelocity = 127;
             const int minimumVelocity = 1;
@@ -285,17 +285,17 @@ namespace Moritz.Spec
                 }
             }
 
-            List<byte> velocityPerAbsPitch = new List<byte>();
+            List<int> velocityPerAbsPitch = new List<int>();
             for(int i = 0; i < 12; ++i)
             {
-                velocityPerAbsPitch.Add((byte)minimumVelocity); // default value 1
+                velocityPerAbsPitch.Add((int)minimumVelocity); // default value 1
             }
 
             for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave; ++absPitchIndex)
             {
                 int absPitch = AbsolutePitchHierarchy[absPitchIndex];
 
-                byte velocity = (byte)Math.Round(velocities[absPitchIndex]);
+                int velocity = (int)Math.Round(velocities[absPitchIndex]);
                 velocity = M.VelocityValue(velocity);
                 velocityPerAbsPitch[absPitch] = velocity;
             }
@@ -310,17 +310,17 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
         /// <param name="power">In range [-1..1]. (1 gives maximum emphasis to high velocities.)</param>
-        public static List<byte> SetVelocityPerAbsolutePitchGradient(IReadOnlyList<byte> velocityPerAbsolutePitch, double power)
+        public static List<int> SetVelocityPerAbsolutePitchGradient(IReadOnlyList<int> velocityPerAbsolutePitch, double power)
         {
             AssertVelocityPerAbsolutePitchValidity(velocityPerAbsolutePitch);
             Debug.Assert(power >= -1 && power <= 1);
 
-            List<byte> rval = new List<byte>();
+            List<int> rval = new List<int>();
             for(int i = 0; i < velocityPerAbsolutePitch.Count; i++)
             {
-                byte velocity = velocityPerAbsolutePitch[i];
+                int velocity = velocityPerAbsolutePitch[i];
                 double factor = Math.Pow(((double)velocity / 127), power);
-                byte newVelocity = (byte)Math.Round(velocity * factor);
+                int newVelocity = (int)Math.Round(velocity * factor);
                 newVelocity = M.VelocityValue(newVelocity);
                 rval.Add(newVelocity);
             }
@@ -335,15 +335,15 @@ namespace Moritz.Spec
         /// Spreads the current range of the velocityPerAbsolutePitch list over the range [minVelocity..maxVelocity].
         /// If the all the values in the input list	are the same, they are changed to the value of maxVelocity.
         /// </summary>
-        public static List<byte> SetVelocityPerAbsolutePitchRange(IReadOnlyList<byte> velocityPerAbsolutePitch, byte minVelocity, byte maxVelocity)
+        public static List<int> SetVelocityPerAbsolutePitchRange(IReadOnlyList<int> velocityPerAbsolutePitch, int minVelocity, int maxVelocity)
         {
             AssertVelocityPerAbsolutePitchValidity(velocityPerAbsolutePitch);
             Debug.Assert(minVelocity <= maxVelocity);
 
-            List<byte> rval = new List<byte>();
-            byte minVel = byte.MaxValue;
-            byte maxVel = byte.MinValue;
-            foreach(byte value in velocityPerAbsolutePitch)
+            List<int> rval = new List<int>();
+            int minVel = int.MaxValue;
+            int maxVel = int.MinValue;
+            foreach(int value in velocityPerAbsolutePitch)
             {
                 minVel = (minVel < value) ? minVel : value;
                 maxVel = (maxVel > value) ? maxVel : value;
@@ -358,7 +358,7 @@ namespace Moritz.Spec
             double factor = ((double)maxVelocity - minVelocity) / (maxVel - minVel);
             for(int i = 0; i < velocityPerAbsolutePitch.Count; i++)
             {
-                byte newVelocity = (byte)Math.Round(minVelocity + ((velocityPerAbsolutePitch[i] - minVel) * factor));
+                int newVelocity = (int)Math.Round(minVelocity + ((velocityPerAbsolutePitch[i] - minVel) * factor));
                 newVelocity = M.VelocityValue(newVelocity);
                 rval.Add(newVelocity);
             }

@@ -1036,7 +1036,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="velocityForMinMsDuration">in range 1..127</param>
         /// <param name="velocityForMaxMsDuration">in range 1..127</param>
-        public virtual void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
+        public virtual void SetVelocitiesFromDurations(int velocityForMinMsDuration, int velocityForMaxMsDuration, double percent = 100.0)
         {
             Debug.Assert(velocityForMinMsDuration >= 1 && velocityForMinMsDuration <= 127);
             Debug.Assert(velocityForMaxMsDuration >= 1 && velocityForMaxMsDuration <= 127);
@@ -1070,7 +1070,7 @@ namespace Moritz.Spec
         /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
         /// on all the MidiChordDefs in the Trk. 
         /// </summary>
-        public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+        public void SetVerticalVelocityGradient(int rootVelocity, int topVelocity)
         {
             #region conditions
             Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
@@ -1141,7 +1141,7 @@ namespace Moritz.Spec
                 double factor = Math.Pow((((double)durationForHighestPitch) / durationForLowestPitch), (((double)1) / (nPitches - 1)));
                 List<int> msDurations = new List<int>();
                 double msDuration = durationForLowestPitch;
-                foreach(byte pitch in pitches)
+                foreach(int pitch in pitches)
                 {
                     msDurations.Add((int)Math.Round(msDuration));
                     msDuration *= factor;

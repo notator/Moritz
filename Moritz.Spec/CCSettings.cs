@@ -23,7 +23,7 @@ namespace Moritz.Spec
             // Note that if the DefaultSettings are not defined, voices having no TrackCCSettings will be unaffected.
             Debug.Assert(defaultSettings != null || overrideSettings != null);
 
-            List<byte?> channels = new List<byte?>();
+            List<int?> channels = new List<int?>();
             if(defaultSettings != null)
             {
                 Debug.Assert(defaultSettings.MidiChannel == null);
@@ -82,13 +82,13 @@ namespace Moritz.Spec
     /// </summary>
     public sealed class TrackCCSettings
     {
-        public TrackCCSettings(byte? midiChannel, CCSetting ccSetting)
+        public TrackCCSettings(int? midiChannel, CCSetting ccSetting)
         {
             _midiChannel = midiChannel;
             AddList(new List<CCSetting>() { ccSetting });
         }
 
-        public TrackCCSettings(byte? midiChannel, List<CCSetting> optList)
+        public TrackCCSettings(int? midiChannel, List<CCSetting> optList)
         {
             _midiChannel = midiChannel;
             AddList(optList);
@@ -268,8 +268,8 @@ namespace Moritz.Spec
 		 * These default values are not written to score files.
 		 */
 
-        public byte? MidiChannel { get { return _midiChannel; } }
-        private byte? _midiChannel = null;
+        public int? MidiChannel { get { return _midiChannel; } }
+        private int? _midiChannel = null;
 
         public CControllerType PressureOption
         {
@@ -290,16 +290,16 @@ namespace Moritz.Spec
         public bool ModWheelVolumeOption { get { return _modWheelVolumeOption; } }
         private bool _modWheelVolumeOption = false;
 
-        public byte? PitchWheelDeviationOption { get { return _pitchWheelDeviationOption; } }
-        private byte? _pitchWheelDeviationOption = null; // should be set if the PitchWheelOption is set to pitchWheel
-        public byte? PanOriginOption { get { return _panOriginOption; } }
-        private byte? _panOriginOption = null;  // should be set if the PitchWheelOption is set to pan. (range 0..127, centre is 64)
+        public int? PitchWheelDeviationOption { get { return _pitchWheelDeviationOption; } }
+        private int? _pitchWheelDeviationOption = null; // should be set if the PitchWheelOption is set to pitchWheel
+        public int? PanOriginOption { get { return _panOriginOption; } }
+        private int? _panOriginOption = null;  // should be set if the PitchWheelOption is set to pan. (range 0..127, centre is 64)
         public float? SpeedDeviationOption { get { return _speedDeviationOption; } }
         private float? _speedDeviationOption = null; // should be set if the PitchWheelOption is set to speed ( < 1 )
-        public byte? MaximumVolume { get { return _maximumVolume; } }
-        private byte? _maximumVolume = null; // must be set if the performer is controlling the volume
-        public byte? MinimumVolume { get { return _minimumVolume; } }
-        private byte? _minimumVolume = null; // must be set if the performer is controlling the volume
+        public int? MaximumVolume { get { return _maximumVolume; } }
+        private int? _maximumVolume = null; // must be set if the performer is controlling the volume
+        public int? MinimumVolume { get { return _minimumVolume; } }
+        private int? _minimumVolume = null; // must be set if the performer is controlling the volume
     }
 
     public class CCSetting
@@ -349,7 +349,7 @@ namespace Moritz.Spec
 
     public class PressureVolumeControl : CCSetting
     {
-        public PressureVolumeControl(byte minVolume, byte maxVolume)
+        public PressureVolumeControl(int minVolume, int maxVolume)
         {
             Debug.Assert(minVolume < maxVolume);
             Debug.Assert(minVolume > 0 && minVolume < 128);
@@ -357,14 +357,14 @@ namespace Moritz.Spec
             _minimumVolume = minVolume;
             _maximumVolume = maxVolume;
         }
-        public byte MinimumVolume { get { return _minimumVolume; } }
-        private readonly byte _minimumVolume;
-        public byte MaximumVolume { get { return _maximumVolume; } }
-        private readonly byte _maximumVolume;
+        public int MinimumVolume { get { return _minimumVolume; } }
+        private readonly int _minimumVolume;
+        public int MaximumVolume { get { return _maximumVolume; } }
+        private readonly int _maximumVolume;
     }
     public class ModWheelVolumeControl : CCSetting
     {
-        public ModWheelVolumeControl(byte minVolume, byte maxVolume)
+        public ModWheelVolumeControl(int minVolume, int maxVolume)
         {
             Debug.Assert(minVolume < maxVolume);
             Debug.Assert(minVolume > 0 && minVolume < 128);
@@ -372,10 +372,10 @@ namespace Moritz.Spec
             _minimumVolume = minVolume;
             _maximumVolume = maxVolume;
         }
-        public byte MinimumVolume { get { return _minimumVolume; } }
-        private readonly byte _minimumVolume;
-        public byte MaximumVolume { get { return _maximumVolume; } }
-        private readonly byte _maximumVolume;
+        public int MinimumVolume { get { return _minimumVolume; } }
+        private readonly int _minimumVolume;
+        public int MaximumVolume { get { return _maximumVolume; } }
+        private readonly int _maximumVolume;
     }
 
     public enum PitchWheelOption
@@ -390,24 +390,24 @@ namespace Moritz.Spec
     }
     public class PitchWheelPitchControl : PitchWheelControl
     {
-        public PitchWheelPitchControl(byte deviation)
+        public PitchWheelPitchControl(int deviation)
         {
             Debug.Assert(deviation > 0 && deviation < 128);
             _pitchWheelDeviation = deviation;
         }
-        public byte PitchWheelDeviation { get { return _pitchWheelDeviation; } }
-        private readonly byte _pitchWheelDeviation;
+        public int PitchWheelDeviation { get { return _pitchWheelDeviation; } }
+        private readonly int _pitchWheelDeviation;
     }
     public class PitchWheelPanControl : PitchWheelControl
     {
-        public PitchWheelPanControl(byte origin)
+        public PitchWheelPanControl(int origin)
         {
             // pan centre is 64)
             Debug.Assert(origin >= 0 && origin < 128);
             _panOriginOption = origin;
         }
-        public byte PanOriginOption { get { return _panOriginOption; } }
-        private readonly byte _panOriginOption;
+        public int PanOriginOption { get { return _panOriginOption; } }
+        private readonly int _panOriginOption;
     }
     public class PitchWheelSpeedControl : PitchWheelControl
     {

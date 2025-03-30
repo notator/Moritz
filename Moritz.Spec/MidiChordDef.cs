@@ -45,11 +45,11 @@ namespace Moritz.Spec
         {
             #region conditions
             Debug.Assert(pitches.Count == velocities.Count);
-            foreach(byte pitch in pitches)
+            foreach(int pitch in pitches)
             {
                 AssertIsMidiValue(pitch);
             }
-            foreach(byte velocity in velocities)
+            foreach(int velocity in velocities)
             {
                 AssertIsVelocityValue(velocity);
             }
@@ -268,7 +268,7 @@ namespace Moritz.Spec
                 int oppositeModeGamutCount = oppositeMode.Gamut.Count;
                 // N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
                 pitchIndex = (pitchIndex < oppositeModeGamutCount) ? pitchIndex : oppositeModeGamutCount - 1;
-                pitches[i] = (byte)oppositeMode.Gamut[pitchIndex];
+                pitches[i] = oppositeMode.Gamut[pitchIndex];
             }
         }
         #endregion Opposite
@@ -299,8 +299,8 @@ namespace Moritz.Spec
             int nPitchesToShift = nPitchesToShiftArg % pitches.Count;
             for(int i = 0; i < nPitchesToShift; ++i)
             {
-                byte newPitch = (byte)(pitches[i] + 12);
-                newPitch = (newPitch < 127) ? newPitch : (byte)127;
+                int newPitch = (pitches[i] + 12);
+                newPitch = (newPitch < 127) ? newPitch : 127;
                 pitches[i] = newPitch;
             }
             pitches.Sort();
@@ -367,7 +367,7 @@ namespace Moritz.Spec
         /// <param name="velocityForMinMsDuration">in range 1..127</param>
         /// <param name="velocityForMaxMsDuration">in range 1..127</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public void SetVelocityFromDuration(int msDurationRangeMin, int msDurationRangeMax, byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
+        public void SetVelocityFromDuration(int msDurationRangeMin, int msDurationRangeMax, int velocityForMinMsDuration, int velocityForMaxMsDuration, double percent = 100.0)
         {
             Debug.Assert(MsDuration >= msDurationRangeMin && MsDuration <= msDurationRangeMax);
             Debug.Assert(msDurationRangeMin <= msDurationRangeMax);
@@ -418,7 +418,7 @@ namespace Moritz.Spec
             double newVelocity = rootVelocity;
             for(int velocityIndex = 0; velocityIndex < nVelocities; ++velocityIndex)
             {
-                int newVel = (byte)Math.Round(newVelocity);
+                int newVel = (int)Math.Round(newVelocity);
                 newVel = VelocityValue(newVel);
                 Velocities[velocityIndex] = newVel;
                 newVelocity += increment;
@@ -451,7 +451,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns the argument as a byte coerced to the range 0..127.
+        /// Returns the argument as a int coerced to the range 0..127.
         /// </summary>
         private static int MidiValue(int value)
         {
@@ -461,7 +461,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns the argument as a byte coerced to the range 1..127.
+        /// Returns the argument as a int coerced to the range 1..127.
         /// </summary>
         private int VelocityValue(int velocity)
         {

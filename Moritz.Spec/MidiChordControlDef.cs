@@ -159,13 +159,13 @@ namespace Moritz.Spec
         /// returns a List of ctlValues containing the single defaultCtlState.
         /// </summary>
         /// <returns></returns>
-        private List<byte> GetValues(List<byte> ctlValues, int defaultCtlState)
+        private List<int> GetValues(List<int> ctlValues, int defaultCtlState)
         {
             if(ctlValues == null || ctlValues.Count == 0)
             {
-                ctlValues = new List<byte>
+                ctlValues = new List<int>
                 {
-                    (byte)defaultCtlState
+                    defaultCtlState
                 };
             }
             return ctlValues;
@@ -175,7 +175,7 @@ namespace Moritz.Spec
         /// If the ctlValue is null or empty, returns the defaultCtlValue.
         /// </summary>
         /// <returns></returns>
-        private byte GetValue(byte? ctlValue, byte defaultCtlValue)
+        private int GetValue(int? ctlValue, int defaultCtlValue)
         {
             if(ctlValue == null)
             {
@@ -183,11 +183,11 @@ namespace Moritz.Spec
             }
             else
             {
-                return (byte) ctlValue;
+                return (int) ctlValue;
             }
         }
 
-        private bool DoWriteControl(List<byte> ctlValues, byte currentCtlState)
+        private bool DoWriteControl(List<int> ctlValues, int currentCtlState)
         {
             if(ctlValues != null && ((ctlValues.Count == 1 && ctlValues[0] != currentCtlState) || ctlValues.Count > 1))
             {
@@ -208,13 +208,13 @@ namespace Moritz.Spec
         /// <param name="d2s">The controller values</param>
         /// <param name="msDuration">The total duration of the envelope</param>
         /// <returns>The last controller value</returns>
-        private byte WriteCCEnv(SvgWriter w, int channel, int d1, List<byte> d2s, int msDuration)
+        private int WriteCCEnv(SvgWriter w, int channel, int d1, List<int> d2s, int msDuration)
         {
             string statusString = $"0x{(M.CMD.CONTROL_CHANGE_176 + channel).ToString("X")}"; ;
             w.WriteStartElement("env"); // envelope
             w.WriteAttributeString("s", statusString);
             w.WriteAttributeString("d1", d1.ToString());
-            byte lastControllerValue = WriteD2VTs(w, d2s, msDuration);
+            int lastControllerValue = WriteD2VTs(w, d2s, msDuration);
             w.WriteEndElement(); // end env
 
             return lastControllerValue;
@@ -227,13 +227,13 @@ namespace Moritz.Spec
         /// <param name="d2s"></param>
         /// <param name="msDuration"></param>
         /// <returns>The last controller value</returns>
-        private byte WriteD2VTs(SvgWriter w, List<byte> d2s, int msDuration)
+        private int WriteD2VTs(SvgWriter w, List<int> d2s, int msDuration)
         {
-            byte lastControllerValue = 0; // will always be changed
+            int lastControllerValue = 0; // will always be changed
             List<int> msDurs = GetMsDurs(d2s.Count, msDuration);
-            Tuple<List<int>, List<byte>> rval = Agglommerate(msDurs, d2s);
+            Tuple<List<int>, List<int>> rval = Agglommerate(msDurs, d2s);
             msDurs = rval.Item1;
-            List<byte> agglommeratedD2s = rval.Item2;
+            List<int> agglommeratedD2s = rval.Item2;
             for(int i = 0; i < msDurs.Count; ++i)
             {
                 Debug.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
@@ -247,11 +247,11 @@ namespace Moritz.Spec
             return lastControllerValue;
         }
 
-        private Tuple<List<int>, List<byte>> Agglommerate(List<int> msDurs, List<byte> d2s)
+        private Tuple<List<int>, List<int>> Agglommerate(List<int> msDurs, List<int> d2s)
         {
             Debug.Assert(msDurs.Count == d2s.Count);
 
-            List<byte> rD2s = new List<byte>(d2s);
+            List<int> rD2s = new List<int>(d2s);
 
             for(int i = rD2s.Count - 1; i > 0; --i)
             {
@@ -262,15 +262,15 @@ namespace Moritz.Spec
                     rD2s.RemoveAt(i);
                 }
             }
-            return new Tuple<List<int>, List<byte>>(msDurs, rD2s);
+            return new Tuple<List<int>, List<int>>(msDurs, rD2s);
         }
 
-        private Tuple<List<int>, List<byte>, List<byte>> Agglommerate(List<int> msDurs, List<byte> d1s, List<byte> d2s)
+        private Tuple<List<int>, List<int>, List<int>> Agglommerate(List<int> msDurs, List<int> d1s, List<int> d2s)
         {
             Debug.Assert(msDurs.Count == d1s.Count && msDurs.Count == d2s.Count);
 
-            List<byte> rD1s = new List<byte>(d1s);
-            List<byte> rD2s = new List<byte>(d2s);
+            List<int> rD1s = new List<int>(d1s);
+            List<int> rD2s = new List<int>(d2s);
 
             for(int i = rD1s.Count - 1; i > 0; --i)
             {
@@ -282,7 +282,7 @@ namespace Moritz.Spec
                     rD2s.RemoveAt(i);
                 }
             }
-            return new Tuple<List<int>, List<byte>, List<byte>>(msDurs, rD1s, rD2s);
+            return new Tuple<List<int>, List<int>, List<int>>(msDurs, rD1s, rD2s);
         }
 
         /// <summary>
@@ -291,15 +291,15 @@ namespace Moritz.Spec
         /// This function writes both d1 and d2
         /// </summary>
         /// <returns>The last controller value</returns>
-        private byte WriteD1AndD2VTs(SvgWriter w, List<byte> d1s, List<byte> d2s, int msDuration)
+        private int WriteD1AndD2VTs(SvgWriter w, List<int> d1s, List<int> d2s, int msDuration)
         {
             Debug.Assert(d1s.Count == d2s.Count);
-            byte lastControllerValue = 0; // will always be changed
+            int lastControllerValue = 0; // will always be changed
             List<int> msDurs = GetMsDurs(d1s.Count, msDuration);
-            Tuple<List<int>, List<byte>, List<byte>> rVals = Agglommerate(msDurs, d1s, d2s);
+            Tuple<List<int>, List<int>, List<int>> rVals = Agglommerate(msDurs, d1s, d2s);
             msDurs = rVals.Item1;
-            List<byte> rD1s = rVals.Item2;
-            List<byte> rD2s = rVals.Item3;
+            List<int> rD1s = rVals.Item2;
+            List<int> rD2s = rVals.Item3;
             for(int i = 0; i < msDurs.Count; ++i)
             {
                 Debug.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
@@ -351,92 +351,91 @@ namespace Moritz.Spec
 
         internal void SetMsg(int controlType, int controlValue)
         {
-            sbyte ctlValue = (sbyte)controlValue;
             switch(controlType)
             {
                 case ((int)M.CMD.PRESET_192):
                 {
-                    Preset = ctlValue;
+                    Preset = controlValue;
                     break;
                 }
                 case ((int)M.CMD.PITCH_WHEEL_224):
                 {
-                    PitchWheel = ctlValue;
+                    PitchWheel = controlValue;
                     break;
                 }
                 case ((int)M.CTL.BANK_0):
                 {
-                    Bank = ctlValue;
+                    Bank = controlValue;
                     break;
                 }
                 case ((int)M.CTL.MOD_WHEEL_1):
                 {
-                    ModWheel = ctlValue;
+                    ModWheel = controlValue;
                     break;
                 }
                 case ((int)M.CTL.VOLUME_7):
                 {
-                    Volume = ctlValue;
+                    Volume = controlValue;
                     break;
                 }
                 case ((int)M.CTL.PAN_10):
                 {
-                    Pan = ctlValue;
+                    Pan = controlValue;
                     break;
                 }
                 case ((int)M.CTL.EXPRESSION_11):
                 {
-                    Expression = ctlValue;
+                    Expression = controlValue;
                     break;
                 }
                 case ((int)M.CTL.PITCH_WHEEL_SENSITIVITY_16):
                 {
-                    PitchWheelSensitivity = ctlValue;
+                    PitchWheelSensitivity = controlValue;
                     break;
                 }
                 case ((int)M.CTL.MIXTURE_17):
                 {
-                    Mixture = ctlValue;
+                    Mixture = controlValue;
                     break;
                 }
                 case ((int)M.CTL.TUNING_GROUP_18):
                 {
-                    TuningGroup = ctlValue;
+                    TuningGroup = controlValue;
                     break;
                 }
                 case ((int)M.CTL.TUNING_19):
                 {
-                    Tuning = ctlValue;
+                    Tuning = controlValue;
                     break;
                 }
                 case ((int)M.CTL.ORNAMENT_GROUP_75):
                 {
-                    OrnamentGroup = ctlValue;
+                    OrnamentGroup = controlValue;
                     break;
                 }
                 case ((int)M.CTL.ORNAMENT_76):
                 {
-                    Ornament = ctlValue;
+                    Ornament = controlValue;
                     break;
                 }
                 case ((int)M.CTL.SEMITONE_OFFSET_80):
                 {
-                    SemitoneOffset = ctlValue;
+                    SemitoneOffset = controlValue;
                     break;
                 }
                 case ((int)M.CTL.CENT_OFFSET_81):
                 {
-                    CentOffset = ctlValue;
+                    CentOffset = controlValue;
                     break;
                 }
                 case ((int)M.CTL.VELOCITY_PITCH_SENSITIVITY_83):
                 {
-                    VelocityPitchSensitivity = ctlValue;
+                    VelocityPitchSensitivity = controlValue;
                     break;
                 }
                 case ((int)M.CTL.REVERBERATION_91):
                 {
-                    Reverberation = ctlValue;
+                    Reverberation = controlValue;
                     break;
                 }
                 case ((int)M.CTL.ALL_SOUND_OFF_120):

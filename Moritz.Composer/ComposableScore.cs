@@ -165,7 +165,7 @@ namespace Moritz.Composer
             List<int> lowerVoiceIndices = new List<int>();
             int voiceIndex = 0;
 
-            List<List<byte>> voiceIndicesPerStaff = _pageFormat.VoicesPerStaff;
+            List<List<int>> voiceIndicesPerStaff = _pageFormat.VoiceIndicesPerStaff;
 
             for(int staffIndex = 0; staffIndex < voiceIndicesPerStaff.Count; ++staffIndex)
             {
@@ -206,7 +206,7 @@ namespace Moritz.Composer
 
         private void CreateEmptyStaves(List<Bar> bars)
         {
-            int nStaves = _pageFormat.VoicesPerStaff.Count;
+            int nStaves = _pageFormat.VoiceIndicesPerStaff.Count;
 
             for(int systemIndex = 0; systemIndex < Systems.Count; systemIndex++)
             {
@@ -219,7 +219,7 @@ namespace Moritz.Composer
                     string staffname = StaffName(systemIndex, staffIndex);
                     Staff staff = new Staff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
 
-                    List<byte> channelIndices = _pageFormat.VoicesPerStaff[staffIndex];
+                    List<int> channelIndices = _pageFormat.VoiceIndicesPerStaff[staffIndex];
                     for(int channelIndex = 0; channelIndex < channelIndices.Count; ++channelIndex)
                     {
                         Voice voice = new Voice(staff);

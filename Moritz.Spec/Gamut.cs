@@ -132,10 +132,10 @@ namespace Moritz.Spec
 		/// </summary>
 		private void SetLinearChordShapesMatrix()
 		{
-			List<byte> inversion0 = new List<byte>();
+			List<int> inversion0 = new List<int>();
 			foreach(var pitchWeight in _absolutePitchWeights)
 			{
-				inversion0.Add((byte)pitchWeight.Pitch);
+				inversion0.Add((int)pitchWeight.Pitch);
 			}
 			_linearChordShapesMatrix = M.GetLinearMatrix(inversion0);
 		}
@@ -256,8 +256,8 @@ namespace Moritz.Spec
 		/// LinearChordShapesMatrix is a linear matrix whose top row (index 0) is the gamut's absolute pitches
 		/// in descending order of their weight (the order they have in the AbsolutePitchWeights attribute).
 		/// </summary>
-		public IReadOnlyList<List<byte>> LinearChordShapesMatrix { get { return _linearChordShapesMatrix; } }
-		protected List<List<byte>> _linearChordShapesMatrix;
+		public IReadOnlyList<List<int>> LinearChordShapesMatrix { get { return _linearChordShapesMatrix; } }
+		protected List<List<int>> _linearChordShapesMatrix;
 	}
 
 	/// <summary>
