@@ -64,12 +64,6 @@
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FormStateFunctions.cs" />
-    <Compile Include="NewPaletteDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NewPaletteDialog.Designer.cs">
-      <DependentUpon>NewPaletteDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="KrystalScore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -79,9 +73,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NewPaletteDialog.resx">
-      <DependentUpon>NewPaletteDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
