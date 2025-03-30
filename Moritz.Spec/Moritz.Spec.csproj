@@ -52,7 +52,6 @@
     <Compile Include="ControlEnvelope.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="GamutVector.cs" />
-    <Compile Include="MidiChordSliderDef.cs" />
     <Compile Include="ModeProximity.cs" />
     <Compile Include="MidiMsg.cs" />
     <Compile Include="CCSettings.cs">

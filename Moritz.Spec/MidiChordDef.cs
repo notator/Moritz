@@ -76,14 +76,18 @@ namespace Moritz.Spec
         /// <returns></returns>
         public override object Clone()
         {
-            Debug.Assert(false, "To be completed.");
             MidiChordDef rval = new MidiChordDef(this.Pitches, this.Velocities, this.MsDuration, this.HasChordOff)
             {
+                MsDurationToNextBarline = this.MsDurationToNextBarline,
+                BeamContinues = this.BeamContinues,
+                Lyric = String.Copy(this.Lyric),
+                OrnamentText = String.Copy(this.OrnamentText), // the displayed ornament Text (without the tilde)
 
-                OrnamentText = this.OrnamentText, // the displayed ornament Text (without the tilde)
-
-                MidiChordControlDef = (MidiChordControlDef)MidiChordControlDef.Clone()
+                MidiChordControlDef = (MidiChordControlDef)MidiChordControlDef.Clone(),
             };
+
+            List<int> envValues = new List<int>(this.EnvelopeTypeDef.Item2);
+            EnvelopeTypeDef = new Tuple<int, List<int>>(this.EnvelopeTypeDef.Item1, envValues);
 
             return rval;
         }
@@ -594,9 +598,10 @@ namespace Moritz.Spec
             get => Velocities;
             set => Velocities = value;
         }
-
-        public int? MsDurationToNextBarline { get; set; } = null;
         public bool HasChordOff { get; set; } = true;
+        public int? MsDurationToNextBarline { get; set; } = null;
+
+
         public bool BeamContinues { get; set; } = true;
         public string Lyric { get; set; } = null;
         /// <summary>
