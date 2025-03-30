@@ -93,9 +93,9 @@ namespace Moritz
 			this.label1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.label1.Location = new System.Drawing.Point(25, 21);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(97, 15);
+			this.label1.Size = new System.Drawing.Size(136, 15);
 			this.label1.TabIndex = 10;
-			this.label1.Text = "Moritz version 4";
+			this.label1.Text = "Moritz 2025 (version 4)";
 			this.label1.Click += new System.EventHandler(this.Anything_Click);
 			// 
 			// WebsiteLinkLabel
