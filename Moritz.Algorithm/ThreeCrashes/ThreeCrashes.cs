@@ -198,11 +198,11 @@ namespace Moritz.Algorithm.ThreeCrashes
                 List<byte> pitchesArg = new List<byte>() { pitches[i] };
                 List<byte> velocitiesArg = new List<byte>() { velocities[i] };
                 int msDuration = msDurations[i];
-                MidiChordDef midiChordDef = new MidiChordDef(pitchesArg, velocitiesArg, msDuration, true)
+                ChordDef chordDef = new ChordDef(pitchesArg, velocitiesArg, msDuration, true)
                 {
                     MsPositionReFirstUD = msPosition
                 };
-                defs.Add(midiChordDef);
+                defs.Add(chordDef);
                 msPosition += msDuration;
             }
             return defs;
@@ -488,11 +488,11 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             foreach(IUniqueDef iud in crashTrk.UniqueDefs)
             {
-                if(iud is MidiChordDef mcd)
+                if(iud is ChordDef chordDef)
                 {
-                    byte originalVelocity = mcd.Velocities[0];
+                    byte originalVelocity = chordDef.Velocities[0];
                     byte newVelocity = (byte)Math.Round(originalVelocity * warpFactor);
-                    mcd.Velocities[0] = newVelocity;
+                    chordDef.Velocities[0] = newVelocity;
                 }
             }
 
@@ -577,7 +577,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         {
             foreach(Trk crashTrk in crashTrks)
             {
-                if(crashTrk.UniqueDefs[crashTrk.UniqueDefs.Count - 1] is MidiChordDef lastMCD)
+                if(crashTrk.UniqueDefs[crashTrk.UniqueDefs.Count - 1] is ChordDef lastMCD)
                 {
                     lastMCD.BeamContinues = false;
                 }

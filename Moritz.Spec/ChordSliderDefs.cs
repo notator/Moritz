@@ -7,12 +7,12 @@ using System.Diagnostics;
 
 namespace Moritz.Spec
 {
-    public class MidiChordSliderDefs
+    public class ChordSliderDefs
     {
         /// <summary>
         /// Used by Assistant Composer
         /// </summary>
-        public MidiChordSliderDefs(List<byte> pitchWheelMsbs, List<byte> panMsbs, List<byte> modulationWheelMsbs, List<byte> expressionMsbs)
+        public ChordSliderDefs(List<byte> pitchWheelMsbs, List<byte> panMsbs, List<byte> modulationWheelMsbs, List<byte> expressionMsbs)
         {
             PitchWheelMsbs = pitchWheelMsbs;
             PanMsbs = panMsbs;

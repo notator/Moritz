@@ -15,32 +15,32 @@ using static Moritz.Globals.M;
 namespace Moritz.Spec
 {
     ///<summary>
-    /// A MidiChordDef can be saved and retrieved from a channel in an SVG file.
+    /// A ChordDef can be saved and retrieved from a channel in an SVG file.
     /// It defines the midi information for a single chord event.
     /// It does not contain graphic information, but can be used to _construct_ graphic information.
-    /// Each MidiChordDef is part of a sequence of IUniqueDefs stored in a Trk.
+    /// Each ChordDef is part of a sequence of IUniqueDefs stored in a Trk.
     /// There may be a list of parallel Trks containing alternative definitions of the same events.
     /// If this is the case, IUniqueDefs in the first Trk will be used to construct the graphics.
-    /// The IUniqueDefs stored in Trks are MidiChordDef, RestDef, CautionaryChordDef, ClefDef.
-    /// A MidiChordDef consists of
+    /// The IUniqueDefs stored in Trks are ChordDef, RestDef, CautionaryChordDef, ClefDef.
+    /// A ChordDef consists of
     ///     1. The pitch and velocity information for NoteOn/NoteOff messages,
     ///     2. The logical duration before the following DurationDef in a Trk,
     ///     3. Whether or not NoteOffs are sent after its msDuration has elapsed,
     ///     4. An optional set of (single) midi control messages that will be sent before the NoteOns.
     ///     5. An optional control envelope that will be sent over the duration of the midiChord.
     ///</summary>
-    public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
+    public class ChordDef : DurationDef, IUniqueSplittableChordDef
     {
         #region constructors
         /// <summary>
-        /// A MidiChordDef whose optional set of MidiControlMessages is null.
+        /// A ChordDef whose optional set of MidiControlMessages is null.
         /// </summary>
         /// <param name="pitches">in range 0..127</param>
         /// <param name="velocities">In range 1..127</param>
         /// <param name="msDuration">greater than zero</param>
         /// <param name="hasChordOff"></param>
         /// <param name="midiChordControlDefs">optional controls</param>
-        public MidiChordDef(List<int> pitches, List<int> velocities, int msDuration, bool hasChordOff, MidiChordControlDefs midiChordControlDefs = null)
+        public ChordDef(List<int> pitches, List<int> velocities, int msDuration, bool hasChordOff, ChordControlDefs midiChordControlDefs = null)
             : base(msDuration)
         {
             #region conditions
@@ -77,12 +77,12 @@ namespace Moritz.Spec
         public override object Clone()
         {
             Debug.Assert(false, "To be completed.");
-            MidiChordDef rval = new MidiChordDef(this.Pitches, this.Velocities, this.MsDuration, this.HasChordOff)
+            ChordDef rval = new ChordDef(this.Pitches, this.Velocities, this.MsDuration, this.HasChordOff)
             {
                 MsPositionReFirstUD = this.MsPositionReFirstUD,
                 OrnamentText = this.OrnamentText, // the displayed ornament Text (without the tilde)
 
-                MidiChordControlDefs = (MidiChordControlDefs)MidiChordControlDefs.Clone()
+                MidiChordControlDefs = (ChordControlDefs)MidiChordControlDefs.Clone()
             };
 
             return rval;
@@ -97,7 +97,7 @@ namespace Moritz.Spec
             {
                 envelopeMessages = GetEnvelopeMessages(channel, EnvelopeTypeDef, MsDuration);
 
-                MidiChordControlDefs = MidiChordControlDefs ?? (MidiChordControlDefs = new MidiChordControlDefs());
+                MidiChordControlDefs = MidiChordControlDefs ?? (MidiChordControlDefs = new ChordControlDefs());
                 var envMsg0 = envelopeMessages[0];                
                 MidiChordControlDefs.SetMsg(EnvelopeTypeDef.Item1, (int)envMsg0.Item1.Data2);
                 noteOnsMsDuration = envMsg0.Item2;               
@@ -202,16 +202,16 @@ namespace Moritz.Spec
             w.WriteEndElement(); // end of noteOns
         }
 
-        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
+        public override string ToString() => $"ChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
 
 
 
 
         /// <summary>
         /// Used by all constructors and Clone().
-        /// ought also to be called at the end of any function that changes the MidiChordDef's content.
+        /// ought also to be called at the end of any function that changes the ChordDef's content.
         /// </summary>
-        private void AssertConsistency(MidiChordDef mcd)
+        private void AssertConsistency(ChordDef chordDef)
         {
             throw new NotImplementedException();
         }
@@ -231,10 +231,10 @@ namespace Moritz.Spec
         #region Opposite
         /// <summary>
         /// 1. Creates a new, opposite mode from the argument Mode (see Mode.Opposite()).
-        /// 2. Clones this MidiChordDef, and replaces the clone's pitches by the equivalent pitches in the opposite Mode.
+        /// 2. Clones this ChordDef, and replaces the clone's pitches by the equivalent pitches in the opposite Mode.
         /// 3. Returns the clone.
         /// </summary>
-        public MidiChordDef Opposite(Mode mode)
+        public ChordDef Opposite(Mode mode)
         {
             #region conditions
             Debug.Assert(mode != null);
@@ -242,7 +242,7 @@ namespace Moritz.Spec
 
             int relativePitchHierarchyIndex = (mode.RelativePitchHierarchyIndex + 11) % 22;
             Mode oppositeMode = new Mode(relativePitchHierarchyIndex, mode.BasePitch, mode.NPitchesPerOctave);
-            MidiChordDef oppositeMCD = (MidiChordDef)Clone();
+            ChordDef oppositeMCD = (ChordDef)Clone();
 
             #region conditions
             Debug.Assert(mode.Gamut[0] == oppositeMode.Gamut[0]);
@@ -271,7 +271,7 @@ namespace Moritz.Spec
 
         #region Invert (shift lowest notes up by one octave)
         /// <summary>
-        /// In each chord in this MidiChordDef:
+        /// In each chord in this ChordDef:
         /// 1. nPitchesToShift is set to nPitchesToShiftArg % nPitches in the chord.
         /// 2. nPitchesToShift pitches are shifted up one octave.
         /// 3. The pitch list is resorted to be in ascending order.
@@ -310,9 +310,9 @@ namespace Moritz.Spec
         #region SetVelocityPerAbsolutePitch
         /// <summary>
         /// The velocityPerAbsolutePitch argument contains a list of 12 velocity values (range [1..127] in order of absolute pitch.
-        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
+        /// For example: If the ChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
-        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
+        /// This function applies equally to all the BasicMidiChordDefs in this ChordDef. 
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
         public void SetVelocityPerAbsolutePitch(IReadOnlyList<int> velocityPerAbsolutePitch)
@@ -349,7 +349,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// N.B. This function's behaviour wrt velocities should be changed to that of SetVelocityPerAbsolutePitch() -- see above.
-        /// Sets all velocities in the MidiChordDef to a value related to its msDuration.
+        /// Sets all velocities in the ChordDef to a value related to its msDuration.
         /// If percent has its default value 100, the new velocity will be in the same proportion between velocityForMinMsDuration
         /// and velocityForMaxMsDuration as MsDuration is between msDurationRangeMin and msDurationRangeMax.
         /// N.B 1) Both velocityForMinMsDuration and velocityForMaxMsDuration must be in range 1..127.
@@ -485,7 +485,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// All the pitches in the MidiChordDef must be contained in the mode.
+        /// All the pitches in the ChordDef must be contained in the mode.
         /// Transposes the Pitches by the number of steps in the mode.
         /// Negative values transpose down.
         /// The vertical velocity sequence remains unchanged except when notes are removed.
@@ -514,7 +514,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The rootPitch and all the pitches in the MidiChordDef must be contained in the mode's Gamut.
+        /// The rootPitch and all the pitches in the ChordDef must be contained in the mode's Gamut.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// Calculates the number of steps to transpose, and then calls TransposeStepsInModeGamut.
         /// When this function returns, rootPitch is the lowest pitch in both BasicMidiChordDefs[0] and NotatedMidiPitches.
@@ -603,7 +603,7 @@ namespace Moritz.Spec
         /// If not null, this is simply a string that is printed after a tilde, above or below the chord.
         /// </summary>
         public string OrnamentText { get; private set; } = null;
-        public MidiChordControlDefs MidiChordControlDefs { get; private set; } = null;
+        public ChordControlDefs MidiChordControlDefs { get; private set; } = null;
         /// <summary>
         /// See ControlEnvelope: a class that converts an EnvelopeTypeDef into a series of control values with a specific Count.
         /// </summary>

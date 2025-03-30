@@ -163,9 +163,9 @@ namespace Moritz.Algorithm
         /// Lyrics can simply be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
         /// provides the possibility of adding them all in one place.
         /// This function returns null or a SortedDictionary per ChannelDef in each bar.
-        /// The SortedDictionary contains the index of the MidiChordDef or InputChordDef in the bar to which the associated
+        /// The SortedDictionary contains the index of the ChordDef or InputChordDef in the bar to which the associated
         /// lyric string will be attached. The index is of MidiChordDefs or InputChordDefs only, beginning with 0 for
-        /// the first MidiChordDef or InptChordDef in the bar.
+        /// the first ChordDef or InptChordDef in the bar.
         /// Lyrics that are attached to top voices on a staff will, like dynamics, be automatically placed above the staff.
         /// </summary>
         /// <returns>null or a SortedDictionary per ChannelDef per bar</returns>
@@ -355,17 +355,17 @@ namespace Moritz.Algorithm
         /// </summary>
         protected void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
         {
-            MidiChordDef midiChordDef = null;
+            ChordDef chordDef = null;
             foreach(ChannelDef channelDef in bar1.ChannelDefs)
             {
                 foreach(var trk in channelDef.Trks)
                 {
                     foreach(IUniqueDef iUniqueDef in trk.UniqueDefs)
                     {
-                        midiChordDef = iUniqueDef as MidiChordDef;
-                        if(midiChordDef != null)
+                        chordDef = iUniqueDef as ChordDef;
+                        if(chordDef != null)
                         {
-                            midiChordDef.MidiChordControlDefs.Preset = 0;
+                            chordDef.MidiChordControlDefs.Preset = 0;
                             break;
                         }
                     }
@@ -432,12 +432,12 @@ namespace Moritz.Algorithm
         {
             if(lyrics.Count > 0)
             {
-                var mcds = new List<MidiChordDef>();
+                var mcds = new List<ChordDef>();
                 foreach(IUniqueDef iud in channelDef.UniqueDefs)
                 {
-                    if(iud is MidiChordDef mcd)
+                    if(iud is ChordDef chordDef)
                     {
-                        mcds.Add(mcd);
+                        mcds.Add(chordDef);
                     }
                 }
                 Debug.Assert(lyrics.Count <= mcds.Count);

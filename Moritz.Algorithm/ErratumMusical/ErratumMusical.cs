@@ -147,11 +147,11 @@ namespace Moritz.Algorithm.ErratumMusical
                 List<byte> pitchesArg = new List<byte>() { pitches[i] };
                 List<byte> velocitiesArg = new List<byte>() { velocities[i] };
                 int msDuration = msDurations[i];
-                MidiChordDef midiChordDef = new MidiChordDef(pitchesArg, velocitiesArg, msDuration, true)
+                ChordDef chordDef = new ChordDef(pitchesArg, velocitiesArg, msDuration, true)
                 {
                     MsPositionReFirstUD = msPosition
                 };
-                defs.Add(midiChordDef);
+                defs.Add(chordDef);
                 msPosition += msDuration;
             }
             return defs;

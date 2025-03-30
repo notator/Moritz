@@ -7,12 +7,12 @@ using System.Diagnostics;
 
 namespace Moritz.Spec
 {
-    public class MidiChordControlDefs : ICloneable
+    public class ChordControlDefs : ICloneable
     {
         /// <summary>
         /// Used by the Assistant Composer's palettes
         /// </summary>
-        public MidiChordControlDefs()
+        public ChordControlDefs()
         {
         }
 
@@ -21,9 +21,9 @@ namespace Moritz.Spec
             return Clone();
         }
 
-        internal MidiChordControlDefs Clone()
+        internal ChordControlDefs Clone()
         {
-            var rval = new MidiChordControlDefs
+            var rval = new ChordControlDefs
             {
                 Preset = this.Preset,
                 PitchWheel = this.PitchWheel,

@@ -530,18 +530,18 @@ namespace Moritz.Symbols
                 CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, absMsPosition, pageFormat);
                 noteObject = cautionaryChordSymbol;
             }
-            else if(iud is MidiChordDef midiChordDef)
+            else if(iud is ChordDef chordDef)
             {
-                ChordSymbol chordSymbol = new ChordSymbol(voice, midiChordDef, absMsPosition, pageFormat);
+                ChordSymbol chordSymbol = new ChordSymbol(voice, chordDef, absMsPosition, pageFormat);
 
                 if(this._coloredVelocities == true)
                 {
                     chordSymbol.SetNoteheadColorClasses();
                 }
-                else if(midiChordDef.Velocities[0] != currentVelocity)
+                else if(chordDef.Velocities[0] != currentVelocity)
                 {
-                    chordSymbol.AddDynamic(midiChordDef.Velocities[0], currentVelocity);
-                    currentVelocity = midiChordDef.Velocities[0];
+                    chordSymbol.AddDynamic(chordDef.Velocities[0], currentVelocity);
+                    currentVelocity = chordDef.Velocities[0];
                 }
                 noteObject = chordSymbol;
             }

@@ -52,7 +52,7 @@
     <Compile Include="ControlEnvelope.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="GamutVector.cs" />
-    <Compile Include="MidiChordSliderDefs.cs" />
+    <Compile Include="ChordSliderDefs.cs" />
     <Compile Include="ModeProximity.cs" />
     <Compile Include="MidiMsg.cs" />
     <Compile Include="CCSettings.cs">
@@ -72,8 +72,8 @@
     <Compile Include="IUniqueChordDef.cs" />
     <Compile Include="IUniqueDef.cs" />
     <Compile Include="IUniqueSplittableChordDef.cs" />
-    <Compile Include="MidiChordDef.cs" />
-    <Compile Include="MidiChordControlDefs.cs" />
+    <Compile Include="ChordDef.cs" />
+    <Compile Include="ChordControlDefs.cs" />
     <Compile Include="MomentDef.cs" />
     <Compile Include="Trk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -25,22 +25,22 @@ namespace Moritz.Spec
         public int MsWidth;
 
         /// <summary>
-        /// The maxmum msDuration of any midiChordDef in this MomentDef.
+        /// The maxmum msDuration of any chordDef in this MomentDef.
         /// </summary>
         public int MaximumMsDuration
         {
             get
             {
                 int maximumMsDuration = 0;
-                foreach(MidiChordDef midiChordDef in MidiChordDefs)
+                foreach(ChordDef chordDef in MidiChordDefs)
                 {
-                    maximumMsDuration = maximumMsDuration > midiChordDef.MsDuration ?
-                                                    maximumMsDuration : midiChordDef.MsDuration;
+                    maximumMsDuration = maximumMsDuration > chordDef.MsDuration ?
+                                                    maximumMsDuration : chordDef.MsDuration;
                 }
                 return maximumMsDuration;
             }
         }
 
-        public List<MidiChordDef> MidiChordDefs = new List<MidiChordDef>();
+        public List<ChordDef> MidiChordDefs = new List<ChordDef>();
     }
 }

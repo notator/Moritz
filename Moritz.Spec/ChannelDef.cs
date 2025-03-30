@@ -35,7 +35,7 @@ namespace Moritz.Spec
                 Debug.Assert(trkIUDs.Count == uidCount);
                 for(int j = 0; j < trkIUDs.Count; j++)
                 {
-                    Debug.Assert((iuds0[j] is MidiChordDef && trkIUDs[j] is MidiChordDef)
+                    Debug.Assert((iuds0[j] is ChordDef && trkIUDs[j] is ChordDef)
                         || (iuds0[j] is RestDef && trkIUDs[j] is RestDef));
                 }
             }
@@ -304,7 +304,7 @@ namespace Moritz.Spec
                     var durationDef = ddList[0];
                     for(var i = 1; i < ddList.Count; ++i)
                     {
-                        Debug.Assert((durationDef is MidiChordDef && ddList[i] is MidiChordDef)
+                        Debug.Assert((durationDef is ChordDef && ddList[i] is ChordDef)
                         || (durationDef is RestDef && ddList[i] is RestDef));
                     }
                 }

@@ -106,11 +106,11 @@ namespace Moritz.Algorithm.PianolaMusic
             {
                 List<byte> pitchesArg = new List<byte>() { (byte)pitches[i] };
                 int msDuration = durations[i] * durationFactor;
-                MidiChordDef midiChordDef = new MidiChordDef(pitchesArg, velocities, msDuration, true)
+                ChordDef chordDef = new ChordDef(pitchesArg, velocities, msDuration, true)
                 {
                     MsPositionReFirstUD = msPosition
                 };
-                defs.Add(midiChordDef);
+                defs.Add(chordDef);
                 msPosition += msDuration;
             }
             return defs;

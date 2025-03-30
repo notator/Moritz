@@ -21,7 +21,7 @@ namespace Moritz.Symbols
             // Beam is currently null. Create when necessary.
         }
 
-        public ChordSymbol(Voice voice, MidiChordDef umcd, int absMsPosition, PageFormat pageFormat)
+        public ChordSymbol(Voice voice, ChordDef umcd, int absMsPosition, PageFormat pageFormat)
             : this(voice, umcd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight, umcd.BeamContinues)
         {
             _midiChordDefs.Add(umcd);
@@ -109,11 +109,11 @@ namespace Moritz.Symbols
         /// <summary>
         /// Adds the argument to the chord's private list of MidiChordDefs. 
         /// </summary>
-        /// <param name="midiChordDef"></param>
+        /// <param name="chordDef"></param>
         /// <returns>The number of midiChordDefs after adding the argument.</returns>
-        public int AddMidiChordDef(MidiChordDef midiChordDef)
+        public int AddMidiChordDef(ChordDef chordDef)
         {
-            _midiChordDefs.Add(midiChordDef);
+            _midiChordDefs.Add(chordDef);
             return _midiChordDefs.Count;
         }
 
@@ -121,11 +121,11 @@ namespace Moritz.Symbols
         /// Throws an exception if the argument (index) is out of range. 
         /// </summary>
         /// <param name="indexInPrivateMidiChordDefsList"></param>
-        /// <returns>A deep clone of the MidiChordDef at the given index</returns>
-        public MidiChordDef GetMidiChordDefClone(int indexInPrivateMidiChordDefsList)
+        /// <returns>A deep clone of the ChordDef at the given index</returns>
+        public ChordDef GetMidiChordDefClone(int indexInPrivateMidiChordDefsList)
         {
             Debug.Assert(indexInPrivateMidiChordDefsList >= 0 && indexInPrivateMidiChordDefsList < _midiChordDefs.Count);
-            return (MidiChordDef)_midiChordDefs[indexInPrivateMidiChordDefsList].Clone();
+            return (ChordDef)_midiChordDefs[indexInPrivateMidiChordDefsList].Clone();
         }
 
         internal void SetNoteheadColorClasses()
@@ -200,9 +200,9 @@ namespace Moritz.Symbols
             // write a list of alternative <midiChord> elements
             for(var trkIndex = 0; trkIndex < _midiChordDefs.Count; trkIndex++)
             {                 
-                var midiChordDef = _midiChordDefs[trkIndex];
+                var chordDef = _midiChordDefs[trkIndex];
                 // writes a "midiChord" element
-                midiChordDef.WriteSVG(w, channel);  // writes a midiChord element
+                chordDef.WriteSVG(w, channel);  // writes a midiChord element
             }
 
             w.WriteEndElement(); // end score:midiChords
@@ -217,7 +217,7 @@ namespace Moritz.Symbols
             return sb.ToString();
         }
 
-        private List<MidiChordDef> _midiChordDefs = new List<MidiChordDef>();
+        private List<ChordDef> _midiChordDefs = new List<ChordDef>();
 
         public VerticalDir DefaultStemDirection(Clef clef)
         {

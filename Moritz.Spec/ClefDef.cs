@@ -5,7 +5,7 @@ namespace Moritz.Spec
 {
     ///<summary>
     /// A ClefDef is a IUniqueDef which can be created while programming a score.
-    /// It must be either be added to a voice.UniqueDefs list immediately before a MidiChordDef or RestDef with which it
+    /// It must be either be added to a voice.UniqueDefs list immediately before a ChordDef or RestDef with which it
     /// shares the same MsPosition, or appended to the voice.UniqueDefs list (in which case it has the EndMsPositionReFirstIUD of
     /// the channelDef (which does not contain barlines).
     /// When converting definitions to symbols, the Notator uses this class to ensure that both voices in
@@ -53,7 +53,7 @@ namespace Moritz.Spec
         public int MsDuration { get { return 0; } set { throw new System.NotSupportedException(); } }
         private int _msPositionReFirstIUD = -1;
         /// <summary>
-        /// Care should be taken to ensure that ClefDefs always have the same msPosition as the following MidiChordDef or RestDef
+        /// Care should be taken to ensure that ClefDefs always have the same msPosition as the following ChordDef or RestDef
         /// </summary>
         public int MsPositionReFirstUD
         {
