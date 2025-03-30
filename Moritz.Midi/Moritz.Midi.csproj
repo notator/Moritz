@@ -47,9 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicMidiChord.cs" />
-    <Compile Include="ChordMessage.cs" />
-    <Compile Include="MidiChord.cs" />
     <Compile Include="MidiChordSlider.cs" />
     <Compile Include="SanfordMessage.cs" />
     <Compile Include="MidiDurationSymbol.cs" />
