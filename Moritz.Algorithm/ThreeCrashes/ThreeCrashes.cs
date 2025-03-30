@@ -19,97 +19,97 @@ namespace Moritz.Algorithm.ThreeCrashes
         public override int NumberOfBars { get { return 27; } }
 
         private static readonly int nKeyboardPitches = 85;
-        private readonly int transposition = (byte)((127 - nKeyboardPitches) / 2); // 21 -- puts the range in middle of the MIDI range
+        private readonly int transposition = (int)((127 - nKeyboardPitches) / 2); // 21 -- puts the range in middle of the MIDI range
 
         // crashes 1-3 contain nKeyboardPitches values each -- not the 89 values described in the online analysis.
-        private static readonly IReadOnlyList<IReadOnlyList<byte>> crashAWagons = new List<List<byte>>()
+        private static readonly IReadOnlyList<IReadOnlyList<int>> crashAWagons = new List<List<int>>()
         {
-            new List<byte>() // Wagon A1, 17 values
+            new List<int>() // Wagon A1, 17 values
 			{10, 13, 17, 27, 29, 37, 47, 49, 54, 57, 58, 62, 64, 66, 68, 73, 80 },
-            new List<byte>() // Wagon A2, 17 values
+            new List<int>() // Wagon A2, 17 values
 			{19, 20, 24, 25, 32, 34, 36, 38, 40, 55, 56, 59, 74, 78, 79, 82, 85 },
-            new List<byte>() // Wagon A3, 17 values
+            new List<int>() // Wagon A3, 17 values
 			{ 1,  4,  5, 11, 15, 21, 23, 28, 39, 42, 46, 48, 60, 65, 69, 72, 77 },
-            new List<byte>() // Wagon A4, 17 values
+            new List<int>() // Wagon A4, 17 values
 			{14, 18, 26, 30, 33, 35, 43, 44, 45, 50, 51, 52, 61, 63, 76, 81, 84 },
-            new List<byte>() // Wagon A5, 17 values
+            new List<int>() // Wagon A5, 17 values
 			{ 2,  3,  6,  7,  8,  9, 12, 16, 22, 31, 41, 53, 67, 70, 71, 75, 83 }
         };
-        private static readonly IReadOnlyList<IReadOnlyList<byte>> crashBWagons = new List<List<byte>>()
+        private static readonly IReadOnlyList<IReadOnlyList<int>> crashBWagons = new List<List<int>>()
         {
-            new List<byte>() // Wagon B1, 23 values
+            new List<int>() // Wagon B1, 23 values
 			{ 2,  4, 15, 20, 26, 32, 35, 37, 39, 41, 46, 48, 49, 52, 56, 60, 63, 65, 67, 77, 78, 82, 83 },
-            new List<byte>() // Wagon B2, 20 values
+            new List<int>() // Wagon B2, 20 values
 			{ 3,  6,  7, 12, 16, 22, 29, 30, 31, 34, 53, 58, 59, 68, 69, 70, 74, 79, 84, 85 },
-            new List<byte>() // Wagon B3, 17 values
+            new List<int>() // Wagon B3, 17 values
 			{ 9, 10, 13, 14, 24, 25, 42, 43, 44, 61, 64, 66, 71, 72, 73, 76, 81 },
-            new List<byte>() // Wagon B4, 14 values
+            new List<int>() // Wagon B4, 14 values
 			{ 1,  8, 17, 19, 21, 28, 36, 50, 51, 54, 57, 62, 75, 80 },
-            new List<byte>() // Wagon B5, 11 values
+            new List<int>() // Wagon B5, 11 values
 			{ 5, 11, 18, 23, 27, 33, 38, 40, 45, 47, 55 }
         };
-        private static readonly IReadOnlyList<IReadOnlyList<byte>> crashCWagons = new List<List<byte>>()
+        private static readonly IReadOnlyList<IReadOnlyList<int>> crashCWagons = new List<List<int>>()
         {
-            new List<byte>() // Wagon C1, 29 values
+            new List<int>() // Wagon C1, 29 values
 			{ 1,  4,  5,  7, 14, 20, 30, 32, 34, 35, 38, 40, 41, 46, 50, 53, 57, 61, 63, 66, 68, 69, 72, 74, 75, 76, 77, 78, 82 },
-            new List<byte>() // Wagon C2, 23 values
+            new List<int>() // Wagon C2, 23 values
 			{ 8,  9, 10, 13, 15, 19, 24, 26, 29, 33, 37, 39, 43, 44, 45, 49, 51, 52, 54, 62, 67, 70, 85 },
-            new List<byte>() // Wagon C3, 17 values
+            new List<int>() // Wagon C3, 17 values
 			{ 2,  3, 11, 16, 21, 25, 28, 31, 36, 47, 48, 55, 60, 65, 81, 83, 84 },
-            new List<byte>() // Wagon C4, 11 values
+            new List<int>() // Wagon C4, 11 values
 			{ 6, 12, 17, 18, 56, 58, 59, 64, 71, 79, 80 },
-            new List<byte>() // Wagon C5, 5 values
+            new List<int>() // Wagon C5, 5 values
 			{ 22, 23, 27, 42, 73 }
         };
 
-        private static readonly IReadOnlyList<IReadOnlyList<byte>> random1to85Lists = new List<List<byte>>()
+        private static readonly IReadOnlyList<IReadOnlyList<int>> random1to85Lists = new List<List<int>>()
         {
-            new List<byte>()
+            new List<int>()
             { 50,  1, 12, 49, 55, 34, 60,  3, 13,  7, 84,  8, 66, 45, 22, 83, 36, 10, 63, 31, 28, 53,  4, 38, 30,
               62, 11, 64,  6, 85, 74, 54, 61, 41, 15,  2, 79, 78, 73, 47, 65, 39, 24, 42, 29, 27, 76, 25, 21, 46,
               37, 51,  5,  9, 19, 35, 77, 69, 48, 14, 82, 18, 68, 26, 81, 16, 58, 40, 56, 20, 80, 17, 32, 52, 75,
               33, 57, 67, 44, 71, 43, 72, 23, 70, 59 },
-            new List<byte>()
+            new List<int>()
             { 31, 44, 71, 76, 68, 53, 32, 13,  5, 14, 69, 64, 50, 79, 78, 59, 48, 29, 34,  7, 37, 11, 85,  6, 65,
               43, 39, 57, 30, 27, 15, 16, 61, 52,  9, 33, 10,  4, 77, 81, 41, 60, 49, 20, 62, 47, 22, 83, 75, 72,
               21, 18, 74, 56,  8, 26, 46, 82, 38, 58, 12, 36, 42, 80, 24, 45, 63, 28, 54, 70, 51, 25, 84, 23, 40,
               19,  3, 66, 35,  2, 73, 55, 17,  1, 67 },
-            new List<byte>()
+            new List<int>()
             { 85, 32, 82, 79, 66,  7, 12,  4,  6, 46, 39, 18, 69, 29, 34, 26, 35, 80, 72,  2, 42, 15,  5, 60, 65,
                8, 28, 63, 43, 84, 36, 44, 70, 61,  1, 45, 73, 40, 83, 20, 71, 22, 52, 74, 57, 11, 38, 76, 51, 17,
               14, 62, 59, 33, 19, 27, 16,  9, 10, 53, 67, 31, 47, 56, 55,  3, 41, 49, 21, 13, 50, 54, 81, 75, 24,
               58, 30, 68, 64, 48, 78, 77, 23, 37, 25 },
-            new List<byte>()
+            new List<int>()
             { 85, 75, 47, 68, 45, 55, 54, 48, 51, 27, 21, 80, 32, 61, 46, 66, 10, 36, 44, 41,  5, 19, 18, 35, 25,
               20, 81, 29, 17, 50, 64, 65, 71, 43, 63, 38, 69, 56,  4, 16,  3,  1, 15,  6, 53,  9, 42, 23, 34, 40,
               28, 49, 76, 74, 31, 30,  8, 72, 62, 52, 59,  7, 13, 70, 77, 24, 82, 57, 37, 39, 26, 14, 60, 84, 67,
                2, 11, 83, 78, 33, 79, 58, 22, 12, 73 },
-            new List<byte>()
+            new List<int>()
             { 40, 34, 27, 56, 10, 26,  4, 20, 64, 42,  7, 47, 52, 76,  9, 28, 67, 24,  8, 45, 65, 66, 13, 71, 74,
               61, 38, 62, 50, 33, 84, 75, 22, 82, 53,  5, 12, 48, 14, 49, 68, 23, 31, 30,  3, 70, 69, 29, 51, 18,
               19, 16, 11, 32, 57, 41, 37, 85, 55, 79, 63, 58, 44, 25, 43,  6, 17, 46, 81,  2, 21, 35, 59, 54, 73,
               77, 39, 80, 78,  1, 15, 72, 83, 60, 36 },
-            new List<byte>()
+            new List<int>()
             { 15, 61, 28, 34, 35, 62, 75, 26, 56, 23, 80, 27, 76, 20, 39,  4, 66, 74, 65, 70, 53, 82,  7, 60, 54,
               79, 31, 36, 59, 13, 10, 38, 43,  1, 52,  2, 14, 19, 68, 77, 33, 16, 58, 50, 69, 11, 40, 45, 81, 63,
               64, 49, 18, 78, 12, 37, 44, 71, 22, 24, 30, 47, 29,  9, 73, 17, 55,  5, 85,  8, 42,  3, 25, 21, 83,
               51, 32, 84, 57,  6, 72, 48, 67, 46, 41 },
-            new List<byte>()
+            new List<int>()
             { 41, 22, 56, 28, 30, 36, 33, 52, 53, 45, 15, 34, 37, 38, 85, 70, 60, 81, 71, 51, 26, 64, 17, 72, 19,
               43, 78, 82, 59,  3, 31, 83, 66, 50, 76, 27, 18, 58, 14, 77, 80, 84, 65, 67, 44,  7, 32, 69,  2,  8,
               40, 35,  9, 13, 75,  4, 55, 46, 42, 39, 62, 48, 49, 25, 47, 73, 79, 20, 11, 21, 16, 24, 68,  5, 23,
               54, 74,  1, 63, 10, 29, 61, 12,  6, 57 },
-            new List<byte>()
+            new List<int>()
             { 65, 53, 56, 45, 48, 79, 37, 33, 55, 74, 78, 52, 10, 24,  2, 31, 41, 25, 75, 42, 19, 28, 66, 80, 12,
               62, 50, 81, 18, 51, 47, 13, 26, 73, 39,  8, 11, 14, 49,  7, 30,  6, 20, 27, 71, 15,  4, 57, 40, 70,
               61, 64, 16, 58, 67, 36, 44, 84, 34, 43, 77, 35, 59, 82, 29, 63,  5, 76, 69,  3, 23, 83,  1,  9, 72,
               21, 60, 22, 54, 32, 17, 46, 85, 68, 38 },
-            new List<byte>()
+            new List<int>()
             { 39, 29, 57, 71, 65,  7, 51, 36, 63, 22, 16, 31, 41, 48, 68, 37, 23, 58, 20, 69, 54, 15, 84, 49, 73,
               47, 76, 46, 80,  4, 34, 85, 66, 78, 17, 28, 50, 27, 61, 42, 70, 26, 19, 83, 38, 62,  5, 13, 59, 56,
               30, 43,  2, 55,  3, 79, 40, 12, 18, 77, 21, 32, 45, 53, 24, 10, 75, 35, 14, 44,  6, 81, 11, 52,  1,
               25, 33, 82,  8,  9, 67, 64, 72, 60, 74 },
-            new List<byte>()
+            new List<int>()
             { 47, 11, 84, 23, 46, 64, 17, 38, 77, 71, 25, 83, 18, 66, 21, 54,  7, 73, 52, 81, 67, 45, 10, 55, 68,
                2,  9, 35, 12, 37, 72, 26, 30, 33, 69, 61, 50,  4, 24, 80, 43, 79,  5,  8, 51, 22, 82, 65, 14, 63,
               27, 29, 16, 28, 19, 58, 74, 76, 20, 13, 85,  3, 15, 60, 62,  1, 49, 40, 41, 44, 34, 57, 56, 70, 36,
@@ -126,7 +126,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 			};
         // 10 velocities, equally spaced, from 28 to 127
         // c.f. MoritzStatics.cs/MaxMidiVelocity: -- 9 dynamic ranges, equally spaced from [0..15] (=pppp) to [113..127] (=fff) --. 
-        private static readonly List<byte> basicVelocities = new List<byte>() { 28, 39, 50, 61, 72, 83, 94, 105, 116, 127 };
+        private static readonly List<int> basicVelocities = new List<int>() { 28, 39, 50, 61, 72, 83, 94, 105, 116, 127 };
 
         /****************************************************************************************/
 
@@ -177,16 +177,14 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, singleBar.Trks.Count);
-
-            List<Bar> bars = GetBars(singleBar, endBarlinePositions, clefChangesPerBar, null);
+            List<Bar> bars = GetBars(singleBar, endBarlinePositions);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
             return bars;
         }
 
-        private List<IUniqueDef> GetMidiChordDefs(List<byte> pitches, List<byte> velocities, List<int> msDurations)
+        private List<IUniqueDef> GetMidiChordDefs(List<int> pitches, List<int> velocities, List<int> msDurations)
         {
             Debug.Assert(pitches.Count == velocities.Count);
             Debug.Assert(msDurations.Count == velocities.Count);
@@ -195,8 +193,8 @@ namespace Moritz.Algorithm.ThreeCrashes
             int msPosition = 0;
             for(int i = 0; i < pitches.Count; ++i)
             {
-                List<byte> pitchesArg = new List<byte>() { pitches[i] };
-                List<byte> velocitiesArg = new List<byte>() { velocities[i] };
+                List<int> pitchesArg = new List<int>() { pitches[i] };
+                List<int> velocitiesArg = new List<int>() { velocities[i] };
                 int msDuration = msDurations[i];
                 MidiChordDef midiChordDef = new MidiChordDef(pitchesArg, velocitiesArg, msDuration, true)
                 {
@@ -220,7 +218,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         /// <param name="crashWagons"></param>
         /// <param name="initialAngularPosition"></param>
         /// <returns></returns>
-        private List<Trk> GetElevenCrashTrks(IReadOnlyList<IReadOnlyList<byte>> crashWagons, int initialAngularPosition)
+        private List<Trk> GetElevenCrashTrks(IReadOnlyList<IReadOnlyList<int>> crashWagons, int initialAngularPosition)
         {
             List<Trk> crashTrks = new List<Trk>();
 
@@ -231,10 +229,10 @@ namespace Moritz.Algorithm.ThreeCrashes
 
                 for(int wagonIndex = 0; wagonIndex < crashWagons.Count; ++wagonIndex)
                 {
-                    IReadOnlyList<byte> wagonValues = crashWagons[wagonIndex];
-                    List<byte> velocities = GetBasicVelocities(wagonIndex, angularPosition, wagonValues.Count);
+                    IReadOnlyList<int> wagonValues = crashWagons[wagonIndex];
+                    List<int> velocities = GetBasicVelocities(wagonIndex, angularPosition, wagonValues.Count);
                     List<int> pitchDurations = GetBasicPitchDurations(wagonValues);
-                    List<byte> midiPitches = GetBasicMidiPitches(wagonValues);
+                    List<int> midiPitches = GetBasicMidiPitches(wagonValues);
 
                     Trk wagonTrk = GetWagonTrk(midiPitches, velocities, pitchDurations);
 
@@ -254,12 +252,12 @@ namespace Moritz.Algorithm.ThreeCrashes
             return crashTrks;
         }
 
-        private List<byte> GetBasicVelocities(int wagonIndex, int angularPos, int wagonValuesCount)
+        private List<int> GetBasicVelocities(int wagonIndex, int angularPos, int wagonValuesCount)
         {
             List<int> basicVelocityIndexPerAngPos = basicVelocityIndexPerWagonPerAngPos[wagonIndex];
             int velocityIndex = basicVelocityIndexPerAngPos[angularPos];
-            byte velocity = basicVelocities[velocityIndex];
-            List<byte> velocities = new List<byte>();
+            int velocity = basicVelocities[velocityIndex];
+            List<int> velocities = new List<int>();
             for(int i = 0; i < wagonValuesCount; ++i)
             {
                 velocities.Add(velocity);
@@ -267,14 +265,14 @@ namespace Moritz.Algorithm.ThreeCrashes
             return velocities;
         }
 
-        private List<int> GetBasicPitchDurations(IReadOnlyList<byte> wagonValues)
+        private List<int> GetBasicPitchDurations(IReadOnlyList<int> wagonValues)
         {
             // nKeyboardPitches durations (longLow to shortHigh)
             IReadOnlyList<int> basicDurations = BasicDurations();
 
             Debug.Assert(wagonValues.Count <= nKeyboardPitches && basicDurations.Count == nKeyboardPitches);
             List<int> pitchDurations = new List<int>();
-            foreach(byte pitch in wagonValues)
+            foreach(int pitch in wagonValues)
             {
                 Debug.Assert(pitch >= 1 && pitch <= nKeyboardPitches);
                 pitchDurations.Add(basicDurations[pitch - 1]);
@@ -285,12 +283,12 @@ namespace Moritz.Algorithm.ThreeCrashes
         /// <summary>
         /// returns the real (transposed) MIDI pitch values.
         /// </summary>
-        private List<byte> GetBasicMidiPitches(IReadOnlyList<byte> wagonValues)
+        private List<int> GetBasicMidiPitches(IReadOnlyList<int> wagonValues)
         {
-            List<byte> midiPitches = new List<byte>();
-            foreach(byte value in wagonValues)
+            List<int> midiPitches = new List<int>();
+            foreach(int value in wagonValues)
             {
-                midiPitches.Add((byte)(value + transposition));
+                midiPitches.Add((int)(value + transposition));
             }
             return midiPitches;
         }
@@ -317,7 +315,7 @@ namespace Moritz.Algorithm.ThreeCrashes
             return durations as IReadOnlyList<int>;
         }
 
-        private Trk GetWagonTrk(List<byte> pitches, List<byte> velocities, List<int> durations)
+        private Trk GetWagonTrk(List<int> pitches, List<int> velocities, List<int> durations)
         {
             Trk trk = new Trk();
             List<IUniqueDef> midiChordDefs = GetMidiChordDefs(pitches, velocities, durations);
@@ -329,16 +327,16 @@ namespace Moritz.Algorithm.ThreeCrashes
         /// <summary>
         /// Adds cloned IUniqueDefs from wagonTrks to the returned Trk.
         /// </summary>
-        private Trk Intersperse(List<Trk> wagonTrks, IReadOnlyList<byte> random1to85List)
+        private Trk Intersperse(List<Trk> wagonTrks, IReadOnlyList<int> random1to85List)
         {
-            List<List<byte>> iudIndicesList = new List<List<byte>>();
+            List<List<int>> iudIndicesList = new List<List<int>>();
             int indexInRandomList = 0;
             foreach(Trk trk in wagonTrks)
             {
-                List<byte> iudIndices = new List<byte>();
+                List<int> iudIndices = new List<int>();
                 for(int i = 0; i < trk.Count; ++i)
                 {
-                    iudIndices.Add((byte)(random1to85List[indexInRandomList++] - 1));
+                    iudIndices.Add((int)(random1to85List[indexInRandomList++] - 1));
                 }
                 iudIndices.Sort();
                 iudIndicesList.Add(iudIndices);
@@ -351,20 +349,20 @@ namespace Moritz.Algorithm.ThreeCrashes
 
         /// <summary>
         /// The IUniqueDefs in each wagonTrk are in ascending order.
-        /// The iudIndices are also in ascending order in each list of byte.
+        /// The iudIndices are also in ascending order in each list of int.
         /// </summary>
         /// <param name="wagonTrks"></param>
         /// <param name="iudIndicesList"></param>
         /// <returns></returns>
-        private Trk GetInterspersedTrk(List<Trk> wagonTrks, List<List<byte>> iudIndicesList)
+        private Trk GetInterspersedTrk(List<Trk> wagonTrks, List<List<int>> iudIndicesList)
         {
             Trk rval = new Trk();
 
-            for(byte iudIndex = 0; iudIndex < 85; ++iudIndex)
+            for(int iudIndex = 0; iudIndex < 85; ++iudIndex)
             {
                 for(int wtIndex = 0; wtIndex < iudIndicesList.Count; ++wtIndex)
                 {
-                    List<byte> iudIndices = iudIndicesList[wtIndex];
+                    List<int> iudIndices = iudIndicesList[wtIndex];
                     int index = iudIndices.IndexOf(iudIndex);
                     if(index >= 0)
                     {
@@ -490,8 +488,8 @@ namespace Moritz.Algorithm.ThreeCrashes
             {
                 if(iud is MidiChordDef midiChordDef)
                 {
-                    byte originalVelocity = midiChordDef.Velocities[0];
-                    byte newVelocity = (byte)Math.Round(originalVelocity * warpFactor);
+                    int originalVelocity = midiChordDef.Velocities[0];
+                    int newVelocity = (int)Math.Round(originalVelocity * warpFactor);
                     midiChordDef.Velocities[0] = newVelocity;
                 }
             }
@@ -648,14 +646,6 @@ namespace Moritz.Algorithm.ThreeCrashes
                 }
             }
             return endBarlinePositions;
-        }
-
-        /// <summary>
-        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
-        /// </summary>
-        protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-        {
-            return null;
         }
     }
 }

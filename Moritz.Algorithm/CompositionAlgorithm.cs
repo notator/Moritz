@@ -124,40 +124,86 @@ namespace Moritz.Algorithm
         public abstract List<Bar> DoAlgorithm(List<Krystal> krystals);
 
         /// <summary>
-        /// This function returns null or a SortedDictionary per ChannelDef in each bar.
-        /// An empty clefChanges list of the returned type can be
-        ///     1. created by calling the protected function GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar) and
-        ///     2. populated with code such as clefChanges[barIndex][voiceIndex].Add(9, "t3"). 
-        /// The dictionary contains the index at which the clef will be inserted in the ChannelDef's IUniqueDefs,
-        /// and the clef ID string ("t", "t1", "b3" etc.).
+        /// To insert clef changes into a score's Bars:
+        ///     1. Construct the bars using GetBars(...)
+        ///     2. Create an empty clefChanges object by calling GetEmptyClefChangesPerBarPerStaff(bars).
+        ///     3  populate the resulting object with code such as clefChanges[barIndex][staffIndex].Add(9, "t3").
+        ///         arg 1) is the index in the IUniqueDefs of the top track in the staff in which the clef will be inserted, and
+        ///         arg 2) is the clef's ID string ("t", "t1", "b3" etc.).
+        ///     4. call InsertClefChangesInBars(bars, clefChanges)
         /// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
         /// the existing IUniqueDefs before which the clef will be inserted.
         /// The SortedDictionaries should not contain the initial clefs per channelDef - those will be included
         /// automatically.
         /// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
         /// cannot be inserted in front of them.
-        /// Clefs should not be inserted here in the lower of two voices in a staff. Lower voices automatically have the
+        /// Note that the top trk in the top voice on each staff is the only one to be converted to graphics,
+        /// so this is the only one that can accept clef definitions. A lower voice on a staff automatically has the
         /// SmallClefs that are defined for the upper voice.
         /// </summary>
+        /// 
         /// <example>
-        /// Example for Study3Sketch1Algorithm
-        /// var clefChangesPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
-        ///
-        /// SortedDictionary;lt;int, string&gt; voiceDef0Bar0 = clefChangesPerBar[0][0];
-        /// voiceDef0Bar0.Add(9, "b3");
-        /// voiceDef0Bar0.Add(8, "b2");
-        /// voiceDef0Bar0.Add(6, "b");
-        /// voiceDef0Bar0.Add(4, "t2");
-        /// voiceDef0Bar0.Add(2, "t");
-        ///
-        /// The following were redundant in this score, since they only apply to rests!
-        /// voiceDef0Bar0.Add(7, "b1");
-        /// voiceDef0Bar0.Add(5, "t3");
-        /// voiceDef0Bar0.Add(3, "t1");
-        ///
-        /// return clefChangesPerBar;
+        /// Example:
+        /// {
+        ///     List<Bar> bars = GetBars(singleBar, barlineMsPositions);
+        ///     
+        ///     var clefChangesPerBarPerStaff = GetEmptyClefChangesPerBarPerStaff(bars, PageFormat.VoiceIndicesPerStaff);
+        ///     
+        ///     var barIndex = 3;
+        ///     var staffIndex = 2;
+        ///     SortedDictionary[int, string] dict = clefChangesPerBar[barIndex][staffIndex];
+        ///     
+        ///     dict.Add(9, "b3");
+        ///     dict.Add(8, "b2");
+        ///     dict.Add(6, "b");
+        ///     dict.Add(4, "t2");
+        ///     dict.Add(2, "t");
+        ///     
+        ///     InsertClefChangesInBars(bars, clefChangesPerBarPerStaff)
+        /// }
         /// </example>
-        protected abstract List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar);
+        /// 
+        /// <paramref name="bars"/>
+        /// Note that:
+        ///     Argument 1 is the algorithm's completed bars object,
+        ///     Argument 2 is the algorithm' PageFormat.VoiceIndicesPerStaff (set by the AssistantComposerForm dialog).
+        protected List<List<SortedDictionary<int, string>>> GetEmptyClefChangesPerBarPerStaff(List<Bar> bars , List<List<int>> voiceIndicesPerStaff)
+        {
+            var rval = new List<List<SortedDictionary<int, string>>>();
+            foreach(var bar in bars)
+            {
+                List<SortedDictionary<int, string>> barList = new List<SortedDictionary<int, string>>();
+                foreach(var voiceIndices in voiceIndicesPerStaff)
+                {
+                    SortedDictionary<int, string> trkDict = new SortedDictionary<int, string>();
+                    barList.Add(trkDict);
+                }
+            }
+
+            return rval;
+        }
+
+        private void InsertClefChangesInBars(List<Bar> bars, List<List<int>> voiceIndicesPerStaff, List<List<SortedDictionary<int, string>>> clefChangesPerBarPerStaff)
+        {
+            Debug.Assert(bars.Count == clefChangesPerBarPerStaff.Count);
+
+            for(int barIndex = 0; barIndex < bars.Count; barIndex++)
+            {
+                var bar = bars[barIndex];
+                for(var staffIndex = 0; staffIndex < voiceIndicesPerStaff.Count; ++staffIndex)
+                {
+                    var midiIndex = voiceIndicesPerStaff[staffIndex][0];
+                    var trk = bar.ChannelDefs[midiIndex].Trks[0];
+                    SortedDictionary<int, string> clefDict = clefChangesPerBarPerStaff[barIndex][staffIndex];
+                    foreach(KeyValuePair<int, string> keyValuePair in clefDict)
+                    {
+                        int index = keyValuePair.Key;
+                        ClefDef clefDef = new ClefDef(keyValuePair.Value, trk.UniqueDefs[index].MsPositionReFirstUD);
+                        trk.Insert(keyValuePair.Key, clefDef);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Lyrics can simply be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
@@ -321,10 +367,8 @@ namespace Moritz.Algorithm
         /// </summary>
         /// <param name="mainBar">A Bar containing all the output IUniqueDefs in the composition.</param>
         /// <param name="barlineMsPositions">All the barline msPositions (except the first).</param>
-        /// <param name="clefChangesPerBar">Can be null.</param>
-        /// <param name="lyricsPerBar">Can be null.</param>
         /// <returns>A list of Bars</returns>
-        protected List<Bar> GetBars(Bar mainBar, List<int> barlineMsPositions, List<List<SortedDictionary<int, string>>> clefChangesPerBar, List<List<SortedDictionary<int, string>>> lyricsPerBar)
+        protected List<Bar> GetBars(Bar mainBar, List<int> barlineMsPositions)
         {
             mainBar.AssertConsistency();
 
@@ -334,16 +378,6 @@ namespace Moritz.Algorithm
             {
                 // Each Trk can begin with a CautionaryChordDef and contains no ClefDefs.
                 bar.AssertConsistency();
-            }
-
-            // These are additional clefs, composed after viewing the first rendering.
-            if(clefChangesPerBar != null)
-            {
-                InsertClefChangesInBars(bars, clefChangesPerBar);
-            }
-            if(lyricsPerBar != null)
-            {
-                AddLyricsToBars(bars, lyricsPerBar);
             }
 
             return bars;
@@ -370,82 +404,6 @@ namespace Moritz.Algorithm
                         }
                     }
                 }
-            }
-        }
-        
-        private void InsertClefChangesInBars(List<Bar> bars, List<List<SortedDictionary<int, string>>> clefChangesPerBar)
-        {
-            Debug.Assert(bars.Count == clefChangesPerBar.Count);
-
-            for(int i = 0; i < bars.Count; i++)
-            {
-                IReadOnlyList<ChannelDef> barVoiceDefs = bars[i].ChannelDefs;
-                List<SortedDictionary<int, string>> clefChangesPerVoiceDef = clefChangesPerBar[i];
-                Debug.Assert(barVoiceDefs.Count == clefChangesPerVoiceDef.Count);
-                for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
-                {
-                    SortedDictionary<int, string> clefChanges = clefChangesPerVoiceDef[voiceDefIndex];
-                    if(clefChanges.Count > 0)
-                    {
-                        ChannelDef channelDef = barVoiceDefs[voiceDefIndex];
-                        InsertClefChangesInChannelDef(channelDef, trkIndex, clefChanges);
-                    }
-                }
-            }
-        }
-
-        private static void InsertClefChangesInChannelDef(ChannelDef channelDef, int trkIndex, SortedDictionary<int, string> clefChanges)
-        {
-            List<int> reversedKeys = new List<int>();
-            foreach(int key in clefChanges.Keys)
-            {
-                reversedKeys.Add(key);
-            }
-            reversedKeys.Reverse();
-
-            foreach(int key in reversedKeys)
-            {
-                string clef = clefChanges[key];
-                channelDef.InsertClefDef(key, clef);
-            }
-        }
-
-        private void AddLyricsToBars(List<Bar> bars, List<List<SortedDictionary<int, string>>> lyricsPerBar)
-        {
-            Debug.Assert(bars.Count == lyricsPerBar.Count);
-
-            for(int i = 0; i < bars.Count; i++)
-            {
-                IReadOnlyList<ChannelDef> barVoiceDefs = bars[i].ChannelDefs;
-                List<SortedDictionary<int, string>> lyricsPerVoiceDef = lyricsPerBar[i];
-                Debug.Assert(barVoiceDefs.Count == lyricsPerVoiceDef.Count);
-                for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
-                {
-                    ChannelDef channelDef = barVoiceDefs[voiceDefIndex];
-                    SortedDictionary<int, string> lyrics = lyricsPerVoiceDef[voiceDefIndex];
-                    AddLyricsToVoiceDef(channelDef, lyrics);
-                }
-            }
-        }
-
-        private static void AddLyricsToVoiceDef(ChannelDef channelDef, SortedDictionary<int, string> lyrics)
-        {
-            if(lyrics.Count > 0)
-            {
-                var mcds = new List<MidiChordDef>();
-                foreach(IUniqueDef iud in channelDef.UniqueDefs)
-                {
-                    if(iud is MidiChordDef midiChordDef)
-                    {
-                        mcds.Add(midiChordDef);
-                    }
-                }
-                Debug.Assert(lyrics.Count <= mcds.Count);
-                foreach(int key in lyrics.Keys)
-                {
-                    mcds[key].Lyric = lyrics[key];
-                }
-
             }
         }
 

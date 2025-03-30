@@ -26,8 +26,8 @@ namespace Moritz.Algorithm.Study1
         // The krystals argument is not used.
         public override List<Bar> DoAlgorithm(List<Krystal> krystals)
         {
-            List<byte> trackChordNumbers = GetTrackChordNumbers();
-            List<byte> trackRootPitches = GetTrackRootPitches();
+            List<int> trackChordNumbers = GetTrackChordNumbers();
+            List<int> trackRootPitches = GetTrackRootPitches();
 
             Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
@@ -50,7 +50,7 @@ namespace Moritz.Algorithm.Study1
 
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(singleBar.Trks0, NumberOfBars);
 
-            List<Bar> bars = GetBars(singleBar, barlineMsPositions, null, null);
+            List<Bar> bars = GetBars(singleBar, barlineMsPositions);
 
             foreach(ChannelDef cDef in channelDefs)
             {
@@ -103,49 +103,46 @@ namespace Moritz.Algorithm.Study1
             return trk3;
         }
 
-        /// <summary>
-        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
-        /// </summary>
-        protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-        {
-            return null;
-        }
 
-        private List<byte> GetTrackChordNumbers()
+        private List<int> GetTrackChordNumbers()
         {
-            var bytes = new byte[] { };
-            
-            bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1\A4chordNumbers");
+            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1\A4chordNumbers"); 
 
-            var rval = new List<byte>(bytes);
+            var rval = new List<int>();
+            foreach(var val in bytes)
+            {
+                rval.Add((int)val);
+            }
 
             return rval;
         }
 
-        private List<byte> GetTrackRootPitches()
+        private List<int> GetTrackRootPitches()
         {
-            var bytes = new byte[] { };
+            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1\A4pitches");
 
-            bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1\A4pitches");
-
-            var rval = new List<byte>(bytes);
+            var rval = new List<int>();
+            foreach(var val in bytes)
+            {
+                rval.Add((int)val);
+            }            
 
             return rval;
         }
 
-        private Trk GetTrk0(List<byte> trackChordNumbers, List<byte> trackRootPitches)
+        private Trk GetTrk0(List<int> trackChordNumbers, List<int> trackRootPitches)
         {
             Trk trk0 = new Trk(new List<IUniqueDef>());
-            List<List<byte>> chordIntervals = GetChordIntervals();
-            List<byte> chordVelocities = GetChordVelocities();
+            List<List<int>> chordIntervals = GetChordIntervals();
+            List<int> chordVelocities = GetChordVelocities();
             List<int> chordDurations = GetChordMsDurations();
 
             int nChords = trackChordNumbers.Count;
             int chordMsPosition = 0;
             for(int i = 0; i < nChords; ++i)
             {
-                byte chordNumber = trackChordNumbers[i];
-                byte pitchNumber = trackRootPitches[i];
+                int chordNumber = trackChordNumbers[i];
+                int pitchNumber = trackRootPitches[i];
 
                 IUniqueDef midiChordDef = GetMidiChordDef(chordIntervals[chordNumber - 1], chordVelocities[chordNumber - 1], chordDurations[chordNumber - 1], pitchNumber, chordMsPosition);
                 chordMsPosition += midiChordDef.MsDuration;
@@ -158,10 +155,10 @@ namespace Moritz.Algorithm.Study1
             return trk0;
         }
 
-        private IUniqueDef GetMidiChordDef(List<byte> chordIntervals, byte chordVelocity, int chordDuration, int relativePitch, int msPosition)
+        private IUniqueDef GetMidiChordDef(List<int> chordIntervals, int chordVelocity, int chordDuration, int relativePitch, int msPosition)
         {
-            List<byte> pitches = GetPitches(relativePitch, chordIntervals);
-            List<byte> velocities = GetVelocities(chordVelocity, chordIntervals.Count() + 1);
+            List<int> pitches = GetPitches(relativePitch, chordIntervals);
+            List<int> velocities = GetVelocities(chordVelocity, chordIntervals.Count() + 1);
 
             IUniqueDef midiChordDef = new MidiChordDef(pitches, velocities, chordDuration, true)
             {
@@ -171,24 +168,24 @@ namespace Moritz.Algorithm.Study1
             return midiChordDef;
         }
 
-        private List<byte> GetPitches(int relativePitch, List<byte> primeIntervals)
+        private List<int> GetPitches(int relativePitch, List<int> primeIntervals)
         {
-            List<byte> pitches = new List<byte>();
-            byte rootPitch = (byte)(59 + relativePitch); // C is relativePitch 1
+            List<int> pitches = new List<int>();
+            int rootPitch = (int)(59 + relativePitch); // C is relativePitch 1
             pitches.Add(rootPitch);
 
             for(int i = 0; i < primeIntervals.Count; ++i)
             {
-                byte newPitch = (byte)(rootPitch + primeIntervals[i]);
+                int newPitch = (int)(rootPitch + primeIntervals[i]);
                 pitches.Add(newPitch);
                 rootPitch = newPitch;
             }
             return pitches;
         }
 
-        private List<byte> GetVelocities(byte velocity, int nVelocities)
+        private List<int> GetVelocities(int velocity, int nVelocities)
         {
-            List<byte> velocities = new List<byte>();
+            List<int> velocities = new List<int>();
             for(int i = 0; i < nVelocities; ++i)
             {
                 velocities.Add(velocity);
@@ -197,27 +194,27 @@ namespace Moritz.Algorithm.Study1
             return velocities;
         }
 
-        List<List<byte>> GetChordIntervals()
+        List<List<int>> GetChordIntervals()
         {
-            List<List<byte>> chords = new List<List<byte>>
+            List<List<int>> chords = new List<List<int>>
             {
 				// The numbers are the number of semitones between neighbouring notes in the chord.
-				new List<byte>() { }, // chordNumber 1 (density 1)
-				new List<byte>() { 4 }, // chordNumber 2 (density 2)
-				new List<byte>() { 4, 3 }, // chordNumber 3	 (density 3)
-				new List<byte>() { 3, 4, 2 }, // chordNumber 4 (density 4)
-				new List<byte>() { 3, 2, 4, 1 }, // chordNumber 5 (density 5)
-				new List<byte>() { 2, 3, 1, 4, 5 }, // chordNumber 6  (density 6)
-				new List<byte>() { 2, 1, 3, 4, 5, 7 }, // chordNumber 7 (density 7)
-				new List<byte>() { 1, 2, 3, 4, 5, 7, 12 } // chordNumber 8 (density 8)
+				new List<int>() { }, // chordNumber 1 (density 1)
+				new List<int>() { 4 }, // chordNumber 2 (density 2)
+				new List<int>() { 4, 3 }, // chordNumber 3	 (density 3)
+				new List<int>() { 3, 4, 2 }, // chordNumber 4 (density 4)
+				new List<int>() { 3, 2, 4, 1 }, // chordNumber 5 (density 5)
+				new List<int>() { 2, 3, 1, 4, 5 }, // chordNumber 6  (density 6)
+				new List<int>() { 2, 1, 3, 4, 5, 7 }, // chordNumber 7 (density 7)
+				new List<int>() { 1, 2, 3, 4, 5, 7, 12 } // chordNumber 8 (density 8)
 			};
 
             return chords;
         }
 
-        List<byte> GetChordVelocities()
+        List<int> GetChordVelocities()
         {
-            List<byte> velocities = new List<byte>
+            List<int> velocities = new List<int>
             {
 				// velocities from the original composition (see About Study 1)
 				//velocities.Add(127);

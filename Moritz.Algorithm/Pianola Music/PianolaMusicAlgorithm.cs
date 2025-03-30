@@ -40,21 +40,12 @@ namespace Moritz.Algorithm.PianolaMusic
             singleBar.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(trks, 8);
-            List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, singleBar.ChannelDefs.Count);
-
-            List<Bar> bars = GetBars(singleBar, barlineMsPositions, clefChangesPerBar, null);
+            
+            List<Bar> bars = GetBars(singleBar, barlineMsPositions);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
             return bars;
-        }
-
-        /// <summary>
-        /// See summary and example code on abstract definition in CompositionAlogorithm.cs
-        /// </summary>
-        protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-        {
-            return null;
         }
 
         // Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.
@@ -100,11 +91,11 @@ namespace Moritz.Algorithm.PianolaMusic
             const int durationFactor = 48;  // the shortest note is 48ms
 
             List<IUniqueDef> defs = new List<IUniqueDef>();
-            List<byte> velocities = new List<byte>() { (byte)127 };
+            List<int> velocities = new List<int>() { (int)127 };
             int msPosition = 0;
             for(int i = 0; i < 96; ++i)
             {
-                List<byte> pitchesArg = new List<byte>() { (byte)pitches[i] };
+                List<int> pitchesArg = new List<int>() { (int)pitches[i] };
                 int msDuration = durations[i] * durationFactor;
                 MidiChordDef midiChordDef = new MidiChordDef(pitchesArg, velocities, msDuration, true)
                 {
