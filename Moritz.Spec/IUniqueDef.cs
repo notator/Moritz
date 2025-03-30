@@ -3,7 +3,7 @@ namespace Moritz.Spec
     ///<summary>
     /// IUniqueDef is implemented by all objects that can be added to a ChannelDefs.UniqueDefs list.
     /// Currently (11.9.2014) these are:
-    ///     ChordDef
+    ///     MidiChordDef
     ///     RestDef
     ///     CautionaryChordDef
     ///     ClefDef

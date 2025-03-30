@@ -12,7 +12,7 @@ namespace Krystals5ObjectLibrary
         /// An envelope is a list of integral values that are greater than or equal to 0, and less than
         /// or equal to the envelope's Domain.
         /// The list's Count must be greater than 0, but is otherwise unlimited.
-        /// Domain must be >= 0. ChordDef Sliders use envelopes having Domain==127.
+        /// Domain must be >= 0. MidiChordDef Sliders use envelopes having Domain==127.
         /// The list's values can repeat. Not all values in range have to be present.
         /// Values that are set to 0 in envelope.Original are set to Domain in envelope.Inversion.
         /// Values that are set to Domain in envelope.Original are set to 0 in envelope.Inversion.

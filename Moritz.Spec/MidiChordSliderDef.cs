@@ -7,17 +7,18 @@ using System.Diagnostics;
 
 namespace Moritz.Spec
 {
-    public class ChordSliderDefs
+    public class MidiChordSliderDef : ICloneable
     {
         /// <summary>
         /// Used by Assistant Composer
         /// </summary>
-        public ChordSliderDefs(List<byte> pitchWheelMsbs, List<byte> panMsbs, List<byte> modulationWheelMsbs, List<byte> expressionMsbs)
+        public MidiChordSliderDef()
         {
-            PitchWheelMsbs = pitchWheelMsbs;
-            PanMsbs = panMsbs;
-            ModulationWheelMsbs = modulationWheelMsbs;
-            ExpressionMsbs = expressionMsbs;
+        }
+
+        public object Clone()
+        {
+            throw new NotImplementedException();
         }
 
         public void WriteSVG(SvgWriter w, int channel, int msDuration)

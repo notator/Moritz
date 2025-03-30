@@ -12,12 +12,12 @@ namespace Moritz.Spec
     /// </summary>
     public class CautionaryChordDef : IUniqueChordDef
     {
-        public CautionaryChordDef(IUniqueChordDef chordDef, int msPositionReFirstIUD, int msDuration)
+        public CautionaryChordDef(IUniqueChordDef midiChordDef, int msPositionReFirstIUD, int msDuration)
         {
-            Pitches = chordDef.Pitches;
-            if(chordDef is ChordDef chordDef)
+            Pitches = midiChordDef.Pitches;
+            if(midiChordDef is MidiChordDef midiChordDef)
             {
-                Velocities = chordDef.Velocities;
+                Velocities = midiChordDef.Velocities;
             }
 
             MsPositionReFirstUD = msPositionReFirstIUD;

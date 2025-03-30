@@ -71,11 +71,11 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns true if the mode.List contains all the pitches in the argument. Otherwise false. 
         /// </summary>
-        public bool ContainsAllPitches(ChordDef chordDef)
+        public bool ContainsAllPitches(MidiChordDef midiChordDef)
         {
-            for(int i = 0; i < chordDef.Pitches.Count; ++i)
+            for(int i = 0; i < midiChordDef.Pitches.Count; ++i)
             {
-                if(this.Gamut.Contains(chordDef.Pitches[i]) == false)
+                if(this.Gamut.Contains(midiChordDef.Pitches[i]) == false)
                 {
                     return false;
                 }
@@ -257,7 +257,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Returns a new DefaultVelocityPerAbsolutePitch list containing 12 velocity values in range [1..127].
-        /// These can be applied to pitches in any Trk or ChordDef (using their SetVelocityPerAbsolutePitch(...) ) function,
+        /// These can be applied to pitches in any Trk or MidiChordDef (using their SetVelocityPerAbsolutePitch(...) ) function,
         /// regardless of the mode from which they have been constructed.
         /// Pitches that are part of *this* mode in the returned list are given velocities in range [1..127].
         /// Other pitches are given velocity = 1.

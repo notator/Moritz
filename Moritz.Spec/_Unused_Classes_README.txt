@@ -6,7 +6,7 @@ of Tombeau 1, but they are currently unused in this repository branch.
 The Mode class is no longer used anywhere because:
 All references by Tombeau 1 and its related classes to Mode have been removed.
 The Mode class is also also referenced by the following files in Moritz.Spec:
-		ChordDef.cs
+		MidiChordDef.cs
 		BasicMidiChordDef.cs
 		ModeProximity.cs
 But those references are themselves not used anywhere.

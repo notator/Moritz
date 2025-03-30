@@ -236,9 +236,9 @@ namespace Moritz.Symbols
                     {
                         chordsBeamedTogether.Add(chord);
                         // chord.Stem.BeamContinues is the value of
-                        // ChordDef.BeamContinues.
+                        // MidiChordDef.BeamContinues.
                         // This value is true by default, but can be set
-                        // (in ChordDef) classes used by composition
+                        // (in MidiChordDef) classes used by composition
                         // algorithms.
                         if(chord.Stem.BeamContinues)
                             breakGroup = false;

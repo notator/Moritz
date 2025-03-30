@@ -119,9 +119,9 @@ Bug fixes: Moritz now writes files and performs them correctly with and without 
 The <use> element is not overridden by attributes or content. Corrected the website documentation. 
 
 12.03.2012 rev58.183
-The score:sliders element is optional inside score:midichord elements because ChordDef.MidiChordControlDefs
-is optional (can be null). Made appropriate changes to ChordDef(ChordDef, MsDuration) and
-ChordDef.WriteSVG(). Corrected website documentation.
+The score:sliders element is optional inside score:midichord elements because MidiChordDef.MidiChordControlDef
+is optional (can be null). Made appropriate changes to MidiChordDef(MidiChordDef, MsDuration) and
+MidiChordDef.WriteSVG(). Corrected website documentation.
 
 
 08.03.2012 rev58.182
@@ -147,14 +147,14 @@ The same is true for cautionary chords, except that these never have midi info. 
 id="cautionaryChord572", then the contained graphics group has id="graphics572".
 
 04.03.2012 rev58.178
-Moved the sliders begin..end elements lines from MidiChordSliderDef.WriteSVG() into ChordDef.Write().
+Moved the sliders begin..end elements lines from MidiChordSliderDef.WriteSVG() into MidiChordDef.Write().
 This makes the structure more obvious.
 
 29.02.2012 rev58.177
 Bug Fixed: Speed changes in AssistantPerformer now work correctly, with ornaments spread correctly over the
-altered total duration. In MidiScore.GetMidiChannelMoments(), a clone of the ChordDef is made with the
+altered total duration. In MidiScore.GetMidiChannelMoments(), a clone of the MidiChordDef is made with the
 correct msPosition and msDuration _before_ creating the midiChord. The clone is made so that the values in
-the original ChordDef don't change, and can be used to calculate other speeds when initiating new
+the original MidiChordDef don't change, and can be used to calculate other speeds when initiating new
 performances in the AssistantPerformer.
 
 29.02.2012 rev58.176
@@ -169,7 +169,7 @@ queued ChordOffs only once per moment, so there is no point in trying to stop no
 sent inside ornaments, but if the outer MidiChord HasChordOff, all its pitches, including the those sent during
 an ornament which HaveChordOff, are sent a noteOff at the end of the outer MidiChord. If a pitch repeats during
 an ornament, it is only sent one chordOff (at the end of the MidiChord).
-Bug Fix 3: In BasicMidiChordDef(XmlReader r) and ChordDef(XmlReader r), fixed the code for hasChordOff.
+Bug Fix 3: In BasicMidiChordDef(XmlReader r) and MidiChordDef(XmlReader r), fixed the code for hasChordOff.
 This attribute is true by default, so if there is a hasChordOff="0" entry in the SVG file, then HasChordOff is
 false.
 
@@ -227,7 +227,7 @@ Fixed in ChordMetrics.AdjustStemLengthAndFlagBlock().
 
 24.02.2012 rev58.168
 Bug Fix: Expression envelopes are now performed. "expressionSlider" was not being read correctly in the
-MidiChordControlDefs constructor.
+MidiChordControlDef constructor.
 
 24.02.2012 rev58.167
 Dots are now allowed in score titles (e.g. Study 2c2.1). By convention, a "b" is used in scores which use
@@ -787,7 +787,7 @@ moved to (derived types defined in) Moritz.AssistantComposer.
 Moritz.Score builds without error.
 Moritz.Score.SvgScore.cs
 Moritz.Score.PageFormat.cs, 
-Moritz.Score.ChordDef.cs and 
+Moritz.Score.MidiChordDef.cs and 
 Moritz.Score.BasicMidiChordDef.cs
 all contain regions which have been commented out, and which must be moved to (derived types defined in)
 Moritz.AssistantComposer.
@@ -1064,7 +1064,7 @@ The generated score currently contains only the singer's part.
 MidiUtilities.GetMomentDefs(): Added the folowing comment:
 	This function has not been completely tested to see that controls inside MidiChordDefs are returned correctly.
 	This function was used in Song6Algorithm to analyse the singer's text (which I had recorded manually with the
-	AssistantPerformer), but only the MomentDef.MsPosition and the ChordDef.BasicMidiChordDef info was relevant there.
+	AssistantPerformer), but only the MomentDef.MsPosition and the MidiChordDef.BasicMidiChordDef info was relevant there.
 	Any controls contained in the returned MidiChordDefs were irrelevant, and were ignored.
 
 21.09.2011 rev58.65
@@ -1307,10 +1307,10 @@ out of synch...
 Study 3b now plays correctly (I think)!  The single event buttons are still working.
 Bug Fix: The lower staves were not being played with the correct durations, because the #use definitions were not
 being cloned, so the definitions were getting changed...
-1. Added two private ChordDef.FitToDuration() functions. This ensure that the sum of the 
-BasicMidiChord.MsDurations is equal to ChordDef.MsDuration. One of these functions is currently used to 
+1. Added two private MidiChordDef.FitToDuration() functions. This ensure that the sum of the 
+BasicMidiChord.MsDurations is equal to MidiChordDef.MsDuration. One of these functions is currently used to 
 calculate the durations inside the top staff's ornaments before saving them to an SVG-MIDI file.
-2. Added a ChordDef(chordDef, msDuration) constructor. This makes a clone of its first argument
+2. Added a MidiChordDef(midiChordDef, msDuration) constructor. This makes a clone of its first argument
 (which is a #use definition) and then calls FitToDuration(msDuration). This is superfluous in Study3b, because
 ornament durations dont change anywhere. But they can in future!
 Looked at MsPosTimeControlsDict to see if it is capella-specific. No it is not. It is used when performing scores
@@ -1426,7 +1426,7 @@ TODO: complete the MidiChord constructor with BasicChords defining ornaments (re
 07.07.2011 rev58.20.j
 This version does not yet compile. Still working on MidiScore without CapXML namespace.
 Moved volume control from staff attribute to Midichorddef attribute (parallel to pitchwheel deviation).
-The assistant composer currently only sets this on the first ChordDef, but that may change...
+The assistant composer currently only sets this on the first MidiChordDef, but that may change...
 
 06.07.2011 rev58.20.h
 This version does not yet compile.
@@ -1469,7 +1469,7 @@ TODO: rewrite Study2b2 in parallel to Study2b3.
 03.07.2011 rev58.20
 Saved SVG-MIDI files now load in IE9.
 TODO:
-1. Move ChordDef analysis to SvgScore.
+1. Move MidiChordDef analysis to SvgScore.
 2. look at the SVG-MIDI code to see that it is as expected:
 	id="staff1_1chord"
     hasChordOff="0"
@@ -1483,7 +1483,7 @@ and contain the following container hierarchy:
 					}
 					score:sliders (optional)
 				}
-  score:midiChord corresponds to a ChordDef object in C#,
+  score:midiChord corresponds to a MidiChordDef object in C#,
   score:basicChord corresponds to a BasicMidiChord object in C#,
   score:sliders corresponds to a MidiSliders object in C#
 
@@ -1522,7 +1522,7 @@ and contain the following container hierarchy:
 					}
 					score:sliders (optional)
 				}
-  score:midiChord corresponds to a ChordDef object in C#,
+  score:midiChord corresponds to a MidiChordDef object in C#,
   score:basicChord corresponds to a BasicMidiChord object in C#,
   score:sliders corresponds to a MidiSliders object in C#
 If the midiChord has just one score:basicChord in the list, it is not an "ornament".
@@ -1540,12 +1540,12 @@ The "score" namespace now has the following container hierarchy for chord midi i
 						List of score:basicChord
 					}
 				}
-  score:midiChord corresponds to a ChordDef object in C#,
+  score:midiChord corresponds to a MidiChordDef object in C#,
   score:basicChord corresponds to a BasicMidiChord object in C#,
   score:sliders corresponds to a MidiSliders object in C#,
   score:ornamentChords corresponds to a list of BasicMidiChords in C#.
-The old C# MidiOrnamentsDef object is now just a local variable used while constructing ChordDef objects.
-MidiOrnamentsDef could actually be a replaced by a private function in ChordDef, returning a list of BasicMidiChords. 
+The old C# MidiOrnamentsDef object is now just a local variable used while constructing MidiChordDef objects.
+MidiOrnamentsDef could actually be a replaced by a private function in MidiChordDef, returning a list of BasicMidiChords. 
 This is now working for the Assistant Composer. Now go through the Assistant Performer, tidying up the code.
 Would be nice to get rid of the MidiOrnament class too!
 

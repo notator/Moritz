@@ -15,22 +15,22 @@ namespace Moritz.Midi
     /// </summary>
     public class MidiChord : MidiDurationSymbol
     {
-        public MidiChord(int channel, ChordDef chordDef, OutputDevice midiOutputDevice)
-            : base(channel, 0, chordDef.MsDuration)
+        public MidiChord(int channel, MidiChordDef midiChordDef, OutputDevice midiOutputDevice)
+            : base(channel, 0, midiChordDef.MsDuration)
         {
             _midiOutputDevice = midiOutputDevice;
 
-            List<BasicDurationDef> basicDurationDefs = chordDef.BasicDurationDefs;
+            List<BasicDurationDef> basicDurationDefs = midiChordDef.BasicDurationDefs;
             //Debug.Assert(basicDurationDefs.Count > 0);
             if(basicDurationDefs.Count < 1)
             {
                 throw new ApplicationException();
             }
-            List<int> realBasicMidiChordDurations = M.IntDivisionSizes(MsDuration, chordDef.BasicDurations);
+            List<int> realBasicMidiChordDurations = M.IntDivisionSizes(MsDuration, midiChordDef.BasicDurations);
 
             var notesToStop = new SortedSet<byte>();
             int i = 0;
-            foreach(BasicDurationDef basicDurationDef in chordDef.BasicDurationDefs)
+            foreach(BasicDurationDef basicDurationDef in midiChordDef.BasicDurationDefs)
             {
                 if(basicDurationDef is BasicMidiChordDef basicMidiChordDef)
                 {
@@ -46,31 +46,31 @@ namespace Moritz.Midi
                 }
             }
 
-            if(chordDef.Bank != null)
+            if(midiChordDef.Bank != null)
             {
-                _bank = new SSBankMsg(channel, (byte)chordDef.Bank);
+                _bank = new SSBankMsg(channel, (byte)midiChordDef.Bank);
             }
-            if(chordDef.Preset != null)
+            if(midiChordDef.Preset != null)
             {
-                _patch = new SSPresetMsg(channel, (byte)chordDef.Preset);
+                _patch = new SSPresetMsg(channel, (byte)midiChordDef.Preset);
             }
 
             // Moritz currently never repeats MidiChords, so the _repeat field is unnecessary.
-            // However: the value of chordDef.Repeat is saved in SVG-MIDI files,
+            // However: the value of midiChordDef.Repeat is saved in SVG-MIDI files,
             // and may be used by the web AssistantPerformer.
-            //_repeat = chordDef.Repeat;
+            //_repeat = midiChordDef.Repeat;
 
-            if(chordDef.PitchWheelSensitivity != null)
+            if(midiChordDef.PitchWheelSensitivity != null)
             {
-                _pitchWheelSensitivity = new SSPitchWheelSensitivityMsg(channel, (byte)chordDef.PitchWheelSensitivity);
+                _pitchWheelSensitivity = new SSPitchWheelSensitivityMsg(channel, (byte)midiChordDef.PitchWheelSensitivity);
             }
-            if(chordDef.MidiChordControlDefs != null)
-                CreateSliders(channel, chordDef.MidiChordControlDefs, MsDuration);
+            if(midiChordDef.MidiChordControlDef != null)
+                CreateSliders(channel, midiChordDef.MidiChordControlDef, MsDuration);
 
             SetMessagesDict();
         }
 
-        private void CreateSliders(int channel, ChordControlDefs sliderDefs, int msDuration)
+        private void CreateSliders(int channel, MidiChordControlDef sliderDefs, int msDuration)
         {
             if(sliderDefs.ModulationWheelMsbs != null && sliderDefs.ModulationWheelMsbs.Count > 0)
                 this._modulationWheelSlider = new MidiModulationWheelSlider(sliderDefs.ModulationWheelMsbs, channel, msDuration);

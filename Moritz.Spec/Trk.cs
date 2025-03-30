@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace Moritz.Spec
 {
     /// <summary>
-	/// In Seqs, Trks can contain any combination of RestDef and ChordDef.
+	/// In Seqs, Trks can contain any combination of RestDef and MidiChordDef.
     /// In Blocks, Trks can additionally contain CautionaryChordDefs and ClefDefs.
     /// Each ChannelDef has a list of Trk objects, each of which has the same midi channel.
     /// (A Voice has a single, defined midi channel)
@@ -19,7 +19,7 @@ namespace Moritz.Spec
     /// <para>For example:</para>
     /// <para>foreach(IUniqueDef iumdd in trk) { ... }</para>
     /// <para>An Enumerator for MidiChordDefs is also defined so that</para>
-    /// <para>foreach(ChordDef chordDef in trkDef.MidiChordDefs) { ... }</para>
+    /// <para>foreach(MidiChordDef midiChordDef in trkDef.MidiChordDefs) { ... }</para>
     /// <para>can also be used.</para>
     /// <para>This class is also indexable, as in:</para>
     /// <para>IUniqueDef iu = trk[index];</para>
@@ -116,7 +116,7 @@ namespace Moritz.Spec
                         // This error can happen if an attempt is made to set barlines too close together,
                         // i.e. (I think) if an attempt is made to create a bar that contains nothing... 
                     }
-                    else if(iud is ChordDef)
+                    else if(iud is MidiChordDef)
                     {
                         IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
                         uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
@@ -141,9 +141,9 @@ namespace Moritz.Spec
 
         /// <summary>
         /// If Finalized is false then the UniqueDefs can only contain any combination of
-        ///     RestDef, ChordDef.
+        ///     RestDef, MidiChordDef.
         /// If finalized is true then the UniqueDefs can contain any combination of
-        ///     RestDef, ChordDef, CautionaryChordDef, ClefDef.
+        ///     RestDef, MidiChordDef, CautionaryChordDef, ClefDef.
         /// Checks the content of the trk, taking the current state of CanContainCautionaryChordDef 
         /// and CanContainClefDefs into account.
         /// The MsPositionReFirstUD of each UniqueDef is always consistent with the uniqueDef.MsDurations.
@@ -179,17 +179,17 @@ namespace Moritz.Spec
             {
                 foreach(IUniqueDef iud in UniqueDefs)
                 {
-                    Debug.Assert(iud is ChordDef || iud is RestDef);
+                    Debug.Assert(iud is MidiChordDef || iud is RestDef);
                 }
             }
             else if(CanContainCautionaryChordDef && !CanContainClefDefs)
             {
                 IUniqueDef iud = UniqueDefs[0];
-                Debug.Assert(iud is ChordDef || iud is RestDef || iud is CautionaryChordDef);
+                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef);
                 for(int i = 1; i < UniqueDefs.Count; i++)
                 {
                     iud = UniqueDefs[i];
-                    Debug.Assert(iud is ChordDef || iud is RestDef);
+                    Debug.Assert(iud is MidiChordDef || iud is RestDef);
                 }
             }
             else
@@ -198,14 +198,14 @@ namespace Moritz.Spec
                 Debug.Assert(!(!CanContainCautionaryChordDef && CanContainClefDefs));
                 foreach(IUniqueDef iud in UniqueDefs)
                 {
-                    Debug.Assert(iud is ChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefDef);
+                    Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefDef);
                 }
             } 
         }
 
         /// <summary>
         /// This value is used by the AssertConsistency() function.
-        /// If CanContainCautionaryChordDef is false, Trks can only contain ChordDef and RestDef IUniqueDefs.
+        /// If CanContainCautionaryChordDef is false, Trks can only contain MidiChordDef and RestDef IUniqueDefs.
         /// If CanContainCautionaryChordDef is true, the first IUniqueDef can also be a CautionaryChordDef.
         /// </summary>
         private bool CanContainCautionaryChordDef = false;
@@ -227,14 +227,14 @@ namespace Moritz.Spec
         /// </summary>
         public void SetPatch0InTheFirstChord()
         {
-            ChordDef firstMidiChordDef = null;
+            MidiChordDef firstMidiChordDef = null;
             foreach(IUniqueDef iUniqueDef in UniqueDefs)
             {
-                firstMidiChordDef = iUniqueDef as ChordDef;
+                firstMidiChordDef = iUniqueDef as MidiChordDef;
                 if(firstMidiChordDef != null)
                 {
-                    firstMidiChordDef.MidiChordControlDefs.Preset = 0;
-                    firstMidiChordDef.MidiChordControlDefs.AllControllersOff = true;
+                    firstMidiChordDef.MidiChordControlDef.Preset = 0;
+                    firstMidiChordDef.MidiChordControlDef.AllControllersOff = true;
                     break;
                 }
             }
@@ -328,7 +328,7 @@ namespace Moritz.Spec
         #region attribute changers (Transpose etc.)
 
         /// <summary>
-        /// An object is a NonMidiOrInputChordDef if it is not a ChordDef.
+        /// An object is a NonMidiOrInputChordDef if it is not a MidiChordDef.
         /// For example: a CautionaryChordDef, a RestDef or ClefDef.
         /// </summary>
         /// <param name="beginIndex"></param>
@@ -339,7 +339,7 @@ namespace Moritz.Spec
             int nNonMidiChordDefs = 0;
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                if(!(_uniqueDefs[i] is ChordDef))
+                if(!(_uniqueDefs[i] is MidiChordDef))
                     nNonMidiChordDefs++;
             }
             return nNonMidiChordDefs;
@@ -393,7 +393,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Transpose all the IUniqueChordDefs from beginIndex to (excluding) endIndex
         /// up by the number of semitones given in the interval argument.
-        /// IUniqueChordDefs are ChordDef, InputChordDef and CautionaryChordDef.
+        /// IUniqueChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
         /// Negative interval values transpose down.
         /// It is not an error if Midi pitch values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
@@ -473,7 +473,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Transposes the UniqueDefs from the beginIndex upto (excluding) endIndex
-        /// by an equally increasing amount, so that the final ChordDef or InputChordDef is transposed by glissInterval.
+        /// by an equally increasing amount, so that the final MidiChordDef or InputChordDef is transposed by glissInterval.
         /// glissInterval can be negative.
         /// </summary>
         public void StepwiseGliss(int beginIndex, int endIndex, int glissInterval)
@@ -506,7 +506,7 @@ namespace Moritz.Spec
         #region Count changers
         #region list functions
         /// <summary>
-        /// Appends the new ChordDef, RestDef, CautionaryChordDef or ClefDef to the end of the list.
+        /// Appends the new MidiChordDef, RestDef, CautionaryChordDef or ClefDef to the end of the list.
         /// Automatically sets the iUniqueDef's msPosition.
         /// N.B. Can be used to Add CautionaryChordDef and ClefDef arguments.
         /// </summary>
@@ -961,27 +961,27 @@ namespace Moritz.Spec
 
         #region Changing the Trk's duration
         /// <summary>
-        /// Multiplies the MsDuration of each chordDef from beginIndex to endIndex (exclusive) by factor.
-        /// If a chordDef's MsDuration becomes less than minThreshold, it is removed.
+        /// Multiplies the MsDuration of each midiChordDef from beginIndex to endIndex (exclusive) by factor.
+        /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this Trk changes accordingly.
         /// </summary>
         public void AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<ChordDef>(beginIndex, endIndex, factor, minThreshold);
+            AdjustMsDurations<MidiChordDef>(beginIndex, endIndex, factor, minThreshold);
         }
 
         /// <summary>
-        /// Multiplies the MsDuration of each chordDef in the UniqueDefs list by factor.
-        /// If a chordDef's MsDuration becomes less than minThreshold, it is removed.
+        /// Multiplies the MsDuration of each midiChordDef in the UniqueDefs list by factor.
+        /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this Trk changes accordingly.
         /// </summary>
         public void AdjustChordMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<ChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
+            AdjustMsDurations<MidiChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
         #endregion Changing the Trk's duration
 
-        #region Changing ChordDef attributes
+        #region Changing MidiChordDef attributes
 
         #region Envelopes
 
@@ -1001,8 +1001,8 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
-        /// The arguments are passed unchanged to ChordDef.SetVelocityPerAbsolutePitch(...) for each ChordDef in this Trk.
-        /// See the ChordDef documentation for details.
+        /// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
+        /// See the MidiChordDef documentation for details.
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
         public virtual void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
@@ -1016,10 +1016,10 @@ namespace Moritz.Spec
             #endregion conditions
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
-                if(UniqueDefs[i] is ChordDef chordDef)
+                if(UniqueDefs[i] is MidiChordDef midiChordDef)
                 {
-                    chordDef.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-                    Debug.Assert(chordDef.Pitches.Count > 0);
+                    midiChordDef.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+                    Debug.Assert(midiChordDef.Pitches.Count > 0);
                 }
             }
         }
@@ -1027,7 +1027,7 @@ namespace Moritz.Spec
         #region SetVelocitiesFromDurations
         /// <summary>
         /// The first two arguments must be in range [1..127].
-        /// Sets the velocity of each ChordDef in the Trk (anti-)proportionally to its duration.
+        /// Sets the velocity of each MidiChordDef in the Trk (anti-)proportionally to its duration.
         /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
         /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
         /// is replaced completely.
@@ -1047,19 +1047,19 @@ namespace Moritz.Spec
             #region find msDurationRangeMin and msDurationRangeMax 
             foreach(IUniqueDef iud in _uniqueDefs)
             {
-                if(iud is ChordDef chordDef)
+                if(iud is MidiChordDef midiChordDef)
                 {
-                    msDurationRangeMin = (msDurationRangeMin < chordDef.MsDuration) ? msDurationRangeMin : chordDef.MsDuration;
-                    msDurationRangeMax = (msDurationRangeMax > chordDef.MsDuration) ? msDurationRangeMax : chordDef.MsDuration;
+                    msDurationRangeMin = (msDurationRangeMin < midiChordDef.MsDuration) ? msDurationRangeMin : midiChordDef.MsDuration;
+                    msDurationRangeMax = (msDurationRangeMax > midiChordDef.MsDuration) ? msDurationRangeMax : midiChordDef.MsDuration;
                 }
             }
             #endregion find msDurationRangeMin and msDurationRangeMax
 
             foreach(IUniqueDef iud in _uniqueDefs)
             {
-                if(iud is ChordDef chordDef)
+                if(iud is MidiChordDef midiChordDef)
                 {
-                    chordDef.SetVelocityFromDuration(msDurationRangeMin, msDurationRangeMax, velocityForMinMsDuration, velocityForMaxMsDuration, percent);
+                    midiChordDef.SetVelocityFromDuration(msDurationRangeMin, msDurationRangeMax, velocityForMinMsDuration, velocityForMaxMsDuration, percent);
                 }
             }
         }
@@ -1067,7 +1067,7 @@ namespace Moritz.Spec
         #region SetVerticalVelocityGradient
         /// <summary>
         /// The arguments must both be in range [1..127].
-        /// This function calls ChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
+        /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
         /// on all the MidiChordDefs in the Trk. 
         /// </summary>
         public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
@@ -1079,9 +1079,9 @@ namespace Moritz.Spec
 
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                if(iud is ChordDef chordDef)
+                if(iud is MidiChordDef midiChordDef)
                 {
-                    chordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity);
+                    midiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity);
                 }
             }
         }
@@ -1096,7 +1096,7 @@ namespace Moritz.Spec
         /// 2. Creates a duration per pitch dictionary, whereby durationPerPitch[lowestPitch] is durationForLowestPitch
         ///    and durationPerPitch[lowestPitch] is durationForHighestPitch. The intermediate duration values are
         ///    interpolated logarithmically.
-        /// 3. Sets the MsDuration of each ChordDef to (percent * the values found in the duration per pitch dictionary) plus
+        /// 3. Sets the MsDuration of each MidiChordDef to (percent * the values found in the duration per pitch dictionary) plus
         ///   ((100-percent)percent * the original durations). Rest msDurations are left unchanged at this stage.
         /// 4. Resets the MsDuration of the Trk to its original value.
         /// N.B. a Debug.Assert() fails if an attempt is made to set the msDuration of a BasicMidiChordDef to zero.
@@ -1111,9 +1111,9 @@ namespace Moritz.Spec
             #region get pitches
             foreach(IUniqueDef iud in _uniqueDefs)
             {
-                if(iud is ChordDef chordDef)
+                if(iud is MidiChordDef midiChordDef)
                 {
-                    int pitch = (useBottomPitch == true) ? chordDef.Pitches[0] : chordDef.Pitches[chordDef.Pitches.Count - 1];
+                    int pitch = (useBottomPitch == true) ? midiChordDef.Pitches[0] : midiChordDef.Pitches[midiChordDef.Pitches.Count - 1];
                     if(!pitches.Contains(pitch))
                     {
                         pitches.Add(pitch);
@@ -1126,9 +1126,9 @@ namespace Moritz.Spec
                 int mcdMsDuration = (useBottomPitch == true) ? durationForLowestPitch : durationForHighestPitch;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iud is ChordDef chordDef)
+                    if(iud is MidiChordDef midiChordDef)
                     {
-                        chordDef.MsDuration = mcdMsDuration;
+                        midiChordDef.MsDuration = mcdMsDuration;
                     }
                 }
             }
@@ -1162,12 +1162,12 @@ namespace Moritz.Spec
                 int currentMsDuration = this.MsDuration;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iud is ChordDef chordDef)
+                    if(iud is MidiChordDef midiChordDef)
                     {
-                        int pitch = (useBottomPitch == true) ? chordDef.Pitches[0] : chordDef.Pitches[chordDef.Pitches.Count - 1];
-                        int oldDuration = chordDef.MsDuration;
+                        int pitch = (useBottomPitch == true) ? midiChordDef.Pitches[0] : midiChordDef.Pitches[midiChordDef.Pitches.Count - 1];
+                        int oldDuration = midiChordDef.MsDuration;
                         int durPerPitch = msDurPerPitch[pitch];
-                        chordDef.MsDuration = (int)Math.Round((oldDuration * factorForOldValue) + (durPerPitch * factorForNewValue));
+                        midiChordDef.MsDuration = (int)Math.Round((oldDuration * factorForOldValue) + (durPerPitch * factorForNewValue));
                     }
                 }
                 this.MsDuration = currentMsDuration;
@@ -1185,9 +1185,9 @@ namespace Moritz.Spec
             {
                 for(int i = beginIndex; i < endIndex; ++i)
                 {
-                    if(_uniqueDefs[i] is ChordDef iumdd)
+                    if(_uniqueDefs[i] is MidiChordDef iumdd)
                     {
-                        iumdd.MidiChordControlDefs.Expression = (int)Math.Round((int)iumdd.MidiChordControlDefs.Expression * factor);
+                        iumdd.MidiChordControlDef.Expression = (int)Math.Round((int)iumdd.MidiChordControlDef.Expression * factor);
                     }
                 }
             }
@@ -1207,9 +1207,9 @@ namespace Moritz.Spec
                 Debug.Assert(factor > 0.0);
                 for(int i = beginIndex; i < nonInclusiveEndIndex; ++i)
                 {
-                    if(_uniqueDefs[i] is ChordDef chordDef)
+                    if(_uniqueDefs[i] is MidiChordDef midiChordDef)
                     {
-                        chordDef.AdjustVelocities(factor);
+                        midiChordDef.AdjustVelocities(factor);
                     }
                 }
             }
@@ -1224,12 +1224,12 @@ namespace Moritz.Spec
             Debug.Assert(factor > 0.0);
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
-                if(UniqueDefs[i] is ChordDef chordDef)
+                if(UniqueDefs[i] is MidiChordDef midiChordDef)
                 {
-                    chordDef.AdjustVelocities(factor);
-                    if(chordDef.Pitches.Count == 0)
+                    midiChordDef.AdjustVelocities(factor);
+                    if(midiChordDef.Pitches.Count == 0)
                     {
-                        Replace(i, new RestDef(chordDef.MsPositionReFirstUD, chordDef.MsDuration));
+                        Replace(i, new RestDef(midiChordDef.MsPositionReFirstUD, midiChordDef.MsDuration));
                     }
                 }
             }
@@ -1263,15 +1263,15 @@ namespace Moritz.Spec
 
                     for(int i = beginIndex; i < endIndex; ++i)
                     {
-                        ChordDef chordDef = _uniqueDefs[i] as ChordDef;
-                        if(chordDef != null)
+                        MidiChordDef midiChordDef = _uniqueDefs[i] as MidiChordDef;
+                        if(midiChordDef != null)
                         {
-                            chordDef.AdjustVelocities(factor);
+                            midiChordDef.AdjustVelocities(factor);
                             factor += factorIncrement;
                         }
-                        if(chordDef.Pitches.Count == 0)
+                        if(midiChordDef.Pitches.Count == 0)
                         {
-                            Replace(i, new RestDef(chordDef.MsPositionReFirstUD, chordDef.MsDuration));
+                            Replace(i, new RestDef(midiChordDef.MsPositionReFirstUD, midiChordDef.MsDuration));
                         }
                     }
                 }
@@ -1281,7 +1281,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Creates a moving pan from startPanValue at beginIndex to endPanValue at (beginIndex + count - 1).
         /// (In other words, it sets count MidiChordDefs.)
-        /// Implemented using one pan value per ChordDef.
+        /// Implemented using one pan value per MidiChordDef.
         /// This function does NOT change pan values outside the position range given in its arguments.
         /// </summary>
         /// <param name="beginIndex">The index at which to start setting pan values</param>
@@ -1305,10 +1305,10 @@ namespace Moritz.Spec
 
                     for(int i = beginIndex; i < endIndex; ++i)
                     {
-                        if(_uniqueDefs[i] is ChordDef iumdd)
+                        if(_uniqueDefs[i] is MidiChordDef iumdd)
                         {
                             int intPan = (int)Math.Round(panValue);
-                            iumdd.MidiChordControlDefs.Pan = intPan;
+                            iumdd.MidiChordControlDef.Pan = intPan;
                             panValue += increment;
                         }
                     }
@@ -1328,9 +1328,9 @@ namespace Moritz.Spec
             {
                 for(int i = beginIndex; i < endIndex; ++i)
                 {
-                    if(this[i] is ChordDef chordDef)
+                    if(this[i] is MidiChordDef midiChordDef)
                     {
-                        chordDef.MidiChordControlDefs.VelocityPitchSensitivity = M.MidiValue(deviation);
+                        midiChordDef.MidiChordControlDef.VelocityPitchSensitivity = M.MidiValue(deviation);
                     }
                 }
             }
@@ -1346,9 +1346,9 @@ namespace Moritz.Spec
             {
                 for(int i = beginIndex; i < endIndex; ++i)
                 {
-                    if(this[i] is ChordDef umcd)
+                    if(this[i] is MidiChordDef umcd)
                     {
-                        umcd.MidiChordControlDefs.PitchWheel = null;
+                        umcd.MidiChordControlDef.PitchWheel = null;
                     }
                 }
             }
@@ -1370,15 +1370,15 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                if(_uniqueDefs[i] is ChordDef umc)
+                if(_uniqueDefs[i] is MidiChordDef umc)
                 {
-                    umc.MidiChordControlDefs.PitchWheelSensitivity = M.MidiValue(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i)));
+                    umc.MidiChordControlDef.PitchWheelSensitivity = M.MidiValue(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i)));
                 }
             }
         }
 
 
-        #endregion Changing ChordDef attributes
+        #endregion Changing MidiChordDef attributes
 
         #region alignment
         /// <summary>
@@ -1750,14 +1750,14 @@ namespace Moritz.Spec
         #endregion Re-ordering the Trk's UniqueDefs
 
         #region Enumerators
-        public IEnumerable<ChordDef> MidiChordDefs
+        public IEnumerable<MidiChordDef> MidiChordDefs
         {
             get
             {
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iud is ChordDef chordDef)
-                        yield return chordDef;
+                    if(iud is MidiChordDef midiChordDef)
+                        yield return midiChordDef;
                 }
             }
         }
@@ -1824,7 +1824,7 @@ namespace Moritz.Spec
                 int count = 0;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iud is ChordDef || iud is RestDef)
+                    if(iud is MidiChordDef || iud is RestDef)
                     {
                         count++;
                     }

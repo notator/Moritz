@@ -6,7 +6,7 @@ namespace Moritz.Spec
     ///<summary>
     /// IUniqueChordDef is implemented by all IUniqueDef objects that have pitches.
     /// Currently (11.9.2014) these are:
-    ///     ChordDef
+    ///     MidiChordDef
     ///     InputChordDef
     ///     CautionaryChordDef
     ///</summary>

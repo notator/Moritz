@@ -67,7 +67,7 @@ namespace Moritz.Algorithm.Study1
         {
             var trk1 = (Trk)trk0.Clone();
 
-            foreach(var chordDef in trk1.MidiChordDefs)
+            foreach(var midiChordDef in trk1.MidiChordDefs)
             {
 
             }
@@ -80,7 +80,7 @@ namespace Moritz.Algorithm.Study1
         {
             var trk2 = (Trk)trk1.Clone();
 
-            foreach(var chordDef in trk2.MidiChordDefs)
+            foreach(var midiChordDef in trk2.MidiChordDefs)
             {
 
             }
@@ -93,7 +93,7 @@ namespace Moritz.Algorithm.Study1
         {
             var trk3 = (Trk)trk2.Clone();
 
-            foreach(var chordDef in trk2.MidiChordDefs)
+            foreach(var midiChordDef in trk2.MidiChordDefs)
             {
 
             }
@@ -147,10 +147,10 @@ namespace Moritz.Algorithm.Study1
                 byte chordNumber = trackChordNumbers[i];
                 byte pitchNumber = trackRootPitches[i];
 
-                IUniqueDef chordDef = GetMidiChordDef(chordIntervals[chordNumber - 1], chordVelocities[chordNumber - 1], chordDurations[chordNumber - 1], pitchNumber, chordMsPosition);
-                chordMsPosition += chordDef.MsDuration;
+                IUniqueDef midiChordDef = GetMidiChordDef(chordIntervals[chordNumber - 1], chordVelocities[chordNumber - 1], chordDurations[chordNumber - 1], pitchNumber, chordMsPosition);
+                chordMsPosition += midiChordDef.MsDuration;
 
-                trk0.UniqueDefs.Add(chordDef);
+                trk0.UniqueDefs.Add(midiChordDef);
             }
 
             trk0.AssertConsistency();
@@ -163,12 +163,12 @@ namespace Moritz.Algorithm.Study1
             List<byte> pitches = GetPitches(relativePitch, chordIntervals);
             List<byte> velocities = GetVelocities(chordVelocity, chordIntervals.Count() + 1);
 
-            IUniqueDef chordDef = new ChordDef(pitches, velocities, chordDuration, true)
+            IUniqueDef midiChordDef = new MidiChordDef(pitches, velocities, chordDuration, true)
             {
                 MsPositionReFirstUD = msPosition
             };
 
-            return chordDef;
+            return midiChordDef;
         }
 
         private List<byte> GetPitches(int relativePitch, List<byte> primeIntervals)
