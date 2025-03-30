@@ -23,7 +23,7 @@ namespace Moritz.Symbols
         public RestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, PageFormat pageFormat)
             : this(voice, iumdd, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight)
         {
-            if(iumdd is MidiRestDef mrd)
+            if(iumdd is RestDef mrd)
             {
                 _midiRestDefs.Add(mrd);
             }
@@ -106,6 +106,6 @@ namespace Moritz.Symbols
             set { _msDuration = value; }
         }
 
-        private List<MidiRestDef> _midiRestDefs = new List<MidiRestDef>();
+        private List<RestDef> _midiRestDefs = new List<RestDef>();
     }
 }

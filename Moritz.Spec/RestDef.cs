@@ -1,19 +1,34 @@
 
+using Moritz.Xml;
+
 using System.Diagnostics;
 
 namespace Moritz.Spec
 {
     ///<summary>
-    /// A RestDef is a unique rest definition which is saved locally in an SVG file.
-    /// Each rest in an SVG file will be given an ID of the form "rest"+uniqueNumber, but
-    /// Moritz does not actually use the ids, so they are not set in UniqueRestDefs.
+    /// A RestDef is a unique rest definition which is saved in an SVG file.
     ///<summary>
-    public abstract class RestDef : DurationDef, IUniqueDef
+    public class RestDef : DurationDef, IUniqueDef
     {
         public RestDef(int msPositionReFirstIUD, int msDuration)
             : base(msDuration)
         {
             MsPositionReFirstUD = msPositionReFirstIUD;
+        }
+
+        public override object Clone()
+        {
+            RestDef umrd = new RestDef(this.MsPositionReFirstUD, this.MsDuration);
+            return umrd;
+        }
+
+        public void WriteSVG(SvgWriter w)
+        {
+            w.WriteStartElement("midiRest");
+
+            w.WriteAttributeString("msDuration", MsDuration.ToString());
+
+            w.WriteEndElement(); // score:midiRest
         }
 
         /// <summary>
@@ -24,6 +39,11 @@ namespace Moritz.Spec
         {
             MsDuration = (int)(MsDuration * factor);
             Debug.Assert(MsDuration > 0, "A UniqueDef's MsDuration may not be set to zero!");
+        }
+
+        public override string ToString()
+        {
+            return ("RestDef: MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString());
         }
     }
 }

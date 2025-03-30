@@ -165,7 +165,7 @@ namespace Moritz.Algorithm.ErratumMusical
 
             if(finalRestDuration > 0)
             {
-                MidiRestDef midiRestDef = new MidiRestDef(0, finalRestDuration);
+                RestDef midiRestDef = new RestDef(0, finalRestDuration);
                 trk.Add(midiRestDef);
             }
 
@@ -197,7 +197,7 @@ namespace Moritz.Algorithm.ErratumMusical
                 endBarlinePositions.Add(endBarlinePosition);
 
                 allSelectionsTrk.AddRange(selectionTrk);
-                //MidiRestDef midiRestDef = new MidiRestDef(0, 1000);
+                //RestDef midiRestDef = new RestDef(0, 1000);
                 //allSelectionsTrk.Add(midiRestDef);
             }
             //allSelectionsTrk.RemoveAt(allSelectionsTrk.Count - 1);

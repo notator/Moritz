@@ -36,7 +36,7 @@ namespace Moritz.Spec
                 for(int j = 0; j < trkIUDs.Count; j++)
                 {
                     Debug.Assert((iuds0[j] is MidiChordDef && trkIUDs[j] is MidiChordDef)
-                        || (iuds0[j] is MidiRestDef && trkIUDs[j] is MidiRestDef));
+                        || (iuds0[j] is RestDef && trkIUDs[j] is RestDef));
                 }
             }
             #endregion

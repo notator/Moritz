@@ -17,7 +17,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="absMsPosition">Must be greater than or equal to zero.</param>
         /// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
-        /// combination of MidiRestDef or MidiChordDef.
+        /// combination of RestDef or MidiChordDef.
         /// Each trk.MsPositionReContainer must be 0. All trk.UniqueDef.MsPositionReFirstUD values must be set correctly.
         /// All Trks that have the same channel must have the same trk.DurationsCount. (They are different performances of the same ChordSymbols.)
         /// <para>Not all the Seq's channels need to be given an explicit Trk in the trks argument. The seq will be given empty
@@ -118,7 +118,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns a Tuple in which Item1 is the popped bar, Item2 is the remaining part of the input bar.
         /// Note that Trks at the same level inside each ChannelDef in each bar have the same duration.
-        /// and that all Trks in a ChannelDef have the same sequence of MidiChordDef and MidiRestDef (and no ClefDefs).
+        /// and that all Trks in a ChannelDef have the same sequence of MidiChordDef and RestDef (and no ClefDefs).
         /// </summary>
         /// <param name ="bar">The bar fron which Item1 is popped.</param>
         /// <param name="poppedBarMsDuration">The duration of the first Trk in each ChannelDef in the popped bar.</param>
@@ -374,7 +374,7 @@ namespace Moritz.Spec
         #region copied from Seq (now deleted)
 
         /// <summary>
-        /// Set empty Trks to contain a single MidiRestDef having the msDuration of the other Trks at the same trkIndex.
+        /// Set empty Trks to contain a single RestDef having the msDuration of the other Trks at the same trkIndex.
         /// </summary>
         public void PadEmptyTrks()
         {
@@ -396,7 +396,7 @@ namespace Moritz.Spec
                     var trk = channelDef.Trks[trkIndex];
                     if(trk.UniqueDefs.Count == 0)
                     {
-                        trk.Add(new MidiRestDef(0, msDuration));
+                        trk.Add(new RestDef(0, msDuration));
                     }
                 }
             }
@@ -412,7 +412,7 @@ namespace Moritz.Spec
         /// All Trks having the same index in any ChannelDef
         ///     1. have the same MsDuration.
         ///     2. have the same channel event sequence as the channel events at ChannelDefs[0].Trks[0]
-        /// if finalised is false, all Trks can only contain MidiRestDef or MidiChordDef objects.
+        /// if finalised is false, all Trks can only contain RestDef or MidiChordDef objects.
         /// </summary>
         public void AssertConsistency()
         {

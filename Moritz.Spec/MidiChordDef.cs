@@ -21,7 +21,7 @@ namespace Moritz.Spec
     /// Each MidiChordDef is part of a sequence of IUniqueDefs stored in a Trk.
     /// There may be a list of parallel Trks containing alternative definitions of the same events.
     /// If this is the case, IUniqueDefs in the first Trk will be used to construct the graphics.
-    /// The IUniqueDefs stored in Trks are MidiChordDef, MidiRestDef, CautionaryChordDef, ClefDef.
+    /// The IUniqueDefs stored in Trks are MidiChordDef, RestDef, CautionaryChordDef, ClefDef.
     /// A MidiChordDef consists of
     ///     1. The pitch and velocity information for NoteOn/NoteOff messages,
     ///     2. The logical duration before the following DurationDef in a Trk,

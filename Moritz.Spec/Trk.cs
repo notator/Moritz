@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace Moritz.Spec
 {
     /// <summary>
-	/// In Seqs, Trks can contain any combination of MidiRestDef and MidiChordDef.
+	/// In Seqs, Trks can contain any combination of RestDef and MidiChordDef.
     /// In Blocks, Trks can additionally contain CautionaryChordDefs and ClefDefs.
     /// Each ChannelDef has a list of Trk objects, each of which has the same midi channel.
     /// (A Voice has a single, defined midi channel)
@@ -101,13 +101,13 @@ namespace Moritz.Spec
                 {
                     int durationBeforeBarline = poppedMsDuration - iudStartPos;
                     int durationAfterBarline = iudEndPos - poppedMsDuration;
-                    if(iud is MidiRestDef)
+                    if(iud is RestDef)
                     {
                         // This is a rest. Split it.
-                        MidiRestDef firstRestHalf = new MidiRestDef(iudStartPos, durationBeforeBarline);
+                        RestDef firstRestHalf = new RestDef(iudStartPos, durationBeforeBarline);
                         poppedTrk.UniqueDefs.Add(firstRestHalf);
 
-                        MidiRestDef secondRestHalf = new MidiRestDef(poppedMsDuration, durationAfterBarline);
+                        RestDef secondRestHalf = new RestDef(poppedMsDuration, durationAfterBarline);
                         remainingTrk.UniqueDefs.Add(secondRestHalf);
                     }
                     else if(iud is CautionaryChordDef)
@@ -141,9 +141,9 @@ namespace Moritz.Spec
 
         /// <summary>
         /// If Finalized is false then the UniqueDefs can only contain any combination of
-        ///     MidiRestDef, MidiChordDef.
+        ///     RestDef, MidiChordDef.
         /// If finalized is true then the UniqueDefs can contain any combination of
-        ///     MidiRestDef, MidiChordDef, CautionaryChordDef, ClefDef.
+        ///     RestDef, MidiChordDef, CautionaryChordDef, ClefDef.
         /// Checks the content of the trk, taking the current state of CanContainCautionaryChordDef 
         /// and CanContainClefDefs into account.
         /// The MsPositionReFirstUD of each UniqueDef is always consistent with the uniqueDef.MsDurations.
@@ -506,7 +506,7 @@ namespace Moritz.Spec
         #region Count changers
         #region list functions
         /// <summary>
-        /// Appends the new MidiChordDef, MidiRestDef, CautionaryChordDef or ClefDef to the end of the list.
+        /// Appends the new MidiChordDef, RestDef, CautionaryChordDef or ClefDef to the end of the list.
         /// Automatically sets the iUniqueDef's msPosition.
         /// N.B. Can be used to Add CautionaryChordDef and ClefDef arguments.
         /// </summary>
@@ -647,7 +647,7 @@ namespace Moritz.Spec
                 IUniqueDef iud = this[i] as IUniqueDef;
                 if(iud != null)
                 {
-                    RestDef restDef = new MidiRestDef(iud.MsPositionReFirstUD, iud.MsDuration);
+                    RestDef restDef = new RestDef(iud.MsPositionReFirstUD, iud.MsDuration);
                     RemoveAt(i);
                     Insert(i, restDef);
                 }
@@ -914,13 +914,13 @@ namespace Moritz.Spec
             {
                 int msDuration = (msPositionReThisTrk - MsDuration);
                 IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
-                if(lastIud is MidiRestDef finalRestDef) // Trks are "OutputVoiceDefs" so cannot contain InputRestDefs.
+                if(lastIud is RestDef finalRestDef) // Trks are "OutputVoiceDefs" so cannot contain InputRestDefs.
                 {
                     lastIud.MsDuration += msDuration;
                 }
                 else
                 {
-                    MidiRestDef midiRestDef = new MidiRestDef(0, msDuration);
+                    RestDef midiRestDef = new RestDef(0, msDuration);
                     this.Add(midiRestDef);
                 }
             }
@@ -1229,7 +1229,7 @@ namespace Moritz.Spec
                     mcd.AdjustVelocities(factor);
                     if(mcd.Pitches.Count == 0)
                     {
-                        Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                        Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                     }
                 }
             }
@@ -1271,7 +1271,7 @@ namespace Moritz.Spec
                         }
                         if(mcd.Pitches.Count == 0)
                         {
-                            Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                            Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                         }
                     }
                 }
@@ -1824,7 +1824,7 @@ namespace Moritz.Spec
                 int count = 0;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iud is MidiChordDef || iud is MidiRestDef)
+                    if(iud is MidiChordDef || iud is RestDef)
                     {
                         count++;
                     }

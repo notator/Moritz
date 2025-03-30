@@ -4,7 +4,7 @@ namespace Moritz.Spec
     /// IUniqueDef is implemented by all objects that can be added to a ChannelDefs.UniqueDefs list.
     /// Currently (11.9.2014) these are:
     ///     MidiChordDef
-    ///     MidiRestDef
+    ///     RestDef
     ///     CautionaryChordDef
     ///     ClefDef
     /// These objects must implement DeepClone() so that ChannelDefs.DeepClone() can be implemented.

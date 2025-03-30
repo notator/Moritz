@@ -55,7 +55,6 @@
     <Compile Include="MidiChordSliderDefs.cs" />
     <Compile Include="ModeProximity.cs" />
     <Compile Include="MidiMsg.cs" />
-    <Compile Include="MidiRestDef.cs" />
     <Compile Include="CCSettings.cs">
       <SubType>Code</SubType>
     </Compile>
