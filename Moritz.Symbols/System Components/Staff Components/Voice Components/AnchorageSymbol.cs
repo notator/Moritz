@@ -28,7 +28,7 @@ namespace Moritz.Symbols
         /// </summary>
         public bool HasExplicitDynamic = false;
 
-        public void AddDynamic(byte midiVelocity, byte currentVelocity)
+        public void AddDynamic(int midiVelocity, int currentVelocity)
         {
             string newDynamicString = GetDynamicString(midiVelocity);
             string currentDynamicString = GetDynamicString(currentVelocity);
@@ -40,7 +40,7 @@ namespace Moritz.Symbols
             }
         }
 
-        private string GetDynamicString(byte midiVelocity)
+        private string GetDynamicString(int midiVelocity)
         {
             string dynamicString = "";
             #region get dynamicString and _dynamic

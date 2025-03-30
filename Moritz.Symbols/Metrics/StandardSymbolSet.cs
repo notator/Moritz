@@ -519,7 +519,7 @@ namespace Moritz.Symbols
         }
 
         public override NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, int iudIndex,
-            ref byte currentVelocity, PageFormat pageFormat)
+            ref int currentVelocity, PageFormat pageFormat)
         {
             NoteObject noteObject = null;
             CautionaryChordDef cautionaryChordDef = iud as CautionaryChordDef;

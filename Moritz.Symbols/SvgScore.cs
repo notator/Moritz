@@ -38,7 +38,7 @@ namespace Moritz.Symbols
             }
         }
 
-        protected virtual byte MidiChannel(int staffIndex) { throw new NotImplementedException(); }
+        protected virtual int MidiChannel(int staffIndex) { throw new NotImplementedException(); }
 
         #region save multi-page score
         /// <summary>

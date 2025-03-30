@@ -45,7 +45,7 @@ namespace Moritz.Symbols
         /// <param name="systems"></param>
         public void ConvertVoiceDefsToNoteObjects(List<SvgSystem> systems)
         {
-            byte[] currentChannelVelocities = new byte[systems[0].Staves.Count];
+            int[] currentChannelVelocities = new int[systems[0].Staves.Count];
             var topVoiceSmallClefs = new List<SmallClef>();
 
             int systemAbsMsPos = 0;
@@ -62,45 +62,48 @@ namespace Moritz.Symbols
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
                         Voice voice = staff.Voices[voiceIndex];
-                        voice.ChannelDef.AgglomerateRests();
-
-                        msPositionReVoiceDef = 0;
-                        List<IUniqueDef> iuds = voice.ChannelDef.UniqueDefs;
-                        Debug.Assert(iuds[0] is ClefDef);
-
-                        for(int iudIndex = 0; iudIndex < iuds.Count; ++iudIndex)
+                        foreach(var trk in voice.ChannelDef.Trks)
                         {
-                            IUniqueDef iud = voice.ChannelDef.UniqueDefs[iudIndex];
-                            int absMsPosition = systemAbsMsPos + msPositionReVoiceDef;
+                            trk.AgglomerateRests();
 
-                            NoteObject noteObject =
-                                SymbolSet.GetNoteObject(voice, absMsPosition, iud, iudIndex, ref currentChannelVelocities[staffIndex], _pageFormat);
+                            msPositionReVoiceDef = 0;
+                            List<IUniqueDef> iuds = trk.UniqueDefs;
+                            Debug.Assert(iuds[0] is ClefDef);
 
-                            if(noteObject is SmallClef smallClef)
+                            for(int iudIndex = 0; iudIndex < iuds.Count; ++iudIndex)
                             {
-                                if(voiceIndex == 0)
+                                IUniqueDef iud = iuds[iudIndex];
+                                int absMsPosition = systemAbsMsPos + msPositionReVoiceDef;
+
+                                NoteObject noteObject =
+                                    SymbolSet.GetNoteObject(voice, absMsPosition, iud, iudIndex, ref currentChannelVelocities[staffIndex], _pageFormat);
+
+                                if(noteObject is SmallClef smallClef)
                                 {
-                                    if(staff.Voices.Count > 1)
+                                    if(voiceIndex == 0)
                                     {
-                                        topVoiceSmallClefs.Add(smallClef);
+                                        if(staff.Voices.Count > 1)
+                                        {
+                                            topVoiceSmallClefs.Add(smallClef);
+                                        }
                                     }
+                                    else
+                                    {
+                                        throw new Exception("SmallClefs may not be defined for a lower voice. They will be copied from the top voice");
+                                    }
+                                }
+
+                                if(iud is IUniqueSplittableChordDef iscd && iscd.MsDurationToNextBarline != null)
+                                {
+                                    msPositionReVoiceDef += (int)iscd.MsDurationToNextBarline;
                                 }
                                 else
                                 {
-                                    throw new Exception("SmallClefs may not be defined for a lower voice. They will be copied from the top voice");
+                                    msPositionReVoiceDef += iud.MsDuration;
                                 }
-                            }
 
-                            if(iud is IUniqueSplittableChordDef iscd && iscd.MsDurationToNextBarline != null)
-                            {
-                                msPositionReVoiceDef += (int)iscd.MsDurationToNextBarline;
+                                voice.NoteObjects.Add(noteObject);
                             }
-                            else
-                            {
-                                msPositionReVoiceDef += iud.MsDuration;
-                            }
-
-                            voice.NoteObjects.Add(noteObject);
                         }
                     }
 
