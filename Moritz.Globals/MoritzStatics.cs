@@ -568,12 +568,12 @@ namespace Moritz.Globals
         /// </summary>
         private class IntervalPositionDistance
         {
-            public IntervalPositionDistance(byte value, int position)
+            public IntervalPositionDistance(int value, int position)
             {
                 Value = value;
                 Position = (float)position;
             }
-            public readonly byte Value;
+            public readonly int Value;
             public readonly float Position;
             public float Distance = 0;
         }
@@ -598,9 +598,9 @@ namespace Moritz.Globals
         /// </summary>
         /// <param name="inversion0"></param>
         /// <returns></returns>
-        public static List<List<byte>> GetLinearMatrix(List<byte> inversion0)
+        public static List<List<int>> GetLinearMatrix(List<int> inversion0)
         {
-            List<List<byte>> inversions = new List<List<byte>>();
+            List<List<int>> inversions = new List<List<int>>();
             if(inversion0 != null && inversion0.Count != 0)
             {
                 if(inversion0.Count == 1)
@@ -624,7 +624,7 @@ namespace Moritz.Globals
                             ipd.Distance = ipd.Distance > 0 ? ipd.Distance : ipd.Distance * -1;
                         }
                         newIpdList.Sort(Compare);
-                        List<byte> intervalList = new List<byte>();
+                        List<int> intervalList = new List<int>();
                         foreach(IntervalPositionDistance ipd in newIpdList)
                             intervalList.Add(ipd.Value);
                         inversions.Add(intervalList);

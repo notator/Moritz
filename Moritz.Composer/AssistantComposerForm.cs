@@ -825,7 +825,7 @@ namespace Moritz.Composer
             M.LeaveIntRangeTextBox(StaffGroupsTextBox, false, uint.MaxValue, 1, 127, M.SetTextBoxErrorColorIfNotOkay);
             if(StaffGroupsTextBox.ForeColor != M.TextBoxErrorColor)
             {
-                List<int> ints = M.StringToByteList(StaffGroupsTextBox.Text, ',');
+                List<int> ints = M.StringToIntList(StaffGroupsTextBox.Text, ',');
                 int sum = 0;
                 foreach(int b in ints)
                 {

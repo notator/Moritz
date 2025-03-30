@@ -2,12 +2,7 @@ using Moritz.Algorithm;
 using Moritz.Algorithm.ErratumMusical;
 using Moritz.Algorithm.PianolaMusic;
 using Moritz.Algorithm.Study1;
-using Moritz.Algorithm.Study2;
-using Moritz.Algorithm.Study3Sketch1;
-using Moritz.Algorithm.Study4;
 using Moritz.Algorithm.ThreeCrashes;
-//using Moritz.Algorithm.SongSix;
-using Moritz.Algorithm.Tombeau1;
 using Moritz.Symbols;
 
 using System.Windows.Forms;
@@ -38,26 +33,8 @@ namespace Moritz.Composer
                 case "Pianola Music":
                     algorithm = new PianolaMusicAlgorithm();
                     break;
-                case "Study 1":
-                    algorithm = new Study1Algorithm();
-                    break;
                 case "Study 1 Performances":
                     algorithm = new Study1PerformancesAlgorithm();
-                    break;
-                case "Study 2":
-                    algorithm = new Study2Algorithm();
-                    break;
-                case "Study 3 sketch 1":
-                    algorithm = new Study3Sketch1Algorithm();
-                    break;
-                case "Study 4":
-                    algorithm = new Study4Algorithm();
-                    break;
-                //case "Song Six":
-                //	algorithm = new SongSixAlgorithm();
-                //	break;
-                case "Tombeau 1":
-                    algorithm = new Tombeau1Algorithm();
                     break;
                 case "Erratum Musical":
                     algorithm = new ErratumMusicalAlgorithm();
