@@ -29,8 +29,9 @@ namespace Moritz.Spec
         {
             #region conditions
             Debug.Assert(absMsPosition >= 0);
-            Debug.Assert(channelDefs != null && channelDefs.Count <= 16);
-            foreach(var channelDef in ChannelDefs)
+            Debug.Assert(channelDefs != null && channelDefs.Count > 0 && channelDefs.Count <= 16);
+            Debug.Assert(ChannelDefs[0].Trks != null && ChannelDefs[0].Trks.Count > 0);
+            foreach(var channelDef in channelDefs)
             {
                 foreach(var trk in channelDef.Trks)
                 {
@@ -40,6 +41,7 @@ namespace Moritz.Spec
             #endregion conditions
 
             _absMsPosition = absMsPosition;
+            _channelDefs = channelDefs;
 
             AssertConsistency();
         }
@@ -62,144 +64,6 @@ namespace Moritz.Spec
 
             return clone;
         }
-
-        #region copied from MainBar (now deleted)
-        /// Converts this Bar to a list of bars, consuming this bar's channelDefs.
-        /// Uses the argument barline msPositions as the EndBarlines of the returned bars (which don't contain barlines).
-        /// An exception is thrown if:
-        ///    1) the first argument value is less than or equal to 0.
-        ///    2) the argument contains duplicate msPositions.
-        ///    3) the argument is not in ascending order.
-        ///    4) a Trk.MsPositionReContainer is not 0.
-        ///    5) an msPosition is not the endMsPosition of any IUniqueDef in the seq.
-        public List<Bar> GetBars(List<int> barlineMsPositionsReTrk0)
-        {
-            CheckBarlineMsPositionsReTrk0(barlineMsPositionsReTrk0);
-            AssertConsistency();
-
-            List<int> barMsDurations = new List<int>();
-            int startMsPos = 0;
-            for(int i = 0; i < barlineMsPositionsReTrk0.Count; i++)
-            {
-                int endMsPos = barlineMsPositionsReTrk0[i];
-                barMsDurations.Add(endMsPos - startMsPos);
-                startMsPos = endMsPos;
-            }
-
-            List<Bar> bars = new List<Bar>();
-            int totalDurationBeforePop = Trks0[0].MsDuration;  // all Trks0 have the same duration
-            Bar remainingBar = (Bar)this;
-            foreach(int barMsDuration in barMsDurations)
-            {
-                Tuple<Bar, Bar> rTuple = PopBar(remainingBar, barMsDuration);
-
-                Bar poppedBar = rTuple.Item1;
-                remainingBar = rTuple.Item2; // null after the last pop.
-
-                int poppedMsDuration = poppedBar.Trks0[0].MsDuration;
-                int remainingMsDuration = remainingBar.Trks0[0].MsDuration;
-                Debug.Assert(poppedMsDuration == barMsDuration);
-                if(remainingBar != null)
-                {
-                    Debug.Assert(poppedMsDuration + remainingMsDuration == totalDurationBeforePop);
-                    totalDurationBeforePop = remainingMsDuration;
-                }
-                else
-                {
-                    Debug.Assert(poppedMsDuration == totalDurationBeforePop);
-                }
-
-                bars.Add(poppedBar);
-            }
-
-            return bars;
-        }
-
-        /// <summary>
-        /// Returns a Tuple in which Item1 is the popped bar, Item2 is the remaining part of the input bar.
-        /// Note that Trks at the same level inside each ChannelDef in each bar have the same duration.
-        /// and that all Trks in a ChannelDef have the same sequence of MidiChordDef and RestDef (and no ClefDefs).
-        /// </summary>
-        /// <param name ="bar">The bar fron which Item1 is popped.</param>
-        /// <param name="poppedBarMsDuration">The duration of the first Trk in each ChannelDef in the popped bar.</param>
-        /// <returns>The popped bar and the remaining part of the input bar</returns>
-        private Tuple<Bar, Bar> PopBar(Bar bar, int poppedBarMsDuration)
-        {
-            Debug.Assert(poppedBarMsDuration > 0);
-
-            if(poppedBarMsDuration == bar.ChannelDefs[0].Trks[0].MsDuration)
-            {
-                return new Tuple<Bar, Bar>(bar, null);
-            }
-
-            int poppedAbsMsPosition = bar.AbsMsPosition;
-            int remainingAbsMsPosition = poppedAbsMsPosition + poppedBarMsDuration;
-
-            List<ChannelDef> poppedChannelDefs = new List<ChannelDef>();
-            List<ChannelDef> remainingChannelDefs = new List<ChannelDef>();
-
-            foreach(ChannelDef channelDef in bar.ChannelDefs)
-            {
-                Tuple<ChannelDef, ChannelDef> channelDefs = channelDef.PopChannelDef(poppedBarMsDuration);
-
-                poppedChannelDefs.Add(channelDefs.Item1);
-                remainingChannelDefs.Add(channelDefs.Item2);
-            }
-
-            var poppedBar = new Bar(poppedAbsMsPosition, poppedChannelDefs);
-            var remainingBar = new Bar(remainingAbsMsPosition, remainingChannelDefs);
-
-            return new Tuple<Bar, Bar>(poppedBar, remainingBar);
-        }
-
-        /// <summary>
-        /// An exception is thrown if:
-        ///    1) the first argument value is less than or equal to 0.
-        ///    2) the argument contains duplicate msPositions.
-        ///    3) the argument is not in ascending order.
-        ///    4) a Trk0.MsPositionReContainer is not 0.
-        ///    5) an msPosition is not the endMsPosition of any IUniqueDef in the bar.
-        /// </summary>
-        private void CheckBarlineMsPositionsReTrk0(IReadOnlyList<int> barlineMsPositionsReTrk0)
-        {
-            Debug.Assert(barlineMsPositionsReTrk0[0] > 0, "The first msPosition must be greater than 0.");
-
-            for(int i = 0; i < barlineMsPositionsReTrk0.Count; ++i)
-            {
-                int msPosition = barlineMsPositionsReTrk0[i];
-                for(int j = i + 1; j < barlineMsPositionsReTrk0.Count; ++j)
-                {
-                    Debug.Assert(msPosition != barlineMsPositionsReTrk0[j], "Error: Duplicate barline msPositions.");
-                }
-            }
-
-            int currentMsPos = -1;
-            List<Trk> trks0 = Trks0;
-
-            foreach(int msPosition in barlineMsPositionsReTrk0)
-            {
-                Debug.Assert(msPosition > currentMsPos, "Value out of order.");
-                currentMsPos = msPosition;
-                bool found = false;
-                foreach(var trk in trks0)
-                {
-                    foreach(IUniqueDef iud in trk.UniqueDefs)
-                    {
-                        if(msPosition == (iud.MsPositionReFirstUD + iud.MsDuration))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(found)
-                    {
-                        break;
-                    }
-                }
-                Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef.");
-            }
-        }
-        #endregion
 
         #region old Bar
 
@@ -434,7 +298,7 @@ namespace Moritz.Spec
             Debug.Assert(nTrks > 0);
 
             // All Trks having the same index in any ChannelDef in this Bar have the same msDuration.
-            for(int trkIndex = 0; trkIndex < nTrks; ++nTrks)
+            for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
             {
                 int barMsDuration = ChannelDefs[0].Trks[trkIndex].MsDuration;
                 for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
@@ -444,9 +308,11 @@ namespace Moritz.Spec
                 }
             }
 
-            for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
+            // In each ChannelDef:
+            //     1. All Trks have the same number of DurationDefs
+            //     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
+            foreach(var channelDef in ChannelDefs)
             {
-                var channelDef = ChannelDefs[channelDefIndex];
                 Debug.Assert(channelDef.Trks.Count == nTrks);
                 Debug.Assert(channelDef.MsPositionReContainer == 0);
                 List<DurationDef> trk0DurationDefs = channelDef.Trks[0].DurationDefs;
@@ -462,67 +328,9 @@ namespace Moritz.Spec
                     }
                 }
             }
-
-
-
-            List<List<int>> trk0ChannelEventSequence = GetChannelIndicesSequence(ChannelDefs, 0);
-            for(int trkIndex = 1; trkIndex < nTrks; ++nTrks)
-            {
-                List<List<int>> trkChannelIndicesSequence = GetChannelIndicesSequence(ChannelDefs, trkIndex);
-                for(int i = 0; i < trkChannelIndicesSequence.Count; ++i)
-                {
-                    List<int> channelIndices0 = trk0ChannelEventSequence[i];
-                    List<int> channelIndices1 = trkChannelIndicesSequence[i];
-
-                    Debug.Assert(channelIndices0.SequenceEqual(channelIndices1));
-                }
-            }
         }
 
         public int MsDuration { get => ChannelDefs[0].Trks[0].MsDuration; }
-
-        private List<List<int>> GetChannelIndicesSequence(IReadOnlyList<ChannelDef> channelDefs, int trkLevel)
-        {
-            List<Trk> channelTrks = new List<Trk>();
-            foreach(var channelDef in channelDefs)
-            {
-                channelTrks.Add(channelDef.Trks[trkLevel]);
-            }
-
-            var channelIndicesPosSequence = new List<Tuple<List<int>, int>>();
-
-            for(var channelIndex = 0; channelIndex < channelTrks.Count; ++channelIndex)
-            {
-                var trk = channelTrks[channelIndex];
-                foreach(var uniqueDef in trk.UniqueDefs)
-                {
-                    var msPos = uniqueDef.MsPositionReFirstUD;
-                    channelIndicesPosSequence.Add(new Tuple<List<int>, int>(new List<int>() { channelIndex }, msPos));
-                }
-            }
-
-            channelIndicesPosSequence.OrderBy(x => x.Item2);
-
-            for(int i = channelIndicesPosSequence.Count - 1; i > 0; i--)
-            {
-                var mPos2 = channelIndicesPosSequence[i].Item2;
-                var mPos1 = channelIndicesPosSequence[i - 1].Item2;
-                if(mPos2 == mPos1)
-                {
-                    List<int> channelIndices = channelIndicesPosSequence[i].Item1;
-                    channelIndicesPosSequence[i - 1].Item1.AddRange(channelIndices);
-                    channelIndicesPosSequence[i - 1].Item1.Sort();
-                    channelIndicesPosSequence.RemoveAt(i);
-                }
-            }
-
-            List<List<int>> channelIndicesSequence = new List<List<int>>();
-            foreach(var tuple in channelIndicesPosSequence)
-            {
-                channelIndicesSequence.Add(tuple.Item1);
-            }
-            return channelIndicesSequence;
-        }
 
         #region Envelopes
         /// <summary>

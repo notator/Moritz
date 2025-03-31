@@ -31,30 +31,30 @@ namespace Moritz.Spec
 		public void Transpose(int interval) { }
 
 		/// <summary>
-		/// This NotatedMidiPitches field is used when displaying the chord's noteheads.
+		/// This Pitches field is used when displaying the chord's noteheads.
 		/// </summary>
 		public List<int> Pitches
 		{
-			get { return _notatedMidiPitches; }
+			get { return _pitches; }
 			set
 			{
 				foreach(int pitch in value)
 				{
 					Debug.Assert(pitch == M.MidiValue(pitch));
 				}
-				_notatedMidiPitches = new List<int>(value);
+				_pitches = new List<int>(value);
 			}
 		}
-		private List<int> _notatedMidiPitches = null;
+		private List<int> _pitches = null;
 
 		/// <summary>
-		/// This NotatedMidiVelocities field is used when displaying the chord's noteheads.
+		/// This Velocities field may be used when displaying the chord's noteheads.
 		/// </summary>
 		public List<int> Velocities
 		{
 			get
 			{
-				return _notatedMidiVelocities;
+				return _velocities;
 			}
 			set
 			{
@@ -62,18 +62,16 @@ namespace Moritz.Spec
 				{
 					Debug.Assert(velocity == M.MidiValue(velocity));
 				}
-				_notatedMidiVelocities = new List<int>(value);
+				_velocities = new List<int>(value);
 			}
 		}
-		private List<int> _notatedMidiVelocities = null;
+		private List<int> _velocities = null;
 
 		#region IUniqueDef
 		public override string ToString()
 		{
 			return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " CautionaryChordDef");
 		}
-
-		public void AdjustMsDuration(double factor) { }
 
 		public object Clone()
 		{

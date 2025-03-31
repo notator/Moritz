@@ -55,7 +55,7 @@ namespace Moritz.Spec
             }
             #endregion conditions
 
-            Pitches = pitches;
+            _pitches = pitches;
             Velocities = velocities;
 
             MsPositionReFirstUD = 0; // default value
@@ -64,7 +64,7 @@ namespace Moritz.Spec
 
             MidiChordControlDef = midiChordControlDef;
 
-            AssertConsistency(this);
+            AssertConsistency();
         }
 
         #endregion constructors
@@ -76,24 +76,31 @@ namespace Moritz.Spec
         /// <returns></returns>
         public override object Clone()
         {
-            MidiChordDef rval = new MidiChordDef(this.Pitches, this.Velocities, this.MsDuration, this.HasChordOff)
+            MidiChordDef rval = new MidiChordDef(this._pitches, this.Velocities, this.MsDuration, this.HasChordOff)
             {
                 MsDurationToNextBarline = this.MsDurationToNextBarline,
                 BeamContinues = this.BeamContinues,
-                Lyric = String.Copy(this.Lyric),
-                OrnamentText = String.Copy(this.OrnamentText), // the displayed ornament Text (without the tilde)
+                Lyric = (this.Lyric == null) ? null : String.Copy(this.Lyric),
+                OrnamentText = (this.OrnamentText == null) ? null : String.Copy(this.OrnamentText), // the displayed ornament Text (without the tilde)
 
-                MidiChordControlDef = (MidiChordControlDef)MidiChordControlDef.Clone(),
+                MidiChordControlDef = (this.MidiChordControlDef == null) ? null : (MidiChordControlDef)MidiChordControlDef.Clone(),
             };
 
-            List<int> envValues = new List<int>(this.EnvelopeTypeDef.Item2);
-            EnvelopeTypeDef = new Tuple<int, List<int>>(this.EnvelopeTypeDef.Item1, envValues);
+            if(this.EnvelopeTypeDef != null)
+            {
+                List<int> envValues = new List<int>(this.EnvelopeTypeDef.Item2);
+                EnvelopeTypeDef = new Tuple<int, List<int>>(this.EnvelopeTypeDef.Item1, envValues);
+            }
+
+            AssertConsistency();
 
             return rval;
         }
 
         public void WriteSVG(SvgWriter w, int channel)
-        {             
+        { 
+            AssertConsistency();
+
             List<Tuple<MidiMsg, int>> envelopeMessages = null;
             #region set envelopeMessages
             int noteOnsMsDuration = 0;
@@ -179,13 +186,13 @@ namespace Moritz.Spec
 
         private void WriteNoteOffs(SvgWriter w, int channel)
         {
-            Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
+            Debug.Assert(Velocities != null && _pitches.Count == Velocities.Count);
             w.WriteStartElement("noteOffs");
             int status = (int)M.CMD.NOTE_OFF_120 + channel; // NoteOff 
-            for(int i = 0; i < Pitches.Count; ++i)
+            for(int i = 0; i < _pitches.Count; ++i)
             {
                 // The ResidentSynth ignores noteOff velocity, so it is not written to SVG.
-                MidiMsg msg = new MidiMsg(status, Pitches[i]);
+                MidiMsg msg = new MidiMsg(status, _pitches[i]);
                 msg.WriteSVG(w);
             }
             w.WriteEndElement(); // end of noteOns
@@ -193,32 +200,47 @@ namespace Moritz.Spec
 
         private void WriteNoteOns(SvgWriter w, int channel, int msDuration)
         {
-            Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
+            Debug.Assert(Velocities != null && _pitches.Count == Velocities.Count);
             w.WriteStartElement("noteOns");
             w.WriteAttributeString("msDuration", msDuration.ToString());
 
             int status = (int)M.CMD.NOTE_ON_144 + channel; // NoteOn
-            for(int i = 0; i < Pitches.Count; ++i)
+            for(int i = 0; i < _pitches.Count; ++i)
             {
-                MidiMsg msg = new MidiMsg(status, Pitches[i], Velocities[i]);
+                MidiMsg msg = new MidiMsg(status, _pitches[i], Velocities[i]);
                 msg.WriteSVG(w);
             }
             w.WriteEndElement(); // end of noteOns
         }
 
-        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
-
-
-
+        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={_pitches[0]} ";
 
         /// <summary>
+        /// Checks that pitches, velocities and EnvelopeTypeDef values are in the allowed ranges.
         /// Used by all constructors and Clone().
-        /// ought also to be called at the end of any function that changes the MidiChordDef's content.
+        /// Should always be called after changing the MidiChordDef's content.
         /// </summary>
-        private void AssertConsistency(MidiChordDef midiChordDef)
-        {
-            throw new NotImplementedException();
-        }
+        private void AssertConsistency()
+		{
+			Debug.Assert(Pitches != null, "Pitches is null");
+			Debug.Assert(Velocities != null, "Velocities is null");
+
+			foreach(int pitch in Pitches)
+			{
+				AssertIsMidiValue(pitch);
+			}
+            foreach(int velocity in Velocities)
+            {
+                AssertIsVelocityValue(velocity);
+			}
+            if(EnvelopeTypeDef != null)
+            {
+                foreach(var value in EnvelopeTypeDef.Item2)
+                {
+                    AssertIsMidiValue(value);
+                }
+            }
+		}
 
         /// <summary>
         /// Used by Clone(). Returns null if listToClone is null, otherwise returns a clone of the listToClone.
@@ -255,7 +277,7 @@ namespace Moritz.Spec
             #endregion conditions
 
             // Substitute the oppositeMCD's pitches by the equivalent pitches in the oppositeMode.
-            OppositePitches(mode, oppositeMode, oppositeMCD.Pitches);
+            OppositePitches(mode, oppositeMode, oppositeMCD._pitches);
 
             return oppositeMCD;
         }
@@ -290,8 +312,8 @@ namespace Moritz.Spec
             Debug.Assert(nPitchesToShiftArg >= 0);
             #endregion conditions
 
-            InvertPitches(Pitches, nPitchesToShiftArg);
-            RemoveDuplicateNotes(Pitches, Velocities);
+            InvertPitches(_pitches, nPitchesToShiftArg);
+            RemoveDuplicateNotes(_pitches, Velocities);
         }
 
         private void InvertPitches(List<int> pitches, int nPitchesToShiftArg)
@@ -328,7 +350,7 @@ namespace Moritz.Spec
                 int v = velocityPerAbsolutePitch[i];
                 AssertIsVelocityValue(v);
             }
-            Debug.Assert(this.Pitches.Count == Velocities.Count);
+            Debug.Assert(this._pitches.Count == Velocities.Count);
             #endregion conditions
 
             SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
@@ -410,7 +432,7 @@ namespace Moritz.Spec
             #region conditions
             AssertIsVelocityValue(rootVelocity);
             AssertIsVelocityValue(topVelocity);
-            AssertConsistency(this);
+            AssertConsistency();
             #endregion conditions
 
             int nVelocities = Velocities.Count;
@@ -430,6 +452,8 @@ namespace Moritz.Spec
             rootVelocity = VelocityValue((int)(Math.Round(Velocities[0] * rootVelocityFactor)));
             topVelocity = VelocityValue((int)(Math.Round(rootVelocity * verticalVelocityFactor)));
             SetVerticalVelocityGradient(rootVelocity, topVelocity);
+
+            AssertConsistency();
         }
         #endregion SetVerticalVelocityGradient
 
@@ -481,11 +505,11 @@ namespace Moritz.Spec
         /// </summary>
         public void Transpose(int interval)
         {
-            for(int i = 0; i < Pitches.Count; ++i)
+            for(int i = 0; i < _pitches.Count; ++i)
             {
-                Pitches[i] = MidiValue(Pitches[i] + interval);
+                _pitches[i] = MidiValue(_pitches[i] + interval);
             }
-            RemoveDuplicateNotes(Pitches, Velocities);
+            RemoveDuplicateNotes(_pitches, Velocities);
         }
 
         /// <summary>
@@ -501,7 +525,7 @@ namespace Moritz.Spec
         {
             #region conditions
             Debug.Assert(mode != null);
-            foreach(int pitch in Pitches)
+            foreach(int pitch in _pitches)
             {
                 Debug.Assert(mode.Gamut.Contains(pitch));
             }
@@ -510,11 +534,11 @@ namespace Moritz.Spec
             int bottomMostPitch = mode.Gamut[0];
             int topMostPitch = mode.Gamut[mode.Gamut.Count - 1];
 
-            for(int i = 0; i < Pitches.Count; ++i)
+            for(int i = 0; i < _pitches.Count; ++i)
             {
-                Pitches[i] = TransposedPitchInModeGamut(Pitches[i], mode, steps);
+                _pitches[i] = TransposedPitchInModeGamut(_pitches[i], mode, steps);
             }
-            RemoveDuplicateNotes(Pitches, Velocities);
+            RemoveDuplicateNotes(_pitches, Velocities);
         }
 
         /// <summary>
@@ -525,18 +549,20 @@ namespace Moritz.Spec
         /// </summary>
         public void TransposeToRootInModeGamut(Mode mode, int rootPitch)
         {
-            AssertConsistency(this);
+            AssertConsistency();
 
             #region conditions
             Debug.Assert(mode != null);
             Debug.Assert(mode.Gamut.Contains(rootPitch));
-            Debug.Assert(mode.Gamut.Contains(Pitches[0]));
+            Debug.Assert(mode.Gamut.Contains(_pitches[0]));
             #endregion conditions
 
-            int stepsToTranspose = mode.IndexInGamut(rootPitch) - mode.IndexInGamut(Pitches[0]);
+            int stepsToTranspose = mode.IndexInGamut(rootPitch) - mode.IndexInGamut(_pitches[0]);
 
             // checks that all the pitches are in the mode.
             TransposeStepsInModeGamut(mode, stepsToTranspose);
+
+            AssertConsistency();
         }
 
         private int TransposedPitchInModeGamut(int initialPitch, Mode mode, int steps)
@@ -585,18 +611,32 @@ namespace Moritz.Spec
         #endregion IUniqueChordDef
 
         #region properties
-        public List<int> Pitches = new List<int>();
-        List<int> IUniqueChordDef.Pitches
+        private List<int> _pitches = new List<int>();
+        public List<int> Pitches
         {
-            get => Pitches;
-            set => Pitches = value;
+            get => _pitches;
+            set
+            {
+                foreach(int pitch in value)
+                {
+                    AssertIsMidiValue(pitch);
+                }
+                _pitches = value;
+            }         
         }
 
-        public List<int> Velocities = new List<int>();
-        List<int> IUniqueChordDef.Velocities
+        private List<int> _velocities = new List<int>();
+        public List<int> Velocities
         {
-            get => Velocities;
-            set => Velocities = value;
+            get => _velocities;
+            set
+            {
+                foreach(int velocity in value)
+                {
+                    AssertIsVelocityValue(velocity);    
+                }
+                _velocities = value;
+            }
         }
         public bool HasChordOff { get; set; } = true;
         public int? MsDurationToNextBarline { get; set; } = null;

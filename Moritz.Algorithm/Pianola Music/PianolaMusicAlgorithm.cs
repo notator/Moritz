@@ -45,7 +45,7 @@ namespace Moritz.Algorithm.PianolaMusic
 
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(trks, 8);
             
-            List<Bar> bars = GetBars(temporalStructure, barlineMsPositions);
+            List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 

@@ -364,27 +364,6 @@ namespace Moritz.Algorithm
         }
 
         /// <summary>
-        /// Uses the private CompositionAlgorithm.MainBar(...) constructor to create Bar objects.
-        /// </summary>
-        /// <param name="mainBar">A Bar containing all the output IUniqueDefs in the composition.</param>
-        /// <param name="barlineMsPositions">All the barline msPositions (except the first).</param>
-        /// <returns>A list of Bars</returns>
-        protected List<Bar> GetBars(Bar mainBar, List<int> barlineMsPositions)
-        {
-            mainBar.AssertConsistency();
-
-            List<Bar> bars = mainBar.GetBars(barlineMsPositions);
-
-            foreach(var bar in bars)
-            {
-                // Each Trk can begin with a CautionaryChordDef and contains no ClefDefs.
-                bar.AssertConsistency();
-            }
-
-            return bars;
-        }
-
-        /// <summary>
         /// The patch only needs to be set in the first chord in each trk,
         /// since it will be set by shunting if the Assistant Performer starts later.
         /// </summary>

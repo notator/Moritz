@@ -180,7 +180,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
-            List<Bar> bars = GetBars(temporalStructure, endBarlinePositions);
+            List<Bar> bars = temporalStructure.GetBars(endBarlinePositions);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 

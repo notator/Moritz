@@ -54,7 +54,7 @@ namespace Moritz.Algorithm.Study1
 
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(temporalStructure.Trks0, NumberOfBars);
 
-            List<Bar> bars = GetBars(temporalStructure, barlineMsPositions);
+            List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
 
             foreach(ChannelDef cDef in channelDefs)
             {

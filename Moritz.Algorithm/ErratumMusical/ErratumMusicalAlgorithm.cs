@@ -121,7 +121,7 @@ namespace Moritz.Algorithm.ErratumMusical
 
             temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
-            List<Bar> bars = GetBars(temporalStructure, endBarlinePositions);
+            List<Bar> bars = temporalStructure.GetBars(endBarlinePositions);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
