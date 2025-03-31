@@ -38,7 +38,7 @@ namespace Moritz.Algorithm.Study1
             Trk trk0 = GetTrk0(trackChordNumbers, trackRootPitches);
             // parallel Trks must have the same number and types of contained UniqueDefs
             // but they can have different durations and MIDI definitions
-            Trk trk1 = GetTrk1(trk0);                                      
+            Trk trk1 = GetTrk1(trk0);
             Trk trk2 = GetTrk2(trk1);
             Trk trk3 = GetTrk3(trk2);
 
@@ -64,21 +64,26 @@ namespace Moritz.Algorithm.Study1
                 }
             }
 
+            InsertClefs(pageFormat, bars);
+
+            return bars;  // The Trks in these bars dont contain ClefDefs.
+        }
+
+        private void InsertClefs(PageFormat pageFormat, List<Bar> bars)
+        {
             var clefChangesPerBarPerStaff = GetEmptyClefChangesPerBarPerStaff(bars, pageFormat.VoiceIndicesPerStaff);
-            
+
             var barIndex = 3;
-            var staffIndex = 2;
+            var staffIndex = 0;
             SortedDictionary<int, string> dict = clefChangesPerBarPerStaff[barIndex][staffIndex];
-            
-            dict.Add(9, "b3");
+
+            dict.Add(9, "t");
             dict.Add(8, "b2");
             dict.Add(6, "b");
             dict.Add(4, "t2");
             dict.Add(2, "t");
 
             InsertClefChangesInBars(bars, pageFormat.VoiceIndicesPerStaff, clefChangesPerBarPerStaff);
-
-            return bars;  // The Trks in these bars dont contain ClefDefs.
         }
 
         private Trk GetTrk1(Trk trk0)

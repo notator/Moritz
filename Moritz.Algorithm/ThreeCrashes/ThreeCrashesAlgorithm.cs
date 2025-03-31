@@ -176,8 +176,6 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
-            //List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
-
             List<int> endBarlinePositions = GetEndBarlineMsPositions(firstATrkUIDs, firstBTrkUIDs, firstCTrkUIDs, msDuration);
 
             Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 

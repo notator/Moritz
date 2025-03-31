@@ -195,7 +195,8 @@ namespace Moritz.Algorithm
                     var midiIndex = voiceIndicesPerStaff[staffIndex][0];
                     var trk = bar.ChannelDefs[midiIndex].Trks[0];
                     SortedDictionary<int, string> clefDict = clefChangesPerBarPerStaff[barIndex][staffIndex];
-                    foreach(KeyValuePair<int, string> keyValuePair in clefDict)
+                    Dictionary<int, string> reversedDict = clefDict.Reverse().ToDictionary(pair => pair.Key, pair => pair.Value);
+                    foreach(KeyValuePair<int, string> keyValuePair in reversedDict)
                     {
                         int index = keyValuePair.Key;
                         ClefDef clefDef = new ClefDef(keyValuePair.Value, trk.UniqueDefs[index].MsPositionReFirstUD);
