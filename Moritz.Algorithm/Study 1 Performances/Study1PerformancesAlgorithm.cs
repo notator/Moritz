@@ -129,7 +129,7 @@ namespace Moritz.Algorithm.Study1
 
         private List<int> GetTrackChordNumbers()
         {
-            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1\A4chordNumbers"); 
+            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1 Performances\A4chordNumbers"); 
 
             var rval = new List<int>();
             foreach(var val in bytes)
@@ -142,7 +142,7 @@ namespace Moritz.Algorithm.Study1
 
         private List<int> GetTrackRootPitches()
         {
-            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1\A4pitches");
+            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1 Performances\A4pitches");
 
             var rval = new List<int>();
             foreach(var val in bytes)
