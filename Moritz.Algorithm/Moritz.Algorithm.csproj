@@ -45,8 +45,8 @@
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
     <Compile Include="Study 1 Performances\Study1PerformancesAlgorithm.cs" />
-    <Compile Include="ThreeCrashes\ThreeCrashes.cs" />
-    <Compile Include="ErratumMusical\ErratumMusical.cs" />
+    <Compile Include="ThreeCrashes\ThreeCrashesAlgorithm.cs" />
+    <Compile Include="ErratumMusical\ErratumMusicalAlgorithm.cs" />
     <Compile Include="Pianola Music\PianolaMusicAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

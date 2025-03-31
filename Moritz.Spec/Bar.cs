@@ -403,24 +403,27 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// AbsMsPosition is greater than or equal 0.
+        /// AbsMsPosition is greater than or equal to 0.
         /// There is at least one ChannelDef in ChannelDefs and at least one Trk in each ChannelDef.
-        /// Trk.AssertConsistency(containsClefDefs) is called on all Trks.
+        /// Trk.AssertConsistency() is called on all Trks.
         /// All ChannelDef.Trks.Count values are the same.
         /// All ChannelDef.MsPositionReContainer values are 0.
-        /// All Trks have the same number of events as the Trk at index 0 in the same ChannelDef.
-        /// All Trks having the same index in any ChannelDef
-        ///     1. have the same MsDuration.
-        ///     2. have the same channel event sequence as the channel events at ChannelDefs[0].Trks[0]
-        /// if finalised is false, all Trks can only contain RestDef or MidiChordDef objects.
+        /// All Trks having the same index in any ChannelDef in this Bar have the same msDuration.
+        /// In each ChannelDef:
+        ///     1. All Trks have the same number of DurationDefs
+        ///     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
         /// </summary>
-        public void AssertConsistency()
+        public virtual void AssertConsistency()
         {
             Debug.Assert(AbsMsPosition >= 0);
             Debug.Assert(ChannelDefs.Count > 0);
+            var trksCount = ChannelDefs[0].Trks.Count;
+            Debug.Assert(trksCount > 0);
 
             foreach(var channelDef in ChannelDefs)
             {
+                Debug.Assert(channelDef.Trks.Count == trksCount);
+                Debug.Assert(channelDef.MsPositionReContainer == 0);
                 foreach(var trk in channelDef.Trks)
                 {
                     trk.AssertConsistency();
@@ -428,27 +431,39 @@ namespace Moritz.Spec
             }
 
             int nTrks = ChannelDefs[0].Trks.Count;
+            Debug.Assert(nTrks > 0);
+
+            // All Trks having the same index in any ChannelDef in this Bar have the same msDuration.
+            for(int trkIndex = 0; trkIndex < nTrks; ++nTrks)
+            {
+                int barMsDuration = ChannelDefs[0].Trks[trkIndex].MsDuration;
+                for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
+                {
+                    var channelDef = ChannelDefs[channelDefIndex];
+                    Debug.Assert(channelDef.Trks[trkIndex].MsDuration == barMsDuration);
+                }
+            }
+
             for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
             {
                 var channelDef = ChannelDefs[channelDefIndex];
                 Debug.Assert(channelDef.Trks.Count == nTrks);
                 Debug.Assert(channelDef.MsPositionReContainer == 0);
-                int nChannelDefTrkEvents = channelDef.Trks[0].Count;
+                List<DurationDef> trk0DurationDefs = channelDef.Trks[0].DurationDefs;
                 for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
                 {
-                    Debug.Assert(channelDef.Trks[trkIndex].Count == nChannelDefTrkEvents);
+                    List<DurationDef> trkDDs = channelDef.Trks[trkIndex].DurationDefs;
+                    Debug.Assert(trkDDs.Count == trk0DurationDefs.Count);
+                    for(var ddIndex = 0; ddIndex < trk0DurationDefs.Count; ++ddIndex)
+                    {
+                        DurationDef dd0 = trk0DurationDefs[ddIndex]; // durationDef in Trk 0
+                        DurationDef trkDD = trkDDs[ddIndex];
+                        Debug.Assert((dd0 is MidiChordDef && trkDD is MidiChordDef) | (dd0 is RestDef && trkDD is RestDef));
+                    }
                 }
             }
 
-            for(int trkIndex = 0; trkIndex < nTrks; ++nTrks)
-            {
-                int msDuration = ChannelDefs[0].Trks[trkIndex].MsDuration;
-                for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
-                {
-                    var channelDef = ChannelDefs[channelDefIndex];
-                    Debug.Assert(channelDef.Trks[trkIndex].MsDuration == msDuration);
-                }
-            }
+
 
             List<List<int>> trk0ChannelEventSequence = GetChannelIndicesSequence(ChannelDefs, 0);
             for(int trkIndex = 1; trkIndex < nTrks; ++nTrks)

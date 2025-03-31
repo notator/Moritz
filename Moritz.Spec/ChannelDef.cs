@@ -262,59 +262,6 @@ namespace Moritz.Spec
 
         public List<Trk> Trks = new List<Trk>();
 
-        /// <summary>
-        /// Returns the contents of the horizontally parallel Trks in vertically parallel DuartionDefs lists.
-        /// The DurationDefs lists:
-        ///     1. contain either all MidiChordDefs or all RestDefs.
-        ///     2. all have the same Count
-        /// The index of each DurationDef in its DurationDefs list is its original trkIndex.
-        /// </summary>
-        public List<List<DurationDef>> DurationDefsList 
-        {
-            get
-            {
-                var durationDefsList = new List<List<DurationDef>>();
-                Trk trk0 = Trks[0];
-                int nDurationDefs = trk0.DurationsCount;
-                for(int i = 0; i < nDurationDefs; ++i)
-                {
-                    var ddList = new List<DurationDef>();
-                    durationDefsList.Add(ddList);
-                }
-                var trks = Trks;
-                var ddListIndex = 0;
-                for(var trkIndex = 0; trkIndex < trks.Count; trkIndex++)
-                { 
-                    var trk = trks[trkIndex];
-                    for(int i = 0; i < trk.UniqueDefs.Count; ++i)
-                    {
-                        var uniqueDef = trk.UniqueDefs[i];
-                        if(uniqueDef is DurationDef def)
-                        {
-                            durationDefsList[ddListIndex].Add(def);
-                            ddListIndex++;
-                        }
-                    }
-                }
-
-                #region check
-
-                foreach(var ddList in durationDefsList)
-                {
-                    var durationDef = ddList[0];
-                    for(var i = 1; i < ddList.Count; ++i)
-                    {
-                        Debug.Assert((durationDef is MidiChordDef && ddList[i] is MidiChordDef)
-                        || (durationDef is RestDef && ddList[i] is RestDef));
-                    }
-                }
-                #endregion
-
-                return durationDefsList;
-            }
-        } 
-
-
         #endregion Properties
     }
 }

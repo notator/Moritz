@@ -168,8 +168,9 @@ namespace Moritz.Algorithm.ThreeCrashes
                 channelDefs.Add(new ChannelDef(new List<Trk>() { trk }));
             }
 
-            Bar singleBar = new Bar(0, channelDefs);
-            singleBar.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
+            TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
+
+            temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
             //List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
 
@@ -177,7 +178,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
-            List<Bar> bars = GetBars(singleBar, endBarlinePositions);
+            List<Bar> bars = GetBars(temporalStructure, endBarlinePositions);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 

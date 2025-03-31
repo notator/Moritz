@@ -72,18 +72,10 @@ namespace Moritz.Spec
 
         public Tuple<Trk, Trk> PopTrk(int poppedMsDuration)
         {
-            CanContainCautionaryChordDef = true;
-            Debug.Assert(CanContainClefDefs == false);
-
             AssertConsistency();
 
             Trk poppedTrk = new Trk(new List<IUniqueDef>());
-            poppedTrk.CanContainCautionaryChordDef = true;
-            Debug.Assert(poppedTrk.CanContainClefDefs == false);
-
             Trk remainingTrk = new Trk(new List<IUniqueDef>());
-            remainingTrk.CanContainCautionaryChordDef = true;
-            Debug.Assert(remainingTrk.CanContainClefDefs == false);
 
             foreach(IUniqueDef iud in UniqueDefs)
             {
@@ -175,46 +167,11 @@ namespace Moritz.Spec
                 }
             }
 
-            if(!CanContainCautionaryChordDef && !CanContainClefDefs)
+            foreach(IUniqueDef iud in UniqueDefs)
             {
-                foreach(IUniqueDef iud in UniqueDefs)
-                {
-                    Debug.Assert(iud is MidiChordDef || iud is RestDef);
-                }
+                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefDef);
             }
-            else if(CanContainCautionaryChordDef && !CanContainClefDefs)
-            {
-                IUniqueDef iud = UniqueDefs[0];
-                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef);
-                for(int i = 1; i < UniqueDefs.Count; i++)
-                {
-                    iud = UniqueDefs[i];
-                    Debug.Assert(iud is MidiChordDef || iud is RestDef);
-                }
-            }
-            else
-            {
-                // ClefDefs must be added _after_ CautionaryChordDefs
-                Debug.Assert(!(!CanContainCautionaryChordDef && CanContainClefDefs));
-                foreach(IUniqueDef iud in UniqueDefs)
-                {
-                    Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefDef);
-                }
-            } 
         }
-
-        /// <summary>
-        /// This value is used by the AssertConsistency() function.
-        /// If CanContainCautionaryChordDef is false, Trks can only contain MidiChordDef and RestDef IUniqueDefs.
-        /// If CanContainCautionaryChordDef is true, the first IUniqueDef can also be a CautionaryChordDef.
-        /// </summary>
-        private bool CanContainCautionaryChordDef = false;
-        /// <summary>
-        /// This value is used by the AssertConsistency() function.
-        /// If CanContainClefDefs is false, Trks cannot contain ClefDefs.
-        /// If CanContainClefDefs is true, Trks can contain ClefDefs.
-        /// </summary>
-        private bool CanContainClefDefs = false;
 
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
         private List<IUniqueDef> _uniqueDefs = null;
@@ -511,23 +468,6 @@ namespace Moritz.Spec
         /// N.B. Can be used to Add CautionaryChordDef and ClefDef arguments.
         /// </summary>
         public void Add(IUniqueDef iUniqueDef)
-        {
-            Debug.Assert(CanContainCautionaryChordDef == true);
-
-            if(_uniqueDefs.Count > 0)
-            {
-                IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
-                iUniqueDef.MsPositionReFirstUD = lastIud.MsPositionReFirstUD + lastIud.MsDuration;
-            }
-            else
-            {
-                iUniqueDef.MsPositionReFirstUD = 0;
-            }
-            _uniqueDefs.Add(iUniqueDef);
-
-            AssertConsistency();
-        }
-        protected void _Add(IUniqueDef iUniqueDef)
         {
             if(_uniqueDefs.Count > 0)
             {
@@ -1815,21 +1755,22 @@ namespace Moritz.Spec
         private int _axisIndex = 0;
 
         /// <summary>
-        /// The number of MidiChordDefs and RestDefs in this Trk
+        /// A list of the MidiChordDefs and RestDefs in this Trk.
+        /// The order of these durationDefs is the same as in the original Trk
         /// </summary>
-        public int DurationsCount
+        internal List<DurationDef> DurationDefs
         {
             get
             {
-                int count = 0;
+                List<DurationDef> rval = new List<DurationDef>();
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
                     if(iud is MidiChordDef || iud is RestDef)
                     {
-                        count++;
+                        rval.Add((DurationDef)iud);
                     }
                 }
-                return count;
+                return rval;
             }
         }
 

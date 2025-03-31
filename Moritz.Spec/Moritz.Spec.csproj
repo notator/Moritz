@@ -65,6 +65,7 @@
     <Compile Include="PitchWeightVector.cs" />
     <Compile Include="SeqRef.cs" />
     <Compile Include="CautionaryChordDef.cs" />
+    <Compile Include="TemporalStructure.cs" />
     <Compile Include="TrkRef.cs" />
     <Compile Include="DurationDef.cs" />
     <Compile Include="TrkOptions.cs" />

@@ -44,13 +44,13 @@ namespace Moritz.Algorithm.Study1
 
             Debug.Assert(channelDefs.Count == NumberOfMidiChannels);
 
-            Bar singleBar = new Bar(0, channelDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
 
-            singleBar.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
+            temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(singleBar.Trks0, NumberOfBars);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(temporalStructure.Trks0, NumberOfBars);
 
-            List<Bar> bars = GetBars(singleBar, barlineMsPositions);
+            List<Bar> bars = GetBars(temporalStructure, barlineMsPositions);
 
             foreach(ChannelDef cDef in channelDefs)
             {

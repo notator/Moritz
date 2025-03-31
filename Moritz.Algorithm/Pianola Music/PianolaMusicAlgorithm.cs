@@ -35,13 +35,13 @@ namespace Moritz.Algorithm.PianolaMusic
                 channelDefs.Add(new ChannelDef(new List<Trk>() { trk }));
             }
 
-            Bar singleBar = new Bar(0, channelDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
 
-            singleBar.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
+            temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
             List<int> barlineMsPositions = GetBalancedBarlineMsPositions(trks, 8);
             
-            List<Bar> bars = GetBars(singleBar, barlineMsPositions);
+            List<Bar> bars = GetBars(temporalStructure, barlineMsPositions);
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
