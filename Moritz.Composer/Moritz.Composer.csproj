@@ -88,10 +88,6 @@
       <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.Palettes\Moritz.Palettes.csproj">
-      <Project>{a240ecd4-6ec2-4a0e-99e4-70cec7b603ca}</Project>
-      <Name>Moritz.Palettes</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
       <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>
       <Name>Moritz.Spec</Name>
