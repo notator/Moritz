@@ -47,7 +47,7 @@ namespace Moritz.Composer
 
             GetSelectedSettings();
 
-            if(VoiceIndicesPerStaffTextBox.Text == "")
+            if(NumberOfVoicesPerStaffTextBox.Text == "")
             {
                 SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfMidiChannels);
             }
@@ -62,11 +62,10 @@ namespace Moritz.Composer
                 MinimumGapsBetweenSystemsTextBox,
                 MinimumCrotchetDurationTextBox,
 
-                VoiceIndicesPerStaffTextBox,
+                NumberOfVoicesPerStaffTextBox,
                 ClefsPerStaffTextBox,
                 StafflinesPerStaffTextBox,
                 StaffGroupsTextBox,
-
 
                 LongStaffNamesTextBox,
                 ShortStaffNamesTextBox,
@@ -116,7 +115,7 @@ namespace Moritz.Composer
 
             SetSystemStartBarsHelpLabel(_algorithm.NumberOfBars);
 
-            VoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
+            NumberOfVoicesPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
 
             SetGroupBoxIsSaved(NotationGroupBox, ConfirmNotationButton, RevertNotationButton, (SavedState)KrystalsGroupBox.Tag);
         }
@@ -136,8 +135,8 @@ namespace Moritz.Composer
                 voiceIndexList.Append(", ");
             }
             voiceIndexList.Remove(voiceIndexList.Length - 2, 2);
-            VoiceIndicesPerStaffTextBox.Text = voiceIndexList.ToString();
-            VoiceIndicesPerStaffTextBox_Leave(null, null);
+            NumberOfVoicesPerStaffTextBox.Text = voiceIndexList.ToString();
+            NumberOfVoicesPerStaffTextBox_Leave(null, null);
         }
         #endregion called from ctor
 
@@ -663,27 +662,32 @@ namespace Moritz.Composer
             CheckTextBoxIsUInt(this.MinimumGapsBetweenSystemsTextBox);
         }
         /// <summary>
-        /// This function sets both _outputVoiceIndicesPerStaff and _inputVoiceIndicesPerStaff
-        /// (and consequetially _numberOfStaves).
-        /// It also sets _staffIsInput and the help texts on the dialog.
+        /// This function sets _voiceIndicesPerStaff and _numberOfStaves.
         /// </summary>
-        private void VoiceIndicesPerStaffTextBox_Leave(object sender, EventArgs e)
+        private void NumberOfVoicesPerStaffTextBox_Leave(object sender, EventArgs e)
         {
             EnableStaffDependentControls(false);
 
             bool error = false;
 
-            List<int> nVoicesPerStaff = M.StringToIntList(VoiceIndicesPerStaffTextBox.Text, ',');
+            List<int> nVoicesPerStaff = M.StringToIntList(NumberOfVoicesPerStaffTextBox.Text, ',');
 
             if(nVoicesPerStaff.Count == 0)
             {
                 error = true;
             }
+            foreach(int nVoices in nVoicesPerStaff)
+            {
+                if(nVoices < 1 || nVoices > 2)
+                {
+                    error = true;
+                }
+            }
 
             if(error)
             {
-                M.SetTextBoxErrorColorIfNotOkay(VoiceIndicesPerStaffTextBox, false);
-                VoiceIndicesPerStaffTextBox.Focus();
+                M.SetTextBoxErrorColorIfNotOkay(NumberOfVoicesPerStaffTextBox, false);
+                NumberOfVoicesPerStaffTextBox.Focus();
             }
             else
             {
@@ -699,9 +703,9 @@ namespace Moritz.Composer
                     }
                     _voiceIndicesPerStaff.Add(staffMidiChannels);
                 }
+                M.SetTextBoxErrorColorIfNotOkay(NumberOfVoicesPerStaffTextBox, true);
                 EnableStaffDependentControls(true);
-                VoiceIndicesPerStaffTextBox.Text = NormalizedVoiceIndicesString(_voiceIndicesPerStaff);
-                M.SetTextBoxErrorColorIfNotOkay(VoiceIndicesPerStaffTextBox, true);
+                NumberOfVoicesPerStaffTextBox.Text = NormalizedNumberOfVoicesPerStaffString(_voiceIndicesPerStaff);
             }
             SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
         }
@@ -943,7 +947,7 @@ namespace Moritz.Composer
         }
         private void VoiceIndicesPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            M.SetToWhite(VoiceIndicesPerStaffTextBox);
+            M.SetToWhite(NumberOfVoicesPerStaffTextBox);
         }
         private void ClefsPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -971,34 +975,20 @@ namespace Moritz.Composer
         }
         #endregion
         #region helper functions
-        private string NormalizedVoiceIndicesString(List<List<int>> visibleVoiceIndexLists)
+        private string NormalizedNumberOfVoicesPerStaffString(List<List<int>> voiceListsPerStaff)
         {
             StringBuilder sb = new StringBuilder();
-            if(visibleVoiceIndexLists.Count > 0)
+            if(voiceListsPerStaff.Count > 0)
             {
-                AppendVoiceIndexListsToSB(visibleVoiceIndexLists, sb);
-                sb.Append(" ");
+                foreach(List<int> staffVoices in voiceListsPerStaff)
+                {
+                    sb.Append(staffVoices.Count);
+                    sb.Append(", ");
+                }
+                sb.Length = sb.Length - 2;
             }
 
             return sb.ToString();
-        }
-        private static void AppendVoiceIndexListsToSB(List<List<int>> indexLists, StringBuilder sb)
-        {
-            StringBuilder appendage = new StringBuilder();
-            foreach(List<int> ints in indexLists)
-            {
-                appendage.Append(", ");
-                StringBuilder intsListSB = new StringBuilder();
-                foreach(int b in ints)
-                {
-                    intsListSB.Append(":");
-                    intsListSB.Append(b.ToString());
-                }
-                intsListSB.Remove(0, 1);
-                appendage.Append(intsListSB.ToString());
-            }
-            appendage.Remove(0, 2);
-            sb.Append(appendage);
         }
         private void EnableStaffDependentControls(bool enabled)
         {
@@ -1274,8 +1264,8 @@ namespace Moritz.Composer
                     case "minGapsBetweenSystems":
                         MinimumGapsBetweenSystemsTextBox.Text = r.Value;
                         break;
-                    case "voiceIndicesPerStaff":
-                        VoiceIndicesPerStaffTextBox.Text = r.Value;
+                    case "numberOfVoicesPerStaff":
+                        NumberOfVoicesPerStaffTextBox.Text = r.Value;
                         break;
                     case "clefsPerStaff":
                         ClefsPerStaffTextBox.Text = r.Value;
@@ -1413,7 +1403,7 @@ namespace Moritz.Composer
             w.WriteAttributeString("gap", GapPixelsComboBox.Text);
             w.WriteAttributeString("minGapsBetweenStaves", this.MinimumGapsBetweenStavesTextBox.Text);
             w.WriteAttributeString("minGapsBetweenSystems", MinimumGapsBetweenSystemsTextBox.Text);
-            w.WriteAttributeString("voiceIndicesPerStaff", VoiceIndicesPerStaffTextBox.Text);
+            w.WriteAttributeString("voiceIndicesPerStaff", NumberOfVoicesPerStaffTextBox.Text);
             w.WriteAttributeString("clefsPerStaff", ClefsPerStaffTextBox.Text);
             w.WriteAttributeString("stafflinesPerStaff", StafflinesPerStaffTextBox.Text);
             w.WriteAttributeString("staffGroups", StaffGroupsTextBox.Text);
@@ -1637,7 +1627,7 @@ namespace Moritz.Composer
         #region score creation
         CompositionAlgorithm _algorithm = null;
         private List<int> _outputMIDIChannels = null;
-        private List<List<int>> _voiceIndicesPerStaff = null; // always set in VoiceIndicesPerStaffTextBox_Leave (cannot be empty)
+        private List<List<int>> _voiceIndicesPerStaff = null; // always set in NumberOfVoicesPerStaffTextBox_Leave (cannot be empty)
         private int _numberOfStaves
         {
             get
@@ -1651,5 +1641,6 @@ namespace Moritz.Composer
         #endregion score creation
 
         #endregion private variables
+
     }
 }

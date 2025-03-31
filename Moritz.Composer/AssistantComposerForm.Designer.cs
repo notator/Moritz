@@ -55,7 +55,7 @@ namespace Moritz.Composer
 			this.VoiceIndicesPerStaffLabel = new System.Windows.Forms.Label();
 			this.StafflinesPerStaffLabel = new System.Windows.Forms.Label();
 			this.LongStaffNamesLabel = new System.Windows.Forms.Label();
-			this.VoiceIndicesPerStaffTextBox = new System.Windows.Forms.TextBox();
+			this.NumberOfVoicesPerStaffTextBox = new System.Windows.Forms.TextBox();
 			this.ClefsPerStaffLabel = new System.Windows.Forms.Label();
 			this.ClefsPerStaffHelpLabel = new System.Windows.Forms.Label();
 			this.StaffGroupsHelpLabel = new System.Windows.Forms.Label();
@@ -162,7 +162,7 @@ namespace Moritz.Composer
 			this.NotationGroupBox.Controls.Add(this.VoiceIndicesPerStaffLabel);
 			this.NotationGroupBox.Controls.Add(this.StafflinesPerStaffLabel);
 			this.NotationGroupBox.Controls.Add(this.LongStaffNamesLabel);
-			this.NotationGroupBox.Controls.Add(this.VoiceIndicesPerStaffTextBox);
+			this.NotationGroupBox.Controls.Add(this.NumberOfVoicesPerStaffTextBox);
 			this.NotationGroupBox.Controls.Add(this.ClefsPerStaffLabel);
 			this.NotationGroupBox.Controls.Add(this.ClefsPerStaffHelpLabel);
 			this.NotationGroupBox.Controls.Add(this.StaffGroupsHelpLabel);
@@ -387,15 +387,15 @@ namespace Moritz.Composer
 			this.LongStaffNamesLabel.TabIndex = 173;
 			this.LongStaffNamesLabel.Text = "long staff names";
 			// 
-			// VoiceIndicesPerStaffTextBox
+			// NumberOfVoicesPerStaffTextBox
 			// 
-			this.VoiceIndicesPerStaffTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.VoiceIndicesPerStaffTextBox.Location = new System.Drawing.Point(111, 177);
-			this.VoiceIndicesPerStaffTextBox.Name = "VoiceIndicesPerStaffTextBox";
-			this.VoiceIndicesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
-			this.VoiceIndicesPerStaffTextBox.TabIndex = 9;
-			this.VoiceIndicesPerStaffTextBox.TextChanged += new System.EventHandler(this.VoiceIndicesPerStaffTextBox_TextChanged);
-			this.VoiceIndicesPerStaffTextBox.Leave += new System.EventHandler(this.VoiceIndicesPerStaffTextBox_Leave);
+			this.NumberOfVoicesPerStaffTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.NumberOfVoicesPerStaffTextBox.Location = new System.Drawing.Point(111, 177);
+			this.NumberOfVoicesPerStaffTextBox.Name = "NumberOfVoicesPerStaffTextBox";
+			this.NumberOfVoicesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
+			this.NumberOfVoicesPerStaffTextBox.TabIndex = 9;
+			this.NumberOfVoicesPerStaffTextBox.TextChanged += new System.EventHandler(this.VoiceIndicesPerStaffTextBox_TextChanged);
+			this.NumberOfVoicesPerStaffTextBox.Leave += new System.EventHandler(this.NumberOfVoicesPerStaffTextBox_Leave);
 			// 
 			// ClefsPerStaffLabel
 			// 
@@ -875,7 +875,7 @@ namespace Moritz.Composer
         private System.Windows.Forms.TextBox ClefsPerStaffTextBox;
         private System.Windows.Forms.TextBox StaffGroupsTextBox;
         private System.Windows.Forms.Label VoiceIndicesPerStaffLabel;
-        private System.Windows.Forms.TextBox VoiceIndicesPerStaffTextBox;
+        private System.Windows.Forms.TextBox NumberOfVoicesPerStaffTextBox;
 		private System.Windows.Forms.Label VoiceIndicesPerStaffHelpLabel;
         private System.Windows.Forms.Button RevertEverythingButton;
         private System.Windows.Forms.Button ShowUncheckedFormsButton;
