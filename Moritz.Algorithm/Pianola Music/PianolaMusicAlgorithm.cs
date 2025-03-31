@@ -1,6 +1,7 @@
 ﻿using Krystals5ObjectLibrary;
 
 using Moritz.Spec;
+using Moritz.Symbols;
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,9 +19,12 @@ namespace Moritz.Algorithm.PianolaMusic
         public override int NumberOfMidiChannels { get { return 6; } }
         public override int NumberOfBars { get { return 8; } }
 
-        // The krystals argument is not used.
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals)
+        public override List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals)
         {
+            // The pageFormat and krystals arguments are not used.
+            _ = pageFormat; // is used by the functions used for inserting clefs (see base class: CompositionAlgorithm.cs)
+            _ = krystals;
+
             List<Trk> tracks1and6 = GetTracks1and6();
             List<Trk> tracks2and5 = GetTracks2and5();
             List<Trk> tracks3and4 = GetTracks3and4();

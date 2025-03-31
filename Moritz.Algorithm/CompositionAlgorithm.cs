@@ -121,7 +121,7 @@ namespace Moritz.Algorithm
         /// Algorithms simply set the InputVoice references to OutputVoices (voiceIDs) by using their index
         /// in the default bar layout being created.
         /// </summary>
-        public abstract List<Bar> DoAlgorithm(List<Krystal> krystals);
+        public abstract List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals);
 
         /// <summary>
         /// To insert clef changes into a score's Bars:
@@ -145,7 +145,7 @@ namespace Moritz.Algorithm
         /// <example>
         /// Example:
         /// {
-        ///     List<Bar> bars = GetBars(singleBar, barlineMsPositions);
+        ///     List<Bar> bars = GetBars(temporalStructure, barlineMsPositions);
         ///     
         ///     var clefChangesPerBarPerStaff = GetEmptyClefChangesPerBarPerStaff(bars, PageFormat.VoiceIndicesPerStaff);
         ///     
@@ -183,7 +183,7 @@ namespace Moritz.Algorithm
             return rval;
         }
 
-        private void InsertClefChangesInBars(List<Bar> bars, List<List<int>> voiceIndicesPerStaff, List<List<SortedDictionary<int, string>>> clefChangesPerBarPerStaff)
+        protected void InsertClefChangesInBars(List<Bar> bars, List<List<int>> voiceIndicesPerStaff, List<List<SortedDictionary<int, string>>> clefChangesPerBarPerStaff)
         {
             Debug.Assert(bars.Count == clefChangesPerBarPerStaff.Count);
 

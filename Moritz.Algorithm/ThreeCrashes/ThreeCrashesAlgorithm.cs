@@ -1,5 +1,6 @@
 ﻿using Krystals5ObjectLibrary;
 using Moritz.Spec;
+using Moritz.Symbols;
 
 using System;
 using System.Collections.Generic;
@@ -130,9 +131,12 @@ namespace Moritz.Algorithm.ThreeCrashes
 
         /****************************************************************************************/
 
-        // The krystals argument is not used.
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals)
+        public override List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals)
         {
+            // The pageFormat and krystals arguments are not used.
+            _ = pageFormat; // is used by the functions used for inserting clefs (see base class: CompositionAlgorithm.cs)
+            _ = krystals;
+
             ///*********************************************/
             List<Trk> crashATrks = GetElevenCrashTrks(crashAWagons, 0); // angular position in range [0..10]
             List<Trk> crashBTrks = GetElevenCrashTrks(crashBWagons, 3); // angular position in range [0..10]	

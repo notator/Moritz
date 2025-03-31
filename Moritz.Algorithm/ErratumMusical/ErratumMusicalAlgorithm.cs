@@ -2,6 +2,7 @@
 
 using Moritz.Globals;
 using Moritz.Spec;
+using Moritz.Symbols;
 
 using System;
 using System.Collections.Generic;
@@ -103,10 +104,13 @@ namespace Moritz.Algorithm.ErratumMusical
               70, 71, 72, 75, 74, 76, 78, 79, 80, 77,
               82, 81, 84, 85, 83 }
         };
-
-        // The krystals argument is not used.
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals)
+        
+        public override List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals)
         {
+            // The pageFormat and krystals arguments are not used.
+            _ = pageFormat; // is used by the functions used for inserting clefs (see base class: CompositionAlgorithm.cs)
+            _ = krystals;
+
             List<int> endBarlinePositions;
             List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
             List<ChannelDef> channelDefs = new List<ChannelDef>() { new ChannelDef(trks) };

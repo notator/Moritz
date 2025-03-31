@@ -24,7 +24,7 @@ namespace Moritz.Composer
         /// </summary>
         protected bool CreateScore(List<Krystal> krystals)
         {
-            List<Bar> bars = _algorithm.DoAlgorithm(krystals);
+            List<Bar> bars = _algorithm.DoAlgorithm(_pageFormat, krystals);
 
             CheckBars(bars);
 

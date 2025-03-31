@@ -2,6 +2,7 @@
 
 using Moritz.Globals;
 using Moritz.Spec;
+using Moritz.Symbols;
 
 using System;
 using System.Collections.Generic;
@@ -23,9 +24,12 @@ namespace Moritz.Algorithm.Study1
         public override int NumberOfMidiChannels { get { return 1; } }
         public override int NumberOfBars { get { return 68; } }
 
-        // The krystals argument is not used.
-        public override List<Bar> DoAlgorithm(List<Krystal> krystals)
+        public override List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals)
         {
+            // The pageFormat and krystals arguments are not used.
+            _ = pageFormat; // is used by the functions used for inserting clefs (see base class: CompositionAlgorithm.cs)
+            _ = krystals;
+
             List<int> trackChordNumbers = GetTrackChordNumbers();
             List<int> trackRootPitches = GetTrackRootPitches();
 
@@ -58,7 +62,21 @@ namespace Moritz.Algorithm.Study1
                 {
                     trk.SetPatch0InTheFirstChord();
                 }
-            }            
+            }
+
+            var clefChangesPerBarPerStaff = GetEmptyClefChangesPerBarPerStaff(bars, pageFormat.VoiceIndicesPerStaff);
+            
+            var barIndex = 3;
+            var staffIndex = 2;
+            SortedDictionary<int, string> dict = clefChangesPerBarPerStaff[barIndex][staffIndex];
+            
+            dict.Add(9, "b3");
+            dict.Add(8, "b2");
+            dict.Add(6, "b");
+            dict.Add(4, "t2");
+            dict.Add(2, "t");
+
+            InsertClefChangesInBars(bars, pageFormat.VoiceIndicesPerStaff, clefChangesPerBarPerStaff);
 
             return bars;  // The Trks in these bars dont contain ClefDefs.
         }
