@@ -91,11 +91,7 @@ namespace Moritz.Composer
                         if(iuds[iudIndex] is ClefDef midStaffClefDef)
                         {
                             int result = String.Compare(currentClefs[voiceIndex], midStaffClefDef.ClefType);
-                            if(result != 0)
-                            {
-                                throw new ApplicationException($"Redundant clef change in voice index {voiceIndex}, position index {iudIndex}");
-                            }
-                            
+                            M.Assert(result != 0, $"Redundant clef change in voice index {voiceIndex}, position index {iudIndex}");                            
                             currentClefs[voiceIndex] = midStaffClefDef.ClefType;
                         }
                     }

@@ -78,6 +78,7 @@ namespace Moritz.Spec
         {
             MidiChordDef rval = new MidiChordDef(this._pitches, this.Velocities, this.MsDuration, this.HasChordOff)
             {
+                MsPositionReFirstUD = this.MsPositionReFirstUD,
                 MsDurationToNextBarline = this.MsDurationToNextBarline,
                 BeamContinues = this.BeamContinues,
                 Lyric = (this.Lyric == null) ? null : String.Copy(this.Lyric),
@@ -213,7 +214,7 @@ namespace Moritz.Spec
             w.WriteEndElement(); // end of noteOns
         }
 
-        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={_pitches[0]} ";
+        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} MsPositionReFirstUD={MsPositionReFirstUD} BasePitch={_pitches[0]} ";
 
         /// <summary>
         /// Checks that pitches, velocities and EnvelopeTypeDef values are in the allowed ranges.

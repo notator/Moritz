@@ -86,6 +86,11 @@ namespace Moritz.Spec
                     poppedTrk.UniqueDefs.Add(originalUids[0]);
                     originalUids.RemoveAt(0);
                 }
+                var msDurationOffset = originalUids[0].MsPositionReFirstUD;
+                foreach(var iud in originalUids)
+                {
+                    iud.MsPositionReFirstUD -= msDurationOffset;
+                }
                 poppedTrks.Add(poppedTrk);
                 remainingTrks.Add(new Trk(originalUids));
             }

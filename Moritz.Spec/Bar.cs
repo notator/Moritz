@@ -30,7 +30,7 @@ namespace Moritz.Spec
             #region conditions
             M.Assert(absMsPosition >= 0);
             M.Assert(channelDefs != null && channelDefs.Count > 0 && channelDefs.Count <= 16);
-            M.Assert(ChannelDefs[0].Trks != null && ChannelDefs[0].Trks.Count > 0);
+            M.Assert(channelDefs[0].Trks != null && channelDefs[0].Trks.Count > 0);
             foreach(var channelDef in channelDefs)
             {
                 foreach(var trk in channelDef.Trks)

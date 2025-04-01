@@ -84,7 +84,6 @@ namespace Moritz.Algorithm.Study1
             dict.Add(8, "b2");
             dict.Add(6, "b");
             dict.Add(4, "t2");
-            dict.Add(2, "t");
 
             InsertClefChangesInBars(bars, voiceIndicesPerStaff, clefChangesPerBarPerStaff);
         }

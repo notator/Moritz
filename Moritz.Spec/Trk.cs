@@ -126,6 +126,12 @@ namespace Moritz.Spec
                 }
             }
 
+            var msPositionOffset = remainingTrk.UniqueDefs[0].MsPositionReFirstUD;
+            foreach(var iud in  remainingTrk.UniqueDefs)
+            {
+                iud.MsPositionReFirstUD -= msPositionOffset;
+            }
+
             return new Tuple<Trk, Trk>(poppedTrk, remainingTrk);
         }
 
