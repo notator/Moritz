@@ -1,9 +1,7 @@
 ﻿using Krystals5ObjectLibrary;
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace Moritz.Spec
 {
@@ -276,6 +274,9 @@ namespace Moritz.Spec
         /// In each ChannelDef:
         ///     1. All Trks have the same number of DurationDefs
         ///     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
+        /// Performance consistency:
+        /// (A "performance" consists of all the trks at the same index within their ChannelDef.)
+        /// The overall sequence of events (DurationDefs) must be identical in all performances.
         /// </summary>
         public virtual void AssertConsistency()
         {
@@ -284,37 +285,39 @@ namespace Moritz.Spec
             var trksCount = ChannelDefs[0].Trks.Count;
             Debug.Assert(trksCount > 0);
 
+            int nTrks = ChannelDefs[0].Trks.Count;
+            Debug.Assert(nTrks > 0);
+
+            CheckChannelDefConsistency(nTrks);
+
+            CheckPerformanceConsistency(nTrks);
+        }
+
+        private void CheckChannelDefConsistency(int nTrks)
+        {
             foreach(var channelDef in ChannelDefs)
             {
-                Debug.Assert(channelDef.Trks.Count == trksCount);
+                Debug.Assert(channelDef.Trks.Count == nTrks);
                 Debug.Assert(channelDef.MsPositionReContainer == 0);
                 foreach(var trk in channelDef.Trks)
                 {
                     trk.AssertConsistency();
                 }
-            }
 
-            int nTrks = ChannelDefs[0].Trks.Count;
-            Debug.Assert(nTrks > 0);
-
-            // All Trks having the same index in any ChannelDef in this Bar have the same msDuration.
-            for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
-            {
-                int barMsDuration = ChannelDefs[0].Trks[trkIndex].MsDuration;
-                for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
+                // All Trks having the same index in any ChannelDef in this Bar have the same msDuration.
+                for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
                 {
-                    var channelDef = ChannelDefs[channelDefIndex];
-                    Debug.Assert(channelDef.Trks[trkIndex].MsDuration == barMsDuration);
+                    int barMsDuration = ChannelDefs[0].Trks[trkIndex].MsDuration;
+                    for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
+                    {
+                        var cDef = ChannelDefs[channelDefIndex];
+                        Debug.Assert(cDef.Trks[trkIndex].MsDuration == barMsDuration);
+                    }
                 }
-            }
 
-            // In each ChannelDef:
-            //     1. All Trks have the same number of DurationDefs
-            //     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
-            foreach(var channelDef in ChannelDefs)
-            {
-                Debug.Assert(channelDef.Trks.Count == nTrks);
-                Debug.Assert(channelDef.MsPositionReContainer == 0);
+                // In each ChannelDef:
+                //     1. All Trks have the same number of DurationDefs
+                //     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
                 List<DurationDef> trk0DurationDefs = channelDef.Trks[0].DurationDefs;
                 for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
                 {
@@ -326,6 +329,34 @@ namespace Moritz.Spec
                         DurationDef trkDD = trkDDs[ddIndex];
                         Debug.Assert((dd0 is MidiChordDef && trkDD is MidiChordDef) | (dd0 is RestDef && trkDD is RestDef));
                     }
+                }
+            }
+        }
+
+        private void CheckPerformanceConsistency(int nTrks)
+        {
+            /// A "performance" consists of all the trks at the same index within their ChannelDef.
+            /// The overall sequence of events (DurationDefs) must be identical in all performances.
+            List<List<DurationDef>> performances = new List<List<DurationDef>>();
+            for(var trkIndex = 0; trkIndex < nTrks; ++trkIndex)
+            {
+                List<DurationDef> performance = new List<DurationDef>();
+                foreach(var channelDef in ChannelDefs)
+                {
+                    performance.AddRange(channelDef.Trks[trkIndex].DurationDefs);
+                }
+                performance.Sort((x, y) => x.MsPositionReFirstUD.CompareTo(y.MsPositionReFirstUD));
+                performances.Add(performance);
+            }
+            int nDurationDefs = performances[0].Count;
+            for(int pIndex = 1; pIndex < nTrks; ++pIndex)
+            {
+                Debug.Assert(performances[pIndex - 1].Count == nDurationDefs);
+                for(int i = 0; i < nDurationDefs; ++i)
+                {
+                    DurationDef dd0 = performances[pIndex - 1][i];
+                    DurationDef dd1 = performances[pIndex][i];
+                    Debug.Assert((dd0 is MidiChordDef && dd1 is MidiChordDef) | (dd0 is RestDef && dd1 is RestDef));
                 }
             }
         }
