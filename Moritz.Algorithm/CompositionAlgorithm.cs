@@ -13,13 +13,13 @@ namespace Moritz.Algorithm
 {
     /// <summary>
     /// A CompositionAlgorithm is special to a particular composition.
-    /// When called, the DoAlgorithm() function returns a list of ChannelDef lists,
-    /// whereby each contained ChannelDef list is the definition of a bar (a bar is
+    /// When called, the DoAlgorithm() function returns a list of VoiceDef lists,
+    /// whereby each contained VoiceDef list is the definition of a bar (a bar is
     /// a place where a system can be broken).
     /// Algorithms don't control the page format, how many bars per system there
     /// are, or the shapes of the symbols. Those things are set for a particular
     /// score in an .mkss file using the Assistant Composer's main form.
-    /// The ChannelDefs returned from DoAlgorithm() are converted to real Voices
+    /// The VoiceDefs returned from DoAlgorithm() are converted to real Voices
     /// (containing real NoteObjects) later, using the options set in an .mkss file. 
     /// </summary>
     public abstract class CompositionAlgorithm
@@ -31,7 +31,7 @@ namespace Moritz.Algorithm
         protected void CheckParameters()
         {
             #region check channels
-            int channelCount = NumberOfMidiChannels;
+            int channelCount = NumberOfVoices;
             if(channelCount < 1)
                 throw new ApplicationException("CompositionAlgorithm: There must be at least one output voice!");
             if(channelCount > 16)
@@ -73,7 +73,7 @@ namespace Moritz.Algorithm
         /// Each Voice contains a list of Trk. Each Trk contains a different interpretation (=performance) of the voice's graphics.
         /// Each Voice can contain more than one (performance) track (Trk), all such tracks have the same midi channel.
         /// </summary>
-        public abstract int NumberOfMidiChannels { get; }
+        public abstract int NumberOfVoices { get; }
 
         /// <summary>
         /// Returns the number of bars (=bar definitions) created by the algorithm.
@@ -85,47 +85,26 @@ namespace Moritz.Algorithm
 
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
-        /// This function returns a sequence of abstract bar definitions, devoid of layout information.
-        /// Each bar definition is a list of voice definitions (ChannelDefs), The ChannelDefs are conceptually
-        /// in the default top to bottom order of the voices in a final score. The actual order in which
-        /// the voices are eventually printed is controlled using the Assistant Composer's layout options,
-        /// Each bar definition in the sequence returned by this function contains the same number of
-        /// ChannelDefs. ChannelDefs at the same index in each bar are continuations of the same overall voice
-        /// definition, and may be concatenated to create multiple bars on a staff.
-        /// Each ChannelDef returned by this function contains a list of UniqueDef objects (ChannelDef.UniqueDefs).
-        /// When the Assistant Composer creates a real score, each of these UniqueDef objects is converted to
-        /// a real NoteObject containing layout information (by a Notator), and the NoteObject then added to a
-        /// concrete Voice.NoteObjects list. See Notator.AddSymbolsToSystems().
-        /// ACHTUNG:
-        /// The top (=first) ChannelDef in each bar definition must be a TrkDef.
-        /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
-        /// The chord definitions in TrkDef.UniqueDefs must be MidiChordDefs.
-        /// The chord definitions in InputVoice.UniqueDefs must be InputChordDefs.
-        /// Algorithms declare the number of output and input voices they construct by defining the
-        /// MidiChannelPerOutputVoice and NumberOfInputVoices properties (see above).
-        /// For convenience in the Assistant Composer, the number of bars is also returned (in the
-        /// NumberOfBars property).
-        /// If one or more InputVoices are defined, then an TrkOptions object must be created, given
-        /// default values, and assigned to this.TrkOptions (see below).
-        /// 
-        /// A note about voiceIDs and midi channels in scores:
-        /// The Assistant Composer allocates the voiceIDs saved in the score automatically when the score is 
-        /// created. Each VoiceID is its index in the original bars created by the algorithm. (The top-bottom 
-        /// order of these voices in the final score is set using the Assistant Composer's layout options.)
-        /// An algorithm associates each voice (voiceID) with a particular midi channel by setting the
-        /// MidiChannelPerOutputVoice property in the top to bottom order of the voices in the bars being
-        /// created. This rigmarole allows algorithms to stipulate the standard midi percussion channel (channel
-        /// index 9).
-        /// An OutputVoice's midiChannel, voiceID (and masterVolume) are written only to each voice in the first
-        /// system in the score. And the voiceID is only written if the score actually contains InputVoices.
-        /// (VoiceIDs are only needed in score because these values are used as references by InputVoices.)
-        /// Algorithms simply set the InputVoice references to OutputVoices (voiceIDs) by using their index
-        /// in the default bar layout being created.
+        /// This function returns a sequence of abstract bar definitions, devoid of layout information,
+        /// but including mid-staff clef changes.
+        /// Each bar definition is a list of voice definitions (VoiceDefs), The VoiceDefs are in top to
+        /// bottom order of the voices in a final score.
+        /// Each bar definition contains the same number of VoiceDefs. VoiceDefs at the same index in
+        /// each bar are continuations of the same overall voice definition, and may be concatenated
+        /// to create multiple bars on a staff.
+        /// Each VoiceDef contains a list of Trk objects, each of which contains a list of IUniqueDef objects.
+        /// Trks at the same index in a particular VoiceDef make up a particular performance of that Voice.
+        /// When the Assistant Composer creates a real score, each of the UniqueDef objects in the VoiceDef's
+        /// first Trk is converted to a real NoteObject containing layout information (by a Notator), and
+        /// the NoteObject is then added to a concrete Voice.NoteObjects list. See Notator.AddSymbolsToSystems().
+        /// Notes:
+        /// Each Bar must contain at least one VoiceDef, and each VoiceDef must contain at least one Trk.
+        /// Each voice's MIDI channel is its index from top to bottom in the score's systems.
         /// </summary>
         public abstract List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals);
 
         /// <summary>
-        /// Inserts ClefDefs at arbitrary positions in the top ChannelDef.Trks[0].UniqueDefs in each Staff.
+        /// Inserts ClefDefs at arbitrary positions in the top VoiceDef.Trks[0].UniqueDefs in each Staff.
         /// The main clefs at the beginnings of bars are added automatically later, taking these clef changes
         /// into account.
         /// Call this function as follows:
@@ -165,7 +144,7 @@ namespace Moritz.Algorithm
         ///     4. call InsertClefChangesInBars(bars, clefChanges)
         /// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
         /// the existing IUniqueDefs before which the clef will be inserted.
-        /// The SortedDictionaries should not contain the initial clefs per channelDef - those will be included
+        /// The SortedDictionaries should not contain the initial clefs per voiceDef - those will be included
         /// automatically.
         /// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
         /// cannot be inserted in front of them.
@@ -226,7 +205,7 @@ namespace Moritz.Algorithm
                 for(var staffIndex = 0; staffIndex < voiceIndicesPerStaff.Count; ++staffIndex)
                 {
                     var midiIndex = voiceIndicesPerStaff[staffIndex][0];
-                    var trk = bar.ChannelDefs[midiIndex].Trks[0];
+                    var trk = bar.VoiceDefs[midiIndex].Trks[0];
                     SortedDictionary<int, string> clefDict = clefChangesPerBarPerStaff[barIndex][staffIndex];
                     if(clefDict.Count > 0)
                     {
@@ -246,13 +225,13 @@ namespace Moritz.Algorithm
         /// <summary>
         /// Lyrics can simply be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
         /// provides the possibility of adding them all in one place.
-        /// This function returns null or a SortedDictionary per ChannelDef in each bar.
+        /// This function returns null or a SortedDictionary per VoiceDef in each bar.
         /// The SortedDictionary contains the index of the MidiChordDef or InputChordDef in the bar to which the associated
         /// lyric string will be attached. The index is of MidiChordDefs or InputChordDefs only, beginning with 0 for
         /// the first MidiChordDef or InptChordDef in the bar.
         /// Lyrics that are attached to top voices on a staff will, like dynamics, be automatically placed above the staff.
         /// </summary>
-        /// <returns>null or a SortedDictionary per ChannelDef per bar</returns>
+        /// <returns>null or a SortedDictionary per VoiceDef per bar</returns>
         /// <example>
         /// Example for Study3Sketch1Algorithm
         /// var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
@@ -280,12 +259,12 @@ namespace Moritz.Algorithm
             var rval = new List<List<SortedDictionary<int, string>>>();
             for(int barIndex = 0; barIndex < nBars; ++barIndex)
             {
-                var channelDefs = new List<SortedDictionary<int, string>>();
-                rval.Add(channelDefs);
+                var voiceDefs = new List<SortedDictionary<int, string>>();
+                rval.Add(voiceDefs);
                 for(int voiceIndex = 0; voiceIndex < nVoicesPerBar; ++voiceIndex)
                 {
                     var clefDict = new SortedDictionary<int, string>();
-                    channelDefs.Add(clefDict);
+                    voiceDefs.Add(clefDict);
                 }
             }
 
@@ -369,7 +348,7 @@ namespace Moritz.Algorithm
 
         /// <summary>
         /// Returns nBars barlineMsPositions.
-        /// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef in the top Trk of a ChannelDef.
+        /// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef in the top Trk of a VoiceDef.
         /// The returned list contains no duplicates (A M.Assertion fails otherwise).
         /// </summary>
         /// <returns></returns>
@@ -407,9 +386,9 @@ namespace Moritz.Algorithm
         protected void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
         {
             MidiChordDef midiChordDef = null;
-            foreach(ChannelDef channelDef in bar1.ChannelDefs)
+            foreach(VoiceDef voiceDef in bar1.VoiceDefs)
             {
-                foreach(var trk in channelDef.Trks)
+                foreach(var trk in voiceDef.Trks)
                 {
                     foreach(IUniqueDef iUniqueDef in trk.UniqueDefs)
                     {

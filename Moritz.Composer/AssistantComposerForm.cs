@@ -49,7 +49,7 @@ namespace Moritz.Composer
 
             if(NumberOfVoicesPerStaffTextBox.Text == "")
             {
-                SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfMidiChannels);
+                SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfVoices);
             }
         }
         #region called from ctor
@@ -1559,7 +1559,7 @@ namespace Moritz.Composer
 
             pageFormat.VoiceIndicesPerStaff = _voiceIndicesPerStaff; // one list of (max 2) midi channel indices per staff
             pageFormat.ClefPerStaff = M.StringToStringList(this.ClefsPerStaffTextBox.Text, ',');
-            pageFormat.InitialClefPerMIDIChannel = GetClefPerVoice(pageFormat);
+            pageFormat.InitialClefPerVoice = GetClefPerVoice(pageFormat);
 
             pageFormat.StafflinesPerStaff = M.StringToIntList(this.StafflinesPerStaffTextBox.Text, ',');
             pageFormat.StaffGroups = M.StringToIntList(this.StaffGroupsTextBox.Text, ',');
@@ -1570,8 +1570,8 @@ namespace Moritz.Composer
         }
 
         /// <summary>
-        /// Returns a clef for each ChannelDef (=MIDI Channel) in the system.
-        /// The pageFormat.ClefsList has one clef per staff. Each staff can have either one or two ChannelDefs. 
+        /// Returns a clef for each VoiceDef (=MIDI Channel) in the system.
+        /// The pageFormat.ClefsList has one clef per staff. Each staff can have either one or two VoiceDefs. 
         /// </summary>
         public List<string> GetClefPerVoice(PageFormat pageFormat)
         {

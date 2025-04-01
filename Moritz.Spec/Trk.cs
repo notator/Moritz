@@ -13,7 +13,7 @@ namespace Moritz.Spec
     /// <summary>
 	/// In Seqs, Trks can contain any combination of RestDef and MidiChordDef.
     /// In Blocks, Trks can additionally contain CautionaryChordDefs and ClefDefs.
-    /// Each ChannelDef has a list of Trk objects, each of which has the same midi channel.
+    /// Each VoiceDef has a list of Trk objects, each of which has the same midi channel.
     /// (A Voice has a single, defined midi channel)
     /// <para>Trks are IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
@@ -182,7 +182,7 @@ namespace Moritz.Spec
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
         private List<IUniqueDef> _uniqueDefs = null;
 
-        #region moved here from ChannelDef
+        #region moved here from VoiceDef
 
         /// <summary>
         /// The position of the end of the last UniqueDef in the list re the first IUniqueDef in the list, or 0 if the list is empty.
@@ -218,7 +218,7 @@ namespace Moritz.Spec
         public int Count { get { return _uniqueDefs.Count; } }
 
         #region  miscellaneous
-        internal void SetToRange(ChannelDef argVoiceDef, int startMsPosReSeq, int endMsPosReSeq)
+        internal void SetToRange(VoiceDef argVoiceDef, int startMsPosReSeq, int endMsPosReSeq)
         {
             _uniqueDefs.Clear();
             foreach(IUniqueDef iud in argVoiceDef)
@@ -252,10 +252,10 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Rests dont have lyrics, so their index in the ChannelDef can't be shown as a lyric.
+        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric.
         /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
         /// </summary>
-        /// <param name="channelDef"></param>
+        /// <param name="voiceDef"></param>
         public virtual void SetLyricsToIndex()
         {
             for(int index = 0; index < _uniqueDefs.Count; ++index)
@@ -357,7 +357,7 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Transpose the whole ChannelDef up by the number of semitones given in the argument.
+        /// Transpose the whole VoiceDef up by the number of semitones given in the argument.
         /// </summary>
         /// <param name="interval"></param>
         public void Transpose(int interval)
@@ -365,7 +365,7 @@ namespace Moritz.Spec
             Transpose(0, _uniqueDefs.Count, interval);
         }
         /// <summary>
-        /// Transposes all the MidiHeadSymbols in this ChannelDef by the number of semitones in the argument
+        /// Transposes all the MidiHeadSymbols in this VoiceDef by the number of semitones in the argument
         /// without changing the sound. Negative arguments transpose downwards.
         /// If the resulting midiHeadSymbol would be less than 0 or greater than 127,
         /// it is silently coerced to 0 or 127 respectively.
@@ -471,7 +471,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// This function __moves__ the channelDef's UniqueDefs to the end of this channelDef's UniqueDefs _without_cloning_them_ (c.f. Trk.ConcatCloneAt(...) ).
+        /// This function __moves__ the voiceDef's UniqueDefs to the end of this voiceDef's UniqueDefs _without_cloning_them_ (c.f. Trk.ConcatCloneAt(...) ).
         /// Rests are automatically agglommerated.
         /// </summary>
         public void AddRange(Trk trk)
@@ -601,7 +601,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns the index of the IUniqueDef which starts at or is otherwise current at msPosition.
         /// If msPosition is the EndMsPosition, the index of the final IUniqueDef + 1 (=Count) is returned.
-        /// If the ChannelDef does not span msPosition, -1 (=error) is returned.
+        /// If the VoiceDef does not span msPosition, -1 (=error) is returned.
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
@@ -621,10 +621,10 @@ namespace Moritz.Spec
         }
         #endregion list functions
 
-        #region ChannelDef duration changers
+        #region VoiceDef duration changers
 
         /// <summary>
-        /// Removes all the rests in this ChannelDef
+        /// Removes all the rests in this VoiceDef
         /// </summary>
         public void RemoveRests()
         {
@@ -633,7 +633,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each chord and rest from beginIndex to endIndex (exclusive) by factor.
         /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this ChannelDef changes accordingly.
+        /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
         public void AdjustMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
@@ -642,7 +642,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each chord and rest in the UniqueDefs list by factor.
         /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this ChannelDef changes accordingly.
+        /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
         public void AdjustMsDurations(double factor, int minThreshold = 100)
         {
@@ -651,7 +651,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each rest from beginIndex to endIndex (exclusive) by factor.
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this ChannelDef changes accordingly.
+        /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
         public void AdjustRestMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
@@ -660,7 +660,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each rest in the UniqueDefs list by factor.
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this ChannelDef changes accordingly.
+        /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
         public void AdjustRestMsDurations(double factor, int minThreshold = 100)
         {
@@ -670,7 +670,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each T from beginIndex to endIndex (exclusive) by factor.
         /// If a MsDuration becomes less than minThreshold, the T (chord or rest) is removed.
-        /// The total duration of this ChannelDef changes accordingly.
+        /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
         protected void AdjustMsDurations<T>(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
@@ -741,7 +741,7 @@ namespace Moritz.Spec
             AssertConsistency();
         }
 
-        #endregion ChannelDef duration changers
+        #endregion VoiceDef duration changers
 
         internal void RemoveDuplicateClefDefs()
         {
@@ -805,7 +805,7 @@ namespace Moritz.Spec
         }
 
         #endregion Count changers
-        #endregion moved here from ChannelDef
+        #endregion moved here from VoiceDef
 
         #region Add, Remove, Insert, Replace objects in the Trk
 
@@ -1376,7 +1376,7 @@ namespace Moritz.Spec
         {
             List<IUniqueDef> lmdds = _uniqueDefs;
             int count = lmdds.Count;
-            string msg = "\nError in ChannelDef.cs,\nfunction AlignDefMsPosition()\n\n";
+            string msg = "\nError in VoiceDef.cs,\nfunction AlignDefMsPosition()\n\n";
             M.Assert((anchor1Index < indexToAlign && anchor2Index > indexToAlign),
                     msg + "Index out of order.\n" +
                     "\nanchor1Index=" + anchor1Index.ToString() +
@@ -1693,7 +1693,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Indexer. Allows individual UniqueDefs to be accessed using array notation on the Trk.
         /// The setter automatically resets the MsPositions of all UniqueDefs in the list.
-        /// e.g. iumdd = channelDef[3].
+        /// e.g. iumdd = voiceDef[3].
         /// </summary>
         public IUniqueDef this[int i]
         {
@@ -1765,7 +1765,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
-        /// This does not change the ChannelDef's MsPosition, but does affect its EndMsPosition.
+        /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
         /// See also EndMsPosition.set.
         /// </summary>
         public int MsDuration

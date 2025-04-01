@@ -18,7 +18,7 @@ namespace Moritz.Algorithm.ErratumMusical
             CheckParameters();
         }
 
-        public override int NumberOfMidiChannels { get { return 1; } }
+        public override int NumberOfVoices { get { return 1; } }
         public override int NumberOfBars { get { return 8; } }
 
         private static IReadOnlyList<IReadOnlyList<int>> erratumMusicalGraphPitches = new List<List<int>>()
@@ -113,11 +113,11 @@ namespace Moritz.Algorithm.ErratumMusical
 
             List<int> endBarlinePositions;
             List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
-            List<ChannelDef> channelDefs = new List<ChannelDef>() { new ChannelDef(trks) };
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() { new VoiceDef(trks) };
 
-            M.Assert(channelDefs.Count == NumberOfMidiChannels);
+            M.Assert(voiceDefs.Count == NumberOfVoices);
 
-            TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
 
             temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 

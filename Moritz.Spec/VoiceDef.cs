@@ -11,10 +11,10 @@ using System.Diagnostics;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// <para>ChannelDef classes are IEnumerable (foreach loops can be used).</para>
+    /// <para>VoiceDef classes are IEnumerable (foreach loops can be used).</para>
     /// <para>They are also indexable (Trk trk = this[index])</para>
     /// </summary>
-    public class ChannelDef : IEnumerable
+    public class VoiceDef : IEnumerable
     {
         #region constructorss
         /// <summary>
@@ -22,7 +22,7 @@ namespace Moritz.Spec
         /// but they can have different durations and MIDI definitions 
         /// </summary>
         /// <param name="trks"></param>
-        public ChannelDef(List<Trk> trks)
+        public VoiceDef(List<Trk> trks)
         {
             #region conditions
             // The Trks must have the same number and types of contained UniqueDefs
@@ -54,17 +54,17 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns two ChannelDefs (each has the same channel index)
+        /// Returns two VoiceDefs (each has the same index)
         /// Item1.Trks[0] contains the IUniqueDefs that begin within the poppedMsDuration.
-        /// Item2.Trks[0] contains the remaining IUniqueDefs from the original channelDef.Trks.
+        /// Item2.Trks[0] contains the remaining IUniqueDefs from the original voiceDef.Trks.
         /// The remaining Trks in Item1 and Item2 are parallel IUniqueDefs (that can have other durations).
-        /// The popped IUniqueDefs are removed from the current channelDef before returning it as Item2.
+        /// The popped IUniqueDefs are removed from the current voiceDef before returning it as Item2.
         /// MidiRestDefs and MidiChordDefs are split as necessary to fit the required Trk[0] duration.
         /// </summary>
-        /// <param name="channelDef"></param>
+        /// <param name="voiceDef"></param>
         /// <param name="poppedBarMsDuration"></param>
         /// <returns></returns>
-        public Tuple<ChannelDef, ChannelDef> PopChannelDef(int poppedMsDuration)
+        public Tuple<VoiceDef, VoiceDef> PopVoiceDef(int poppedMsDuration)
         {
             Tuple<Trk, Trk> trks = Trks[0].PopTrk(poppedMsDuration);
 
@@ -75,12 +75,12 @@ namespace Moritz.Spec
             List<Trk> remainingTrks = new List<Trk> { remainingTrk0 };
 
             int nUniqueDefs = poppedTrk0.UniqueDefs.Count;
-            List<Trk> channelTrks = Trks;
+            List<Trk> voiceTrks = Trks;
 
-            for(int trkIndex = 1; trkIndex < channelTrks.Count; ++trkIndex)
+            for(int trkIndex = 1; trkIndex < voiceTrks.Count; ++trkIndex)
             {
                 Trk poppedTrk = new Trk();
-                List<IUniqueDef> originalUids = channelTrks[trkIndex].UniqueDefs;
+                List<IUniqueDef> originalUids = voiceTrks[trkIndex].UniqueDefs;
                 for(int uidIndex = 0; uidIndex < nUniqueDefs; ++uidIndex)
                 {
                     poppedTrk.UniqueDefs.Add(originalUids[0]);
@@ -95,10 +95,10 @@ namespace Moritz.Spec
                 remainingTrks.Add(new Trk(originalUids));
             }
 
-            ChannelDef poppedChannelDef = new ChannelDef(poppedTrks);
-            ChannelDef remainingChannelDef = new ChannelDef(remainingTrks);
+            VoiceDef poppedVoiceDef = new VoiceDef(poppedTrks);
+            VoiceDef remainingVoiceDef = new VoiceDef(remainingTrks);
 
-            return new Tuple<ChannelDef, ChannelDef>(poppedChannelDef, remainingChannelDef);
+            return new Tuple<VoiceDef, VoiceDef>(poppedVoiceDef, remainingVoiceDef);
         }
 
         #endregion constructors
@@ -117,11 +117,11 @@ namespace Moritz.Spec
         /// <para>If a ClefDef is defined directly before a rest, the resulting SmallClef will be placed before the
         /// following Chord or the bar's end barline.
         /// </para>
-        /// <para>If the index is equal to or greater than the number of objects in the channelDef, the ClefDef will be
+        /// <para>If the index is equal to or greater than the number of objects in the voiceDef, the ClefDef will be
         /// placed before the final barline.
         /// </para>
         /// <para>
-        /// When changing clefs more than once in the same ChannelDef, it is easier to get the indices right if
+        /// When changing clefs more than once in the same VoiceDef, it is easier to get the indices right if
         /// they are added backwards.
         /// </para>
         /// </summary>
@@ -247,7 +247,7 @@ namespace Moritz.Spec
         public Bar Container = null;
 
         /// <summary>
-        /// The msPosition of the first note or rest in the ChannelDef re the start of the containing Seq or Bar.
+        /// The msPosition of the first note or rest in the VoiceDef re the start of the containing Seq or Bar.
         /// The msPositions of the IUniqueDefs in the Trks are re the first IUniqueDef in the list,
         /// so the first IUniqueDef.MsPositionReFirstUID is always 0;
         /// </summary>

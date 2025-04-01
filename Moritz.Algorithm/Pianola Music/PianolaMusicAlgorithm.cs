@@ -17,7 +17,7 @@ namespace Moritz.Algorithm.PianolaMusic
             CheckParameters();
         }
 
-        public override int NumberOfMidiChannels { get { return 6; } }
+        public override int NumberOfVoices { get { return 6; } }
         public override int NumberOfBars { get { return 8; } }
 
         public override List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals)
@@ -32,15 +32,15 @@ namespace Moritz.Algorithm.PianolaMusic
 
             // Add each Trk to trks here, in top to bottom (=channelIndex) order in the score.
             List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
-            M.Assert(trks.Count == NumberOfMidiChannels);
+            M.Assert(trks.Count == NumberOfVoices);
 
-            List<ChannelDef> channelDefs = new List<ChannelDef>();
+            List<VoiceDef> voiceDefs = new List<VoiceDef>();
             foreach(var trk in trks)
             {
-                channelDefs.Add(new ChannelDef(new List<Trk>() { trk }));
+                voiceDefs.Add(new VoiceDef(new List<Trk>() { trk }));
             }
 
-            TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
 
             temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 

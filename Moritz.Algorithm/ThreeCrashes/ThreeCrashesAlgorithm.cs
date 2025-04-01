@@ -18,7 +18,7 @@ namespace Moritz.Algorithm.ThreeCrashes
             CheckParameters();
         }
 
-        public override int NumberOfMidiChannels { get { return 3; } }
+        public override int NumberOfVoices { get { return 3; } }
         public override int NumberOfBars { get { return 27; } }
 
         private static readonly int nKeyboardPitches = 85;
@@ -167,14 +167,14 @@ namespace Moritz.Algorithm.ThreeCrashes
             ///*******************************************/
 
             List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
-            M.Assert(trks.Count == NumberOfMidiChannels);
-            List<ChannelDef> channelDefs = new List<ChannelDef>();
+            M.Assert(trks.Count == NumberOfVoices);
+            List<VoiceDef> voiceDefs = new List<VoiceDef>();
             foreach(var trk in trks)
             {
-                channelDefs.Add(new ChannelDef(new List<Trk>() { trk }));
+                voiceDefs.Add(new VoiceDef(new List<Trk>() { trk }));
             }
 
-            TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
 
             temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 

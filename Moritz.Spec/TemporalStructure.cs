@@ -16,8 +16,8 @@ namespace Moritz.Spec
     /// </summary>
     public class TemporalStructure : Bar
     {
-        public TemporalStructure(List<ChannelDef> channelDefs)
-            : base(0, channelDefs)
+        public TemporalStructure(List<VoiceDef> voiceDefs)
+            : base(0, voiceDefs)
         {
         }
 
@@ -25,9 +25,9 @@ namespace Moritz.Spec
 
         public override void AssertConsistency()
         {
-            foreach(var channelDef in ChannelDefs)
+            foreach(var voiceDef in VoiceDefs)
             {
-                foreach(var trk in channelDef.Trks)
+                foreach(var trk in voiceDef.Trks)
                 {
                     foreach(var uniqueDef in trk.UniqueDefs)
                     {
@@ -40,7 +40,7 @@ namespace Moritz.Spec
             base.AssertConsistency();
         }
 
-        /// Converts this temporalStructure to a list of bars, consuming the temporalStructure's channelDefs.
+        /// Converts this temporalStructure to a list of bars, consuming the temporalStructure's voiceDefs.
         /// Uses the argument barline msPositions as the EndBarlines of the returned bars (which don't contain barlines).
         /// An exception is thrown if:
         ///    1) the first argument value is less than or equal to 0.
@@ -148,17 +148,17 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Returns a Tuple in which Item1 is the popped bar, Item2 is the remaining part of the input bar.
-        /// Note that Trks at the same level inside each ChannelDef in each bar have the same duration.
-        /// and that all Trks in a ChannelDef have the same sequence of MidiChordDef and RestDef (and no ClefDefs).
+        /// Note that Trks at the same level inside each VoiceDef in each bar have the same duration.
+        /// and that all Trks in a VoiceDef have the same sequence of MidiChordDef and RestDef (and no ClefDefs).
         /// </summary>
         /// <param name ="bar">The bar fron which Item1 is popped.</param>
-        /// <param name="poppedBarMsDuration">The duration of the first Trk in each ChannelDef in the popped bar.</param>
+        /// <param name="poppedBarMsDuration">The duration of the first Trk in each VoiceDef in the popped bar.</param>
         /// <returns>The popped bar and the remaining part of the input bar</returns>
         public Tuple<Bar, Bar> PopBar(Bar bar, int poppedBarMsDuration)
         {
             M.Assert(poppedBarMsDuration > 0);
 
-            if(poppedBarMsDuration == bar.ChannelDefs[0].Trks[0].MsDuration)
+            if(poppedBarMsDuration == bar.VoiceDefs[0].Trks[0].MsDuration)
             {
                 return new Tuple<Bar, Bar>(bar, null);
             }
@@ -166,19 +166,19 @@ namespace Moritz.Spec
             int poppedAbsMsPosition = bar.AbsMsPosition;
             int remainingAbsMsPosition = poppedAbsMsPosition + poppedBarMsDuration;
 
-            List<ChannelDef> poppedChannelDefs = new List<ChannelDef>();
-            List<ChannelDef> remainingChannelDefs = new List<ChannelDef>();
+            List<VoiceDef> poppedVoiceDefs = new List<VoiceDef>();
+            List<VoiceDef> remainingVoiceDefs = new List<VoiceDef>();
 
-            foreach(ChannelDef channelDef in bar.ChannelDefs)
+            foreach(VoiceDef voiceDef in bar.VoiceDefs)
             {
-                Tuple<ChannelDef, ChannelDef> channelDefs = channelDef.PopChannelDef(poppedBarMsDuration);
+                Tuple<VoiceDef, VoiceDef> voiceDefs = voiceDef.PopVoiceDef(poppedBarMsDuration);
 
-                poppedChannelDefs.Add(channelDefs.Item1);
-                remainingChannelDefs.Add(channelDefs.Item2);
+                poppedVoiceDefs.Add(voiceDefs.Item1);
+                remainingVoiceDefs.Add(voiceDefs.Item2);
             }
 
-            var poppedBar = new Bar(poppedAbsMsPosition, poppedChannelDefs);
-            var remainingBar = new Bar(remainingAbsMsPosition, remainingChannelDefs);
+            var poppedBar = new Bar(poppedAbsMsPosition, poppedVoiceDefs);
+            var remainingBar = new Bar(remainingAbsMsPosition, remainingVoiceDefs);
 
             return new Tuple<Bar, Bar>(poppedBar, remainingBar);
         }

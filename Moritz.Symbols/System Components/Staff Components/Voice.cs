@@ -417,7 +417,7 @@ namespace Moritz.Symbols
         }
         #endregion
 
-        public ChannelDef ChannelDef = null;
+        public VoiceDef VoiceDef = null;
 
         private DurationSymbol _firstDurationSymbol;
     }

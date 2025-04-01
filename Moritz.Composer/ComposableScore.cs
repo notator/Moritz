@@ -30,7 +30,7 @@ namespace Moritz.Composer
 
             this.ScoreData = _algorithm.SetScoreRegionsData(bars);
 
-            InsertInitialClefDefs(bars, _pageFormat.InitialClefPerMIDIChannel);
+            InsertInitialClefDefs(bars, _pageFormat.InitialClefPerVoice);
 
             CreateEmptySystems(bars); // one system per bar
 
@@ -52,15 +52,15 @@ namespace Moritz.Composer
         }
 
         /// <summary>
-        /// Inserts a ClefDef at the beginning of the first Trk in each ChannelDef in each bar, taking any optional ChordDefs into account.
+        /// Inserts a ClefDef at the beginning of the first Trk in each VoiceDef in each bar, taking any optional ChordDefs into account.
         /// </summary>
         /// <param name="bars"></param>
-        /// <param name="initialClefPerMIDIChannel">The clefs at the beginning of the score.</param>
-        private void InsertInitialClefDefs(List<Bar> bars, List<string> initialClefPerMIDIChannel)
+        /// <param name="initialClefPerVoice">The clefs at the beginning of the score.</param>
+        private void InsertInitialClefDefs(List<Bar> bars, List<string> initialClefPerVoice)
         {
             // bars can currently contain cautionary clefs, but no initial clefs
-            List<string> currentClefs = new List<string>(initialClefPerMIDIChannel);
-            int nVoiceDefs = bars[0].ChannelDefs.Count;
+            List<string> currentClefs = new List<string>(initialClefPerVoice);
+            int nVoiceDefs = bars[0].VoiceDefs.Count;
             M.Assert(nVoiceDefs == currentClefs.Count);
 
             for(int barIndex = 0; barIndex < bars.Count; barIndex++)
@@ -68,14 +68,14 @@ namespace Moritz.Composer
                 Bar bar = bars[barIndex];
                 for(int voiceIndex = 0; voiceIndex < nVoiceDefs; ++voiceIndex)
                 {
-                    Trk trk = bar.ChannelDefs[voiceIndex].Trks[0];                    
+                    Trk trk = bar.VoiceDefs[voiceIndex].Trks[0];                    
 
                     if(trk.UniqueDefs[0] is ClefDef startClef)
                     {
                         currentClefs[voiceIndex] = startClef.ClefType;
                         if(barIndex > 0)
                         {
-                            Trk trkInPreviousBar = bars[barIndex - 1].ChannelDefs[voiceIndex].Trks[0];
+                            Trk trkInPreviousBar = bars[barIndex - 1].VoiceDefs[voiceIndex].Trks[0];
                             trkInPreviousBar.UniqueDefs.Add(startClef);                           
                         }
                     }
@@ -100,15 +100,12 @@ namespace Moritz.Composer
         }
 
         /// <summary>
-        /// Creates one System per bar (=list of ChannelDefs) in the argument.
+        /// Creates one System per bar (=list of VoiceDefs) in the argument.
         /// The Systems are complete with staves and voices of the correct type:
-        /// Each InputStaff is allocated parallel (empty) InputVoice fields.
-        /// Each OutputStaff is allocated parallel (empty) OutputVoice fields.
-        /// Each Voice has a ChannelDef field that is allocated to the corresponding
-        /// ChannelDef from the argument.
-        /// The OutputVoices have MIDIChannels arranged according to _pageFormat.OutputMIDIChannelsPerStaff.
-        /// The InputVoices have MIDIChannels arranged according to _pageFormat.InputMIDIChannelsPerStaff.
-        /// OutputVoices are given a midi channel allocated from top to bottom in the printed score.
+        /// Each Staff is allocated parallel (empty) Voice fields.
+        /// Each Voice has a VoiceDef field that is allocated to the corresponding
+        /// VoiceDef from the argument.
+        /// Voices are given a midi channel allocated from top to bottom in the printed score.
         /// </summary>
         public void CreateEmptySystems(List<Bar> bars)
         {
@@ -128,7 +125,7 @@ namespace Moritz.Composer
             for(int systemIndex = 0; systemIndex < Systems.Count; systemIndex++)
             {
                 SvgSystem system = Systems[systemIndex];
-                IReadOnlyList<ChannelDef> channelDefs = bars[systemIndex].ChannelDefs;
+                IReadOnlyList<VoiceDef> voiceDefs = bars[systemIndex].VoiceDefs;
 
                 #region create visible staves
                 for(int staffIndex = 0; staffIndex < nStaves; staffIndex++)
@@ -136,8 +133,8 @@ namespace Moritz.Composer
                     string staffname = StaffName(systemIndex, staffIndex);
                     Staff staff = new Staff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
 
-                    List<int> channelIndices = _pageFormat.VoiceIndicesPerStaff[staffIndex];
-                    for(int channelIndex = 0; channelIndex < channelIndices.Count; ++channelIndex)
+                    List<int> voiceIndices = _pageFormat.VoiceIndicesPerStaff[staffIndex];
+                    for(int voiceIndex = 0; voiceIndex < voiceIndices.Count; ++voiceIndex)
                     {
                         Voice voice = new Voice(staff);
                         staff.Voices.Add(voice);

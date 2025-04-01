@@ -10,10 +10,10 @@ namespace Moritz.Spec
     public class Bar
     {
         /// <summary>
-        /// This constructor creates the Seq.ChannelDefs field containing a list of ChannelDef objects.
-        /// Each ChannelDef has a unique midi channel that is its index in the ChannelDefs list.
-        /// Each ChannelDef contains a list of Trk. Each such Trk has the same channel, and is an alternative performance
-        /// of the graphics that will eventually be associated with the ChannelDef's graphics. 
+        /// This constructor creates the Seq.VoiceDefs field containing a list of VoiceDef objects.
+        /// Each VoiceDef has a unique midi channel that is its index in the VoiceDefs list.
+        /// Each VoiceDef contains a list of Trk. Each such Trk has the same channel, and is an alternative performance
+        /// of the graphics that will eventually be associated with the VoiceDef's graphics. 
         /// </summary>
         /// <param name="absMsPosition">Must be greater than or equal to zero.</param>
         /// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
@@ -25,15 +25,15 @@ namespace Moritz.Spec
         /// trks.Count must be less than or equal to numberOfMidiChannels.</para>
         /// </param>
         /// <param name="numberOfMidiChannels">Each Voice has one channel index.</param>
-        public Bar(int absMsPosition, List<ChannelDef> channelDefs)
+        public Bar(int absMsPosition, List<VoiceDef> voiceDefs)
         {
             #region conditions
             M.Assert(absMsPosition >= 0);
-            M.Assert(channelDefs != null && channelDefs.Count > 0 && channelDefs.Count <= 16);
-            M.Assert(channelDefs[0].Trks != null && channelDefs[0].Trks.Count > 0);
-            foreach(var channelDef in channelDefs)
+            M.Assert(voiceDefs != null && voiceDefs.Count > 0 && voiceDefs.Count <= 16);
+            M.Assert(voiceDefs[0].Trks != null && voiceDefs[0].Trks.Count > 0);
+            foreach(var voiceDef in voiceDefs)
             {
-                foreach(var trk in channelDef.Trks)
+                foreach(var trk in voiceDef.Trks)
                 {
                     trk.AssertConsistency();
                 }
@@ -41,26 +41,26 @@ namespace Moritz.Spec
             #endregion conditions
 
             _absMsPosition = absMsPosition;
-            _channelDefs = channelDefs;
+            _voiceDefs = voiceDefs;
 
             AssertConsistency();
         }
 
         public Bar Clone()
         {
-            var newMidiChannelDefs = new List<ChannelDef>();
+            var newMidiVoiceDefs = new List<VoiceDef>();
 
-            foreach(var oldMidiChannelDef in this.ChannelDefs)
+            foreach(var oldMidiVoiceDef in this.VoiceDefs)
             {
                 List<Trk> newTrks = new List<Trk>();
-                foreach(var oldTrk in oldMidiChannelDef.Trks)
+                foreach(var oldTrk in oldMidiVoiceDef.Trks)
                 {
                     newTrks.Add((Trk)oldTrk.Clone());
                 }
-                newMidiChannelDefs.Add(new ChannelDef(newTrks));
+                newMidiVoiceDefs.Add(new VoiceDef(newTrks));
             }
 
-            Bar clone = new Bar(_absMsPosition, newMidiChannelDefs);
+            Bar clone = new Bar(_absMsPosition, newMidiVoiceDefs);
 
             return clone;
         }
@@ -69,19 +69,19 @@ namespace Moritz.Spec
 
         public void Concat(Bar bar2)
         {
-            M.Assert(ChannelDefs.Count == bar2.ChannelDefs.Count);
+            M.Assert(VoiceDefs.Count == bar2.VoiceDefs.Count);
 
-            for(int i = 0; i < ChannelDefs.Count; ++i)
+            for(int i = 0; i < VoiceDefs.Count; ++i)
             {
-                ChannelDef channelDef1 = ChannelDefs[i];
-                ChannelDef channelDef2 = bar2.ChannelDefs[i];
+                VoiceDef voiceDef1 = VoiceDefs[i];
+                VoiceDef voiceDef2 = bar2.VoiceDefs[i];
 
-                M.Assert(channelDef1.Trks.Count == channelDef2.Trks.Count);
+                M.Assert(voiceDef1.Trks.Count == voiceDef2.Trks.Count);
 
-                for(int j = 0; j < channelDef1.Trks.Count; ++j)
+                for(int j = 0; j < voiceDef1.Trks.Count; ++j)
                 {
-                    Trk trk1 = channelDef1.Trks[j];
-                    Trk trk2 = channelDef2.Trks[j];
+                    Trk trk1 = voiceDef1.Trks[j];
+                    Trk trk2 = voiceDef2.Trks[j];
 
                     trk1.AddRange(trk2);
                     trk1.RemoveDuplicateClefDefs();
@@ -94,7 +94,7 @@ namespace Moritz.Spec
 
         #region envelopes
         /// <summary>
-        /// Warps the durations in the Trks at trkIndex in all ChannelDefs.
+        /// Warps the durations in the Trks at trkIndex in all VoiceDefs.
         /// This function does not change the MsDuration of the Trks.
         /// See Envelope.TimeWarp() for a description of the arguments.
         /// </summary>
@@ -103,9 +103,9 @@ namespace Moritz.Spec
         public void TimeWarp(int trkIndex, Envelope envelope, double distortion)
         {
             AssertConsistency();
-            foreach(var channelDef in ChannelDefs)
+            foreach(var voiceDef in VoiceDefs)
             {
-                var trk = channelDef.Trks[trkIndex];
+                var trk = voiceDef.Trks[trkIndex];
                 int originalMsDuration = trk.MsDuration;
                 List<int> originalMsPositions = trk.GetMsPositions();
                 Dictionary<int, int> warpDict = new Dictionary<int, int>();
@@ -138,15 +138,15 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Returns a flat list containing
-        /// the unique msPositions of IUniqueDefs in Track 0 of all ChannelDefs,
+        /// the unique msPositions of IUniqueDefs in Track 0 of all VoiceDefs,
         /// plus the endMsPosition of the final object.
         /// </summary>
         private List<int> GetTrk0MsPositions()
         {
             List<int> originalMsPositions = new List<int>();
-            foreach(var channelDef in ChannelDefs)
+            foreach(var voiceDef in VoiceDefs)
             {
-                var trk = channelDef.Trks[0];
+                var trk = voiceDef.Trks[0];
                 int originalMsDuration = trk.MsDuration;                
                 foreach(IUniqueDef iud in trk.UniqueDefs)
                 {
@@ -166,9 +166,9 @@ namespace Moritz.Spec
 
         public void SetMsPositionsReFirstUD()
         {
-            foreach(ChannelDef channelDef in ChannelDefs)
+            foreach(VoiceDef voiceDef in VoiceDefs)
             {
-                foreach(var trk in channelDef.Trks)
+                foreach(var trk in voiceDef.Trks)
                 {
                     int msPosition = 0;
                     foreach(IUniqueDef iud in trk.UniqueDefs)
@@ -200,9 +200,9 @@ namespace Moritz.Spec
             get
             {
                 List<Trk> trks = new List<Trk>();
-                foreach(ChannelDef channelDef in ChannelDefs)
+                foreach(VoiceDef voiceDef in VoiceDefs)
                 {
-                    foreach(var trk in channelDef.Trks)
+                    foreach(var trk in voiceDef.Trks)
                     {
                         trks.Add(trk);
                     }
@@ -213,21 +213,21 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return $"AbsMsPosition={AbsMsPosition}, nChannelDefs={ChannelDefs.Count}, nTrksPerChannel={ChannelDefs[0].Trks.Count}";
+            return $"AbsMsPosition={AbsMsPosition}, nVoiceDefs={VoiceDefs.Count}, nTrksPerChannel={VoiceDefs[0].Trks.Count}";
         }
 
-        public IReadOnlyList<ChannelDef> ChannelDefs { get => _channelDefs; }
-        private List<ChannelDef> _channelDefs = new List<ChannelDef>();
+        public IReadOnlyList<VoiceDef> VoiceDefs { get => _voiceDefs; }
+        private List<VoiceDef> _voiceDefs = new List<VoiceDef>();
 
-        /// A list containing only the top Trk in each ChannelDef
+        /// A list containing only the top Trk in each VoiceDef
         public List<Trk> Trks0
         {
             get 
             {
                 List<Trk> trks0 = new List<Trk>();
-                foreach(var channelDef in ChannelDefs)
+                foreach(var voiceDef in VoiceDefs)
                 {
-                    trks0.Add(channelDef.Trks[0]);
+                    trks0.Add(voiceDef.Trks[0]);
                 }
                 return trks0;
             }
@@ -242,12 +242,12 @@ namespace Moritz.Spec
         /// </summary>
         public void PadEmptyTrks()
         {
-            for(var trkIndex = 0; trkIndex < ChannelDefs[0].Trks.Count; trkIndex++)
+            for(var trkIndex = 0; trkIndex < VoiceDefs[0].Trks.Count; trkIndex++)
             {
                 int msDuration = 0;
-                foreach(var channelDef in ChannelDefs)
+                foreach(var voiceDef in VoiceDefs)
                 {
-                    var trk = channelDef.Trks[trkIndex];
+                    var trk = voiceDef.Trks[trkIndex];
                     if(trk.UniqueDefs.Count > 0)
                     {
                         msDuration = trk.MsDuration;
@@ -255,9 +255,9 @@ namespace Moritz.Spec
                     }
                 }
                 M.Assert(msDuration > 0);
-                foreach(var channelDef in ChannelDefs)
+                foreach(var voiceDef in VoiceDefs)
                 {
-                    var trk = channelDef.Trks[trkIndex];
+                    var trk = voiceDef.Trks[trkIndex];
                     if(trk.UniqueDefs.Count == 0)
                     {
                         trk.Add(new RestDef(0, msDuration));
@@ -268,62 +268,62 @@ namespace Moritz.Spec
 
         /// <summary>
         /// AbsMsPosition is greater than or equal to 0.
-        /// There is at least one ChannelDef in ChannelDefs and at least one Trk in each ChannelDef.
+        /// There is at least one VoiceDef in VoiceDefs and at least one Trk in each VoiceDef.
         /// Trk.AssertConsistency() is called on all Trks.
-        /// All ChannelDef.Trks.Count values are the same.
-        /// All ChannelDef.MsPositionReContainer values are 0.
-        /// All Trks having the same index in any ChannelDef in this Bar have the same msDuration.
-        /// In each ChannelDef:
+        /// All VoiceDef.Trks.Count values are the same.
+        /// All VoiceDef.MsPositionReContainer values are 0.
+        /// All Trks having the same index in any VoiceDef in this Bar have the same msDuration.
+        /// In each VoiceDef:
         ///     1. All Trks have the same number of DurationDefs
         ///     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
         /// Performance consistency:
-        /// (A "performance" consists of all the trks at the same index within their ChannelDef.)
+        /// (A "performance" consists of all the trks at the same index within their VoiceDef.)
         /// The overall sequence of events (DurationDefs) must be identical in all performances.
         /// </summary>
         public virtual void AssertConsistency()
         {
             M.Assert(AbsMsPosition >= 0);
-            M.Assert(ChannelDefs.Count > 0);
-            var trksCount = ChannelDefs[0].Trks.Count;
+            M.Assert(VoiceDefs.Count > 0);
+            var trksCount = VoiceDefs[0].Trks.Count;
             M.Assert(trksCount > 0);
 
-            int nTrks = ChannelDefs[0].Trks.Count;
+            int nTrks = VoiceDefs[0].Trks.Count;
             M.Assert(nTrks > 0);
 
-            CheckChannelDefConsistency(nTrks);
+            CheckVoiceDefConsistency(nTrks);
 
             CheckPerformanceConsistency(nTrks);
         }
 
-        private void CheckChannelDefConsistency(int nTrks)
+        private void CheckVoiceDefConsistency(int nTrks)
         {
-            foreach(var channelDef in ChannelDefs)
+            foreach(var voiceDef in VoiceDefs)
             {
-                M.Assert(channelDef.Trks.Count == nTrks);
-                M.Assert(channelDef.MsPositionReContainer == 0);
-                foreach(var trk in channelDef.Trks)
+                M.Assert(voiceDef.Trks.Count == nTrks);
+                M.Assert(voiceDef.MsPositionReContainer == 0);
+                foreach(var trk in voiceDef.Trks)
                 {
                     trk.AssertConsistency();
                 }
 
-                // All Trks having the same index in any ChannelDef in this Bar have the same msDuration.
+                // All Trks having the same index in any VoiceDef in this Bar have the same msDuration.
                 for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
                 {
-                    int barMsDuration = ChannelDefs[0].Trks[trkIndex].MsDuration;
-                    for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
+                    int barMsDuration = VoiceDefs[0].Trks[trkIndex].MsDuration;
+                    for(int voiceDefIndex = 1; voiceDefIndex < VoiceDefs.Count; ++voiceDefIndex)
                     {
-                        var cDef = ChannelDefs[channelDefIndex];
+                        var cDef = VoiceDefs[voiceDefIndex];
                         M.Assert(cDef.Trks[trkIndex].MsDuration == barMsDuration);
                     }
                 }
 
-                // In each ChannelDef:
+                // In each VoiceDef:
                 //     1. All Trks have the same number of DurationDefs
                 //     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
-                List<DurationDef> trk0DurationDefs = channelDef.Trks[0].DurationDefs;
+                List<DurationDef> trk0DurationDefs = voiceDef.Trks[0].DurationDefs;
                 for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
                 {
-                    List<DurationDef> trkDDs = channelDef.Trks[trkIndex].DurationDefs;
+                    List<DurationDef> trkDDs = voiceDef.Trks[trkIndex].DurationDefs;
                     M.Assert(trkDDs.Count == trk0DurationDefs.Count);
                     for(var ddIndex = 0; ddIndex < trk0DurationDefs.Count; ++ddIndex)
                     {
@@ -337,15 +337,15 @@ namespace Moritz.Spec
 
         private void CheckPerformanceConsistency(int nTrks)
         {
-            /// A "performance" consists of all the trks at the same index within their ChannelDef.
+            /// A "performance" consists of all the trks at the same index within their VoiceDef.
             /// The overall sequence of events (DurationDefs) must be identical in all performances.
             List<List<DurationDef>> performances = new List<List<DurationDef>>();
             for(var trkIndex = 0; trkIndex < nTrks; ++trkIndex)
             {
                 List<DurationDef> performance = new List<DurationDef>();
-                foreach(var channelDef in ChannelDefs)
+                foreach(var voiceDef in VoiceDefs)
                 {
-                    performance.AddRange(channelDef.Trks[trkIndex].DurationDefs);
+                    performance.AddRange(voiceDef.Trks[trkIndex].DurationDefs);
                 }
                 performance.Sort((x, y) => x.MsPositionReFirstUD.CompareTo(y.MsPositionReFirstUD));
                 performances.Add(performance);
@@ -363,7 +363,7 @@ namespace Moritz.Spec
             }
         }
 
-        public int MsDuration { get => ChannelDefs[0].Trks[0].MsDuration; }
+        public int MsDuration { get => VoiceDefs[0].Trks[0].MsDuration; }
 
         #region Envelopes
         /// <summary>
@@ -387,9 +387,9 @@ namespace Moritz.Spec
             }
             #endregion get warpDict
 
-            foreach(var channelDef in ChannelDefs)
+            foreach(var voiceDef in VoiceDefs)
             {
-                foreach(Trk trk in channelDef.Trks)
+                foreach(Trk trk in voiceDef.Trks)
                 {
                     List<IUniqueDef> iuds = trk.UniqueDefs;
                     IUniqueDef iud = null;
@@ -424,9 +424,9 @@ namespace Moritz.Spec
             int originalMsDuration = MsDuration;
 
             List<int> originalMsPositions = new List<int>();
-            foreach(var channelDef in ChannelDefs)
+            foreach(var voiceDef in VoiceDefs)
             {
-                foreach(Trk trk in channelDef.Trks)
+                foreach(Trk trk in voiceDef.Trks)
                 {
                     foreach(IUniqueDef iud in trk)
                     {

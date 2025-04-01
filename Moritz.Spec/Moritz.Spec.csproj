@@ -78,7 +78,7 @@
     <Compile Include="Trk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestDef.cs" />
-    <Compile Include="ChannelDef.cs" />
+    <Compile Include="VoiceDef.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

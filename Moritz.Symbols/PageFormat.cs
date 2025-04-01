@@ -92,7 +92,7 @@ namespace Moritz.Symbols
         public float DefaultDistanceBetweenSystems;
         public List<List<int>> VoiceIndicesPerStaff = null; // ascending midi channels, grouped by staff.
         public List<string> ClefPerStaff = null;
-        public List<string> InitialClefPerMIDIChannel = null;
+        public List<string> InitialClefPerVoice = null;
         public List<int> StafflinesPerStaff = null;
         public List<int> StaffGroups = null;
         public List<string> LongStaffNames = null;

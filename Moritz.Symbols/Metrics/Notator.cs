@@ -39,8 +39,8 @@ namespace Moritz.Symbols
         /// <summary>
         /// There is still one system per bar.
         /// In each system, the staff list contains OutputStaff objects followed by InputStaff objects.
-		/// Each ChannelDef contains ClefDefs. The first is converted to a Clef, later ones to SmallClefs.
-		/// An Exception will be thrown if a SmallClefDef is found on the lower channelDef in a staf in the systems input.
+		/// Each VoiceDef contains ClefDefs. The first is converted to a Clef, later ones to SmallClefs.
+		/// An Exception will be thrown if a SmallClefDef is found on the lower voiceDef in a staf in the systems input.
 		/// Small clefs (if there are any) are copied from the top to the bottom voice (if there is one) on each staff.
         /// </summary>
         /// <param name="systems"></param>
@@ -63,7 +63,7 @@ namespace Moritz.Symbols
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
                         Voice voice = staff.Voices[voiceIndex];
-                        foreach(var trk in voice.ChannelDef.Trks)
+                        foreach(var trk in voice.VoiceDef.Trks)
                         {
                             trk.AgglomerateRests();
 

@@ -21,7 +21,7 @@ namespace Moritz.Algorithm.Study1
         }
 
         // required as forward reference by AssistantComposerForm.
-        public override int NumberOfMidiChannels { get { return 1; } }
+        public override int NumberOfVoices { get { return 1; } }
         public override int NumberOfBars { get { return 68; } }
 
         public override List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals)
@@ -43,12 +43,12 @@ namespace Moritz.Algorithm.Study1
             Trk trk3 = GetTrk3(trk2);
 
             List<Trk> channelTrks = new List<Trk>() { trk0, trk1, trk2, trk3 }; // all in the same channel
-            var channelDef = new ChannelDef(channelTrks);
-            List<ChannelDef> channelDefs = new List<ChannelDef>() { channelDef };
+            var voiceDef = new VoiceDef(channelTrks);
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() { voiceDef };
 
-            M.Assert(channelDefs.Count == NumberOfMidiChannels);
+            M.Assert(voiceDefs.Count == NumberOfVoices);
 
-            TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
 
             temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
@@ -56,9 +56,9 @@ namespace Moritz.Algorithm.Study1
 
             List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
 
-            foreach(ChannelDef cDef in channelDefs)
+            foreach(VoiceDef cDef in voiceDefs)
             {
-                foreach(Trk trk in channelDef.Trks)
+                foreach(Trk trk in voiceDef.Trks)
                 {
                     trk.SetPresetInTheFirstChord(0);
                 }
@@ -69,7 +69,7 @@ namespace Moritz.Algorithm.Study1
             return bars;  // The Trks in these bars contain ClefDefs.
         }
 
-        // Inserts ClefDefs at arbitrary positions in the top ChannelDef.Trks[0].UniqueDefs in each Staff.
+        // Inserts ClefDefs at arbitrary positions in the top VoiceDef.Trks[0].UniqueDefs in each Staff.
         // The main clefs at the beginnings of bars are added automatically later, taking these clef changes
         // into account.
         protected override void InsertClefChanges(List<Bar> bars, List<List<int>> voiceIndicesPerStaff)
