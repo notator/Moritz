@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Moritz.Globals;
+
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Xml;
@@ -18,7 +20,7 @@ namespace Krystals5ObjectLibrary
             var valuesArray = svgPathElem.GetAttribute("values").Split(' ');
             var nodes = svgPath.Nodes;
 
-            Debug.Assert(valuesArray.Length == nodes.Count);
+            M.Assert(valuesArray.Length == nodes.Count);
 
             Domain = nodes.Count;
 

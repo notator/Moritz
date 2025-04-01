@@ -1,4 +1,6 @@
 ﻿using Krystals5ObjectLibrary;
+
+using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Symbols;
 
@@ -165,7 +167,7 @@ namespace Moritz.Algorithm.ThreeCrashes
             ///*******************************************/
 
             List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
-            Debug.Assert(trks.Count == NumberOfMidiChannels);
+            M.Assert(trks.Count == NumberOfMidiChannels);
             List<ChannelDef> channelDefs = new List<ChannelDef>();
             foreach(var trk in trks)
             {
@@ -178,7 +180,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             List<int> endBarlinePositions = GetEndBarlineMsPositions(firstATrkUIDs, firstBTrkUIDs, firstCTrkUIDs, msDuration);
 
-            Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
+            M.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
             List<Bar> bars = temporalStructure.GetBars(endBarlinePositions);
 
@@ -189,8 +191,8 @@ namespace Moritz.Algorithm.ThreeCrashes
 
         private List<IUniqueDef> GetMidiChordDefs(List<int> pitches, List<int> velocities, List<int> msDurations)
         {
-            Debug.Assert(pitches.Count == velocities.Count);
-            Debug.Assert(msDurations.Count == velocities.Count);
+            M.Assert(pitches.Count == velocities.Count);
+            M.Assert(msDurations.Count == velocities.Count);
 
             List<IUniqueDef> defs = new List<IUniqueDef>();
             int msPosition = 0;
@@ -248,7 +250,7 @@ namespace Moritz.Algorithm.ThreeCrashes
                 crashTrk = SetVelocities(crashTrk, angularPosition, minFactor: 0.3);
                 crashTrk = SetDuration(crashTrk, angularPosition, maxFactor: 3);
 
-                Debug.Assert(crashTrk.Count == nKeyboardPitches);
+                M.Assert(crashTrk.Count == nKeyboardPitches);
 
                 crashTrks.Add(crashTrk);
             }
@@ -273,11 +275,11 @@ namespace Moritz.Algorithm.ThreeCrashes
             // nKeyboardPitches durations (longLow to shortHigh)
             IReadOnlyList<int> basicDurations = BasicDurations();
 
-            Debug.Assert(wagonValues.Count <= nKeyboardPitches && basicDurations.Count == nKeyboardPitches);
+            M.Assert(wagonValues.Count <= nKeyboardPitches && basicDurations.Count == nKeyboardPitches);
             List<int> pitchDurations = new List<int>();
             foreach(int pitch in wagonValues)
             {
-                Debug.Assert(pitch >= 1 && pitch <= nKeyboardPitches);
+                M.Assert(pitch >= 1 && pitch <= nKeyboardPitches);
                 pitchDurations.Add(basicDurations[pitch - 1]);
             }
             return pitchDurations;
@@ -379,7 +381,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
         private Trk SetPan(Trk crashTrk, int angularPosition)
         {
-            Debug.Assert(0 <= angularPosition && angularPosition < 11);
+            M.Assert(0 <= angularPosition && angularPosition < 11);
 
             const double angle = Math.PI / 10;
 
@@ -447,8 +449,8 @@ namespace Moritz.Algorithm.ThreeCrashes
 
         private Trk SetVelocities(Trk crashTrk, int angularPosition, double minFactor)
         {
-            Debug.Assert(0 <= angularPosition && angularPosition < 11);
-            Debug.Assert(0 < minFactor && minFactor < 1);
+            M.Assert(0 <= angularPosition && angularPosition < 11);
+            M.Assert(0 < minFactor && minFactor < 1);
 
             double factor = Math.Pow(minFactor, 0.2);
             double factor0 = 1;
@@ -502,7 +504,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
         private Trk SetDuration(Trk crashTrk, int angularPosition, double maxFactor)
         {
-            Debug.Assert(0 <= angularPosition && angularPosition < 11);
+            M.Assert(0 <= angularPosition && angularPosition < 11);
 
             double factor = Math.Pow(maxFactor, 0.2);
             double factor0 = 1;
@@ -597,7 +599,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
         private Trk Concat(List<Trk> crashTrks)
         {
-            Debug.Assert(crashTrks.Count == 11);
+            M.Assert(crashTrks.Count == 11);
 
             Trk crashTrk = new Trk();
 

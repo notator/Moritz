@@ -1,3 +1,4 @@
+using Moritz.Globals;
 using Moritz.Xml;
 
 using System;
@@ -40,7 +41,7 @@ namespace Moritz.Symbols
         /// <param name="chordsBeamedTogether"></param>
         private void SetBeamedGroupStemDirection(Clef currentClef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection)
         {
-            Debug.Assert(chordsBeamedTogether.Count > 1);
+            M.Assert(chordsBeamedTogether.Count > 1);
             VerticalDir groupStemDirection = voiceStemDirection;
             if(voiceStemDirection == VerticalDir.none)
             {   // here, there is only one voice in the staff, so the direction depends on the height of the noteheads.
@@ -124,7 +125,7 @@ namespace Moritz.Symbols
         /// </summary>
         public List<ChordSymbol> EnclosedChords(Voice otherVoice)
         {
-            Debug.Assert(Chords.Count > 1);
+            M.Assert(Chords.Count > 1);
             int startMsPos = Chords[0].AbsMsPosition;
             int endMsPos = Chords[Chords.Count - 1].AbsMsPosition;
             List<ChordSymbol> enclosedChordSymbols = new List<ChordSymbol>();
@@ -394,7 +395,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            Debug.Assert(!(rval is IBeamStub));
+            M.Assert(!(rval is IBeamStub));
 
             return rval;
         }
@@ -546,7 +547,7 @@ namespace Moritz.Symbols
                     newBeam = new QuaverBeam(leftX, rightX);
                     break;
                 default:
-                    Debug.Assert(false, "Illegal beam duration class");
+                    M.Assert(false, "Illegal beam duration class");
                     break;
             }
             return newBeam;
@@ -859,7 +860,7 @@ namespace Moritz.Symbols
                 if(quaverBeam != null)
                     break;
             }
-            Debug.Assert(quaverBeam != null);
+            M.Assert(quaverBeam != null);
             float tanAlpha = (quaverBeam.RightTopY - quaverBeam.LeftTopY) / (quaverBeam.RightX - quaverBeam.LeftX);
 
             foreach(ChordSymbol chord in Chords)
@@ -867,7 +868,7 @@ namespace Moritz.Symbols
                 ChordMetrics chordMetrics = ((ChordMetrics)chord.Metrics);
                 StemMetrics stemMetrics = chordMetrics.StemMetrics; // a clone
 
-                Debug.Assert(chord.Stem.Direction == _stemDirection); // just to be sure.
+                M.Assert(chord.Stem.Direction == _stemDirection); // just to be sure.
 
                 float stemTipDeltaY = ((stemMetrics.OriginX - this._left) * tanAlpha);
                 float stemTipY = quaverBeam.LeftTopY + stemTipDeltaY;
@@ -890,7 +891,7 @@ namespace Moritz.Symbols
                     if(qBeam != null)
                         break;
                 }
-                Debug.Assert(qBeam != null);
+                M.Assert(qBeam != null);
                 float tan = ((qBeam.LeftTopY - qBeam.RightTopY) / (qBeam.RightX - qBeam.LeftX));
                 return tan;
             }
@@ -908,7 +909,7 @@ namespace Moritz.Symbols
                 if(qBeam != null)
                     break;
             }
-            Debug.Assert(qBeam != null);
+            M.Assert(qBeam != null);
 
             List<HLine> outerEdge = new List<HLine>();
             float hlineY = 0F;
@@ -1059,7 +1060,7 @@ namespace Moritz.Symbols
 
         private float BeamBeginMsPosition(Beam beam)
         {
-            Debug.Assert(this.Beams.Contains(beam));
+            M.Assert(this.Beams.Contains(beam));
             float beamBeginAbsMsPosition = float.MinValue;
             foreach(ChordSymbol chord in Chords)
             {
@@ -1070,13 +1071,13 @@ namespace Moritz.Symbols
                     break;
                 }
             }
-            Debug.Assert(beamBeginAbsMsPosition != float.MinValue);
+            M.Assert(beamBeginAbsMsPosition != float.MinValue);
             return beamBeginAbsMsPosition;
         }
 
         private float BeamEndMsPosition(Beam beam)
         {
-            Debug.Assert(this.Beams.Contains(beam));
+            M.Assert(this.Beams.Contains(beam));
             float beamEndAbsMsPosition = float.MinValue;
             for(int i = Chords.Count - 1; i >= 0; --i)
             {
@@ -1088,7 +1089,7 @@ namespace Moritz.Symbols
                     break;
                 }
             }
-            Debug.Assert(beamEndAbsMsPosition != float.MinValue);
+            M.Assert(beamEndAbsMsPosition != float.MinValue);
             return beamEndAbsMsPosition;
         }
 

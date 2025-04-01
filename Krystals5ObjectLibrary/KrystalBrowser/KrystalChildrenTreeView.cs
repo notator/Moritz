@@ -1,3 +1,5 @@
+using Moritz.Globals;
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -187,7 +189,7 @@ namespace Krystals5ObjectLibrary
                 }
                 if(dependency.ScoreNames != null)
                 {
-                    Debug.Assert(rootNode.ForeColor == Color.Red);
+                    M.Assert(rootNode.ForeColor == Color.Red);
                     foreach(string scoreName in dependency.ScoreNames)
                     {
                         rootNode.Nodes.Insert(0, scoreName);

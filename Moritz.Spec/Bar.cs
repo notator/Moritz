@@ -1,5 +1,7 @@
 ﻿using Krystals5ObjectLibrary;
 
+using Moritz.Globals;
+
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -26,9 +28,9 @@ namespace Moritz.Spec
         public Bar(int absMsPosition, List<ChannelDef> channelDefs)
         {
             #region conditions
-            Debug.Assert(absMsPosition >= 0);
-            Debug.Assert(channelDefs != null && channelDefs.Count > 0 && channelDefs.Count <= 16);
-            Debug.Assert(ChannelDefs[0].Trks != null && ChannelDefs[0].Trks.Count > 0);
+            M.Assert(absMsPosition >= 0);
+            M.Assert(channelDefs != null && channelDefs.Count > 0 && channelDefs.Count <= 16);
+            M.Assert(ChannelDefs[0].Trks != null && ChannelDefs[0].Trks.Count > 0);
             foreach(var channelDef in channelDefs)
             {
                 foreach(var trk in channelDef.Trks)
@@ -67,14 +69,14 @@ namespace Moritz.Spec
 
         public void Concat(Bar bar2)
         {
-            Debug.Assert(ChannelDefs.Count == bar2.ChannelDefs.Count);
+            M.Assert(ChannelDefs.Count == bar2.ChannelDefs.Count);
 
             for(int i = 0; i < ChannelDefs.Count; ++i)
             {
                 ChannelDef channelDef1 = ChannelDefs[i];
                 ChannelDef channelDef2 = bar2.ChannelDefs[i];
 
-                Debug.Assert(channelDef1.Trks.Count == channelDef2.Trks.Count);
+                M.Assert(channelDef1.Trks.Count == channelDef2.Trks.Count);
 
                 for(int j = 0; j < channelDef1.Trks.Count; ++j)
                 {
@@ -129,7 +131,7 @@ namespace Moritz.Spec
                 iud.MsPositionReFirstUD = msPos;
                 iud.MsDuration = originalMsDuration - msPos;
 
-                Debug.Assert(originalMsDuration == trk.MsDuration);
+                M.Assert(originalMsDuration == trk.MsDuration);
             }
             AssertConsistency();
         }
@@ -183,7 +185,7 @@ namespace Moritz.Spec
             get { return _absMsPosition; }
             set
             {
-                Debug.Assert(value >= 0);
+                M.Assert(value >= 0);
                 _absMsPosition = value;
             }
         }
@@ -252,7 +254,7 @@ namespace Moritz.Spec
                         break;
                     }
                 }
-                Debug.Assert(msDuration > 0);
+                M.Assert(msDuration > 0);
                 foreach(var channelDef in ChannelDefs)
                 {
                     var trk = channelDef.Trks[trkIndex];
@@ -280,13 +282,13 @@ namespace Moritz.Spec
         /// </summary>
         public virtual void AssertConsistency()
         {
-            Debug.Assert(AbsMsPosition >= 0);
-            Debug.Assert(ChannelDefs.Count > 0);
+            M.Assert(AbsMsPosition >= 0);
+            M.Assert(ChannelDefs.Count > 0);
             var trksCount = ChannelDefs[0].Trks.Count;
-            Debug.Assert(trksCount > 0);
+            M.Assert(trksCount > 0);
 
             int nTrks = ChannelDefs[0].Trks.Count;
-            Debug.Assert(nTrks > 0);
+            M.Assert(nTrks > 0);
 
             CheckChannelDefConsistency(nTrks);
 
@@ -297,8 +299,8 @@ namespace Moritz.Spec
         {
             foreach(var channelDef in ChannelDefs)
             {
-                Debug.Assert(channelDef.Trks.Count == nTrks);
-                Debug.Assert(channelDef.MsPositionReContainer == 0);
+                M.Assert(channelDef.Trks.Count == nTrks);
+                M.Assert(channelDef.MsPositionReContainer == 0);
                 foreach(var trk in channelDef.Trks)
                 {
                     trk.AssertConsistency();
@@ -311,7 +313,7 @@ namespace Moritz.Spec
                     for(int channelDefIndex = 1; channelDefIndex < ChannelDefs.Count; ++channelDefIndex)
                     {
                         var cDef = ChannelDefs[channelDefIndex];
-                        Debug.Assert(cDef.Trks[trkIndex].MsDuration == barMsDuration);
+                        M.Assert(cDef.Trks[trkIndex].MsDuration == barMsDuration);
                     }
                 }
 
@@ -322,12 +324,12 @@ namespace Moritz.Spec
                 for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
                 {
                     List<DurationDef> trkDDs = channelDef.Trks[trkIndex].DurationDefs;
-                    Debug.Assert(trkDDs.Count == trk0DurationDefs.Count);
+                    M.Assert(trkDDs.Count == trk0DurationDefs.Count);
                     for(var ddIndex = 0; ddIndex < trk0DurationDefs.Count; ++ddIndex)
                     {
                         DurationDef dd0 = trk0DurationDefs[ddIndex]; // durationDef in Trk 0
                         DurationDef trkDD = trkDDs[ddIndex];
-                        Debug.Assert((dd0 is MidiChordDef && trkDD is MidiChordDef) | (dd0 is RestDef && trkDD is RestDef));
+                        M.Assert((dd0 is MidiChordDef && trkDD is MidiChordDef) | (dd0 is RestDef && trkDD is RestDef));
                     }
                 }
             }
@@ -351,12 +353,12 @@ namespace Moritz.Spec
             int nDurationDefs = performances[0].Count;
             for(int pIndex = 1; pIndex < nTrks; ++pIndex)
             {
-                Debug.Assert(performances[pIndex - 1].Count == nDurationDefs);
+                M.Assert(performances[pIndex - 1].Count == nDurationDefs);
                 for(int i = 0; i < nDurationDefs; ++i)
                 {
                     DurationDef dd0 = performances[pIndex - 1][i];
                     DurationDef dd1 = performances[pIndex][i];
-                    Debug.Assert((dd0 is MidiChordDef && dd1 is MidiChordDef) | (dd0 is RestDef && dd1 is RestDef));
+                    M.Assert((dd0 is MidiChordDef && dd1 is MidiChordDef) | (dd0 is RestDef && dd1 is RestDef));
                 }
             }
         }
@@ -406,7 +408,7 @@ namespace Moritz.Spec
                 }
             }
 
-            Debug.Assert(originalMsDuration == MsDuration);
+            M.Assert(originalMsDuration == MsDuration);
 
             AssertConsistency();
         }

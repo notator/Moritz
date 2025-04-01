@@ -1,4 +1,5 @@
-﻿using Moritz.Spec;
+﻿using Moritz.Globals;
+using Moritz.Spec;
 using Moritz.Xml;
 
 using System;
@@ -68,7 +69,7 @@ namespace Moritz.Symbols
 
                             msPositionReVoiceDef = 0;
                             List<IUniqueDef> iuds = trk.UniqueDefs;
-                            Debug.Assert(iuds[0] is ClefDef);
+                            M.Assert(iuds[0] is ClefDef);
 
                             for(int iudIndex = 0; iudIndex < iuds.Count; ++iudIndex)
                             {
@@ -143,13 +144,13 @@ namespace Moritz.Symbols
                 durationSymbols.Add(durationSymbol);
             }
 
-            Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
-            Debug.Assert(durationSymbols.Count > 0);
-            Debug.Assert(absMsPos > durationSymbols[0].AbsMsPosition);
+            M.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
+            M.Assert(durationSymbols.Count > 0);
+            M.Assert(absMsPos > durationSymbols[0].AbsMsPosition);
 
             if(absMsPos > durationSymbols[durationSymbols.Count - 1].AbsMsPosition)
             {
-                // the noteObjects do not yet have a final barline (see Debug.Assert() above)
+                // the noteObjects do not yet have a final barline (see M.Assert() above)
                 voice.NoteObjects.Add(invisibleSmallClef);
             }
             else
@@ -268,7 +269,7 @@ namespace Moritz.Symbols
                         {
                             if(drawObject is StaffNameText staffName)
                             {
-                                Debug.Assert(staffName.TextInfo != null);
+                                M.Assert(staffName.TextInfo != null);
 
                                 TextMetrics staffNameMetrics = new TextMetrics(CSSObjectClass.staffName, graphics, staffName.TextInfo);
                                 float nameWidth = staffNameMetrics.Right - staffNameMetrics.Left;

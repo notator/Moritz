@@ -1,4 +1,5 @@
-﻿using Moritz.Xml;
+﻿using Moritz.Globals;
+using Moritz.Xml;
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,7 +36,7 @@ namespace Moritz.Symbols
                 // possible Values:
                 // "C", "C#", "Db", "D", "D#", "Eb", "E", "E#", "Fb", "F", "F#" "Gb",
                 // "G", "G#", "Ab", "A", "A#", "Bb", "B", "B#", "Cb"
-                Debug.Assert(Regex.Matches(value, @"^[A-G][#b]?$") != null);
+                M.Assert(Regex.Matches(value, @"^[A-G][#b]?$") != null);
                 _enharmonicNote = value;
             }
         }
@@ -231,7 +232,7 @@ namespace Moritz.Symbols
                 }
                 else
                 {
-                    Debug.Assert(text.Contains("end"));
+                    M.Assert(text.Contains("end"));
                 }
             }
         }

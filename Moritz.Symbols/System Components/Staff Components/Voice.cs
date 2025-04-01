@@ -1,3 +1,4 @@
+using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Xml;
 
@@ -151,7 +152,7 @@ namespace Moritz.Symbols
         public void Replace(DurationSymbol symbolToBeReplaced, List<NoteObject> noteObjects)
         {
             #region conditions
-            Debug.Assert(symbolToBeReplaced != null && symbolToBeReplaced.Voice == this);
+            M.Assert(symbolToBeReplaced != null && symbolToBeReplaced.Voice == this);
             #endregion conditions
 
             List<NoteObject> tempList = new List<NoteObject>(this.NoteObjects);

@@ -32,10 +32,10 @@ namespace Moritz.Spec
             for(int i = 1; i < trks.Count; i++)
             {
                 List<IUniqueDef> trkIUDs = trks[i].UniqueDefs;
-                Debug.Assert(trkIUDs.Count == uidCount);
+                M.Assert(trkIUDs.Count == uidCount);
                 for(int j = 0; j < trkIUDs.Count; j++)
                 {
-                    Debug.Assert((iuds0[j] is MidiChordDef && trkIUDs[j] is MidiChordDef)
+                    M.Assert((iuds0[j] is MidiChordDef && trkIUDs[j] is MidiChordDef)
                         || (iuds0[j] is RestDef && trkIUDs[j] is RestDef));
                 }
             }
@@ -99,8 +99,8 @@ namespace Moritz.Spec
         #endregion constructors
         public virtual void AssertConsistency()
         {
-            Debug.Assert(MsPositionReContainer >= 0);
-            Debug.Assert(Trks != null && Trks.Count > 0);
+            M.Assert(MsPositionReContainer >= 0);
+            M.Assert(Trks != null && Trks.Count > 0);
             foreach(var trk in Trks)
             {
                 trk.AssertConsistency();
@@ -125,8 +125,8 @@ namespace Moritz.Spec
         public void InsertClefDef(int trkIndex, int uidIindex, string clefType)
         {
             #region check args
-            Debug.Assert(trkIndex < Trks.Count);
-            Debug.Assert(uidIindex > 0, "Cannot insert a clef before the first chord or rest in the bar!");
+            M.Assert(trkIndex < Trks.Count);
+            M.Assert(uidIindex > 0, "Cannot insert a clef before the first chord or rest in the bar!");
 
             if(String.Equals(clefType, "t") == false
             && String.Equals(clefType, "t1") == false
@@ -137,7 +137,7 @@ namespace Moritz.Spec
             && String.Equals(clefType, "b2") == false
             && String.Equals(clefType, "b3") == false)
             {
-                Debug.Assert(false, "Unknown clef type.");
+                M.Assert(false, "Unknown clef type.");
             }
             #endregion
 
@@ -147,7 +147,7 @@ namespace Moritz.Spec
 
         public void Insert(int trkIndex, int uidIndex, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
+            M.Assert(!(iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
 
             Trk trk = Trks[trkIndex];
             trk.Insert(uidIndex, iUniqueDef);
@@ -169,7 +169,7 @@ namespace Moritz.Spec
             {
                 if(i < 0 || i >= Trks.Count)
                 {
-                    Debug.Assert(false, "Index out of range");
+                    M.Assert(false, "Index out of range");
                 }
                 return Trks[i];
             }
@@ -177,7 +177,7 @@ namespace Moritz.Spec
             {
                 if(i < 0 || i >= Trks.Count)
                 {
-                    Debug.Assert(false, "Index out of range");
+                    M.Assert(false, "Index out of range");
                 }
 
                 Trks[i] = value;
@@ -222,7 +222,7 @@ namespace Moritz.Spec
 					}
 					catch(IndexOutOfRangeException)
 					{
-						Debug.Assert(false);
+						M.Assert(false);
 						return null;
 					}
 				}
@@ -255,7 +255,7 @@ namespace Moritz.Spec
             }
             set
             {
-                Debug.Assert(value >= 0);
+                M.Assert(value >= 0);
                 _msPositionReContainer = value;
             }
         }

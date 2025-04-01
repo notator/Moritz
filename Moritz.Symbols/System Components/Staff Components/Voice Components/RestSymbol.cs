@@ -40,7 +40,7 @@ namespace Moritz.Symbols
         {
             if(LocalCautionaryChordDef == null)
             {
-                Debug.Assert(_msDuration > 0);
+                M.Assert(_msDuration > 0);
 
                 w.SvgStartGroup(CSSObjectClass.rest.ToString()); // "rest"
 
@@ -94,7 +94,7 @@ namespace Moritz.Symbols
             get
             {
                 RestMetrics restMetrics = Metrics as RestMetrics;
-                Debug.Assert(restMetrics != null);
+                M.Assert(restMetrics != null);
                 return restMetrics;
             }
         }

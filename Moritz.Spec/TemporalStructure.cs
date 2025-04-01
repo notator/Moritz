@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Moritz.Globals;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -29,8 +31,8 @@ namespace Moritz.Spec
                 {
                     foreach(var uniqueDef in trk.UniqueDefs)
                     {
-                        Debug.Assert(uniqueDef is MidiChordDef || uniqueDef is RestDef);
-                        Debug.Assert(!(uniqueDef is CautionaryChordDef || uniqueDef is ClefDef));
+                        M.Assert(uniqueDef is MidiChordDef || uniqueDef is RestDef);
+                        M.Assert(!(uniqueDef is CautionaryChordDef || uniqueDef is ClefDef));
                     }
                 }
             }
@@ -74,14 +76,14 @@ namespace Moritz.Spec
                 if(remainingBar != null)
                 {
                     int remainingMsDuration = remainingBar.Trks0[0].MsDuration;
-                    Debug.Assert(poppedMsDuration == barMsDuration);
+                    M.Assert(poppedMsDuration == barMsDuration);
 
-                    Debug.Assert(poppedMsDuration + remainingMsDuration == totalDurationBeforePop);
+                    M.Assert(poppedMsDuration + remainingMsDuration == totalDurationBeforePop);
                     totalDurationBeforePop = remainingMsDuration;
                 }
                 else
                 {
-                    Debug.Assert(poppedMsDuration == totalDurationBeforePop);
+                    M.Assert(poppedMsDuration == totalDurationBeforePop);
                 }
 
                 bars.Add(poppedBar);
@@ -106,14 +108,14 @@ namespace Moritz.Spec
         /// </summary>
         private void CheckBarlineMsPositionsReTrk0(IReadOnlyList<int> barlineMsPositionsReTrk0)
         {
-            Debug.Assert(barlineMsPositionsReTrk0[0] > 0, "The first msPosition must be greater than 0.");
+            M.Assert(barlineMsPositionsReTrk0[0] > 0, "The first msPosition must be greater than 0.");
 
             for(int i = 0; i < barlineMsPositionsReTrk0.Count; ++i)
             {
                 int msPosition = barlineMsPositionsReTrk0[i];
                 for(int j = i + 1; j < barlineMsPositionsReTrk0.Count; ++j)
                 {
-                    Debug.Assert(msPosition != barlineMsPositionsReTrk0[j], "Error: Duplicate barline msPositions.");
+                    M.Assert(msPosition != barlineMsPositionsReTrk0[j], "Error: Duplicate barline msPositions.");
                 }
             }
 
@@ -122,7 +124,7 @@ namespace Moritz.Spec
 
             foreach(int msPosition in barlineMsPositionsReTrk0)
             {
-                Debug.Assert(msPosition > currentMsPos, "Value out of order.");
+                M.Assert(msPosition > currentMsPos, "Value out of order.");
                 currentMsPos = msPosition;
                 bool found = false;
                 foreach(var trk in trks0)
@@ -140,7 +142,7 @@ namespace Moritz.Spec
                         break;
                     }
                 }
-                Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef.");
+                M.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef.");
             }
         }
 
@@ -154,7 +156,7 @@ namespace Moritz.Spec
         /// <returns>The popped bar and the remaining part of the input bar</returns>
         public Tuple<Bar, Bar> PopBar(Bar bar, int poppedBarMsDuration)
         {
-            Debug.Assert(poppedBarMsDuration > 0);
+            M.Assert(poppedBarMsDuration > 0);
 
             if(poppedBarMsDuration == bar.ChannelDefs[0].Trks[0].MsDuration)
             {

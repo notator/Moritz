@@ -40,7 +40,7 @@ namespace Moritz.Spec
 			{
 				foreach(int pitch in value)
 				{
-					Debug.Assert(pitch == M.MidiValue(pitch));
+					M.Assert(pitch == M.MidiValue(pitch));
 				}
 				_pitches = new List<int>(value);
 			}
@@ -60,7 +60,7 @@ namespace Moritz.Spec
 			{
 				foreach(int velocity in value)
 				{
-					Debug.Assert(velocity == M.MidiValue(velocity));
+					M.Assert(velocity == M.MidiValue(velocity));
 				}
 				_velocities = new List<int>(value);
 			}

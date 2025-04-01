@@ -236,7 +236,7 @@ namespace Moritz.Spec
             List<int> agglommeratedD2s = rval.Item2;
             for(int i = 0; i < msDurs.Count; ++i)
             {
-                Debug.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
+                M.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
                 w.WriteStartElement("vt"); // envelope
                 w.WriteAttributeString("d2", agglommeratedD2s[i].ToString());
                 w.WriteAttributeString("msDur", msDurs[i].ToString());
@@ -249,7 +249,7 @@ namespace Moritz.Spec
 
         private Tuple<List<int>, List<int>> Agglommerate(List<int> msDurs, List<int> d2s)
         {
-            Debug.Assert(msDurs.Count == d2s.Count);
+            M.Assert(msDurs.Count == d2s.Count);
 
             List<int> rD2s = new List<int>(d2s);
 
@@ -267,7 +267,7 @@ namespace Moritz.Spec
 
         private Tuple<List<int>, List<int>, List<int>> Agglommerate(List<int> msDurs, List<int> d1s, List<int> d2s)
         {
-            Debug.Assert(msDurs.Count == d1s.Count && msDurs.Count == d2s.Count);
+            M.Assert(msDurs.Count == d1s.Count && msDurs.Count == d2s.Count);
 
             List<int> rD1s = new List<int>(d1s);
             List<int> rD2s = new List<int>(d2s);
@@ -293,7 +293,7 @@ namespace Moritz.Spec
         /// <returns>The last controller value</returns>
         private int WriteD1AndD2VTs(SvgWriter w, List<int> d1s, List<int> d2s, int msDuration)
         {
-            Debug.Assert(d1s.Count == d2s.Count);
+            M.Assert(d1s.Count == d2s.Count);
             int lastControllerValue = 0; // will always be changed
             List<int> msDurs = GetMsDurs(d1s.Count, msDuration);
             Tuple<List<int>, List<int>, List<int>> rVals = Agglommerate(msDurs, d1s, d2s);
@@ -302,7 +302,7 @@ namespace Moritz.Spec
             List<int> rD2s = rVals.Item3;
             for(int i = 0; i < msDurs.Count; ++i)
             {
-                Debug.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
+                M.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
                 w.WriteStartElement("vt"); // envelope
                 w.WriteAttributeString("d1", rD1s[i].ToString());
                 w.WriteAttributeString("d2", rD2s[i].ToString());
@@ -324,12 +324,12 @@ namespace Moritz.Spec
                     msDurs.Add(msDuration);
                     break;
                 case 2:
-                    Debug.Assert(msDuration > 1);
+                    M.Assert(msDuration > 1);
                     msDurs.Add(msDuration - 1);
                     msDurs.Add(1);
                     break;
                 default:
-                    Debug.Assert(msDuration > 2);
+                    M.Assert(msDuration > 2);
                     float fDuration = ((float)msDuration - 1) / (count - 1);
                     List<int> iPositions = new List<int>();
                     float fPosition = 0;

@@ -1,3 +1,4 @@
+using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Xml;
 
@@ -12,7 +13,7 @@ namespace Moritz.Symbols
         {
             SVGSystem = svgSystem;
             Staffname = staffName;
-            Debug.Assert(numberOfStafflines > 0);
+            M.Assert(numberOfStafflines > 0);
             NumberOfStafflines = numberOfStafflines;
             Gap = gap;
             StafflineStemStrokeWidth = stafflineStemStrokeWidth;
@@ -154,7 +155,7 @@ namespace Moritz.Symbols
         /// </summary>
         public void AdjustRestsVertically()
         {
-            Debug.Assert(Voices.Count == 2);
+            M.Assert(Voices.Count == 2);
             MoveRestsOntoOuterStafflines();
             RemoveVerticalRestCollisions();
         }
@@ -198,7 +199,7 @@ namespace Moritz.Symbols
         /// </summary>
         private void RemoveVerticalRestCollisions()
         {
-            Debug.Assert(Voices.Count == 2);
+            M.Assert(Voices.Count == 2);
             AdjustRestRestCollisions();
             AdjustRestsForVerticalChordCollisions(0);
             AdjustRestsForVerticalChordCollisions(1);
@@ -255,7 +256,7 @@ namespace Moritz.Symbols
         }
         private void AdjustRestsForVerticalChordCollisions(int restsChannelIndex)
         {
-            Debug.Assert(restsChannelIndex == 0 || restsChannelIndex == 1);
+            M.Assert(restsChannelIndex == 0 || restsChannelIndex == 1);
 
             List<NoteObject> restObjects;
             List<NoteObject> chordObjects;
@@ -394,9 +395,9 @@ namespace Moritz.Symbols
         /// </summary>
         public void AdjustTwoPartChords()
         {
-            Debug.Assert(Voices.Count == 2);
-            Debug.Assert(Voices[0].StemDirection == VerticalDir.up);
-            Debug.Assert(Voices[1].StemDirection == VerticalDir.down);
+            M.Assert(Voices.Count == 2);
+            M.Assert(Voices[0].StemDirection == VerticalDir.up);
+            M.Assert(Voices[1].StemDirection == VerticalDir.down);
             foreach(ChordSymbol upperChord in Voices[0].ChordSymbols)
             {
                 foreach(ChordSymbol lowerChord in Voices[1].ChordSymbols)
@@ -431,10 +432,10 @@ namespace Moritz.Symbols
         /// </summary>
         public void AdjustBeamedStemHeights(int voiceIndex)
         {
-            Debug.Assert(Voices.Count == 2);
-            Debug.Assert(voiceIndex == 0 || voiceIndex == 1);
-            Debug.Assert(Voices[0].StemDirection == VerticalDir.up);
-            Debug.Assert(Voices[1].StemDirection == VerticalDir.down);
+            M.Assert(Voices.Count == 2);
+            M.Assert(voiceIndex == 0 || voiceIndex == 1);
+            M.Assert(Voices[0].StemDirection == VerticalDir.up);
+            M.Assert(Voices[1].StemDirection == VerticalDir.down);
 
             int adjustVoiceIndex = 0;
             int otherVoiceIndex = 1;
@@ -490,10 +491,10 @@ namespace Moritz.Symbols
         /// </summary>
         public void AdjustStemAndBeamBlockHeights(int voiceIndex)
         {
-            Debug.Assert(Voices.Count == 2);
-            Debug.Assert(voiceIndex == 0 || voiceIndex == 1);
-            Debug.Assert(Voices[0].StemDirection == VerticalDir.up);
-            Debug.Assert(Voices[1].StemDirection == VerticalDir.down);
+            M.Assert(Voices.Count == 2);
+            M.Assert(voiceIndex == 0 || voiceIndex == 1);
+            M.Assert(Voices[0].StemDirection == VerticalDir.up);
+            M.Assert(Voices[1].StemDirection == VerticalDir.down);
 
             int adjustVoiceIndex = 0;
             int otherVoiceIndex = 1;
@@ -548,14 +549,14 @@ namespace Moritz.Symbols
         /// </summary>
         private void AdjustLowerChordXPosition(ChordSymbol upperChord, ChordSymbol lowerChord)
         {
-            Debug.Assert(upperChord.AbsMsPosition == lowerChord.AbsMsPosition);
+            M.Assert(upperChord.AbsMsPosition == lowerChord.AbsMsPosition);
             if(!(upperChord is CautionaryChordSymbol))
             {
-                Debug.Assert(upperChord.Stem.Direction == VerticalDir.up);
+                M.Assert(upperChord.Stem.Direction == VerticalDir.up);
             }
             if(!(lowerChord is CautionaryChordSymbol))
             {
-                Debug.Assert(lowerChord.Stem.Direction == VerticalDir.down);
+                M.Assert(lowerChord.Stem.Direction == VerticalDir.down);
             }
 
             List<HeadMetrics> upperChordHeadMetrics = upperChord.ChordMetrics.HeadsMetrics; // a clone
@@ -751,7 +752,7 @@ namespace Moritz.Symbols
                 {
                     if(noteObject is DurationSymbol symbol && symbol is Type)
                     {
-                        Debug.Assert(symbol.AbsMsPosition >= 0,
+                        M.Assert(symbol.AbsMsPosition >= 0,
                              "Symbol.MsPosition must be set before calling this funcion!");
                         if(!dict.ContainsKey(symbol.AbsMsPosition))
                         {
@@ -770,7 +771,7 @@ namespace Moritz.Symbols
             while(dict.Count > 0)
             {
                 int smallestKey = int.MaxValue;
-                Debug.Assert(dict.Count > 0);
+                M.Assert(dict.Count > 0);
                 foreach(int key in dict.Keys)
                 {
                     smallestKey = key < smallestKey ? key : smallestKey;

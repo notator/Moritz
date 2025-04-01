@@ -228,7 +228,7 @@ namespace DeleteUnusedDuplicateKrystalsApp
             string backupDirectoryName = K.CopyDirectoryToMoritzBackup(_krystalsFolder);
             MessageBox.Show($"\nA backup of the original krystals folder has been created in\n    {backupDirectoryName}");
 
-            Debug.Assert(false, "This function has only been kept for archiving purposes." +
+            M.Assert(false, "This function has only been kept for archiving purposes." +
                 "Before running it, see the comment above it in the code.");
 
             Dictionary<string, string> expanderNamesDict = SaveExpandersWithNewNames();

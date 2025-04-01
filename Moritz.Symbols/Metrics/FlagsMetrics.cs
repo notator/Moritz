@@ -1,4 +1,5 @@
-﻿using Moritz.Xml;
+﻿using Moritz.Globals;
+using Moritz.Xml;
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -64,7 +65,7 @@ namespace Moritz.Symbols
                     offset = 1F;
                     break;
                 default:
-                    Debug.Assert(false, "This duration class has no flags.");
+                    M.Assert(false, "This duration class has no flags.");
                     break;
             }
             if(stemDirection == VerticalDir.up)

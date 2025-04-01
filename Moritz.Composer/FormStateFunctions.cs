@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Moritz.Globals;
+
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -104,7 +106,7 @@ namespace Moritz.Composer
         /// <param name="Form"></param>
         public void SetSettingsAreConfirmed(Form form, bool hasError, Button confirmButton)
         {
-            Debug.Assert(!hasError); // the confirmButton should have been disabled if there is an error on the form
+            M.Assert(!hasError); // the confirmButton should have been disabled if there is an error on the form
 
             SetFormState(form, SavedState.confirmed);
             confirmButton.Enabled = false;
@@ -115,7 +117,7 @@ namespace Moritz.Composer
         /// </summary>
         public void SetSettingsAreSaved(Form form, bool hasError, Button confirmButton, Button revertToSavedButton)
         {
-            //Debug.Assert(!hasError); // the revertToSavedButton should already be disabled if there is an error on the form
+            //M.Assert(!hasError); // the revertToSavedButton should already be disabled if there is an error on the form
 
             SetFormState(form, SavedState.saved);
             if(confirmButton != null) confirmButton.Enabled = false;

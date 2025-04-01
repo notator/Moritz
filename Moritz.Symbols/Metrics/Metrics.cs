@@ -1,4 +1,5 @@
-﻿using Moritz.Xml;
+﻿using Moritz.Globals;
+using Moritz.Xml;
 
 using System;
 using System.Collections.Generic;
@@ -160,13 +161,13 @@ namespace Moritz.Symbols
 
         protected void MoveAboveTopBoundary(float topBoundary, float padding)
         {
-            Debug.Assert(padding >= 0.0F);
+            M.Assert(padding >= 0.0F);
             float newBottom = topBoundary - padding;
             Move(0F, newBottom - Bottom);
         }
         protected void MoveBelowBottomBoundary(float bottomBoundary, float padding)
         {
-            Debug.Assert(padding >= 0.0F);
+            M.Assert(padding >= 0.0F);
             float newTop = bottomBoundary + padding;
             Move(0F, newTop - Top);
         }

@@ -1,10 +1,12 @@
 using Krystals5ObjectLibrary;
 
 using Moritz.Algorithm;
+using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Symbols;
 using Moritz.Xml;
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -25,8 +27,6 @@ namespace Moritz.Composer
         protected bool CreateScore(List<Krystal> krystals)
         {
             List<Bar> bars = _algorithm.DoAlgorithm(_pageFormat, krystals);
-
-            CheckBars(bars);
 
             this.ScoreData = _algorithm.SetScoreRegionsData(bars);
 
@@ -52,7 +52,7 @@ namespace Moritz.Composer
         }
 
         /// <summary>
-        /// Inserts a ClefDef at the beginning of each Trk in each bar, taking any cautionaryChordDefs into account.
+        /// Inserts a ClefDef at the beginning of the first Trk in each ChannelDef in each bar, taking any optional ChordDefs into account.
         /// </summary>
         /// <param name="bars"></param>
         /// <param name="initialClefPerMIDIChannel">The clefs at the beginning of the score.</param>
@@ -60,127 +60,48 @@ namespace Moritz.Composer
         {
             // bars can currently contain cautionary clefs, but no initial clefs
             List<string> currentClefs = new List<string>(initialClefPerMIDIChannel);
-            int nVoiceDefs = bars[0].ChannelDefs.Count;        
-            foreach(Bar bar in bars)
-            {
-                for(int i = 0; i < nVoiceDefs; ++i)
-                {
-                    ClefDef initialClefDef = new ClefDef(currentClefs[i], 0); // msPos is set later in Notator.ConvertVoiceDefsToNoteObjects()
-                    foreach(var trk in bar.ChannelDefs[i].Trks)
-                    {
-                        trk.Insert(0, initialClefDef);
-                        List<IUniqueDef> iuds = trk.UniqueDefs;
-                        for(int j = 1; j < iuds.Count; ++j)
-                        {
-                            if(iuds[j] is ClefDef cautionaryClefDef)
-                            {
-                                currentClefs[i] = cautionaryClefDef.ClefType;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            int nVoiceDefs = bars[0].ChannelDefs.Count;
+            M.Assert(nVoiceDefs == currentClefs.Count);
 
-        private void CheckBars(List<Bar> bars)
-        {
-            string errorString = null;
-            if(bars.Count == 0)
-                errorString = "The algorithm has not created any bars!";
-            else
-            {
-                errorString = BasicChecks(bars);
-            }
-            Debug.Assert(string.IsNullOrEmpty(errorString), errorString);
-        }
-        #region private to CheckBars(...)
-        private string BasicChecks(List<Bar> bars)
-        {
-            string errorString = null;
-            //List<int> visibleLowerVoiceIndices = new List<int>();
-            //Dictionary<int, string> upperVoiceClefDict = GetUpperVoiceClefDict(bars[0], _pageFormat, /*sets*/ visibleLowerVoiceIndices);
-
-            for(int barIndex = 0; barIndex < bars.Count; ++barIndex)
+            for(int barIndex = 0; barIndex < bars.Count; barIndex++)
             {
                 Bar bar = bars[barIndex];
-                IReadOnlyList<ChannelDef> channelDefs = bar.ChannelDefs;
-
-                if(channelDefs.Count == 0)
+                for(int voiceIndex = 0; voiceIndex < nVoiceDefs; ++voiceIndex)
                 {
-                    errorString = $"Bar (index {barIndex}) contains no voices.";
-                    break;
-                }
+                    Trk trk = bar.ChannelDefs[voiceIndex].Trks[0];                    
 
-                for(int channelIndex = 0; channelIndex < channelDefs.Count; ++channelIndex)
-                {
-                    ChannelDef channelDef = channelDefs[channelIndex];
-                    for(int trkIndex = 0; trkIndex < channelDef.Trks.Count; ++trkIndex)
+                    if(trk.UniqueDefs[0] is ClefDef startClef)
                     {
-                        if(channelDef.Trks[trkIndex].UniqueDefs.Count == 0)
+                        currentClefs[voiceIndex] = startClef.ClefType;
+                        if(barIndex > 0)
                         {
-                            errorString = $"Trk (index {trkIndex}) in Voice (index {channelIndex}) in Bar (index {barIndex}) has an empty UniqueDefs list.";
-                            break;
+                            Trk trkInPreviousBar = bars[barIndex - 1].ChannelDefs[voiceIndex].Trks[0];
+                            trkInPreviousBar.UniqueDefs.Add(startClef);                           
+                        }
+                    }
+                    else
+                    {
+                        ClefDef initialClefDef = new ClefDef(currentClefs[voiceIndex], 0);
+                        trk.Insert(0, initialClefDef);
+                    }
+
+                    List<IUniqueDef> iuds = trk.UniqueDefs;
+                    for(int iudIndex = 1; iudIndex < iuds.Count; ++iudIndex)
+                    {
+                        if(iuds[iudIndex] is ClefDef midStaffClefDef)
+                        {
+                            int result = String.Compare(currentClefs[voiceIndex], midStaffClefDef.ClefType);
+                            if(result != 0)
+                            {
+                                throw new ApplicationException($"Redundant clef change in voice index {voiceIndex}, position index {iudIndex}");
+                            }
+                            
+                            currentClefs[voiceIndex] = midStaffClefDef.ClefType;
                         }
                     }
                 }
-
-                errorString = CheckThatLowerVoicesHaveNoSmallClefs(channelDefs);
-
-                if(!string.IsNullOrEmpty(errorString))
-                    break;
             }
-            return errorString;
         }
-
-        private string CheckThatLowerVoicesHaveNoSmallClefs(IReadOnlyList<ChannelDef> channelDefs)
-        {
-            string errorString = "";
-
-            List<int> lowerVoiceIndices = GetLowerVoiceIndices();
-
-            foreach(int lowerVoiceIndex in lowerVoiceIndices)
-            {
-                var trks = channelDefs[lowerVoiceIndex].Trks;
-                foreach(var trk in trks)
-                {
-
-                    foreach(IUniqueDef iud in trk.UniqueDefs)
-                    {
-                        if(iud is ClefDef)
-                        {
-                            errorString = "Small Clefs may not be defined for lower voices on a staff.";
-                            break;
-                        }
-                    }
-                }
-                if(!string.IsNullOrEmpty(errorString))
-                    break;
-            }
-
-            return errorString;
-        }
-
-        private List<int> GetLowerVoiceIndices()
-        {
-            List<int> lowerVoiceIndices = new List<int>();
-            int voiceIndex = 0;
-
-            List<List<int>> voiceIndicesPerStaff = _pageFormat.VoiceIndicesPerStaff;
-
-            for(int staffIndex = 0; staffIndex < voiceIndicesPerStaff.Count; ++staffIndex)
-            {
-                if(voiceIndicesPerStaff[staffIndex].Count > 1)
-                {
-                    voiceIndex++;
-                    lowerVoiceIndices.Add(voiceIndex);
-                }
-                voiceIndex++;
-            }
-
-            return lowerVoiceIndices;
-        }
-
-        #endregion
 
         /// <summary>
         /// Creates one System per bar (=list of ChannelDefs) in the argument.
@@ -252,7 +173,7 @@ namespace Moritz.Composer
             }
             else
             {
-                Debug.Assert(staff.Voices.Count == 2);
+                M.Assert(staff.Voices.Count == 2);
                 staff.Voices[0].StemDirection = VerticalDir.up;
                 staff.Voices[1].StemDirection = VerticalDir.down;
             }

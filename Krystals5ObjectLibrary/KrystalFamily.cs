@@ -1,3 +1,5 @@
+using Moritz.Globals;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -116,7 +118,7 @@ namespace Krystals5ObjectLibrary
 
         private void AddExpansionDependency(Dependency d, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            Debug.Assert(d != null);
+            M.Assert(d != null);
 
             string path = K.KrystalsFolder + @"\" + fileInfo.Name;
             var xk = new ExpansionKrystal(path, true);
@@ -136,7 +138,7 @@ namespace Krystals5ObjectLibrary
         }
         private void AddModulationDependency(Dependency d, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            Debug.Assert(d != null);
+            M.Assert(d != null);
 
             string path = K.KrystalsFolder + @"\" + fileInfo.Name;
             var mk = new ModulationKrystal(path, true);
@@ -156,7 +158,7 @@ namespace Krystals5ObjectLibrary
         }
         private void AddPermutationDependency(Dependency d, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            Debug.Assert(d != null);
+            M.Assert(d != null);
 
             string path = K.KrystalsFolder + @"\" + fileInfo.Name;
             var pk = new PermutationKrystal(path, true);
@@ -178,7 +180,7 @@ namespace Krystals5ObjectLibrary
         }
         private void AddPathDependency(Dependency d, Dictionary<string, List<string>> krystalScoresDict, FileInfo[] fileInfos, FileInfo fileInfo)
         {
-            Debug.Assert(d != null);
+            M.Assert(d != null);
 
             string path = K.KrystalsFolder + @"\" + fileInfo.Name;
             var pk = new PathKrystal(path, true);

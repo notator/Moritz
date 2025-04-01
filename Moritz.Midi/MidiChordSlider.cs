@@ -1,3 +1,5 @@
+using Moritz.Globals;
+
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,7 +14,7 @@ namespace Moritz.Midi
         protected MidiChordSlider(ChordSliderType chordSliderType, List<byte> values, int channel, int noteDurationMilliseconds)
             : base()
         {
-            Debug.Assert(values.Count > 0);
+            M.Assert(values.Count > 0);
             if(values.Count == 1)
             {
                 SetSingleMidiChordSlider(chordSliderType, channel, values[0]);
@@ -72,7 +74,7 @@ namespace Moritz.Midi
         protected void SetMidiChordSlider(ChordSliderType chordSliderType, int channel, int currentMsPosition, int endMsPosition,
             byte currentValue, byte endValue)
         {
-            Debug.Assert(endMsPosition >= currentMsPosition);
+            M.Assert(endMsPosition >= currentMsPosition);
 
             float slideValueDelta = 0f;
             float slideDuration = endMsPosition - currentMsPosition;

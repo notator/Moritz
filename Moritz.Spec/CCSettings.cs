@@ -21,19 +21,19 @@ namespace Moritz.Spec
             #region check args
             // There must be a _defaultSettings and/or an _overrideSettings
             // Note that if the DefaultSettings are not defined, voices having no TrackCCSettings will be unaffected.
-            Debug.Assert(defaultSettings != null || overrideSettings != null);
+            M.Assert(defaultSettings != null || overrideSettings != null);
 
             List<int?> channels = new List<int?>();
             if(defaultSettings != null)
             {
-                Debug.Assert(defaultSettings.MidiChannel == null);
+                M.Assert(defaultSettings.MidiChannel == null);
             }
             if(overrideSettings != null)
             {
                 foreach(TrackCCSettings tccs in overrideSettings)
                 {
-                    Debug.Assert(tccs.MidiChannel != null);
-                    Debug.Assert(!channels.Contains(tccs.MidiChannel));
+                    M.Assert(tccs.MidiChannel != null);
+                    M.Assert(!channels.Contains(tccs.MidiChannel));
                     channels.Add(tccs.MidiChannel);
                 }
             }
@@ -96,7 +96,7 @@ namespace Moritz.Spec
 
         public void WriteSVG(SvgWriter w, string elementName)
         {
-            Debug.Assert((_pressureOption != CControllerType.undefined || _pressureVolumeOption == true)
+            M.Assert((_pressureOption != CControllerType.undefined || _pressureVolumeOption == true)
                     || (_modWheelOption != CControllerType.undefined || _modWheelVolumeOption == true)
                     || (_pitchWheelOption != PitchWheelOption.undefined), "Attempt to write an empty TrackCCSettings element.");
 
@@ -126,18 +126,18 @@ namespace Moritz.Spec
                 {
                     case PitchWheelOption.pitch:
                         //(range 0..127)
-                        Debug.Assert(_pitchWheelDeviationOption != null && _pitchWheelDeviationOption >= 0 && _pitchWheelDeviationOption <= 127);
+                        M.Assert(_pitchWheelDeviationOption != null && _pitchWheelDeviationOption >= 0 && _pitchWheelDeviationOption <= 127);
                         w.WriteAttributeString("pitchWheelDeviation", _pitchWheelDeviationOption.ToString());
                         break;
                     case PitchWheelOption.pan:
                         //(range 0..127, centre is 64)
-                        Debug.Assert(_panOriginOption != null && _panOriginOption >= 0 && _panOriginOption <= 127);
+                        M.Assert(_panOriginOption != null && _panOriginOption >= 0 && _panOriginOption <= 127);
                         w.WriteAttributeString("panOrigin", _panOriginOption.ToString());
                         break;
                     case PitchWheelOption.speed:
                         // maximum speed is when durations = durations / speedDeviation
                         // minimum speed is when durations = durations * speedDeviation 
-                        Debug.Assert(_speedDeviationOption != null && _speedDeviationOption >= 1);
+                        M.Assert(_speedDeviationOption != null && _speedDeviationOption >= 1);
                         w.WriteAttributeString("speedDeviation", M.FloatToShortString((float)_speedDeviationOption));
                         break;
                 }
@@ -149,7 +149,7 @@ namespace Moritz.Spec
             }
             else if(_modWheelVolumeOption == true)
             {
-                Debug.Assert(isControllingVolume == false, "Can't control volume with both pressure and modWheel.");
+                M.Assert(isControllingVolume == false, "Can't control volume with both pressure and modWheel.");
                 w.WriteAttributeString("modWheel", "volume");
                 WriteMaxMinVolume(w);
                 isControllingVolume = true;
@@ -162,14 +162,14 @@ namespace Moritz.Spec
         {
             if(_maximumVolume == null || _minimumVolume == null)
             {
-                Debug.Assert(false,
+                M.Assert(false,
                     "If any of the continuous controllers is set to control the *volume*,\n" +
                     "then both MaximumVolume and MinimumVolume must also be set.\n\n" +
                     "Use either the PressureVolume(...) or ModWheelVolume(...) constructor.");
             }
             if(_maximumVolume <= _minimumVolume)
             {
-                Debug.Assert(false,
+                M.Assert(false,
                     "MaximumVolume must be greater than MinimumVolume.");
             }
             w.WriteAttributeString("maxVolume", _maximumVolume.ToString());
@@ -178,8 +178,8 @@ namespace Moritz.Spec
 
         public void AddList(List<CCSetting> optList)
         {
-            Debug.Assert(optList.Count < 4, "Each of the three continuous controllers can only be set once!");
-            Debug.Assert(optList.Count > 0, "Empty TrackCCSettings list.");
+            M.Assert(optList.Count < 4, "Each of the three continuous controllers can only be set once!");
+            M.Assert(optList.Count > 0, "Empty TrackCCSettings list.");
             foreach(CCSetting opt in optList)
             {
                 if(opt is PressureControl pcto)
@@ -215,21 +215,21 @@ namespace Moritz.Spec
 
         public void Add(PressureControl pressureControl)
         {
-            Debug.Assert(_pressureOption == CControllerType.undefined && _pressureVolumeOption == false,
+            M.Assert(_pressureOption == CControllerType.undefined && _pressureVolumeOption == false,
                 "Illegal attempt to set the PressureOption twice.");
 
             _pressureOption = pressureControl.ControllerType;
         }
         public void Add(ModWheelControl modWheelControllerCCSetting)
         {
-            Debug.Assert(_modWheelOption == CControllerType.undefined && _modWheelVolumeOption == false,
+            M.Assert(_modWheelOption == CControllerType.undefined && _modWheelVolumeOption == false,
                 "Illegal attempt to set the ModWheelOption twice.");
 
             _modWheelOption = modWheelControllerCCSetting.ControllerType;
         }
         public void Add(PressureVolumeControl pressureVolumeCCSetting)
         {
-            Debug.Assert(_pressureOption == CControllerType.undefined && _pressureVolumeOption == false,
+            M.Assert(_pressureOption == CControllerType.undefined && _pressureVolumeOption == false,
                 "Illegal attempt to set the PressureOption twice.");
 
             _pressureVolumeOption = true;
@@ -239,7 +239,7 @@ namespace Moritz.Spec
         }
         public void Add(ModWheelVolumeControl modWheelVolumeCCSetting)
         {
-            Debug.Assert(_modWheelOption == CControllerType.undefined && _modWheelVolumeOption == false,
+            M.Assert(_modWheelOption == CControllerType.undefined && _modWheelVolumeOption == false,
                 "Illegal attempt to set the ModWheelOption twice.");
             _modWheelVolumeOption = true;
             _minimumVolume = modWheelVolumeCCSetting.MinimumVolume;
@@ -247,19 +247,19 @@ namespace Moritz.Spec
         }
         public void Add(PitchWheelPitchControl pitchWheelPitchCCSetting)
         {
-            Debug.Assert(_pitchWheelOption == PitchWheelOption.undefined, "Illegal attempt to set the PitchWheelOption twice.");
+            M.Assert(_pitchWheelOption == PitchWheelOption.undefined, "Illegal attempt to set the PitchWheelOption twice.");
             _pitchWheelOption = PitchWheelOption.pitch;
             _pitchWheelDeviationOption = pitchWheelPitchCCSetting.PitchWheelDeviation;
         }
         public void Add(PitchWheelPanControl pitchWheelPanCCSetting)
         {
-            Debug.Assert(_pitchWheelOption == PitchWheelOption.undefined, "Illegal attempt to set the PitchWheelOption twice.");
+            M.Assert(_pitchWheelOption == PitchWheelOption.undefined, "Illegal attempt to set the PitchWheelOption twice.");
             _pitchWheelOption = PitchWheelOption.pan;
             _panOriginOption = pitchWheelPanCCSetting.PanOriginOption;
         }
         public void Add(PitchWheelSpeedControl pitchWheelSpeedCCSetting)
         {
-            Debug.Assert(_pitchWheelOption == PitchWheelOption.undefined, "Illegal attempt to set the PitchWheelOption twice.");
+            M.Assert(_pitchWheelOption == PitchWheelOption.undefined, "Illegal attempt to set the PitchWheelOption twice.");
             _pitchWheelOption = PitchWheelOption.speed;
             _speedDeviationOption = pitchWheelSpeedCCSetting.SpeedDeviationOption;
         }
@@ -351,9 +351,9 @@ namespace Moritz.Spec
     {
         public PressureVolumeControl(int minVolume, int maxVolume)
         {
-            Debug.Assert(minVolume < maxVolume);
-            Debug.Assert(minVolume > 0 && minVolume < 128);
-            Debug.Assert(maxVolume > 0 && maxVolume < 128);
+            M.Assert(minVolume < maxVolume);
+            M.Assert(minVolume > 0 && minVolume < 128);
+            M.Assert(maxVolume > 0 && maxVolume < 128);
             _minimumVolume = minVolume;
             _maximumVolume = maxVolume;
         }
@@ -366,9 +366,9 @@ namespace Moritz.Spec
     {
         public ModWheelVolumeControl(int minVolume, int maxVolume)
         {
-            Debug.Assert(minVolume < maxVolume);
-            Debug.Assert(minVolume > 0 && minVolume < 128);
-            Debug.Assert(maxVolume > 0 && maxVolume < 128);
+            M.Assert(minVolume < maxVolume);
+            M.Assert(minVolume > 0 && minVolume < 128);
+            M.Assert(maxVolume > 0 && maxVolume < 128);
             _minimumVolume = minVolume;
             _maximumVolume = maxVolume;
         }
@@ -392,7 +392,7 @@ namespace Moritz.Spec
     {
         public PitchWheelPitchControl(int deviation)
         {
-            Debug.Assert(deviation > 0 && deviation < 128);
+            M.Assert(deviation > 0 && deviation < 128);
             _pitchWheelDeviation = deviation;
         }
         public int PitchWheelDeviation { get { return _pitchWheelDeviation; } }
@@ -403,7 +403,7 @@ namespace Moritz.Spec
         public PitchWheelPanControl(int origin)
         {
             // pan centre is 64)
-            Debug.Assert(origin >= 0 && origin < 128);
+            M.Assert(origin >= 0 && origin < 128);
             _panOriginOption = origin;
         }
         public int PanOriginOption { get { return _panOriginOption; } }
@@ -413,7 +413,7 @@ namespace Moritz.Spec
     {
         public PitchWheelSpeedControl(float maxFactor)
         {
-            Debug.Assert(maxFactor > 1.0F);
+            M.Assert(maxFactor > 1.0F);
             _speedDeviationOption = maxFactor;
         }
         public float SpeedDeviationOption { get { return _speedDeviationOption; } }

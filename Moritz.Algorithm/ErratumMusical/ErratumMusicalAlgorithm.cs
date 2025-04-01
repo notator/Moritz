@@ -115,7 +115,7 @@ namespace Moritz.Algorithm.ErratumMusical
             List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
             List<ChannelDef> channelDefs = new List<ChannelDef>() { new ChannelDef(trks) };
 
-            Debug.Assert(channelDefs.Count == NumberOfMidiChannels);
+            M.Assert(channelDefs.Count == NumberOfMidiChannels);
 
             TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
 
@@ -130,9 +130,9 @@ namespace Moritz.Algorithm.ErratumMusical
 
         private List<IUniqueDef> GetMidiChordDefs(List<int> pitches, List<int> velocities, List<int> msDurations)
         {
-            Debug.Assert(pitches.Count == 85);
-            Debug.Assert(velocities.Count == 85);
-            Debug.Assert(msDurations.Count == 85);
+            M.Assert(pitches.Count == 85);
+            M.Assert(velocities.Count == 85);
+            M.Assert(msDurations.Count == 85);
 
             List<IUniqueDef> defs = new List<IUniqueDef>();
             int msPosition = 0;
@@ -173,7 +173,7 @@ namespace Moritz.Algorithm.ErratumMusical
             IReadOnlyList<int> durations = Durations();
             IReadOnlyList<List<M.Dynamic>> pitchDynamicPerSelection = GetPitchDynamicPerSelection(erratumMusicalGraphPitches);
             IReadOnlyList<int> finalRestMsDurations = new List<int>() { 2000, 2450, 2200, 1900, 2600, 2400, 2500, 0 };
-            Debug.Assert(finalRestMsDurations.Count == (erratumMusicalGraphPitches.Count));
+            M.Assert(finalRestMsDurations.Count == (erratumMusicalGraphPitches.Count));
 
             endBarlinePositions = new List<int>();
             int endBarlinePosition = 0;
@@ -304,11 +304,11 @@ namespace Moritz.Algorithm.ErratumMusical
 
         private List<int> GetPitchDurations(IReadOnlyList<int> graphPitches, IReadOnlyList<int> durations)
         {
-            Debug.Assert(graphPitches.Count == 85 && durations.Count == 85);
+            M.Assert(graphPitches.Count == 85 && durations.Count == 85);
             List<int> pitchDurations = new List<int>();
             foreach(int pitch in graphPitches)
             {
-                Debug.Assert(pitch >= 1 && pitch <= 85);
+                M.Assert(pitch >= 1 && pitch <= 85);
                 pitchDurations.Add(durations[pitch - 1]);
             }
             return pitchDurations;

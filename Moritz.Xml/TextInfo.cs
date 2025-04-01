@@ -1,4 +1,6 @@
 
+using Moritz.Globals;
+
 using System;
 using System.Diagnostics;
 
@@ -14,7 +16,7 @@ namespace Moritz.Xml
         public TextInfo(string text, string fontFamily, float fontHeight, ColorString colorString,
             TextHorizAlign textHorizAlign)
         {
-            Debug.Assert(!String.IsNullOrEmpty(text));
+            M.Assert(!String.IsNullOrEmpty(text));
             _text = text;
             _fontFamily = fontFamily;
             _fontHeight = fontHeight;

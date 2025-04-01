@@ -1,4 +1,5 @@
-﻿using Moritz.Xml;
+﻿using Moritz.Globals;
+using Moritz.Xml;
 
 using System;
 using System.Diagnostics;
@@ -44,7 +45,7 @@ namespace Moritz.Symbols
                 {
                     fill.Insert(0, "#");
                 }
-                Debug.Assert(Regex.IsMatch(fill, @"^#[0-9a-fA-F]{6}$"));
+                M.Assert(Regex.IsMatch(fill, @"^#[0-9a-fA-F]{6}$"));
                 Fill = fill; // a string of the form "#AAAAAA"
             }
         }
@@ -70,7 +71,7 @@ namespace Moritz.Symbols
         {
             _characterString = characterString;
 
-            Debug.Assert(_characterString != null);
+            M.Assert(_characterString != null);
             Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
 
             _originY = 0;
@@ -94,7 +95,7 @@ namespace Moritz.Symbols
         {
             _characterString = GetClichtCharacterString(durationClass, (cssClass == CSSObjectClass.rest));
 
-            Debug.Assert(_characterString != null);
+            M.Assert(_characterString != null);
             Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
 
             _originY = 0;
@@ -117,7 +118,7 @@ namespace Moritz.Symbols
         {
             _characterString = GetClichtCharacterString(head);
 
-            Debug.Assert(_characterString != null);
+            M.Assert(_characterString != null);
             Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
 
             _originY = 0;
@@ -249,7 +250,7 @@ namespace Moritz.Symbols
                     cLichtCharacterString = "#";
                     break;
                 default:
-                    Debug.Assert(false, "unknown accidental type");
+                    M.Assert(false, "unknown accidental type");
                     break;
             }
             return cLichtCharacterString;

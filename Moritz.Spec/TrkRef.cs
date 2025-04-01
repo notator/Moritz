@@ -1,4 +1,5 @@
 
+using Moritz.Globals;
 using Moritz.Xml;
 
 using System.Diagnostics;
@@ -40,7 +41,7 @@ namespace Moritz.Spec
             }
             set
             {
-                Debug.Assert(value >= 0 && value <= 15);
+                M.Assert(value >= 0 && value <= 15);
                 _trkIndex = value;
             }
         }

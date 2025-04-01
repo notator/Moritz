@@ -44,7 +44,7 @@ namespace Moritz.Spec
             : base(msDuration)
         {
             #region conditions
-            Debug.Assert(pitches.Count == velocities.Count);
+            M.Assert(pitches.Count == velocities.Count);
             foreach(int pitch in pitches)
             {
                 AssertIsMidiValue(pitch);
@@ -186,7 +186,7 @@ namespace Moritz.Spec
 
         private void WriteNoteOffs(SvgWriter w, int channel)
         {
-            Debug.Assert(Velocities != null && _pitches.Count == Velocities.Count);
+            M.Assert(Velocities != null && _pitches.Count == Velocities.Count);
             w.WriteStartElement("noteOffs");
             int status = (int)M.CMD.NOTE_OFF_120 + channel; // NoteOff 
             for(int i = 0; i < _pitches.Count; ++i)
@@ -200,7 +200,7 @@ namespace Moritz.Spec
 
         private void WriteNoteOns(SvgWriter w, int channel, int msDuration)
         {
-            Debug.Assert(Velocities != null && _pitches.Count == Velocities.Count);
+            M.Assert(Velocities != null && _pitches.Count == Velocities.Count);
             w.WriteStartElement("noteOns");
             w.WriteAttributeString("msDuration", msDuration.ToString());
 
@@ -222,8 +222,8 @@ namespace Moritz.Spec
         /// </summary>
         private void AssertConsistency()
 		{
-			Debug.Assert(Pitches != null, "Pitches is null");
-			Debug.Assert(Velocities != null, "Velocities is null");
+			M.Assert(Pitches != null, "Pitches is null");
+			M.Assert(Velocities != null, "Velocities is null");
 
 			foreach(int pitch in Pitches)
 			{
@@ -263,7 +263,7 @@ namespace Moritz.Spec
         public MidiChordDef Opposite(Mode mode)
         {
             #region conditions
-            Debug.Assert(mode != null);
+            M.Assert(mode != null);
             #endregion conditions
 
             int relativePitchHierarchyIndex = (mode.RelativePitchHierarchyIndex + 11) % 22;
@@ -271,8 +271,8 @@ namespace Moritz.Spec
             MidiChordDef oppositeMCD = (MidiChordDef)Clone();
 
             #region conditions
-            Debug.Assert(mode.Gamut[0] == oppositeMode.Gamut[0]);
-            Debug.Assert(mode.NPitchesPerOctave == oppositeMode.NPitchesPerOctave);
+            M.Assert(mode.Gamut[0] == oppositeMode.Gamut[0]);
+            M.Assert(mode.NPitchesPerOctave == oppositeMode.NPitchesPerOctave);
             // N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
             #endregion conditions
 
@@ -309,7 +309,7 @@ namespace Moritz.Spec
         public void Invert(int nPitchesToShiftArg)
         {
             #region conditions
-            Debug.Assert(nPitchesToShiftArg >= 0);
+            M.Assert(nPitchesToShiftArg >= 0);
             #endregion conditions
 
             InvertPitches(_pitches, nPitchesToShiftArg);
@@ -344,13 +344,13 @@ namespace Moritz.Spec
         public void SetVelocityPerAbsolutePitch(IReadOnlyList<int> velocityPerAbsolutePitch)
         {
             #region conditions
-            Debug.Assert(velocityPerAbsolutePitch.Count == 12);
+            M.Assert(velocityPerAbsolutePitch.Count == 12);
             for(int i = 0; i < 12; ++i)
             {
                 int v = velocityPerAbsolutePitch[i];
                 AssertIsVelocityValue(v);
             }
-            Debug.Assert(this._pitches.Count == Velocities.Count);
+            M.Assert(this._pitches.Count == Velocities.Count);
             #endregion conditions
 
             SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
@@ -391,12 +391,12 @@ namespace Moritz.Spec
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
         public void SetVelocityFromDuration(int msDurationRangeMin, int msDurationRangeMax, int velocityForMinMsDuration, int velocityForMaxMsDuration, double percent = 100.0)
         {
-            Debug.Assert(MsDuration >= msDurationRangeMin && MsDuration <= msDurationRangeMax);
-            Debug.Assert(msDurationRangeMin <= msDurationRangeMax);
+            M.Assert(MsDuration >= msDurationRangeMin && MsDuration <= msDurationRangeMax);
+            M.Assert(msDurationRangeMin <= msDurationRangeMax);
             // velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
             AssertIsVelocityValue(velocityForMinMsDuration);
             AssertIsVelocityValue(velocityForMaxMsDuration);
-            Debug.Assert(percent >= 0 && percent <= 100);
+            M.Assert(percent >= 0 && percent <= 100);
 
             double factorForNewValue = percent / 100;
             double factorForOldValue = 1 - factorForNewValue;
@@ -459,19 +459,19 @@ namespace Moritz.Spec
 
         #region utilities
         /// <summary>
-        /// A Debug.Assert that fails if the argument is outside the range 0..127.
+        /// A M.Assert that fails if the argument is outside the range 0..127.
         /// </summary>
         private static void AssertIsMidiValue(int value)
         {
-            Debug.Assert(value >= 0 && value <= 127);
+            M.Assert(value >= 0 && value <= 127);
         }
 
         /// <summary>
-        /// A Debug.Assert that fails if the argument is outside the range 1..127.
+        /// A M.Assert that fails if the argument is outside the range 1..127.
         /// </summary>
         private static void AssertIsVelocityValue(int velocity)
         {
-            Debug.Assert(velocity >= 1 && velocity <= 127);
+            M.Assert(velocity >= 1 && velocity <= 127);
         }
 
         /// <summary>
@@ -524,10 +524,10 @@ namespace Moritz.Spec
         public void TransposeStepsInModeGamut(Mode mode, int steps)
         {
             #region conditions
-            Debug.Assert(mode != null);
+            M.Assert(mode != null);
             foreach(int pitch in _pitches)
             {
-                Debug.Assert(mode.Gamut.Contains(pitch));
+                M.Assert(mode.Gamut.Contains(pitch));
             }
             #endregion conditions
 
@@ -552,9 +552,9 @@ namespace Moritz.Spec
             AssertConsistency();
 
             #region conditions
-            Debug.Assert(mode != null);
-            Debug.Assert(mode.Gamut.Contains(rootPitch));
-            Debug.Assert(mode.Gamut.Contains(_pitches[0]));
+            M.Assert(mode != null);
+            M.Assert(mode.Gamut.Contains(rootPitch));
+            M.Assert(mode.Gamut.Contains(_pitches[0]));
             #endregion conditions
 
             int stepsToTranspose = mode.IndexInGamut(rootPitch) - mode.IndexInGamut(_pitches[0]);
@@ -579,7 +579,7 @@ namespace Moritz.Spec
 
         private void RemoveDuplicateNotes(List<int> pitches, List<int> velocities)
         {
-            Debug.Assert(pitches.Count == velocities.Count);
+            M.Assert(pitches.Count == velocities.Count);
             pitches.Sort(); // just to be sure
             List<int> indicesOfPitchesToRemove = new List<int>();
             for(int i = 1; i < pitches.Count; ++i)
@@ -597,7 +597,7 @@ namespace Moritz.Spec
                     velocities.RemoveAt(i);
                 }
             }
-            Debug.Assert(pitches.Count == velocities.Count);
+            M.Assert(pitches.Count == velocities.Count);
         }
 
         internal void AdjustVelocities(double factor)
@@ -648,7 +648,7 @@ namespace Moritz.Spec
         /// If not null, this is simply a string that is printed after a tilde, above or below the chord.
         /// </summary>
         public string OrnamentText { get; private set; } = null;
-        public MidiChordControlDef MidiChordControlDef { get; private set; } = null;
+        public MidiChordControlDef MidiChordControlDef { get; set; } = null;
         /// <summary>
         /// See ControlEnvelope: a class that converts an EnvelopeTypeDef into a series of control values with a specific Count.
         /// </summary>

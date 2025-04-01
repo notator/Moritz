@@ -39,7 +39,7 @@ namespace Moritz.Globals.IODevices
                 {
                     MIDIOUTCAPS caps = new MIDIOUTCAPS();
                     uint returnValue = Functions.midiOutGetDevCaps(i, ref caps, (UInt32)Marshal.SizeOf(caps));
-                    Debug.Assert(returnValue == Constants.MMSYSERR_NOERROR);
+                    M.Assert(returnValue == Constants.MMSYSERR_NOERROR);
                     if(string.Compare(caps.szPname, "VirtualMIDISynth #1") != 0)
                     {
                         devices.Add(new OutputDevice(i, caps));

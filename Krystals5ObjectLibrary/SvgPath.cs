@@ -14,7 +14,7 @@ namespace Krystals5ObjectLibrary
 
         public SvgPath(XmlElement svgPathElem)
         {
-            Debug.Assert(svgPathElem != null && svgPathElem.HasAttribute("d"));
+            M.Assert(svgPathElem != null && svgPathElem.HasAttribute("d"));
 
             string d = svgPathElem.GetAttribute("d").Trim();
             Nodes = GetNodes(d);
@@ -26,8 +26,8 @@ namespace Krystals5ObjectLibrary
         //     object.closed: is a boolean that is true if the rawPathString ends with a "Z" or "z".
         private List<SvgNode> GetNodes(string rawPathString)
         {
-            Debug.Assert(rawPathString.Contains(",,") == false);
-            Debug.Assert(rawPathString.Contains("  ") == false);
+            M.Assert(rawPathString.Contains(",,") == false);
+            M.Assert(rawPathString.Contains("  ") == false);
 
             char[] separators = { ',', ' ' };
             string[] components = rawPathString.Split(separators); // split on both commas and whitespace
@@ -188,7 +188,7 @@ namespace Krystals5ObjectLibrary
                     currentSvgNode = new SvgNode(pointF, pointF, pointF);
                     break;
                 default:
-                    Debug.Assert(false, "unknown operator");
+                    M.Assert(false, "unknown operator");
                     break;
             }
 

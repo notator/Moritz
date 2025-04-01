@@ -1,5 +1,6 @@
 ﻿using Krystals5ObjectLibrary;
 
+using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Symbols;
 
@@ -124,6 +125,37 @@ namespace Moritz.Algorithm
         public abstract List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals);
 
         /// <summary>
+        /// Inserts ClefDefs at arbitrary positions in the top ChannelDef.Trks[0].UniqueDefs in each Staff.
+        /// The main clefs at the beginnings of bars are added automatically later, taking these clef changes
+        /// into account.
+        /// Call this function as follows:
+        ///     InsertClefChanges(bars, pageformat.VoiceIndicesPerStaff);
+        /// Its realisation follows the following pattern:
+        /// protected override void InsertClefChanges(bars, voiceIndicesPerStaff)
+        /// {
+        ///     // GetEmptyClefChangesPerBarPerStaff is predefined in this file.
+        ///     var clefChangesPerBarPerStaff = GetEmptyClefChangesPerBarPerStaff(bars, voiceIndicesPerStaff);
+        ///     
+        ///     var barIndex = 3;
+        ///     var staffIndex = 0;
+        ///     SortedDictionary<int, string> dict = clefChangesPerBarPerStaff[barIndex][staffIndex];
+        ///     
+        ///     dict.Add(9, "t");
+        ///     dict.Add(8, "b2");
+        ///     dict.Add(6, "b");
+        ///     dict.Add(4, "t2");
+        ///     dict.Add(2, "t");
+        ///
+        ///     // InsertClefChangesInBars is predefined in this file.
+        ///     InsertClefChangesInBars(bars, voiceIndicesPerStaff, clefChangesPerBarPerStaff);
+        /// }
+        /// </example> 
+        /// </summary>
+        /// <param name="bars">the completed bars</param>
+        /// <param name="voiceIndicesPerStaff">pageFormat.VoiceIndicesPerStaff</param>
+        protected virtual void InsertClefChanges(List<Bar> bars, List<List<int>> voiceIndicesPerStaff) { }
+
+        /// <summary>
         /// To insert clef changes into a score's Bars:
         ///     1. Construct the bars using GetBars(...)
         ///     2. Create an empty clefChanges object by calling GetEmptyClefChangesPerBarPerStaff(bars).
@@ -178,6 +210,7 @@ namespace Moritz.Algorithm
                     SortedDictionary<int, string> trkDict = new SortedDictionary<int, string>();
                     barList.Add(trkDict);
                 }
+                rval.Add(barList);
             }
 
             return rval;
@@ -185,7 +218,7 @@ namespace Moritz.Algorithm
 
         protected void InsertClefChangesInBars(List<Bar> bars, List<List<int>> voiceIndicesPerStaff, List<List<SortedDictionary<int, string>>> clefChangesPerBarPerStaff)
         {
-            Debug.Assert(bars.Count == clefChangesPerBarPerStaff.Count);
+            M.Assert(bars.Count == clefChangesPerBarPerStaff.Count);
 
             for(int barIndex = 0; barIndex < bars.Count; barIndex++)
             {
@@ -195,12 +228,16 @@ namespace Moritz.Algorithm
                     var midiIndex = voiceIndicesPerStaff[staffIndex][0];
                     var trk = bar.ChannelDefs[midiIndex].Trks[0];
                     SortedDictionary<int, string> clefDict = clefChangesPerBarPerStaff[barIndex][staffIndex];
-                    Dictionary<int, string> reversedDict = clefDict.Reverse().ToDictionary(pair => pair.Key, pair => pair.Value);
-                    foreach(KeyValuePair<int, string> keyValuePair in reversedDict)
+                    if(clefDict.Count > 0)
                     {
-                        int index = keyValuePair.Key;
-                        ClefDef clefDef = new ClefDef(keyValuePair.Value, trk.UniqueDefs[index].MsPositionReFirstUD);
-                        trk.Insert(keyValuePair.Key, clefDef);
+                        Dictionary<int, string> reversedDict = clefDict.Reverse().ToDictionary(pair => pair.Key, pair => pair.Value);
+                        M.Assert(reversedDict.First().Key < trk.UniqueDefs.Count);
+                        foreach(KeyValuePair<int, string> keyValuePair in reversedDict)
+                        {
+                            int index = keyValuePair.Key;
+                            ClefDef clefDef = new ClefDef(keyValuePair.Value, trk.UniqueDefs[index].MsPositionReFirstUD);
+                            trk.Insert(keyValuePair.Key, clefDef);
+                        }
                     }
                 }
             }
@@ -333,7 +370,7 @@ namespace Moritz.Algorithm
         /// <summary>
         /// Returns nBars barlineMsPositions.
         /// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef in the top Trk of a ChannelDef.
-        /// The returned list contains no duplicates (A Debug.Assertion fails otherwise).
+        /// The returned list contains no duplicates (A M.Assertion fails otherwise).
         /// </summary>
         /// <returns></returns>
         /// <param name="trks"></param>
@@ -345,7 +382,7 @@ namespace Moritz.Algorithm
             int msDuration = trks0[0].MsDuration; // all the trks0 have the same MsDuration
 
             double approxBarMsDuration = (((double)msDuration) / nBars);
-            Debug.Assert(approxBarMsDuration * nBars == msDuration);
+            M.Assert(approxBarMsDuration * nBars == msDuration);
 
             List<int> barlineMsPositions = new List<int>();
 
@@ -354,11 +391,11 @@ namespace Moritz.Algorithm
                 double approxBarMsPosition = approxBarMsDuration * barNumber;
                 int barMsPosition = NearestAbsUIDEndMsPosition(trks0, approxBarMsPosition);
 
-                Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
+                M.Assert(barlineMsPositions.Contains(barMsPosition) == false);
 
                 barlineMsPositions.Add(barMsPosition);
             }
-            Debug.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == msDuration);
+            M.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == msDuration);
 
             return barlineMsPositions;
         }

@@ -33,7 +33,7 @@ namespace Moritz.Algorithm.Study1
             List<int> trackChordNumbers = GetTrackChordNumbers();
             List<int> trackRootPitches = GetTrackRootPitches();
 
-            Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
+            M.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
             Trk trk0 = GetTrk0(trackChordNumbers, trackRootPitches);
             // parallel Trks must have the same number and types of contained UniqueDefs
@@ -46,7 +46,7 @@ namespace Moritz.Algorithm.Study1
             var channelDef = new ChannelDef(channelTrks);
             List<ChannelDef> channelDefs = new List<ChannelDef>() { channelDef };
 
-            Debug.Assert(channelDefs.Count == NumberOfMidiChannels);
+            M.Assert(channelDefs.Count == NumberOfMidiChannels);
 
             TemporalStructure temporalStructure = new TemporalStructure(channelDefs);
 
@@ -60,18 +60,21 @@ namespace Moritz.Algorithm.Study1
             {
                 foreach(Trk trk in channelDef.Trks)
                 {
-                    trk.SetPatch0InTheFirstChord();
+                    trk.SetPresetInTheFirstChord(0);
                 }
             }
+                         
+            InsertClefChanges(bars, pageFormat.VoiceIndicesPerStaff);
 
-            InsertClefs(pageFormat, bars);
-
-            return bars;  // The Trks in these bars dont contain ClefDefs.
+            return bars;  // The Trks in these bars contain ClefDefs.
         }
 
-        private void InsertClefs(PageFormat pageFormat, List<Bar> bars)
+        // Inserts ClefDefs at arbitrary positions in the top ChannelDef.Trks[0].UniqueDefs in each Staff.
+        // The main clefs at the beginnings of bars are added automatically later, taking these clef changes
+        // into account.
+        protected override void InsertClefChanges(List<Bar> bars, List<List<int>> voiceIndicesPerStaff)
         {
-            var clefChangesPerBarPerStaff = GetEmptyClefChangesPerBarPerStaff(bars, pageFormat.VoiceIndicesPerStaff);
+            var clefChangesPerBarPerStaff = GetEmptyClefChangesPerBarPerStaff(bars, voiceIndicesPerStaff);
 
             var barIndex = 3;
             var staffIndex = 0;
@@ -83,7 +86,7 @@ namespace Moritz.Algorithm.Study1
             dict.Add(4, "t2");
             dict.Add(2, "t");
 
-            InsertClefChangesInBars(bars, pageFormat.VoiceIndicesPerStaff, clefChangesPerBarPerStaff);
+            InsertClefChangesInBars(bars, voiceIndicesPerStaff, clefChangesPerBarPerStaff);
         }
 
         private Trk GetTrk1(Trk trk0)

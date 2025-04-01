@@ -23,9 +23,9 @@ namespace Moritz.Spec
 		/// <param name="steps">The number of PitchWeights in the constructed PitchWeights list. Must be greater than 0</param>
 		public PitchWeightVector(Gamut startGamut, Gamut targetGamut, Tuple<int, int> pitchVectorEndPoints, int steps)
 		{
-			Debug.Assert(pitchVectorEndPoints.Item1 >= startGamut.MinPitch && pitchVectorEndPoints.Item1 <= startGamut.MaxPitch);
-			Debug.Assert(pitchVectorEndPoints.Item2 >= targetGamut.MinPitch && pitchVectorEndPoints.Item2 <= targetGamut.MaxPitch);
-			Debug.Assert(steps > 0);
+			M.Assert(pitchVectorEndPoints.Item1 >= startGamut.MinPitch && pitchVectorEndPoints.Item1 <= startGamut.MaxPitch);
+			M.Assert(pitchVectorEndPoints.Item2 >= targetGamut.MinPitch && pitchVectorEndPoints.Item2 <= targetGamut.MaxPitch);
+			M.Assert(steps > 0);
 
 			int startPitch = pitchVectorEndPoints.Item1;
 			int startWeight = startGamut.Weight(startPitch);
@@ -71,7 +71,7 @@ namespace Moritz.Spec
 
 		internal PitchWeightVector Concat(PitchWeightVector pitchWeightVectorToConcat)
 		{
-			Debug.Assert(TargetPitchWeight == pitchWeightVectorToConcat.PitchWeights[0]);
+			M.Assert(TargetPitchWeight == pitchWeightVectorToConcat.PitchWeights[0]);
 
 			List<PitchWeight> pitchWeights = new List<PitchWeight>(PitchWeights);
 			pitchWeights.AddRange(pitchWeightVectorToConcat.PitchWeights);

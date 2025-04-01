@@ -1,3 +1,5 @@
+using Moritz.Globals;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -106,7 +108,7 @@ namespace Krystals5ObjectLibrary
 
         private void ContourStrands(List<StrandNode> contouredStrandNodeList, List<Strand> strands)
         {
-            Debug.Assert(contouredStrandNodeList.Count == strands.Count);
+            M.Assert(contouredStrandNodeList.Count == strands.Count);
 
             List<uint> tempList = new List<uint>();
             int[] contour;

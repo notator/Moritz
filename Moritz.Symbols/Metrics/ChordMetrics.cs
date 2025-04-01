@@ -156,8 +156,8 @@ namespace Moritz.Symbols
                 }
             }
 
-            Debug.Assert(_originX == 0F);
-            Debug.Assert(_headsMetricsTopDown.Count == chord.HeadsTopDown.Count);
+            M.Assert(_originX == 0F);
+            M.Assert(_headsMetricsTopDown.Count == chord.HeadsTopDown.Count);
         }
 
         private CSSObjectClass GetMainHeadClass(ChordSymbol chord)
@@ -360,7 +360,7 @@ namespace Moritz.Symbols
 
         private void MoveAccidentalLeftOfLedgerlineBlock(AccidentalMetrics accidentalM, LedgerlineBlockMetrics ledgerlineBlockM)
         {
-            Debug.Assert(accidentalM != null && ledgerlineBlockM != null);
+            M.Assert(accidentalM != null && ledgerlineBlockM != null);
 
             //float top = ledgerlineBlockM.Top - (_gap * 0.51F);
             //float bottom = ledgerlineBlockM.Bottom + (_gap * 0.51F);
@@ -372,7 +372,7 @@ namespace Moritz.Symbols
 
         private LedgerlineBlockMetrics CreateUpperLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth, CSSObjectClass ledgerlinesClass)
         {
-            Debug.Assert(topDownHeadsMetrics != null);
+            M.Assert(topDownHeadsMetrics != null);
             #region upper ledgerline block
             float minLeftX = float.MaxValue;
             float maxRightX = float.MinValue;
@@ -407,7 +407,7 @@ namespace Moritz.Symbols
         }
         private LedgerlineBlockMetrics CreateLowerLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth, CSSObjectClass ledgerlinesClass)
         {
-            Debug.Assert(topDownHeadsMetrics != null);
+            M.Assert(topDownHeadsMetrics != null);
             float minLeftX = float.MaxValue;
             float maxRightX = float.MinValue;
             foreach(HeadMetrics head in topDownHeadsMetrics)
@@ -477,7 +477,7 @@ namespace Moritz.Symbols
         /// </summary>
         private FlagsMetrics GetFlagsMetrics(List<HeadMetrics> topDownHeadsMetrics, DurationClass durationClass, float fontSize, VerticalDir stemDirection, float stemThickness)
         {
-            Debug.Assert(durationClass == DurationClass.quaver
+            M.Assert(durationClass == DurationClass.quaver
                 || durationClass == DurationClass.semiquaver
                 || durationClass == DurationClass.threeFlags
                 || durationClass == DurationClass.fourFlags
@@ -502,7 +502,7 @@ namespace Moritz.Symbols
         /// </summary>
         private void SetFlagsPositionReNoteheads(List<HeadMetrics> topDownHeadsMetrics, FlagsMetrics flagsMetrics, VerticalDir stemDirection, float stemThickness)
         {
-            Debug.Assert(flagsMetrics != null);
+            M.Assert(flagsMetrics != null);
 
             HeadMetrics outerNoteheadMetrics = FindOuterNotehead(topDownHeadsMetrics, stemDirection);
             HeadMetrics innerNoteheadMetrics = FindInnerNotehead(topDownHeadsMetrics, stemDirection);
@@ -564,7 +564,7 @@ namespace Moritz.Symbols
         /// </summary>
         private HeadMetrics FindInnerNotehead(List<HeadMetrics> topDownHeadsMetrics, VerticalDir stemDirection)
         {
-            Debug.Assert(topDownHeadsMetrics.Count > 0);
+            M.Assert(topDownHeadsMetrics.Count > 0);
             HeadMetrics innerNotehead = null;
             if(stemDirection == VerticalDir.up)
             {
@@ -581,7 +581,7 @@ namespace Moritz.Symbols
         /// </summary>
         private HeadMetrics FindOuterNotehead(List<HeadMetrics> topDownHeadsMetrics, VerticalDir stemDirection)
         {
-            Debug.Assert(topDownHeadsMetrics.Count > 0);
+            M.Assert(topDownHeadsMetrics.Count > 0);
             HeadMetrics outerNotehead = null;
             if(stemDirection == VerticalDir.up)
             {
@@ -668,7 +668,7 @@ namespace Moritz.Symbols
             ref float topBoundary, float topPadding,
             ref float bottomBoundary, float bottomPadding)
         {
-            Debug.Assert(NoteheadExtendersMetrics == null);
+            M.Assert(NoteheadExtendersMetrics == null);
             if(isBelow)
             {
                 MoveBelowBottomBoundary(metrics, ref bottomBoundary, bottomPadding);
@@ -742,9 +742,9 @@ namespace Moritz.Symbols
             {
                 if(drawObject is Text text)
                 {
-                    Debug.Assert(text.TextInfo != null);
-                    Debug.Assert(!String.IsNullOrEmpty(text.TextInfo.Text));
-                    Debug.Assert(!String.IsNullOrEmpty(text.TextInfo.FontFamily));
+                    M.Assert(text.TextInfo != null);
+                    M.Assert(!String.IsNullOrEmpty(text.TextInfo.Text));
+                    M.Assert(!String.IsNullOrEmpty(text.TextInfo.FontFamily));
                     if(text.TextInfo.FontFamily == "CLicht" && clichtDynamics.Contains(text.TextInfo.Text))
                     {
                         dynamicText = text;
@@ -817,7 +817,7 @@ namespace Moritz.Symbols
 
                 if(_topDownAccidentalsMetrics != null)
                 {
-                    Debug.Assert(_topDownAccidentalsMetrics.Count > 0);
+                    M.Assert(_topDownAccidentalsMetrics.Count > 0);
                     float topOfTopAccidental = _topDownAccidentalsMetrics[0].Top;
                     topBoundary = (topBoundary < topOfTopAccidental) ? topBoundary : topOfTopAccidental;
                     //float bottomOfBottomAccidental = _topDownAccidentalsMetrics[_topDownAccidentalsMetrics.Count - 1].Bottom;
@@ -832,7 +832,7 @@ namespace Moritz.Symbols
                 bottomBoundary = (bottomBoundary > bottomOfBottomHead) ? bottomBoundary : bottomOfBottomHead;
                 //if(_topDownAccidentalsMetrics != null)
                 //{
-                //    Debug.Assert(_topDownAccidentalsMetrics.Count > 0);
+                //    M.Assert(_topDownAccidentalsMetrics.Count > 0);
                 //    float bottomOfBottomAccidental = _topDownAccidentalsMetrics[_topDownAccidentalsMetrics.Count - 1].Bottom;
                 //    bottomBoundary = (bottomBoundary > bottomOfBottomAccidental) ? bottomBoundary : bottomOfBottomAccidental;
                 //}
@@ -843,7 +843,7 @@ namespace Moritz.Symbols
                 topBoundary = (topBoundary < topOfTopHead) ? topBoundary : topOfTopHead;
                 if(_topDownAccidentalsMetrics != null)
                 {
-                    Debug.Assert(_topDownAccidentalsMetrics.Count > 0);
+                    M.Assert(_topDownAccidentalsMetrics.Count > 0);
                     float topOfTopAccidental = _topDownAccidentalsMetrics[0].Top;
                     topBoundary = (topBoundary < topOfTopAccidental) ? topBoundary : topOfTopAccidental;
                 }
@@ -854,7 +854,7 @@ namespace Moritz.Symbols
 
         private void MoveBelowBottomBoundary(Metrics metrics, ref float bottomBoundary, float padding)
         {
-            Debug.Assert(padding >= 0.0F);
+            M.Assert(padding >= 0.0F);
             float newTop = bottomBoundary + padding;
             metrics.Move(0F, newTop - metrics.Top);
             bottomBoundary = metrics.Bottom;
@@ -863,7 +863,7 @@ namespace Moritz.Symbols
 
         private void MoveAboveTopBoundary(Metrics metrics, ref float topBoundary, float padding)
         {
-            Debug.Assert(padding >= 0.0F);
+            M.Assert(padding >= 0.0F);
             float newBottom = topBoundary - padding;
             metrics.Move(0F, newBottom - metrics.Bottom);
             topBoundary = metrics.Top;
@@ -1712,7 +1712,7 @@ namespace Moritz.Symbols
             #region NoteheadExtendersMetrics
             // NoteheadExtenders should only be created after JustifyHorizontally(),
             // so they should be null here.
-            Debug.Assert(NoteheadExtendersMetrics == null);
+            M.Assert(NoteheadExtendersMetrics == null);
             #endregion
             return maxOverlapWidth;
 
@@ -1802,7 +1802,7 @@ namespace Moritz.Symbols
             // NoteheadExtenders never overlap the previousAnchorageSymbol,
             // and should only be created after JustifyHorizontally() anyway.
             // They should be null here.
-            Debug.Assert(NoteheadExtendersMetrics == null);
+            M.Assert(NoteheadExtendersMetrics == null);
             #endregion
             return maxOverlapWidth;
         }
@@ -1922,14 +1922,14 @@ namespace Moritz.Symbols
         public void AddAccidentalMetrics(AccidentalMetrics newAccidentalMetrics)
         {
             #region conditions
-            Debug.Assert(newAccidentalMetrics != null);
+            M.Assert(newAccidentalMetrics != null);
             if(_topDownAccidentalsMetrics != null)
             {
                 if(_topDownAccidentalsMetrics.Count > 1)
                 {
                     for(int i = 1; i < _topDownAccidentalsMetrics.Count; ++i)
                     {
-                        Debug.Assert(_topDownAccidentalsMetrics[i].OriginY >= _topDownAccidentalsMetrics[i - 1].OriginY);
+                        M.Assert(_topDownAccidentalsMetrics[i].OriginY >= _topDownAccidentalsMetrics[i - 1].OriginY);
                     }
                 }
             }

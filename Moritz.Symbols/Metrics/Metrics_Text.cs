@@ -1,4 +1,5 @@
-﻿using Moritz.Xml;
+﻿using Moritz.Globals;
+using Moritz.Xml;
 
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ namespace Moritz.Symbols
             }
             catch(Exception ex)
             {
-                Debug.Assert(false, ex.Message);
+                M.Assert(false, ex.Message);
             }
             _left = 0;
             _right = textInfo.FontHeight * textMaxSize.Width / maxFontSize;
@@ -72,7 +73,7 @@ namespace Moritz.Symbols
                 //	_bottom = 0F;
                 //	break;
                 default:
-                    Debug.Assert(false, "Unknown font");
+                    M.Assert(false, "Unknown font");
                     break;
             }
 

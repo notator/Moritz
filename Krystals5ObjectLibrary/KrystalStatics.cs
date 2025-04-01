@@ -83,7 +83,7 @@ namespace Krystals5ObjectLibrary
         /// <returns></returns>
         public static int[] Contour(int density, int contourNumberMod12, int axisNumberMod12)
         {
-            Debug.Assert(density > 0 && density <= 7
+            M.Assert(density > 0 && density <= 7
                 && contourNumberMod12 > 0 && contourNumberMod12 <= 12
                 && axisNumberMod12 > 0 && axisNumberMod12 <= 12);
 
@@ -363,7 +363,7 @@ namespace Krystals5ObjectLibrary
                     }
                     else
                     {
-                        Debug.Assert(r.Name == "krystals");
+                        M.Assert(r.Name == "krystals");
                         scoreKrystals = GetKrystals(r);
                     }
                 }
@@ -378,7 +378,7 @@ namespace Krystals5ObjectLibrary
         private static List<string> GetKrystals(XmlReader r)
         {
             List<string> scoreKrystals = new List<string>();
-            Debug.Assert(r.Name == "krystals");
+            M.Assert(r.Name == "krystals");
 
             M.ReadToXmlElementTag(r, "krystal");
             while(r.Name == "krystal")
@@ -797,7 +797,7 @@ namespace Krystals5ObjectLibrary
             StringBuilder sb = new StringBuilder();
             foreach(var val in values)
             {
-                Debug.Assert(val <= chars.Count);
+                M.Assert(val <= chars.Count);
                 sb.Append(chars[(int)val]);
             }
             return sb.ToString();
@@ -966,7 +966,7 @@ namespace Krystals5ObjectLibrary
 
         public static KrystalType GetKrystalTypeFromKrystalName(string krystalName)
         {
-            Debug.Assert(IsKrystalFilename(krystalName));
+            M.Assert(IsKrystalFilename(krystalName));
 
             KrystalType rval = KrystalType.constant; // default 
             char[] dot = new char[] { '.' };

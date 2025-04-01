@@ -1,5 +1,6 @@
 ﻿using Krystals5ObjectLibrary;
 
+using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Symbols;
 
@@ -31,7 +32,7 @@ namespace Moritz.Algorithm.PianolaMusic
 
             // Add each Trk to trks here, in top to bottom (=channelIndex) order in the score.
             List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
-            Debug.Assert(trks.Count == NumberOfMidiChannels);
+            M.Assert(trks.Count == NumberOfMidiChannels);
 
             List<ChannelDef> channelDefs = new List<ChannelDef>();
             foreach(var trk in trks)
@@ -89,8 +90,8 @@ namespace Moritz.Algorithm.PianolaMusic
 
         private List<IUniqueDef> GetMidiChordDefs(List<int> pitches, List<int> durations)
         {
-            Debug.Assert(pitches.Count == 96);
-            Debug.Assert(durations.Count == 96);
+            M.Assert(pitches.Count == 96);
+            M.Assert(durations.Count == 96);
 
             const int durationFactor = 48;  // the shortest note is 48ms
 
