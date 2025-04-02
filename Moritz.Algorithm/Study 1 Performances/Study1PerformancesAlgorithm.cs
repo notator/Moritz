@@ -63,7 +63,7 @@ namespace Moritz.Algorithm.Study1
                     trk.SetPresetInTheFirstChord(0);
                 }
             }
-                         
+
             InsertClefChanges(bars, pageFormat.VoiceIndicesPerStaff);
 
             return bars;  // The Trks in these bars contain ClefDefs.

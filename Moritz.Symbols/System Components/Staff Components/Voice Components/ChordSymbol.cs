@@ -24,7 +24,7 @@ namespace Moritz.Symbols
         public ChordSymbol(Voice voice, MidiChordDef umcd, int absMsPosition, PageFormat pageFormat)
             : this(voice, umcd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight, umcd.BeamContinues)
         {
-            _midiChordDefs.Add(umcd);
+            MidiChordDefs.Add(umcd);
 
             _msDurationToNextBarline = umcd.MsDurationToNextBarline;
 
@@ -113,8 +113,8 @@ namespace Moritz.Symbols
         /// <returns>The number of midiChordDefs after adding the argument.</returns>
         public int AddMidiChordDef(MidiChordDef midiChordDef)
         {
-            _midiChordDefs.Add(midiChordDef);
-            return _midiChordDefs.Count;
+            MidiChordDefs.Add(midiChordDef);
+            return MidiChordDefs.Count;
         }
 
         /// <summary>
@@ -124,8 +124,8 @@ namespace Moritz.Symbols
         /// <returns>A deep clone of the MidiChordDef at the given index</returns>
         public MidiChordDef GetMidiChordDefClone(int indexInPrivateMidiChordDefsList)
         {
-            M.Assert(indexInPrivateMidiChordDefsList >= 0 && indexInPrivateMidiChordDefsList < _midiChordDefs.Count);
-            return (MidiChordDef)_midiChordDefs[indexInPrivateMidiChordDefsList].Clone();
+            M.Assert(indexInPrivateMidiChordDefsList >= 0 && indexInPrivateMidiChordDefsList < MidiChordDefs.Count);
+            return (MidiChordDef)MidiChordDefs[indexInPrivateMidiChordDefsList].Clone();
         }
 
         internal void SetNoteheadColorClasses()
@@ -198,9 +198,9 @@ namespace Moritz.Symbols
             w.WriteStartElement("score", "midiChords", null);
 
             // write a list of alternative <midiChord> elements
-            for(var trkIndex = 0; trkIndex < _midiChordDefs.Count; trkIndex++)
+            for(var trkIndex = 0; trkIndex < MidiChordDefs.Count; trkIndex++)
             {                 
-                var midiChordDef = _midiChordDefs[trkIndex];
+                var midiChordDef = MidiChordDefs[trkIndex];
                 // writes a "midiChord" element
                 midiChordDef.WriteSVG(w, channel);  // writes a midiChord element
             }
@@ -217,7 +217,7 @@ namespace Moritz.Symbols
             return sb.ToString();
         }
 
-        private List<MidiChordDef> _midiChordDefs = new List<MidiChordDef>();
+        public List<MidiChordDef> MidiChordDefs = new List<MidiChordDef>();
 
         public VerticalDir DefaultStemDirection(Clef clef)
         {

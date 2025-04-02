@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Moritz.Symbols
 {
@@ -16,11 +17,50 @@ namespace Moritz.Symbols
     {
         public Voice(Staff staff, VoiceDef voiceDef)
         {
+            voiceDef.AssertConsistency();
+
             Staff = staff;
             VoiceDef = voiceDef;
+
+            _midiChordDefsListList = GetMidiChordDefsListList(voiceDef.Trks);
         }
 
-        //public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
+        private List<List<MidiChordDef>> GetMidiChordDefsListList(List<Trk> trks)
+        {
+            int nTrks = trks.Count;
+
+            List<List<MidiChordDef>> horizontalMcdListList = new List<List<MidiChordDef>>();
+            for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
+            {
+                List<MidiChordDef> hMcdList = new List<MidiChordDef>();
+                var iuds = trks[trkIndex].UniqueDefs;
+                foreach(IUniqueDef iud in iuds)
+                {
+                    if(iud is MidiChordDef mcd)
+                    {
+                        hMcdList.Add(mcd);
+                    }
+                }
+                horizontalMcdListList.Add(hMcdList);
+            }
+            int nMcds = horizontalMcdListList[0].Count;
+            for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
+            {
+                M.Assert(horizontalMcdListList[trkIndex].Count == nMcds);
+            } 
+            
+            List<List<MidiChordDef>> verticalMcdListList = new List<List<MidiChordDef>>();
+            for(int mcdIndex = 0; mcdIndex < nMcds; ++mcdIndex)
+            {
+                List<MidiChordDef> vMcdList = new List<MidiChordDef>();
+                for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
+                {
+                    vMcdList.Add(horizontalMcdListList[trkIndex][mcdIndex]);
+                }
+                verticalMcdListList.Add(vMcdList);
+            }
+            return verticalMcdListList;
+        }
 
         /// <summary>
         /// Writes out an SVG Voice
@@ -56,6 +96,12 @@ namespace Moritz.Symbols
                 }
                 else if(chordSymbol != null)
                 {
+                    MidiChordDef topMcd = chordSymbol.MidiChordDefs[0];
+					List<MidiChordDef> mcds = _midiChordDefsListList.Find(mcdList => mcdList[0].Equals(topMcd));
+                    for(int mcdIndex = 1; mcdIndex < mcds.Count; ++mcdIndex)
+                    {
+                        chordSymbol.AddMidiChordDef(mcds[mcdIndex]);
+                    }
                     chordSymbol.WriteSVG(w, channelIndex);
                 }
                 else if(restSymbol != null)
@@ -412,6 +458,8 @@ namespace Moritz.Symbols
         #endregion
 
         public VoiceDef VoiceDef = null;
+
+        private List<List<MidiChordDef>> _midiChordDefsListList;
 
         private DurationSymbol _firstDurationSymbol;
     }

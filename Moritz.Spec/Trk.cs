@@ -1843,7 +1843,7 @@ namespace Moritz.Spec
                 {
                     firstMidiChordDef.MidiChordControlDef = new MidiChordControlDef
                     {
-                        Preset = 0,
+                        Preset = presetIndex,
                         AllControllersOff = true
                     };
                     break;
