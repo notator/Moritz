@@ -56,13 +56,7 @@ namespace Moritz.Algorithm.Study1
 
             List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
 
-            foreach(VoiceDef vDef in bars[0].VoiceDefs)
-            {
-                foreach(Trk trk in vDef.Trks)
-                {
-                    trk.SetPresetInTheFirstChord(0);
-                }
-            }
+            SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
             InsertClefChanges(bars, pageFormat.VoiceIndicesPerStaff);
 

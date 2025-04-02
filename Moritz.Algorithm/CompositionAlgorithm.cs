@@ -385,24 +385,15 @@ namespace Moritz.Algorithm
         /// </summary>
         protected void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
         {
-            MidiChordDef midiChordDef = null;
             foreach(VoiceDef voiceDef in bar1.VoiceDefs)
             {
-                foreach(var trk in voiceDef.Trks)
+                foreach(Trk trk in voiceDef.Trks)
                 {
-                    foreach(IUniqueDef iUniqueDef in trk.UniqueDefs)
-                    {
-                        midiChordDef = iUniqueDef as MidiChordDef;
-                        if(midiChordDef != null)
-                        {
-                            midiChordDef.MidiChordControlDef.Preset = 0;
-                            break;
-                        }
-                    }
+                    trk.SetPresetInTheFirstChord(0);
                 }
             }
         }
-
+        
         protected List<Krystal> _krystals;
     }
 }
