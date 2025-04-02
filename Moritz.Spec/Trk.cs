@@ -1835,19 +1835,14 @@ namespace Moritz.Spec
         /// </summary>
         public void SetPresetInTheFirstChord(int presetIndex)
         {
-            MidiChordDef firstMidiChordDef = null;
-            foreach(IUniqueDef iUniqueDef in UniqueDefs)
+            foreach(var midiChordDef in MidiChordDefs)
             {
-                firstMidiChordDef = iUniqueDef as MidiChordDef;
-                if(firstMidiChordDef != null)
+                midiChordDef.MidiChordControlDef = new MidiChordControlDef
                 {
-                    firstMidiChordDef.MidiChordControlDef = new MidiChordControlDef
-                    {
-                        Preset = presetIndex,
-                        AllControllersOff = true
-                    };
-                    break;
-                }
+                    Preset = presetIndex,
+                    AllControllersOff = true
+                };
+                break;
             }
         }
 

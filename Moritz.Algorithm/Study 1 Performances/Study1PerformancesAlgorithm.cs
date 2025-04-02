@@ -56,9 +56,9 @@ namespace Moritz.Algorithm.Study1
 
             List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
 
-            foreach(VoiceDef cDef in voiceDefs)
+            foreach(VoiceDef vDef in bars[0].VoiceDefs)
             {
-                foreach(Trk trk in voiceDef.Trks)
+                foreach(Trk trk in vDef.Trks)
                 {
                     trk.SetPresetInTheFirstChord(0);
                 }
@@ -69,7 +69,7 @@ namespace Moritz.Algorithm.Study1
             return bars;  // The Trks in these bars contain ClefDefs.
         }
 
-        // Inserts ClefDefs at arbitrary positions in the top VoiceDef.Trks[0].UniqueDefs in each Staff.
+         // Inserts ClefDefs at arbitrary positions in the top VoiceDef.Trks[0].UniqueDefs in each Staff.
         // The main clefs at the beginnings of bars are added automatically later, taking these clef changes
         // into account.
         protected override void InsertClefChanges(List<Bar> bars, List<List<int>> voiceIndicesPerStaff)
