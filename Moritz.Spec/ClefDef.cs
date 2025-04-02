@@ -29,7 +29,7 @@ namespace Moritz.Spec
             && String.Equals(clefType, "b2") == false
             && String.Equals(clefType, "b3") == false)
             {
-                M.Assert(false, "Unknown clef type.");
+                Debug.Assert(false, "Unknown clef type.");
             }
             #endregion
 
@@ -61,12 +61,12 @@ namespace Moritz.Spec
         {
             get
             {
-                M.Assert(_msPositionReFirstIUD >= 0);
+                Debug.Assert(_msPositionReFirstIUD >= 0);
                 return _msPositionReFirstIUD;
             }
             set
             {
-                M.Assert(value >= 0);
+                Debug.Assert(value >= 0);
                 _msPositionReFirstIUD = value;
             }
         }

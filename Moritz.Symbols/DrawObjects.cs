@@ -36,7 +36,7 @@ namespace Moritz.Symbols
                 // possible Values:
                 // "C", "C#", "Db", "D", "D#", "Eb", "E", "E#", "Fb", "F", "F#" "Gb",
                 // "G", "G#", "Ab", "A", "A#", "Bb", "B", "B#", "Cb"
-                M.Assert(Regex.Matches(value, @"^[A-G][#b]?$") != null);
+                Debug.Assert(Regex.Matches(value, @"^[A-G][#b]?$") != null);
                 _enharmonicNote = value;
             }
         }
@@ -232,7 +232,7 @@ namespace Moritz.Symbols
                 }
                 else
                 {
-                    M.Assert(text.Contains("end"));
+                    Debug.Assert(text.Contains("end"));
                 }
             }
         }

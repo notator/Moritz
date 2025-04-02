@@ -72,7 +72,7 @@ namespace Krystals5ObjectLibrary
             char[] splitChar = { '.' };
             var svgInputFilenameComponents = SVGInputFilename.Split(splitChar);
 
-            M.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && DensityInputKrystalName.EndsWith(".krys"));
+            Debug.Assert(svgInputFilenameComponents[3] == "path" && svgInputFilenameComponents[4] == "svg" && DensityInputKrystalName.EndsWith(".krys"));
 
             int nEffectiveTrajectoryNodes = int.Parse(svgInputFilenameComponents[1]); // can be 1 (A constant: the first node in the trajectory path)
 
@@ -126,7 +126,7 @@ namespace Krystals5ObjectLibrary
         }
         private List<Strand> ExpandStrands(List<StrandArgs> strandsInput, List<string> focusValues, List<List<uint>> expansionDistances)
         {
-            M.Assert(strandsInput.Count == expansionDistances.Count);
+            Debug.Assert(strandsInput.Count == expansionDistances.Count);
 
             NumValues = 0;
             MaxValue = uint.MinValue;
@@ -149,7 +149,7 @@ namespace Krystals5ObjectLibrary
                 var density = strandArgs.Density;
                 var distances = expansionDistances[strandIndex];
 
-                M.Assert(distances.Count == trammel.Count);
+                Debug.Assert(distances.Count == trammel.Count);
                 for(int tmIndex = 0; tmIndex < trammel.Count; tmIndex++)
                 {
                     trammel[tmIndex].Distance = distances[tmIndex];

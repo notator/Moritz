@@ -28,9 +28,9 @@ namespace Moritz.Spec
         public Bar(int absMsPosition, List<VoiceDef> voiceDefs)
         {
             #region conditions
-            M.Assert(absMsPosition >= 0);
-            M.Assert(voiceDefs != null && voiceDefs.Count > 0 && voiceDefs.Count <= 16);
-            M.Assert(voiceDefs[0].Trks != null && voiceDefs[0].Trks.Count > 0);
+            Debug.Assert(absMsPosition >= 0);
+            Debug.Assert(voiceDefs != null && voiceDefs.Count > 0 && voiceDefs.Count <= 16);
+            Debug.Assert(voiceDefs[0].Trks != null && voiceDefs[0].Trks.Count > 0);
             foreach(var voiceDef in voiceDefs)
             {
                 foreach(var trk in voiceDef.Trks)
@@ -69,14 +69,14 @@ namespace Moritz.Spec
 
         public void Concat(Bar bar2)
         {
-            M.Assert(VoiceDefs.Count == bar2.VoiceDefs.Count);
+            Debug.Assert(VoiceDefs.Count == bar2.VoiceDefs.Count);
 
             for(int i = 0; i < VoiceDefs.Count; ++i)
             {
                 VoiceDef voiceDef1 = VoiceDefs[i];
                 VoiceDef voiceDef2 = bar2.VoiceDefs[i];
 
-                M.Assert(voiceDef1.Trks.Count == voiceDef2.Trks.Count);
+                Debug.Assert(voiceDef1.Trks.Count == voiceDef2.Trks.Count);
 
                 for(int j = 0; j < voiceDef1.Trks.Count; ++j)
                 {
@@ -131,7 +131,7 @@ namespace Moritz.Spec
                 iud.MsPositionReFirstUD = msPos;
                 iud.MsDuration = originalMsDuration - msPos;
 
-                M.Assert(originalMsDuration == trk.MsDuration);
+                Debug.Assert(originalMsDuration == trk.MsDuration);
             }
             AssertConsistency();
         }
@@ -185,7 +185,7 @@ namespace Moritz.Spec
             get { return _absMsPosition; }
             set
             {
-                M.Assert(value >= 0);
+                Debug.Assert(value >= 0);
                 _absMsPosition = value;
             }
         }
@@ -254,7 +254,7 @@ namespace Moritz.Spec
                         break;
                     }
                 }
-                M.Assert(msDuration > 0);
+                Debug.Assert(msDuration > 0);
                 foreach(var voiceDef in VoiceDefs)
                 {
                     var trk = voiceDef.Trks[trkIndex];
@@ -282,13 +282,13 @@ namespace Moritz.Spec
         /// </summary>
         public virtual void AssertConsistency()
         {
-            M.Assert(AbsMsPosition >= 0);
-            M.Assert(VoiceDefs.Count > 0);
+            Debug.Assert(AbsMsPosition >= 0);
+            Debug.Assert(VoiceDefs.Count > 0);
             var trksCount = VoiceDefs[0].Trks.Count;
-            M.Assert(trksCount > 0);
+            Debug.Assert(trksCount > 0);
 
             int nTrks = VoiceDefs[0].Trks.Count;
-            M.Assert(nTrks > 0);
+            Debug.Assert(nTrks > 0);
 
             CheckVoiceDefConsistency(nTrks);
 
@@ -299,8 +299,8 @@ namespace Moritz.Spec
         {
             foreach(var voiceDef in VoiceDefs)
             {
-                M.Assert(voiceDef.Trks.Count == nTrks);
-                M.Assert(voiceDef.MsPositionReContainer == 0);
+                Debug.Assert(voiceDef.Trks.Count == nTrks);
+                Debug.Assert(voiceDef.MsPositionReContainer == 0);
                 foreach(var trk in voiceDef.Trks)
                 {
                     trk.AssertConsistency();
@@ -313,7 +313,7 @@ namespace Moritz.Spec
                     for(int voiceDefIndex = 1; voiceDefIndex < VoiceDefs.Count; ++voiceDefIndex)
                     {
                         var cDef = VoiceDefs[voiceDefIndex];
-                        M.Assert(cDef.Trks[trkIndex].MsDuration == barMsDuration);
+                        Debug.Assert(cDef.Trks[trkIndex].MsDuration == barMsDuration);
                     }
                 }
 
@@ -324,12 +324,12 @@ namespace Moritz.Spec
                 for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
                 {
                     List<DurationDef> trkDDs = voiceDef.Trks[trkIndex].DurationDefs;
-                    M.Assert(trkDDs.Count == trk0DurationDefs.Count);
+                    Debug.Assert(trkDDs.Count == trk0DurationDefs.Count);
                     for(var ddIndex = 0; ddIndex < trk0DurationDefs.Count; ++ddIndex)
                     {
                         DurationDef dd0 = trk0DurationDefs[ddIndex]; // durationDef in Trk 0
                         DurationDef trkDD = trkDDs[ddIndex];
-                        M.Assert((dd0 is MidiChordDef && trkDD is MidiChordDef) | (dd0 is RestDef && trkDD is RestDef));
+                        Debug.Assert((dd0 is MidiChordDef && trkDD is MidiChordDef) | (dd0 is RestDef && trkDD is RestDef));
                     }
                 }
             }
@@ -353,12 +353,12 @@ namespace Moritz.Spec
             int nDurationDefs = performances[0].Count;
             for(int pIndex = 1; pIndex < nTrks; ++pIndex)
             {
-                M.Assert(performances[pIndex - 1].Count == nDurationDefs);
+                Debug.Assert(performances[pIndex - 1].Count == nDurationDefs);
                 for(int i = 0; i < nDurationDefs; ++i)
                 {
                     DurationDef dd0 = performances[pIndex - 1][i];
                     DurationDef dd1 = performances[pIndex][i];
-                    M.Assert((dd0 is MidiChordDef && dd1 is MidiChordDef) | (dd0 is RestDef && dd1 is RestDef));
+                    Debug.Assert((dd0 is MidiChordDef && dd1 is MidiChordDef) | (dd0 is RestDef && dd1 is RestDef));
                 }
             }
         }
@@ -408,7 +408,7 @@ namespace Moritz.Spec
                 }
             }
 
-            M.Assert(originalMsDuration == MsDuration);
+            Debug.Assert(originalMsDuration == MsDuration);
 
             AssertConsistency();
         }

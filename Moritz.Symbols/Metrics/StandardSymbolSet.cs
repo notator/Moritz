@@ -473,7 +473,7 @@ namespace Moritz.Symbols
                     clefID = ClefID.smallBassClef3x8;
                     break;
                 default:
-                    M.Assert(false, "Unknown clef type.");
+                    Debug.Assert(false, "Unknown clef type.");
                     break;
             }
 
@@ -511,7 +511,7 @@ namespace Moritz.Symbols
                     clefID = ClefID.bassClef3x8;
                     break;
                 default:
-                    M.Assert(false, "Unknown clef type.");
+                    Debug.Assert(false, "Unknown clef type.");
                     break;
             }
 
@@ -569,7 +569,7 @@ namespace Moritz.Symbols
 
         public void ForceNaturalsInSynchronousChords(Staff staff)
         {
-            M.Assert(staff.Voices.Count == 2);
+            Debug.Assert(staff.Voices.Count == 2);
             foreach(ChordSymbol voice0chord in staff.Voices[0].ChordSymbols)
             {
                 foreach(ChordSymbol voice1chord in staff.Voices[1].ChordSymbols)
@@ -591,7 +591,7 @@ namespace Moritz.Symbols
         /// </summary>
         private void ForceNaturals(ChordSymbol synchChord1, ChordSymbol synchChord2)
         {
-            M.Assert(synchChord1.AbsMsPosition == synchChord2.AbsMsPosition);
+            Debug.Assert(synchChord1.AbsMsPosition == synchChord2.AbsMsPosition);
             foreach(Head head1 in synchChord1.HeadsTopDown)
             {
                 foreach(Head head2 in synchChord2.HeadsTopDown)
@@ -707,7 +707,7 @@ namespace Moritz.Symbols
                     {
                         // create brackets
                         List<CautionaryBracketMetrics> cbMetrics = cautionaryChordSymbol.ChordMetrics.CautionaryBracketsMetrics;
-                        M.Assert(cbMetrics.Count == 2);
+                        Debug.Assert(cbMetrics.Count == 2);
                         Metrics clefMetrics = firstClef.Metrics;
 
                         // extender left of cautionary
@@ -756,7 +756,7 @@ namespace Moritz.Symbols
             }
             else // no2 == null
             {
-                M.Assert(no2 == null);
+                Debug.Assert(no2 == null);
                 // This voice has no further chords or rests,
                 // so draw extenders to the right margin.
                 // extend to the right margin
@@ -862,7 +862,7 @@ namespace Moritz.Symbols
                                     bool hasContinuingBeamBlock =
                                         ((chord1.BeamBlock != null) && (chord1.BeamBlock.Chords[chord1.BeamBlock.Chords.Count - 1] != chord1));
                                     if(hasContinuingBeamBlock)
-                                        M.Assert(true);
+                                        Debug.Assert(true);
 
                                     if(noteObjects[index - 1] is Barline barline)
                                     {
@@ -959,9 +959,9 @@ namespace Moritz.Symbols
         /// </summary>
         private List<NoteheadExtenderMetrics> CreateExtenders(List<float> x1s, List<float> x2s, List<float> ys, List<HeadMetrics> headMetrics, float extenderStrokeWidth, float gap, bool drawExtender)
         {
-            M.Assert(ys.Count == x1s.Count);
-            M.Assert(ys.Count == x2s.Count);
-            M.Assert(ys.Count > 0);
+            Debug.Assert(ys.Count == x1s.Count);
+            Debug.Assert(ys.Count == x2s.Count);
+            Debug.Assert(ys.Count > 0);
 
             List<NoteheadExtenderMetrics> noteheadExtendersMetrics = new List<NoteheadExtenderMetrics>();
             for(int i = 0; i < ys.Count; ++i)
@@ -984,7 +984,7 @@ namespace Moritz.Symbols
             LedgerlineBlockMetrics upperLedgerlineMetrics = chord1Metrics.UpperLedgerlineBlockMetrics;
             LedgerlineBlockMetrics lowerLedgerlineMetrics = chord1Metrics.LowerLedgerlineBlockMetrics;
             List<HeadMetrics> headsMetrics = chord1Metrics.HeadsMetrics;
-            M.Assert(headsMetrics.Count > 0);
+            Debug.Assert(headsMetrics.Count > 0);
 
             foreach(HeadMetrics headmetrics in headsMetrics)
             {
@@ -1006,7 +1006,7 @@ namespace Moritz.Symbols
             LedgerlineBlockMetrics c2UpperLedgerlineMetrics = chord2Metrics.UpperLedgerlineBlockMetrics;
             LedgerlineBlockMetrics c2LowerLedgerlineMetrics = chord2Metrics.LowerLedgerlineBlockMetrics;
             List<HeadMetrics> c2headsMetrics = chord2Metrics.HeadsMetrics;
-            M.Assert(c2headsMetrics.Count > 0);
+            Debug.Assert(c2headsMetrics.Count > 0);
             List<AccidentalMetrics> c2AccidentalsMetrics = chord2Metrics.TopDownAccidentalsMetrics;
 
             float verticalPadding = hairlinePadding * 4.0f;

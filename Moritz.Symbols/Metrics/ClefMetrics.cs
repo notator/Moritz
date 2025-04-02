@@ -79,7 +79,7 @@ namespace Moritz.Symbols
                         _bottom = lowBassBottom;
                         break;
                     default:
-                        M.Assert(false, "Unknown clef type.");
+                        Debug.Assert(false, "Unknown clef type.");
                         break;
                 }
                 if(_right > 0F)

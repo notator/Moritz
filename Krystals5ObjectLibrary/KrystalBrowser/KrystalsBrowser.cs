@@ -105,7 +105,7 @@ namespace Krystals5ObjectLibrary
         /// </summary>
         private void DeleteKrystalButton_Click(object sender, EventArgs e)
         {
-            M.Assert(_krystalChildrenTreeView.SelectedNode.Nodes.Count == 0);
+            Debug.Assert(_krystalChildrenTreeView.SelectedNode.Nodes.Count == 0);
 
             var selectedNode = _krystalChildrenTreeView.SelectedNode;
             string krystalToDelete = selectedNode.Text;

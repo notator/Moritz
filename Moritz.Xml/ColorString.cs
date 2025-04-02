@@ -36,7 +36,7 @@ namespace Moritz.Xml
             get { return _redComponent; }
             set
             {
-                M.Assert(value >= 0 && value <= 0xFF);
+                Debug.Assert(value >= 0 && value <= 0xFF);
                 _redComponent = value;
             }
         }
@@ -45,7 +45,7 @@ namespace Moritz.Xml
             get { return _greenComponent; }
             set
             {
-                M.Assert(value >= 0 && value <= 0xFF);
+                Debug.Assert(value >= 0 && value <= 0xFF);
                 _greenComponent = value;
             }
         }
@@ -54,7 +54,7 @@ namespace Moritz.Xml
             get { return _blueComponent; }
             set
             {
-                M.Assert(value >= 0 && value <= 0xFF);
+                Debug.Assert(value >= 0 && value <= 0xFF);
                 _blueComponent = value;
             }
         }
@@ -103,7 +103,7 @@ namespace Moritz.Xml
         /// <param name="colorString"></param>
         private void StringToComponents(string colorString)
         {
-            M.Assert(Regex.IsMatch(colorString, @"^[0-9a-fA-F]{6}$"));
+            Debug.Assert(Regex.IsMatch(colorString, @"^[0-9a-fA-F]{6}$"));
             int[] ints = new int[6];
             for(int i = 0; i < 6; i++)
             {

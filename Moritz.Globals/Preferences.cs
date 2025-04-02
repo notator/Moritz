@@ -258,7 +258,7 @@ namespace Moritz.Globals
         }
         public Sanford.Multimedia.Midi.OutputDevice GetMidiOutputDevice(string deviceName)
         {
-            M.Assert(MultimediaMidiOutputDevices.ContainsKey(deviceName));
+            Debug.Assert(MultimediaMidiOutputDevices.ContainsKey(deviceName));
             return MultimediaMidiOutputDevices[deviceName];
         }
 

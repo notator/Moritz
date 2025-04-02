@@ -23,7 +23,7 @@ namespace Moritz.Midi
             get { return _channel; }
             set
             {
-                M.Assert(value >= 0 || value <= 15);
+                Debug.Assert(value >= 0 || value <= 15);
                 _channel = value;
             }
         }
@@ -33,7 +33,7 @@ namespace Moritz.Midi
             get { return _pitch; }
             set
             {
-                M.Assert(value >= 0 || value <= 127);
+                Debug.Assert(value >= 0 || value <= 127);
                 _pitch = value;
             }
         }
@@ -43,7 +43,7 @@ namespace Moritz.Midi
             get { return _velocity; }
             set
             {
-                M.Assert(value >= 0 || value <= 127);
+                Debug.Assert(value >= 0 || value <= 127);
                 _velocity = value;
             }
         }

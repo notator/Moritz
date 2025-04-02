@@ -63,7 +63,7 @@ namespace Moritz.Spec
                 {
                     if(_minimumVelocity == null || _minimumVelocity < 1 || _minimumVelocity > 127)
                     {
-                        M.Assert(false,
+                        Debug.Assert(false,
                             "If the VelocityOption is being used, then\n" +
                             "MinimumVelocity must be set to a value in range [1..127]");
                     }
@@ -180,7 +180,7 @@ namespace Moritz.Spec
         /// <param name="speedFactor">A value greater than zero. Greater values mean greater speed.</param>
         public SpeedControl(float speedFactor)
         {
-            M.Assert(speedFactor > 0, "Error: speedFactor must be greater than zero.");
+            Debug.Assert(speedFactor > 0, "Error: speedFactor must be greater than zero.");
             _speedFactor = speedFactor;
         }
         public float SpeedFactor { get { return _speedFactor; } }
@@ -218,7 +218,7 @@ namespace Moritz.Spec
     {
         protected VelocityTrkOption(VelocityOption velocityOption, int minVelocity)
         {
-            M.Assert(minVelocity > 0 && minVelocity < 128);
+            Debug.Assert(minVelocity > 0 && minVelocity < 128);
             _minVelocity = minVelocity;
             _velocityOption = velocityOption;
         }

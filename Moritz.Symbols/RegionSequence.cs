@@ -13,22 +13,22 @@ namespace Moritz.Symbols
 		public RegionSequence(IReadOnlyList<RegionDef> basicRegionDefs, string regionSequence)
 		{
 			#region check arguments
-			M.Assert(!(basicRegionDefs == null || basicRegionDefs.Count == 0));
-			M.Assert(!String.IsNullOrEmpty(regionSequence));
-			M.Assert(basicRegionDefs[0].startBarlineMsPosInScore == 0);
+			Debug.Assert(!(basicRegionDefs == null || basicRegionDefs.Count == 0));
+			Debug.Assert(!String.IsNullOrEmpty(regionSequence));
+			Debug.Assert(basicRegionDefs[0].startBarlineMsPosInScore == 0);
 
 			for(int i = 0; i < basicRegionDefs.Count - 1; ++i)
 			{
-				M.Assert(basicRegionDefs[i].name.Length == 1,
+				Debug.Assert(basicRegionDefs[i].name.Length == 1,
 					"RegionDef names can only have one character here.");
-				M.Assert(regionSequence.Contains(basicRegionDefs[i].name),
+				Debug.Assert(regionSequence.Contains(basicRegionDefs[i].name),
 					"The regionSequence can only use defined RegionDefs.");
 
 				for(int j = i + 1; j < basicRegionDefs.Count; ++j)
 				{
-					M.Assert(basicRegionDefs[i].startBarlineMsPosInScore <= basicRegionDefs[j].startBarlineMsPosInScore,
+					Debug.Assert(basicRegionDefs[i].startBarlineMsPosInScore <= basicRegionDefs[j].startBarlineMsPosInScore,
 						"RegionDef startMsPositions may be the same, but must otherwise be in chronological order.");
-					M.Assert(basicRegionDefs[i].name.CompareTo(basicRegionDefs[j].name) < 0,
+					Debug.Assert(basicRegionDefs[i].name.CompareTo(basicRegionDefs[j].name) < 0,
 						"The RegionDefs names must all be different and in alphabetical order here.");
 				}
 			}

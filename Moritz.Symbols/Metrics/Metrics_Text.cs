@@ -52,7 +52,7 @@ namespace Moritz.Symbols
             }
             catch(Exception ex)
             {
-                M.Assert(false, ex.Message);
+                Debug.Assert(false, ex.Message);
             }
             _left = 0;
             _right = textInfo.FontHeight * textMaxSize.Width / maxFontSize;
@@ -73,7 +73,7 @@ namespace Moritz.Symbols
                 //	_bottom = 0F;
                 //	break;
                 default:
-                    M.Assert(false, "Unknown font");
+                    Debug.Assert(false, "Unknown font");
                     break;
             }
 

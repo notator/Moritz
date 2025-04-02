@@ -109,7 +109,7 @@ namespace Moritz.Symbols
                 ChordSymbol chordSymbol = _noteObjects[index] as ChordSymbol;
                 if(_noteObjects[index] is Barline barline && barline.Metrics != null)
                 {
-                    M.Assert(AlignmentX == 0F);
+                    Debug.Assert(AlignmentX == 0F);
                     if(index > 0)
                     {
                         if(_noteObjects[index - 1] is Clef clef)
@@ -133,8 +133,8 @@ namespace Moritz.Symbols
         {
             if(noteObject is DurationSymbol durationSymbol && _noteObjects.Count > 0)
             {
-                M.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
-                M.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
+                Debug.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
+                Debug.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
             }
             if(noteObject is Clef)
             {

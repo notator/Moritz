@@ -13,8 +13,8 @@ namespace Moritz.Spec
 		/// <param name="weight">Must be in range 1..127</param>
 		public PitchWeight(int pitch, int weight)
 		{
-            M.Assert(pitch >= 0 && pitch <= 127);
-            M.Assert(weight >= 0 && weight <= 127);
+            Debug.Assert(pitch >= 0 && pitch <= 127);
+            Debug.Assert(weight >= 0 && weight <= 127);
 
 			Pitch = pitch;
 			Weight = weight;

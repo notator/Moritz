@@ -32,7 +32,7 @@ namespace Krystals5ObjectLibrary
         {
             if(nEffectiveTrajectoryNodes > 1)
             {
-                M.Assert(densityInputKrystal.Level > 0, "The density input cannot be a constant."); // The trajectory must contain at least two nodes...");
+                Debug.Assert(densityInputKrystal.Level > 0, "The density input cannot be a constant."); // The trajectory must contain at least two nodes...");
             }
 
             DensityInputKrystalName = densityInputKrystal.Name;
@@ -55,13 +55,13 @@ namespace Krystals5ObjectLibrary
                 {
                     nodeIndex++;
                 }
-                M.Assert(nodeIndex >= 0 && nodeIndex < nodes.Count);
+                Debug.Assert(nodeIndex >= 0 && nodeIndex < nodes.Count);
 
                 var strandArgs = new StrandArgs(leveledValue.level, leveledValue.value, nodes[nodeIndex].position);
                 StrandsInput.Add(strandArgs);
             }
 
-            M.Assert(nodeIndex == (nodes.Count - 1));
+            Debug.Assert(nodeIndex == (nodes.Count - 1));
         }
 
         private int GetNodesLevel(Krystal densityInputKrystal, int trajectoryNodesCount)
@@ -70,7 +70,7 @@ namespace Krystals5ObjectLibrary
 
             if(densityInputKrystal.Level > 0)
             {
-                M.Assert(densityInputKrystal.ShapeArray.Length > 0);
+                Debug.Assert(densityInputKrystal.ShapeArray.Length > 0);
 
                 int[] shapeArray = densityInputKrystal.ShapeArray;
 
@@ -84,7 +84,7 @@ namespace Krystals5ObjectLibrary
                 }
             }
 
-            M.Assert(nodesLevel > 0, "The (input) nodes count must exist somewhere in the (output) shapeArray.\n\n" +
+            Debug.Assert(nodesLevel > 0, "The (input) nodes count must exist somewhere in the (output) shapeArray.\n\n" +
                 "In other words: The density input krystal must have a shape that includes\n" +
                 "the number of nodes in the trajectory path (in the SVG input).");
 

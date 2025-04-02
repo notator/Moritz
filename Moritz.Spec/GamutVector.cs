@@ -49,14 +49,14 @@ namespace Moritz.Spec
 		/// <param name="steps">An integer greater than 0 (The number of Gamuts in this GamutVector's Gamuts list.)</param>
 		public GamutVector(Gamut startGamut, Gamut targetGamut, List<Tuple<int, int>> pitchVectorEndPointsList, int steps)
 		{
-			M.Assert(startGamut != null && targetGamut != null);
-			M.Assert(pitchVectorEndPointsList != null && pitchVectorEndPointsList.Count >= 1);
+			Debug.Assert(startGamut != null && targetGamut != null);
+			Debug.Assert(pitchVectorEndPointsList != null && pitchVectorEndPointsList.Count >= 1);
 			foreach(var tuple in pitchVectorEndPointsList)
 			{
-				M.Assert(tuple.Item1 >= startGamut.MinPitch && tuple.Item1 <= startGamut.MaxPitch);
-				M.Assert(tuple.Item2 >= targetGamut.MinPitch && tuple.Item2 <= targetGamut.MaxPitch);
+				Debug.Assert(tuple.Item1 >= startGamut.MinPitch && tuple.Item1 <= startGamut.MaxPitch);
+				Debug.Assert(tuple.Item2 >= targetGamut.MinPitch && tuple.Item2 <= targetGamut.MaxPitch);
 			}
-			M.Assert(steps > 0);
+			Debug.Assert(steps > 0);
 
 			List<PitchWeightVector> pitchWeightVectors = new List<PitchWeightVector>();
 			foreach(Tuple<int, int> pitchVectorEndPoints in pitchVectorEndPointsList)
@@ -147,7 +147,7 @@ namespace Moritz.Spec
 		/// <returns></returns>
 		public GamutVector Concat(GamutVector concatenatedGamutVector)
 		{
-			M.Assert(PitchWeightVectors.Count == concatenatedGamutVector.PitchWeightVectors.Count);
+			Debug.Assert(PitchWeightVectors.Count == concatenatedGamutVector.PitchWeightVectors.Count);
 
 			List<PitchWeightVector> pitchWeightVectors = new List<PitchWeightVector>();
 			for(int i = 0; i < PitchWeightVectors.Count; i++)

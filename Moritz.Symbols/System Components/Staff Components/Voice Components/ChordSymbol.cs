@@ -69,17 +69,17 @@ namespace Moritz.Symbols
         public void SetNoteheadPitchesAndVelocities(List<int> midiPitches, List<int> midiVelocities)
         {
             #region check inputs
-            M.Assert(midiPitches.Count == midiVelocities.Count);
+            Debug.Assert(midiPitches.Count == midiVelocities.Count);
             int previousPitch = -1;
             foreach(int midiPitch in midiPitches)
             {
-                M.Assert(midiPitch >= 0 && midiPitch <= 127, "midiPitch out of range.");
-                M.Assert(midiPitch > previousPitch, "midiPitches must be unique and in ascending order.");
+                Debug.Assert(midiPitch >= 0 && midiPitch <= 127, "midiPitch out of range.");
+                Debug.Assert(midiPitch > previousPitch, "midiPitches must be unique and in ascending order.");
                 previousPitch = midiPitch;
             }
             foreach(int midiVelocity in midiVelocities)
             {
-                M.Assert(midiVelocity >= 0 && midiVelocity <= 127, "midiVelocity out of range.");
+                Debug.Assert(midiVelocity >= 0 && midiVelocity <= 127, "midiVelocity out of range.");
             }
             #endregion
             this.HeadsTopDown.Clear();
@@ -124,7 +124,7 @@ namespace Moritz.Symbols
         /// <returns>A deep clone of the MidiChordDef at the given index</returns>
         public MidiChordDef GetMidiChordDefClone(int indexInPrivateMidiChordDefsList)
         {
-            M.Assert(indexInPrivateMidiChordDefsList >= 0 && indexInPrivateMidiChordDefsList < MidiChordDefs.Count);
+            Debug.Assert(indexInPrivateMidiChordDefsList >= 0 && indexInPrivateMidiChordDefsList < MidiChordDefs.Count);
             return (MidiChordDef)MidiChordDefs[indexInPrivateMidiChordDefsList].Clone();
         }
 
@@ -132,7 +132,7 @@ namespace Moritz.Symbols
         {
             foreach(Head head in HeadsTopDown)
             {
-                M.Assert(head.MidiVelocity >= 0 && head.MidiVelocity <= 127);
+                Debug.Assert(head.MidiVelocity >= 0 && head.MidiVelocity <= 127);
 
                 int velocity = head.MidiVelocity;
                 if(velocity > M.MaxMidiVelocity[M.Dynamic.ff])
@@ -221,13 +221,13 @@ namespace Moritz.Symbols
 
         public VerticalDir DefaultStemDirection(Clef clef)
         {
-            M.Assert(this.HeadsTopDown.Count > 0);
+            Debug.Assert(this.HeadsTopDown.Count > 0);
             float gap = 32F; // dummy value
             List<float> topDownHeadOriginYs = new List<float>();
             int lastMidiPitch = int.MaxValue;
             foreach(Head head in this.HeadsTopDown)
             {
-                M.Assert(head.MidiPitch < lastMidiPitch);
+                Debug.Assert(head.MidiPitch < lastMidiPitch);
                 topDownHeadOriginYs.Add(head.GetOriginY(clef, gap));
             }
 
@@ -262,7 +262,7 @@ namespace Moritz.Symbols
         {
             for(int i = 0; i < midiPitches.Count; i++)
             {
-                M.Assert(midiPitches[i] >= 0 && midiPitches[i] < 128);
+                Debug.Assert(midiPitches[i] >= 0 && midiPitches[i] < 128);
             }
 
             bool useSharps = true;
@@ -324,8 +324,8 @@ namespace Moritz.Symbols
         /// <returns></returns>
         private bool? GetUseSharps(Head head, int interval)
         {
-            M.Assert(interval > 0 && interval < 12);
-            M.Assert(head.Alteration == 0 || head.Alteration == 1);
+            Debug.Assert(interval > 0 && interval < 12);
+            Debug.Assert(head.Alteration == 0 || head.Alteration == 1);
             bool? useSharpsOrNull = null;
             #region Head is A
             if(head.Pitch[0] == 'A')

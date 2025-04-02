@@ -108,7 +108,7 @@ namespace Krystals5ObjectLibrary
 
         private void ContourStrands(List<StrandNode> contouredStrandNodeList, List<Strand> strands)
         {
-            M.Assert(contouredStrandNodeList.Count == strands.Count);
+            Debug.Assert(contouredStrandNodeList.Count == strands.Count);
 
             List<uint> tempList = new List<uint>();
             int[] contour;

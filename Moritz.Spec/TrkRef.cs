@@ -41,7 +41,7 @@ namespace Moritz.Spec
             }
             set
             {
-                M.Assert(value >= 0 && value <= 15);
+                Debug.Assert(value >= 0 && value <= 15);
                 _trkIndex = value;
             }
         }

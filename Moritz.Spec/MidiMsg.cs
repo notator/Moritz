@@ -9,9 +9,9 @@ namespace Moritz.Spec
     {
         internal MidiMsg(int status, int data1, int? data2 = null)
         {
-            M.Assert(status >= 0 && status <= 255); // 0x0..0xFF
-            M.Assert(data1 >= 0 && data1 <= 127);
-            M.Assert(data2 == null || (data2 >= 0 && data2 <= 127));
+            Debug.Assert(status >= 0 && status <= 255); // 0x0..0xFF
+            Debug.Assert(data1 >= 0 && data1 <= 127);
+            Debug.Assert(data2 == null || (data2 >= 0 && data2 <= 127));
 
             _status = status;
             _data1 = data1;

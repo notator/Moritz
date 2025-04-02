@@ -110,7 +110,7 @@ namespace Moritz.Symbols
             }
             catch
             {
-                M.Assert(false, "Error in octave string");
+                Debug.Assert(false, "Error in octave string");
             }
             float octaveShift = octave - 5F;
             shiftFactor -= (octaveShift * 3.5F); // 3.5 spaces is one octave
@@ -160,7 +160,7 @@ namespace Moritz.Symbols
             get { return _pitch; }
             set
             {
-                M.Assert(Regex.Matches(value, @"^[A-G][0-9|:]$") != null);
+                Debug.Assert(Regex.Matches(value, @"^[A-G][0-9|:]$") != null);
                 _pitch = value;
             }
         }
@@ -218,7 +218,7 @@ namespace Moritz.Symbols
             get { return _alteration; }
             set
             {
-                M.Assert(value >= -2 && value <= 2);
+                Debug.Assert(value >= -2 && value <= 2);
                 _alteration = value;
             }
         }

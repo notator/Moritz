@@ -84,7 +84,7 @@ namespace Moritz.Symbols
                     float totalSystemHeight = 0;
                     foreach(SvgSystem system in pageSystems)
                     {
-                        M.Assert(system.Metrics != null);
+                        Debug.Assert(system.Metrics != null);
                         totalSystemHeight += (system.Metrics.NotesBottom - system.Metrics.NotesTop);
                     }
                     systemSeparation = (frameHeight - totalSystemHeight) / (pageSystems.Count - 1);

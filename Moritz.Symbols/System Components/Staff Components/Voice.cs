@@ -46,7 +46,7 @@ namespace Moritz.Symbols
             int nMcds = horizontalMcdListList[0].Count;
             for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
             {
-                M.Assert(horizontalMcdListList[trkIndex].Count == nMcds);
+                Debug.Assert(horizontalMcdListList[trkIndex].Count == nMcds);
             } 
             
             List<List<MidiChordDef>> verticalMcdListList = new List<List<MidiChordDef>>();
@@ -192,7 +192,7 @@ namespace Moritz.Symbols
         public void Replace(DurationSymbol symbolToBeReplaced, List<NoteObject> noteObjects)
         {
             #region conditions
-            M.Assert(symbolToBeReplaced != null && symbolToBeReplaced.Voice == this);
+            Debug.Assert(symbolToBeReplaced != null && symbolToBeReplaced.Voice == this);
             #endregion conditions
 
             List<NoteObject> tempList = new List<NoteObject>(this.NoteObjects);

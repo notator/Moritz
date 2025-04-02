@@ -15,7 +15,7 @@ namespace Moritz.Symbols
         /// <param name="y">The y-coordinate</param>
         public HLine(float leftX, float rightX, float y)
         {
-            M.Assert(leftX < rightX);
+            Debug.Assert(leftX < rightX);
             Left = leftX;
             Right = rightX;
             Y = y;
@@ -23,7 +23,7 @@ namespace Moritz.Symbols
 
         public Dictionary<float, HLine> Split(float x)
         {
-            M.Assert(Left < x && Right > x);
+            Debug.Assert(Left < x && Right > x);
 
             Dictionary<float, HLine> linesDict = new Dictionary<float, HLine>();
             HLine line1 = new HLine(Left, x, Y);
@@ -39,13 +39,13 @@ namespace Moritz.Symbols
             // Xs can be empty, in which case this function returns the original line in the dict.
             foreach(float x in Xs)
             {
-                M.Assert(x > Left && x < Right);
+                Debug.Assert(x > Left && x < Right);
             }
             if(Xs.Count > 1)
             {
                 for(int i = 1; i < Xs.Count; ++i)
                 {
-                    M.Assert(Xs[i - 1] < Xs[i]);
+                    Debug.Assert(Xs[i - 1] < Xs[i]);
                 }
             }
             #endregion conditions;
@@ -122,7 +122,7 @@ namespace Moritz.Symbols
                     }
                 }
             }
-            M.Assert(y != float.MaxValue);
+            Debug.Assert(y != float.MaxValue);
             return y;
         }
 
@@ -240,7 +240,7 @@ namespace Moritz.Symbols
 
         public void AddLineToUpperEdge(HLine newLine)
         {
-            M.Assert(newLine.Y != float.MaxValue);
+            Debug.Assert(newLine.Y != float.MaxValue);
             if(Lines.Count == 0)
             {
                 Lines.Add(newLine);
@@ -279,7 +279,7 @@ namespace Moritz.Symbols
 
                 for(int i = 1; i < newLines.Count; ++i)
                 {
-                    M.Assert(newLines[i - 1].Right == newLines[i].Left);
+                    Debug.Assert(newLines[i - 1].Right == newLines[i].Left);
                 }
 
                 Lines = null;
@@ -293,7 +293,7 @@ namespace Moritz.Symbols
         /// </summary>
         private Dictionary<float, HLine> SplitEdge(HLine newLine, float leftY, float rightY)
         {
-            M.Assert(Lines.Count > 0);
+            Debug.Assert(Lines.Count > 0);
 
             Dictionary<float, HLine> splitEdge = new Dictionary<float, HLine>();
             foreach(HLine hline in Lines)
@@ -351,7 +351,7 @@ namespace Moritz.Symbols
             {
                 HLine leftEdgeLine = Lines[i - 1];
                 HLine rightEdgeLine = Lines[i];
-                M.Assert(leftEdgeLine.Right == rightEdgeLine.Left);
+                Debug.Assert(leftEdgeLine.Right == rightEdgeLine.Left);
 
                 if(leftEdgeLine.Right > newLine.Left && leftEdgeLine.Right < newLine.Right)
                 {
@@ -482,7 +482,7 @@ namespace Moritz.Symbols
 
         private TopEdge FlipVertically()
         {
-            M.Assert(Lines.Count > 0);
+            Debug.Assert(Lines.Count > 0);
             return new TopEdge(this);
         }
     }

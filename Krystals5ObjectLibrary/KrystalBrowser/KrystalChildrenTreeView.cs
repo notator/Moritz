@@ -189,7 +189,7 @@ namespace Krystals5ObjectLibrary
                 }
                 if(dependency.ScoreNames != null)
                 {
-                    M.Assert(rootNode.ForeColor == Color.Red);
+                    Debug.Assert(rootNode.ForeColor == Color.Red);
                     foreach(string scoreName in dependency.ScoreNames)
                     {
                         rootNode.Nodes.Insert(0, scoreName);

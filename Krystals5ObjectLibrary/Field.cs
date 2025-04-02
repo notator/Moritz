@@ -20,7 +20,7 @@ namespace Krystals5ObjectLibrary
             var valuesArray = svgPathElem.GetAttribute("values").Split(' ');
             var nodes = svgPath.Nodes;
 
-            M.Assert(valuesArray.Length == nodes.Count);
+            Debug.Assert(valuesArray.Length == nodes.Count);
 
             Domain = nodes.Count;
 

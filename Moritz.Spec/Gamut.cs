@@ -24,8 +24,8 @@ namespace Moritz.Spec
 			#region checks
             foreach(var item in absPitchWeightDict)
             {
-                M.Assert(item.Key >= 0 && item.Key <= 11);
-                M.Assert(item.Value >= 0 && item.Value <= 127);
+                Debug.Assert(item.Key >= 0 && item.Key <= 11);
+                Debug.Assert(item.Value >= 0 && item.Value <= 127);
             }
 			#endregion checks
 
@@ -51,21 +51,21 @@ namespace Moritz.Spec
 		protected void SetAttributes(IReadOnlyList<PitchWeight> absolutePitchWeights)
 		{
 			#region conditions
-			M.Assert(absolutePitchWeights != null && absolutePitchWeights.Count > 1);
+			Debug.Assert(absolutePitchWeights != null && absolutePitchWeights.Count > 1);
 			foreach(var pitchWeight in absolutePitchWeights)
 			{
-				M.Assert(pitchWeight.Pitch >= 0 && pitchWeight.Pitch <= 11, "Absolute pitch out of range.");
-				M.Assert(pitchWeight.Weight >= 1 && pitchWeight.Pitch <= 127, "Weight out of range.");
+				Debug.Assert(pitchWeight.Pitch >= 0 && pitchWeight.Pitch <= 11, "Absolute pitch out of range.");
+				Debug.Assert(pitchWeight.Weight >= 1 && pitchWeight.Pitch <= 127, "Weight out of range.");
 			}
 			var exists = new List<int>();
 			for(int i = 0; i < absolutePitchWeights.Count; i++)
 			{
-				M.Assert(!exists.Contains(absolutePitchWeights[i].Pitch), "Absolute pitches must be unique.");
+				Debug.Assert(!exists.Contains(absolutePitchWeights[i].Pitch), "Absolute pitches must be unique.");
 				exists.Add(absolutePitchWeights[i].Pitch);
 			}
 			for(int i = 1; i < absolutePitchWeights.Count; i++)
 			{
-				M.Assert(absolutePitchWeights[i - 1].Weight >= absolutePitchWeights[i].Weight, "Weights must be in descending order.");
+				Debug.Assert(absolutePitchWeights[i - 1].Weight >= absolutePitchWeights[i].Weight, "Weights must be in descending order.");
 			}
 			#endregion conditions
 
@@ -108,10 +108,10 @@ namespace Moritz.Spec
 			_pitchWeights = pitchWeights;
 
 			#region check PitchWeights
-			M.Assert(PitchWeights[0].Pitch >= 0 && PitchWeights[PitchWeights.Count - 1].Pitch <= 127, "Pitch out of range.");
+			Debug.Assert(PitchWeights[0].Pitch >= 0 && PitchWeights[PitchWeights.Count - 1].Pitch <= 127, "Pitch out of range.");
 			for(int i = 1; i < PitchWeights.Count; ++i)
 			{
-				M.Assert(PitchWeights[i].Pitch > PitchWeights[i - 1].Pitch, "Pitches must be unique and in ascending order.");
+				Debug.Assert(PitchWeights[i].Pitch > PitchWeights[i - 1].Pitch, "Pitches must be unique and in ascending order.");
 			}
 			var absPitches = AbsolutePitches;
 			List<int> relPitches = new List<int>(Pitches);
@@ -120,7 +120,7 @@ namespace Moritz.Spec
 				int relPitch = absPitch;
 				while(relPitch <= 127)
 				{
-					M.Assert(relPitches.FindIndex(x => x == relPitch) >= 0, "Each absolute pitch must occur in each possible octave.");
+					Debug.Assert(relPitches.FindIndex(x => x == relPitch) >= 0, "Each absolute pitch must occur in each possible octave.");
 					relPitch += 12;
 				}
 			}
@@ -185,7 +185,7 @@ namespace Moritz.Spec
 		{
 			PitchWeight defaultPitchWeight = new PitchWeight();
 			PitchWeight pitchWeight = ((List<PitchWeight>)PitchWeights).Find(x => x.Pitch == pitch);
-			M.Assert(pitchWeight != defaultPitchWeight, $"Gamut.PitchWeights does not contain pitch {pitch}");
+			Debug.Assert(pitchWeight != defaultPitchWeight, $"Gamut.PitchWeights does not contain pitch {pitch}");
 			return pitchWeight.Weight;
 		}
 
@@ -193,7 +193,7 @@ namespace Moritz.Spec
 		{
 			get
 			{
-				M.Assert(PitchWeights != null && PitchWeights.Count > 1);
+				Debug.Assert(PitchWeights != null && PitchWeights.Count > 1);
 
 				return PitchWeights[0].Pitch;
 			}
@@ -202,7 +202,7 @@ namespace Moritz.Spec
 		{
 			get
 			{
-				M.Assert(PitchWeights != null && PitchWeights.Count > 1);
+				Debug.Assert(PitchWeights != null && PitchWeights.Count > 1);
 
 				return PitchWeights[PitchWeights.Count - 1].Pitch;
 			}
@@ -212,7 +212,7 @@ namespace Moritz.Spec
 		{
 			get
 			{
-				M.Assert(PitchWeights != null && PitchWeights.Count > 1);
+				Debug.Assert(PitchWeights != null && PitchWeights.Count > 1);
 
 				List<int> pitches = new List<int>();
 				foreach(PitchWeight pitchWeight in PitchWeights)
@@ -226,7 +226,7 @@ namespace Moritz.Spec
 		{
 			get
 			{
-				M.Assert(PitchWeights != null && PitchWeights.Count > 1);
+				Debug.Assert(PitchWeights != null && PitchWeights.Count > 1);
 
 				List<int> weights = new List<int>();
 				foreach(PitchWeight pitchWeight in PitchWeights)
@@ -351,13 +351,13 @@ namespace Moritz.Spec
 			{
 				throw new ApplicationException($"{nameof(pitchHierarchyIndex)} out of range.");
 			}
-            M.Assert(transposition >= 0 && transposition <= 11);
-            M.Assert(absolutePitches[0] >= 0 && absolutePitches[0] <= 11);
+            Debug.Assert(transposition >= 0 && transposition <= 11);
+            Debug.Assert(absolutePitches[0] >= 0 && absolutePitches[0] <= 11);
 
 			for(int i = 1; i < absolutePitches.Count; i++)
 			{
-                M.Assert(absolutePitches[i] >= 0 && absolutePitches[i] <= 11);
-                M.Assert(absolutePitches[i - 1] < absolutePitches[i]);
+                Debug.Assert(absolutePitches[i] >= 0 && absolutePitches[i] <= 11);
+                Debug.Assert(absolutePitches[i - 1] < absolutePitches[i]);
 			}
 			#endregion conditions
 

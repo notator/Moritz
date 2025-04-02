@@ -197,7 +197,7 @@ namespace Moritz.Algorithm
 
         protected void InsertClefChangesInBars(List<Bar> bars, List<List<int>> voiceIndicesPerStaff, List<List<SortedDictionary<int, string>>> clefChangesPerBarPerStaff)
         {
-            M.Assert(bars.Count == clefChangesPerBarPerStaff.Count);
+            Debug.Assert(bars.Count == clefChangesPerBarPerStaff.Count);
 
             for(int barIndex = 0; barIndex < bars.Count; barIndex++)
             {
@@ -210,7 +210,7 @@ namespace Moritz.Algorithm
                     if(clefDict.Count > 0)
                     {
                         Dictionary<int, string> reversedDict = clefDict.Reverse().ToDictionary(pair => pair.Key, pair => pair.Value);
-                        M.Assert(reversedDict.First().Key < trk.UniqueDefs.Count);
+                        Debug.Assert(reversedDict.First().Key < trk.UniqueDefs.Count);
                         foreach(KeyValuePair<int, string> keyValuePair in reversedDict)
                         {
                             int index = keyValuePair.Key;
@@ -361,7 +361,7 @@ namespace Moritz.Algorithm
             int msDuration = trks0[0].MsDuration; // all the trks0 have the same MsDuration
 
             double approxBarMsDuration = (((double)msDuration) / nBars);
-            M.Assert(approxBarMsDuration * nBars == msDuration);
+            Debug.Assert(approxBarMsDuration * nBars == msDuration);
 
             List<int> barlineMsPositions = new List<int>();
 
@@ -370,11 +370,11 @@ namespace Moritz.Algorithm
                 double approxBarMsPosition = approxBarMsDuration * barNumber;
                 int barMsPosition = NearestAbsUIDEndMsPosition(trks0, approxBarMsPosition);
 
-                M.Assert(barlineMsPositions.Contains(barMsPosition) == false);
+                Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
 
                 barlineMsPositions.Add(barMsPosition);
             }
-            M.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == msDuration);
+            Debug.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == msDuration);
 
             return barlineMsPositions;
         }

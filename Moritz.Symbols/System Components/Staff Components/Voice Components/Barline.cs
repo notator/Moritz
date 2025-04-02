@@ -649,7 +649,7 @@ namespace Moritz.Symbols
 
             // An EndAndStartRegionBarline cannot be at the start of a system,
             // so it can't have a barnumber, and there's no reason to call base.AlignBarnumberX();
-            M.Assert(BarnumberMetrics == null);
+            Debug.Assert(BarnumberMetrics == null);
 
             float originX = Barline_LineMetrics.OriginX;
             if(FramedRegionEndTextMetrics != null)

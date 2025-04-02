@@ -12,14 +12,14 @@ namespace Moritz.Spec
     {
         public MomentDef(int msPosition)
         {
-            M.Assert(msPosition >= 0);
+            Debug.Assert(msPosition >= 0);
             _msPosition = msPosition;
         }
 
         /// <summary>
         /// The millisecond position of this MomentDef in the score.
         /// </summary>
-        public int MsPosition { get { return _msPosition; } set { M.Assert(value >= 0); _msPosition = value; } }
+        public int MsPosition { get { return _msPosition; } set { Debug.Assert(value >= 0); _msPosition = value; } }
         private int _msPosition;
         /// <summary>
         /// When the performer releases a key, the current msPosition becomes MsPosition + MsWidth.

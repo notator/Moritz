@@ -61,7 +61,7 @@ namespace Moritz.Composer
             // bars can currently contain cautionary clefs, but no initial clefs
             List<string> currentClefs = new List<string>(initialClefPerVoice);
             int nVoiceDefs = bars[0].VoiceDefs.Count;
-            M.Assert(nVoiceDefs == currentClefs.Count);
+            Debug.Assert(nVoiceDefs == currentClefs.Count);
 
             for(int barIndex = 0; barIndex < bars.Count; barIndex++)
             {
@@ -91,7 +91,7 @@ namespace Moritz.Composer
                         if(iuds[iudIndex] is ClefDef midStaffClefDef)
                         {
                             int result = String.Compare(currentClefs[voiceIndex], midStaffClefDef.ClefType);
-                            M.Assert(result != 0, $"Redundant clef change in voice index {voiceIndex}, position index {iudIndex}");                            
+                            Debug.Assert(result != 0, $"Redundant clef change in voice index {voiceIndex}, position index {iudIndex}");                            
                             currentClefs[voiceIndex] = midStaffClefDef.ClefType;
                         }
                     }
@@ -170,7 +170,7 @@ namespace Moritz.Composer
             }
             else
             {
-                M.Assert(staff.Voices.Count == 2);
+                Debug.Assert(staff.Voices.Count == 2);
                 staff.Voices[0].StemDirection = VerticalDir.up;
                 staff.Voices[1].StemDirection = VerticalDir.down;
             }

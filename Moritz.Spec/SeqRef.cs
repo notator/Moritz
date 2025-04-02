@@ -13,7 +13,7 @@ namespace Moritz.Spec
         /// <param name="trkOptions">Can be null</param>
         public SeqRef(List<TrkRef> trkRefs, TrkOptions trkOptions)
         {
-            M.Assert(trkRefs != null && trkRefs.Count > 0);
+            Debug.Assert(trkRefs != null && trkRefs.Count > 0);
             TrkOptions = trkOptions;
             TrkRefs = trkRefs;
         }
@@ -31,7 +31,7 @@ namespace Moritz.Spec
             {
                 TrkOptions.WriteSVG(w, false);
             }
-            M.Assert(TrkRefs != null && TrkRefs.Count > 0);
+            Debug.Assert(TrkRefs != null && TrkRefs.Count > 0);
             foreach(TrkRef trkRef in TrkRefs)
             {
                 trkRef.WriteSVG(w);
@@ -81,7 +81,7 @@ namespace Moritz.Spec
                     }
                     catch(IndexOutOfRangeException)
                     {
-                        M.Assert(false);
+                        Debug.Assert(false);
                         return null;
                     }
                 }

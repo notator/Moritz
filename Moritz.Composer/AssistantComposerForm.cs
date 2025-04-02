@@ -30,7 +30,7 @@ namespace Moritz.Composer
             SetDefaultValues();
             DeselectAll();
 
-            M.Assert(File.Exists(settingsPath));
+            Debug.Assert(File.Exists(settingsPath));
 
             _settingsPath = settingsPath;
             _settingsFolderPath = Path.GetDirectoryName(settingsPath);
@@ -43,7 +43,7 @@ namespace Moritz.Composer
 
             _algorithm = ComposableScore.Algorithm(_scoreTitle);
 
-            M.Assert(_algorithm != null);
+            Debug.Assert(_algorithm != null);
 
             GetSelectedSettings();
 
@@ -270,7 +270,7 @@ namespace Moritz.Composer
         }
         private void RevertNotationToSavedButton_Click(object sender, EventArgs e)
         {
-            M.Assert(((SavedState)NotationGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)NotationGroupBox.Tag) == SavedState.confirmed);
+            Debug.Assert(((SavedState)NotationGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)NotationGroupBox.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert the notation panel to the saved version?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -299,7 +299,7 @@ namespace Moritz.Composer
                         }
                         M.ReadToXmlElementTag(r, "notation", "moritzKrystalScore");
                     }
-                    M.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
             }
             catch(Exception ex)
@@ -314,7 +314,7 @@ namespace Moritz.Composer
         }
         private void RevertKrystalsToSavedButton_Click(object sender, EventArgs e)
         {
-            M.Assert(((SavedState)KrystalsGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)KrystalsGroupBox.Tag) == SavedState.confirmed);
+            Debug.Assert(((SavedState)KrystalsGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)KrystalsGroupBox.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert the krystals panel to the saved version?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -343,7 +343,7 @@ namespace Moritz.Composer
                         }
                         M.ReadToXmlElementTag(r, "krystals", "moritzKrystalScore");
                     }
-                    M.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
             }
             catch(Exception ex)
@@ -355,12 +355,12 @@ namespace Moritz.Composer
         #endregion GroupBox confirm and revert buttons
         private void ShowUnconfirmedFormsButton_Click(object sender, EventArgs e)
         {
-            M.Assert(_fsf.UnconfirmedFormsExist());
+            Debug.Assert(_fsf.UnconfirmedFormsExist());
             _fsf.ShowUnconfirmedForms();
         }
         private void ShowConfirmedFormsButton_Click(object sender, EventArgs e)
         {
-            M.Assert(_fsf.ConfirmedFormsExist());
+            Debug.Assert(_fsf.ConfirmedFormsExist());
             _fsf.ShowConfirmedForms();
         }
         #region SaveSettingsCreateScore button
@@ -374,7 +374,7 @@ namespace Moritz.Composer
             }
             else
             {
-                M.Assert(SaveSettingsCreateScoreButton.Text.StartsWith("create"));
+                Debug.Assert(SaveSettingsCreateScoreButton.Text.StartsWith("create"));
                 CreateSVGScore();
             }
         }
@@ -712,7 +712,7 @@ namespace Moritz.Composer
 
         private bool CheckMIDIChannelIndices(List<List<int>> midiChannelsPerStaff, List<int> availableMIDIChannels)
         {
-            M.Assert(availableMIDIChannels != null);
+            Debug.Assert(availableMIDIChannels != null);
 
             bool error = false;
             var flatMIDIChannels = new List<int>();
@@ -1202,7 +1202,7 @@ namespace Moritz.Composer
 
                     _dimensionsAndMetadataForm.Read(r);
 
-                    M.Assert(r.Name == "notation" || r.Name == "krystals");
+                    Debug.Assert(r.Name == "notation" || r.Name == "krystals");
 
                     while(r.Name == "notation" || r.Name == "krystals")
                     {
@@ -1220,10 +1220,10 @@ namespace Moritz.Composer
                         }
                         M.ReadToXmlElementTag(r, "notation", "krystals", "moritzKrystalScore");
                     }
-                    M.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
-                M.Assert(!_fsf.UnconfirmedFormsExist());
-                M.Assert(!_fsf.ConfirmedFormsExist());
+                Debug.Assert(!_fsf.UnconfirmedFormsExist());
+                Debug.Assert(!_fsf.ConfirmedFormsExist());
             }
             catch(Exception ex)
             {
@@ -1232,7 +1232,7 @@ namespace Moritz.Composer
         }
         private void GetNotation(XmlReader r)
         {
-            M.Assert(r.Name == "notation");
+            Debug.Assert(r.Name == "notation");
             int count = r.AttributeCount;
             OutputChordSymbolTypeComboBox.SelectedIndex = 0; // default is standard outputChord symbols (all noteheads black)
             for(int i = 0; i < count; i++)
@@ -1316,7 +1316,7 @@ namespace Moritz.Composer
         #endregion helpers
         private void GetKrystals(XmlReader r)
         {
-            M.Assert(r.Name == "krystals");
+            Debug.Assert(r.Name == "krystals");
 
             M.ReadToXmlElementTag(r, "krystal");
             this.KrystalsListBox.SuspendLayout();
@@ -1356,7 +1356,7 @@ namespace Moritz.Composer
         #region save settings
         public void SaveSettings()
         {
-            M.Assert(!string.IsNullOrEmpty(_settingsPath));
+            Debug.Assert(!string.IsNullOrEmpty(_settingsPath));
 
             M.CreateDirectoryIfItDoesNotExist(this._settingsFolderPath);
 
@@ -1498,7 +1498,7 @@ namespace Moritz.Composer
             pageFormat.IsLandscape = _dimensionsAndMetadataForm.Landscape;
             int bottomPX;
             int rightPX;
-            M.Assert(Regex.Matches(pageFormat.PaperSize, @"^(A4|B4|A5|B5|A3|Letter|Legal|Tabloid)$") != null);
+            Debug.Assert(Regex.Matches(pageFormat.PaperSize, @"^(A4|B4|A5|B5|A3|Letter|Legal|Tabloid)$") != null);
             if(pageFormat.IsLandscape == true)
             {
                 bottomPX = (int)(pageFormat.VerticalPixelsPerMillimeter * M.PaperSizes[pageFormat.PaperSize].ShortDimension_MM);
@@ -1583,7 +1583,7 @@ namespace Moritz.Composer
                 clefPerVoice.Add(clef);
                 if(pageFormat.VoiceIndicesPerStaff[staffIndex].Count > 1)
                 {
-                    M.Assert(pageFormat.VoiceIndicesPerStaff[index: staffIndex].Count == 2);
+                    Debug.Assert(pageFormat.VoiceIndicesPerStaff[index: staffIndex].Count == 2);
                     clefPerVoice.Add(clef);
                 }
             }
@@ -1631,7 +1631,7 @@ namespace Moritz.Composer
         {
             get
             {
-                M.Assert(_voiceIndicesPerStaff != null && _voiceIndicesPerStaff.Count > 0);
+                Debug.Assert(_voiceIndicesPerStaff != null && _voiceIndicesPerStaff.Count > 0);
                 var nStaves = _voiceIndicesPerStaff.Count;
                 return nStaves;
             }

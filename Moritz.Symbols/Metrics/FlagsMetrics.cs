@@ -65,7 +65,7 @@ namespace Moritz.Symbols
                     offset = 1F;
                     break;
                 default:
-                    M.Assert(false, "This duration class has no flags.");
+                    Debug.Assert(false, "This duration class has no flags.");
                     break;
             }
             if(stemDirection == VerticalDir.up)

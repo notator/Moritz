@@ -224,8 +224,8 @@ namespace Krystals5ObjectLibrary
             uint permutationLevel,
             bool sortFirst)
         {
-            M.Assert(axisList.Count == contourList.Count);
-            M.Assert(axisList.Count == outerSuperStrands.Count);
+            Debug.Assert(axisList.Count == contourList.Count);
+            Debug.Assert(axisList.Count == outerSuperStrands.Count);
 
             List<int> sourceMoments = new List<int>();
 
@@ -256,7 +256,7 @@ namespace Krystals5ObjectLibrary
         /// <returns></returns>
         private List<int> GetSourceAlignedValues(PermutationSourceInputKrystal source, uint permutationLevel, InputKrystal acKrystal)
         {
-            M.Assert(permutationLevel <= source.Level && permutationLevel > acKrystal.Level);
+            Debug.Assert(permutationLevel <= source.Level && permutationLevel > acKrystal.Level);
             List<int> alignedValues = new List<int>();
             int acStrandIndex = 0;
             int acValueIndex = 0;
@@ -293,8 +293,8 @@ namespace Krystals5ObjectLibrary
 
         private void AddValue(List<int> alignedValues, InputKrystal acKrystal, int acStrandIndex, int acValueIndex)
         {
-            M.Assert(acStrandIndex < acKrystal.Strands.Count);
-            M.Assert(acValueIndex < acKrystal.Strands[acStrandIndex].Values.Count);
+            Debug.Assert(acStrandIndex < acKrystal.Strands.Count);
+            Debug.Assert(acValueIndex < acKrystal.Strands[acStrandIndex].Values.Count);
 
             alignedValues.Add((int)(acKrystal.Strands[acStrandIndex].Values[acValueIndex]));
         }
@@ -309,7 +309,7 @@ namespace Krystals5ObjectLibrary
                 this.Strands.Clear();
                 foreach(PermutationNode pn in _permutationNodeList)
                 {
-                    M.Assert(pn.SourceStrandNumber > 0 && pn.SourceStrandNumber <= _sourceInputKrystal.Strands.Count);
+                    Debug.Assert(pn.SourceStrandNumber > 0 && pn.SourceStrandNumber <= _sourceInputKrystal.Strands.Count);
 
                     this.Strands.Add(_sourceInputKrystal.Strands[pn.SourceStrandNumber - 1]);
                 }

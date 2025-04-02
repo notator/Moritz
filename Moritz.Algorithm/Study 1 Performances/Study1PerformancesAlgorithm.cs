@@ -33,7 +33,7 @@ namespace Moritz.Algorithm.Study1
             List<int> trackChordNumbers = GetTrackChordNumbers();
             List<int> trackRootPitches = GetTrackRootPitches();
 
-            M.Assert(trackChordNumbers.Count == trackRootPitches.Count);
+            Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
             Trk trk0 = GetTrk0(trackChordNumbers, trackRootPitches);
             // parallel Trks must have the same number and types of contained UniqueDefs
@@ -46,7 +46,7 @@ namespace Moritz.Algorithm.Study1
             var voiceDef = new VoiceDef(channelTrks);
             List<VoiceDef> voiceDefs = new List<VoiceDef>() { voiceDef };
 
-            M.Assert(voiceDefs.Count == NumberOfVoices);
+            Debug.Assert(voiceDefs.Count == NumberOfVoices);
 
             TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
 

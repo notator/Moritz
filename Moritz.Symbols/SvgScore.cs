@@ -175,7 +175,7 @@ namespace Moritz.Symbols
 
         public void WriteDefs(SvgWriter w, int pageNumber)
         {
-            M.Assert(Notator != null);
+            Debug.Assert(Notator != null);
             w.SvgStartDefs(null);
             WriteStyle(w, pageNumber);
             Notator.SymbolSet.WriteSymbolDefinitions(w, _pageFormat);
@@ -844,14 +844,14 @@ namespace Moritz.Symbols
                 {
                     foreach(Voice voice in staff.Voices)
                     {
-                        M.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
+                        Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
                         // contains lists of consecutive rest indices
                         List<List<int>> restIndexLists = new List<List<int>>();
                         #region find the consecutive rests
                         List<int> consecutiveRestIndexList = new List<int>();
                         for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
                         {
-                            M.Assert(!(voice.NoteObjects[i] is Barline));
+                            Debug.Assert(!(voice.NoteObjects[i] is Barline));
 
                             RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
                             if(voice.NoteObjects[i] is RestSymbol rest1 && rest2 != null)
@@ -884,7 +884,7 @@ namespace Moritz.Symbols
                                 for(int j = consecutiveRestIndices.Count - 1; j > 0; j--)
                                 {
                                     rest = voice.NoteObjects[consecutiveRestIndices[j]] as RestSymbol;
-                                    M.Assert(rest != null);
+                                    Debug.Assert(rest != null);
                                     msDuration += rest.MsDuration;
                                     voice.NoteObjects.RemoveAt(consecutiveRestIndices[j]);
                                 }
@@ -908,7 +908,7 @@ namespace Moritz.Symbols
         /// </summary>
         public void SetSystemsToBeginAtBars(List<int> barNumbers)
         {
-            M.Assert(barNumbers != null);
+            Debug.Assert(barNumbers != null);
             if(barNumbers.Count == 0)
             {
                 int barNumber = 1;
@@ -919,7 +919,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            M.Assert(barNumbers[0] == 1);
+            Debug.Assert(barNumbers[0] == 1);
 
             // barNumbers beyond the end of the score are silently ignored.
             List<int> systemStartBarIndices = new List<int>();
@@ -967,15 +967,15 @@ namespace Moritz.Symbols
         /// <param name="barlineIndex"></param>
         private void JoinNextSystemToSystem(int systemIndex)
         {
-            M.Assert(Systems.Count > 1 && Systems.Count > systemIndex + 1);
+            Debug.Assert(Systems.Count > 1 && Systems.Count > systemIndex + 1);
             SvgSystem system1 = Systems[systemIndex];
             SvgSystem system2 = Systems[systemIndex + 1];
-            M.Assert(system1.Staves.Count == system2.Staves.Count);
+            Debug.Assert(system1.Staves.Count == system2.Staves.Count);
             foreach(Staff staff in system2.Staves)
             {
                 foreach(Voice voice in staff.Voices)
                 {
-                    M.Assert(voice.NoteObjects[0] is Clef);
+                    Debug.Assert(voice.NoteObjects[0] is Clef);
                 }
             }
 
@@ -988,7 +988,7 @@ namespace Moritz.Symbols
                 {
                     Voice voice1 = system1.Staves[staffIndex].Voices[voiceIndex];
                     Voice voice2 = system2.Staves[staffIndex].Voices[voiceIndex];
-                    M.Assert(voice2.NoteObjects[0] is Clef);
+                    Debug.Assert(voice2.NoteObjects[0] is Clef);
                     voice2.NoteObjects.RemoveAt(0);
                     try
                     {
@@ -1007,7 +1007,7 @@ namespace Moritz.Symbols
         //private string FindClefTypeAtEndOfStaff1(Voice staff1voice0)
         //{
         //    Clef mainStaff1Clef = staff1voice0.NoteObjects[0] as Clef;
-        //    M.Assert(mainStaff1Clef != null);
+        //    Debug.Assert(mainStaff1Clef != null);
 
         //    string clefTypeAtEndOfStaff1 = mainStaff1Clef.ClefType;
         //    foreach(NoteObject noteObject in staff1voice0.NoteObjects)
@@ -1093,7 +1093,7 @@ namespace Moritz.Symbols
                 {
                     foreach(Voice voice in staff.Voices)
                     {
-                        M.Assert(voice.NoteObjects.Count > 0
+                        Debug.Assert(voice.NoteObjects.Count > 0
                             && !(voice.NoteObjects[voice.NoteObjects.Count - 1] is NormalBarline));
 
                         NormalBarline normalBarline = new NormalBarline(voice);
@@ -1145,7 +1145,7 @@ namespace Moritz.Symbols
             int nStaves = Systems[0].Staves.Count;
             foreach(SvgSystem system in Systems)
             {
-                M.Assert(system.Staves.Count == nStaves);
+                Debug.Assert(system.Staves.Count == nStaves);
             }
             List<int> nVoices = new List<int>();
             foreach(Staff staff in Systems[0].Staves)
@@ -1155,10 +1155,10 @@ namespace Moritz.Symbols
             {
                 for(int i = 0; i < system.Staves.Count; ++i)
                 {
-                    M.Assert(system.Staves[i].Voices.Count == nVoices[i]);
+                    Debug.Assert(system.Staves[i].Voices.Count == nVoices[i]);
                     foreach(Voice voice in system.Staves[i].Voices)
                     {
-                        M.Assert(voice.NoteObjects[0] is Clef);
+                        Debug.Assert(voice.NoteObjects[0] is Clef);
                     }
                 }
             }
@@ -1251,12 +1251,12 @@ namespace Moritz.Symbols
 
         private int BarlineMsPos(List<NoteObject> noteObjects, int i)
         {
-            M.Assert(noteObjects[i] is Barline);
+            Debug.Assert(noteObjects[i] is Barline);
             int barlineMsPos = 0;
             if(i > 0 && i == noteObjects.Count - 1)
             {
                 DurationSymbol prevDurationSymbol = noteObjects[i - 1] as DurationSymbol;
-                M.Assert(prevDurationSymbol != null);
+                Debug.Assert(prevDurationSymbol != null);
                 if((prevDurationSymbol is RestSymbol restSymbol)
                 || (prevDurationSymbol is ChordSymbol cSymbol && cSymbol.MsDurationToNextBarline == null))
                 {
@@ -1370,8 +1370,8 @@ namespace Moritz.Symbols
         private void MoveSmallClefsToFollowRests(Voice voice, int systemIndex, int staffIndex, int voiceIndex)
         {
             List<NoteObject> noteObjects = voice.NoteObjects;
-            M.Assert(noteObjects[0] is Clef);
-            M.Assert(noteObjects[noteObjects.Count - 1] is Barline);
+            Debug.Assert(noteObjects[0] is Clef);
+            Debug.Assert(noteObjects[noteObjects.Count - 1] is Barline);
 
             for(int i = noteObjects.Count - 1; i > 0; --i)
             {
@@ -1463,8 +1463,8 @@ namespace Moritz.Symbols
             float systemHeightsTotal = 0;
             while(systemIndex < Systems.Count)
             {
-                M.Assert(Systems[systemIndex].Metrics != null);
-                M.Assert(Systems[systemIndex].Metrics.StafflinesTop == 0);
+                Debug.Assert(Systems[systemIndex].Metrics != null);
+                Debug.Assert(Systems[systemIndex].Metrics.StafflinesTop == 0);
 
                 systemHeight = Systems[systemIndex].Metrics.NotesBottom - Systems[systemIndex].Metrics.NotesTop;
 
@@ -1702,12 +1702,12 @@ namespace Moritz.Symbols
         {
             get
             {
-                M.Assert(_pages.Count > 0);
-                M.Assert(_pages[0].Systems.Count > 0);
-                M.Assert(_pages[0].Systems[0].Staves.Count > 0);
+                Debug.Assert(_pages.Count > 0);
+                Debug.Assert(_pages[0].Systems.Count > 0);
+                Debug.Assert(_pages[0].Systems[0].Staves.Count > 0);
                 foreach(Staff staff in _pages[0].Systems[0].Staves)
                 {
-                    M.Assert(!String.IsNullOrEmpty(staff.Staffname));
+                    Debug.Assert(!String.IsNullOrEmpty(staff.Staffname));
                     yield return staff.Staffname;
                 }
             }

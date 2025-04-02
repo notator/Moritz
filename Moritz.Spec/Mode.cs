@@ -93,7 +93,7 @@ namespace Moritz.Spec
             {
                 IReadOnlyList<int> gamut = Gamut; // evaluates _gamut
             }
-            M.Assert(_gamut != null && _gamut.Count > 0);
+            Debug.Assert(_gamut != null && _gamut.Count > 0);
 
             return _gamut.IndexOf(pitch);
         }
@@ -107,7 +107,7 @@ namespace Moritz.Spec
         /// <param name="firstPitch">Will be the first pitch in the returned list.</param>
         internal List<int> PitchSequence(int firstPitch, Envelope envelope)
         {
-            M.Assert(_gamut.Contains(firstPitch), $"{nameof(firstPitch)} is not in mode.");
+            Debug.Assert(_gamut.Contains(firstPitch), $"{nameof(firstPitch)} is not in mode.");
 
             List<int> pitchSequence = new List<int>();
             if(envelope == null)
@@ -154,8 +154,8 @@ namespace Moritz.Spec
         /// <returns></returns>
         public List<int> GetChord(int rootPitch, int nPitches)
         {
-            M.Assert(nPitches > 0 && nPitches <= 12);
-            M.Assert(Gamut.Contains(rootPitch));
+            Debug.Assert(nPitches > 0 && nPitches <= 12);
+            Debug.Assert(Gamut.Contains(rootPitch));
 
             List<int> pitches = new List<int>() { rootPitch };
 
@@ -247,7 +247,7 @@ namespace Moritz.Spec
 
         private static void AssertVelocityPerAbsolutePitchValidity(IReadOnlyList<int> velocityPerAbsolutePitch)
         {
-            M.Assert(velocityPerAbsolutePitch.Count == 12);
+            Debug.Assert(velocityPerAbsolutePitch.Count == 12);
 
             foreach(int velocity in velocityPerAbsolutePitch)
             {
@@ -313,7 +313,7 @@ namespace Moritz.Spec
         public static List<int> SetVelocityPerAbsolutePitchGradient(IReadOnlyList<int> velocityPerAbsolutePitch, double power)
         {
             AssertVelocityPerAbsolutePitchValidity(velocityPerAbsolutePitch);
-            M.Assert(power >= -1 && power <= 1);
+            Debug.Assert(power >= -1 && power <= 1);
 
             List<int> rval = new List<int>();
             for(int i = 0; i < velocityPerAbsolutePitch.Count; i++)
@@ -338,7 +338,7 @@ namespace Moritz.Spec
         public static List<int> SetVelocityPerAbsolutePitchRange(IReadOnlyList<int> velocityPerAbsolutePitch, int minVelocity, int maxVelocity)
         {
             AssertVelocityPerAbsolutePitchValidity(velocityPerAbsolutePitch);
-            M.Assert(minVelocity <= maxVelocity);
+            Debug.Assert(minVelocity <= maxVelocity);
 
             List<int> rval = new List<int>();
             int minVel = int.MaxValue;
@@ -486,7 +486,7 @@ namespace Moritz.Spec
 
                 AssertGamutValidity();
 
-                M.Assert(MaxGamutPitch == _gamut[_gamut.Count - 1]);
+                Debug.Assert(MaxGamutPitch == _gamut[_gamut.Count - 1]);
 
                 return _gamut as IReadOnlyList<int>;
             }
@@ -499,7 +499,7 @@ namespace Moritz.Spec
         #region private helper functions
         private ModeProximity GetModeProximity(Mode otherMode)
         {
-            M.Assert(this.NPitchesPerOctave == otherMode.NPitchesPerOctave);
+            Debug.Assert(this.NPitchesPerOctave == otherMode.NPitchesPerOctave);
 
             int proximity = GetProximity(otherMode);
             ModeProximity rval = new ModeProximity(otherMode, proximity);
@@ -533,7 +533,7 @@ namespace Moritz.Spec
         /// </summary>
         private void AssertAbsolutePitchHierarchyValidity()
         {
-            M.Assert(AbsolutePitchHierarchy.Count == 12);
+            Debug.Assert(AbsolutePitchHierarchy.Count == 12);
             List<bool> presence = new List<bool>();
             for(int i = 0; i < 12; ++i)
             {
@@ -542,14 +542,14 @@ namespace Moritz.Spec
 
             foreach(int value in AbsolutePitchHierarchy)
             {
-                M.Assert(value >= 0 && value <= 11);
-                M.Assert(presence[value] == false);
+                Debug.Assert(value >= 0 && value <= 11);
+                Debug.Assert(presence[value] == false);
                 presence[value] = true;
             }
 
             for(int i = 0; i < 12; ++i)
             {
-                M.Assert(presence[i] == true);
+                Debug.Assert(presence[i] == true);
             }
         }
 
@@ -561,13 +561,13 @@ namespace Moritz.Spec
         /// </summary>
         private void AssertGamutValidity()
         {
-            M.Assert(_gamut != null && _gamut.Count > 0, $"{nameof(_gamut)} is null or empty.");
-            M.Assert(_gamut[0] % 12 == AbsolutePitchHierarchy[0], $"The lowest pitch in {nameof(_gamut)} must always be equal to {nameof(AbsolutePitchHierarchy)}[0].");
+            Debug.Assert(_gamut != null && _gamut.Count > 0, $"{nameof(_gamut)} is null or empty.");
+            Debug.Assert(_gamut[0] % 12 == AbsolutePitchHierarchy[0], $"The lowest pitch in {nameof(_gamut)} must always be equal to {nameof(AbsolutePitchHierarchy)}[0].");
 
             for(int i = 1; i < _gamut.Count; ++i)
             {
-                M.Assert(_gamut[i] >= 0 && _gamut[i] <= 127, $"{nameof(_gamut)}[{i}] is out of range.");
-                M.Assert(_gamut[i] > _gamut[i - 1], $"{nameof(_gamut)} values must be in ascending order.");
+                Debug.Assert(_gamut[i] >= 0 && _gamut[i] <= 127, $"{nameof(_gamut)}[{i}] is out of range.");
+                Debug.Assert(_gamut[i] > _gamut[i - 1], $"{nameof(_gamut)} values must be in ascending order.");
             }
 
             #region check pitch consistency
@@ -584,12 +584,12 @@ namespace Moritz.Spec
                 int pitchOctave = pitch;
                 while(pitchOctave < 128)
                 {
-                    M.Assert(_gamut.Contains(pitchOctave), $"Missing pitch in {nameof(_gamut)}");
+                    Debug.Assert(_gamut.Contains(pitchOctave), $"Missing pitch in {nameof(_gamut)}");
                     pitchCount += 1;
                     pitchOctave += 12;
                 }
             }
-            M.Assert(_gamut.Count == pitchCount, $"Unknown pitch in {nameof(_gamut)}.");
+            Debug.Assert(_gamut.Count == pitchCount, $"Unknown pitch in {nameof(_gamut)}.");
             #endregion check pitch consistency
         }
         #endregion private helper functions

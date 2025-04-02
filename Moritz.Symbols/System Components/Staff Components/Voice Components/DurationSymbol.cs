@@ -79,7 +79,7 @@ namespace Moritz.Symbols
         public virtual int MsDuration
         {
             get { return _msDuration; }
-            set { M.Assert(false, "This property should only be set when agglomerating RestSymbols."); }
+            set { Debug.Assert(false, "This property should only be set when agglomerating RestSymbols."); }
         }
         protected int _msDuration = 0;
 

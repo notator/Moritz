@@ -16,7 +16,7 @@ namespace Moritz.Xml
         public TextInfo(string text, string fontFamily, float fontHeight, ColorString colorString,
             TextHorizAlign textHorizAlign)
         {
-            M.Assert(!String.IsNullOrEmpty(text));
+            Debug.Assert(!String.IsNullOrEmpty(text));
             _text = text;
             _fontFamily = fontFamily;
             _fontHeight = fontHeight;
