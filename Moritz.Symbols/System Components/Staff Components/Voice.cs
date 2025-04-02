@@ -14,16 +14,10 @@ namespace Moritz.Symbols
     /// </summary>
     public class Voice
     {
-        public Voice(Staff staff, Voice voice)
+        public Voice(Staff staff, VoiceDef voiceDef)
         {
             Staff = staff;
-            StemDirection = voice.StemDirection;
-            this.AppendNoteObjects(voice.NoteObjects);
-        }
-
-        public Voice(Staff staff)
-        {
-            Staff = staff;
+            VoiceDef = voiceDef;
         }
 
         //public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);

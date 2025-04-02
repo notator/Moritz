@@ -38,9 +38,10 @@ namespace Moritz.Symbols
 
         /// <summary>
         /// There is still one system per bar.
-        /// In each system, the staff list contains OutputStaff objects followed by InputStaff objects.
-		/// Each VoiceDef contains ClefDefs. The first is converted to a Clef, later ones to SmallClefs.
-		/// An Exception will be thrown if a SmallClefDef is found on the lower voiceDef in a staf in the systems input.
+        /// In each system, the staff list contains Staff objects containing empty Voice objects
+        /// containing VoiceDefs containing one or more Trks. Only Trk[0] is used to construct the score's graphics.
+		/// Trk[0] contains ClefDefs. The first is converted to a Clef, later ones to SmallClefs.
+		/// An Exception will be thrown if a SmallClefDef is found on the lower voiceDef in a staff in the systems input.
 		/// Small clefs (if there are any) are copied from the top to the bottom voice (if there is one) on each staff.
         /// </summary>
         /// <param name="systems"></param>
@@ -63,48 +64,47 @@ namespace Moritz.Symbols
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
                         Voice voice = staff.Voices[voiceIndex];
-                        foreach(var trk in voice.VoiceDef.Trks)
+                        Trk trk = voice.VoiceDef.Trks[0];
+
+                        trk.AssertConsistency();
+
+                        msPositionReVoiceDef = 0;
+                        List<IUniqueDef> iuds = trk.UniqueDefs;
+                        M.Assert(iuds[0] is ClefDef);
+
+                        for(int iudIndex = 0; iudIndex < iuds.Count; ++iudIndex)
                         {
-                            trk.AgglomerateRests();
+                            IUniqueDef iud = iuds[iudIndex];
+                            int absMsPosition = systemAbsMsPos + msPositionReVoiceDef;
 
-                            msPositionReVoiceDef = 0;
-                            List<IUniqueDef> iuds = trk.UniqueDefs;
-                            M.Assert(iuds[0] is ClefDef);
+                            NoteObject noteObject =
+                                SymbolSet.GetNoteObject(voice, absMsPosition, iud, iudIndex, ref currentChannelVelocities[staffIndex], _pageFormat);
 
-                            for(int iudIndex = 0; iudIndex < iuds.Count; ++iudIndex)
+                            if(noteObject is SmallClef smallClef)
                             {
-                                IUniqueDef iud = iuds[iudIndex];
-                                int absMsPosition = systemAbsMsPos + msPositionReVoiceDef;
-
-                                NoteObject noteObject =
-                                    SymbolSet.GetNoteObject(voice, absMsPosition, iud, iudIndex, ref currentChannelVelocities[staffIndex], _pageFormat);
-
-                                if(noteObject is SmallClef smallClef)
+                                if(voiceIndex == 0)
                                 {
-                                    if(voiceIndex == 0)
+                                    if(staff.Voices.Count > 1)
                                     {
-                                        if(staff.Voices.Count > 1)
-                                        {
-                                            topVoiceSmallClefs.Add(smallClef);
-                                        }
+                                        topVoiceSmallClefs.Add(smallClef);
                                     }
-                                    else
-                                    {
-                                        throw new Exception("SmallClefs may not be defined for a lower voice. They will be copied from the top voice");
-                                    }
-                                }
-
-                                if(iud is IUniqueSplittableChordDef iscd && iscd.MsDurationToNextBarline != null)
-                                {
-                                    msPositionReVoiceDef += (int)iscd.MsDurationToNextBarline;
                                 }
                                 else
                                 {
-                                    msPositionReVoiceDef += iud.MsDuration;
+                                    throw new Exception("SmallClefs may not be defined for a lower voice. They will be copied from the top voice");
                                 }
-
-                                voice.NoteObjects.Add(noteObject);
                             }
+
+                            if(iud is IUniqueSplittableChordDef iscd && iscd.MsDurationToNextBarline != null)
+                            {
+                                msPositionReVoiceDef += (int)iscd.MsDurationToNextBarline;
+                            }
+                            else
+                            {
+                                msPositionReVoiceDef += iud.MsDuration;
+                            }
+
+                            voice.NoteObjects.Add(noteObject);
                         }
                     }
 

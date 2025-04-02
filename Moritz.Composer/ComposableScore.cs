@@ -103,9 +103,9 @@ namespace Moritz.Composer
         /// Creates one System per bar (=list of VoiceDefs) in the argument.
         /// The Systems are complete with staves and voices of the correct type:
         /// Each Staff is allocated parallel (empty) Voice fields.
-        /// Each Voice has a VoiceDef field that is allocated to the corresponding
-        /// VoiceDef from the argument.
-        /// Voices are given a midi channel allocated from top to bottom in the printed score.
+        /// Each Voice has a VoiceDef field that is set using the corresponding
+        /// VoiceDef in the argument bar.
+        /// A Voice's midi channel will be its index from top to bottom in the score.
         /// </summary>
         public void CreateEmptySystems(List<Bar> bars)
         {
@@ -118,6 +118,10 @@ namespace Moritz.Composer
             CreateEmptyStaves(bars);
         }
 
+        /// <summary>
+        /// Creates empty Staff objects in each System,
+        /// and attaches corresponding VoiceDefs to Voices.
+        /// </summary>
         private void CreateEmptyStaves(List<Bar> bars)
         {
             int nStaves = _pageFormat.VoiceIndicesPerStaff.Count;
@@ -136,7 +140,7 @@ namespace Moritz.Composer
                     List<int> voiceIndices = _pageFormat.VoiceIndicesPerStaff[staffIndex];
                     for(int voiceIndex = 0; voiceIndex < voiceIndices.Count; ++voiceIndex)
                     {
-                        Voice voice = new Voice(staff);
+                        Voice voice = new Voice(staff, voiceDefs[voiceIndex]);
                         staff.Voices.Add(voice);
                     }
                     SetStemDirections(staff);

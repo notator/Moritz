@@ -145,7 +145,7 @@ namespace Moritz.Spec
         /// Checks the content of the trk, taking the current state of CanContainCautionaryChordDef 
         /// and CanContainClefDefs into account.
         /// The MsPositionReFirstUD of each UniqueDef is always consistent with the uniqueDef.MsDurations.
-        /// Consecutive MidiRestDefs are always illegal.
+        /// Consecutive RestDefs are illegal.
         /// </summary>
         public void AssertConsistency()
         {
