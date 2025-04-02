@@ -10,21 +10,16 @@ namespace Moritz.Spec
     public class Bar
     {
         /// <summary>
-        /// This constructor creates the Seq.VoiceDefs field containing a list of VoiceDef objects.
+        /// This constructor creates the VoiceDefs field containing a list of VoiceDef objects.
         /// Each VoiceDef has a unique midi channel that is its index in the VoiceDefs list.
         /// Each VoiceDef contains a list of Trk. Each such Trk has the same channel, and is an alternative performance
         /// of the graphics that will eventually be associated with the VoiceDef's graphics. 
         /// </summary>
         /// <param name="absMsPosition">Must be greater than or equal to zero.</param>
-        /// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
-        /// combination of RestDef or MidiChordDef.
+        /// <param name="voiceDefs">Each voiceDef has a Trks property containing at least one Trk (performance)
+        /// Each Trk must have a constructed UniqueDefs list which is either empty, or contains any combination of RestDef or MidiChordDef.
         /// Each trk.MsPositionReContainer must be 0. All trk.UniqueDef.MsPositionReFirstUD values must be set correctly.
         /// All Trks that have the same channel must have the same trk.DurationsCount. (They are different performances of the same ChordSymbols.)
-        /// <para>Not all the Seq's channels need to be given an explicit Trk in the trks argument. The seq will be given empty
-        /// (default) Trks for the channels that are missing.
-        /// trks.Count must be less than or equal to numberOfMidiChannels.</para>
-        /// </param>
-        /// <param name="numberOfMidiChannels">Each Voice has one channel index.</param>
         public Bar(int absMsPosition, List<VoiceDef> voiceDefs)
         {
             #region conditions
@@ -192,28 +187,9 @@ namespace Moritz.Spec
 
         private int _absMsPosition = 0;
 
-        /// <summary>
-        /// returns _all_ the trks in the Bar as a flat list.
-        /// </summary>
-        public IReadOnlyList<Trk> Trks
-        {
-            get
-            {
-                List<Trk> trks = new List<Trk>();
-                foreach(VoiceDef voiceDef in VoiceDefs)
-                {
-                    foreach(var trk in voiceDef.Trks)
-                    {
-                        trks.Add(trk);
-                    }
-                }
-                return trks.AsReadOnly();
-            }
-        }
-
         public override string ToString()
         {
-            return $"AbsMsPosition={AbsMsPosition}, nVoiceDefs={VoiceDefs.Count}, nTrksPerChannel={VoiceDefs[0].Trks.Count}";
+            return $"AbsMsPosition={AbsMsPosition}, nVoiceDefs={VoiceDefs.Count}, nTrksPerVoice={VoiceDefs[0].Trks.Count}";
         }
 
         public IReadOnlyList<VoiceDef> VoiceDefs { get => _voiceDefs; }
@@ -236,35 +212,6 @@ namespace Moritz.Spec
         #endregion old Bar
 
         #region copied from Seq (now deleted)
-
-        /// <summary>
-        /// Set empty Trks to contain a single RestDef having the msDuration of the other Trks at the same trkIndex.
-        /// </summary>
-        public void PadEmptyTrks()
-        {
-            for(var trkIndex = 0; trkIndex < VoiceDefs[0].Trks.Count; trkIndex++)
-            {
-                int msDuration = 0;
-                foreach(var voiceDef in VoiceDefs)
-                {
-                    var trk = voiceDef.Trks[trkIndex];
-                    if(trk.UniqueDefs.Count > 0)
-                    {
-                        msDuration = trk.MsDuration;
-                        break;
-                    }
-                }
-                Debug.Assert(msDuration > 0);
-                foreach(var voiceDef in VoiceDefs)
-                {
-                    var trk = voiceDef.Trks[trkIndex];
-                    if(trk.UniqueDefs.Count == 0)
-                    {
-                        trk.Add(new RestDef(0, msDuration));
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// AbsMsPosition is greater than or equal to 0.
