@@ -239,7 +239,6 @@ namespace Krystals5Application
 
         private void QuitButton_Click(object sender, EventArgs e)
         {
-            M.Preferences.Dispose();
             Close();
         }
 

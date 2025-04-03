@@ -176,9 +176,9 @@ namespace Moritz
 			this.label8.Font = new System.Drawing.Font("Arial", 7F);
 			this.label8.Location = new System.Drawing.Point(25, 183);
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(169, 13);
+			this.label8.Size = new System.Drawing.Size(149, 13);
 			this.label8.TabIndex = 38;
-			this.label8.Text = "Moritz uses version 4 of this library.";
+			this.label8.Text = "No longer used in Moritz 2025";
 			this.label8.Click += new System.EventHandler(this.Anything_Click);
 			// 
 			// label14

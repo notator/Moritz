@@ -539,7 +539,6 @@ namespace DeleteUnusedDuplicateKrystalsApp
 
         private void QuitButton_Click(object sender, EventArgs e)
         {
-            M.Preferences.Dispose();
             Close();
         }
 

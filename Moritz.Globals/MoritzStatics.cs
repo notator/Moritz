@@ -31,8 +31,6 @@ namespace Moritz.Globals
 
             SetMidiPitchDict();
 
-            Preferences = new Preferences();
-
             MoritzPerformanceOptionsExtension = ".mpox";
             MoritzKrystalScoreSettingsExtension = ".mkss";
         }
@@ -119,9 +117,6 @@ namespace Moritz.Globals
 
         public static string MoritzAppDataFolder = @"C:\Users\James\OneDrive\Moritz_2025";
 
-        public static string MoritzPreferencesPath = MoritzAppDataFolder + @"\Preferences.mzpf";
-        public static string MoritzAudioFolder = MoritzAppDataFolder + @"\audio";
-
         public static string MoritzKrystalsFolder = MoritzAppDataFolder + @"\krystals\krystals";
         public static string MoritzExpansionFieldsFolder = MoritzAppDataFolder + @"\krystals\expansion operators";
         public static string MoritzModulationOperatorsFolder = MoritzAppDataFolder + @"\krystals\modulation operators";
@@ -132,7 +127,7 @@ namespace Moritz.Globals
         // james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
         public static string MoritzScoresFolder = MoritzAppDataFolder + @"\scores";
 
-        public static string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
+        public static string XMLSchemasFolder = MoritzAppDataFolder + @"\XML_Schemas";
 
         #endregion folders
 
@@ -968,7 +963,6 @@ namespace Moritz.Globals
             { M.Dynamic.pppp, "Ø"}
         };
 
-        public readonly static Preferences Preferences;
         public readonly static IFormatProvider En_USNumberFormat;
 
         public readonly static string MoritzPerformanceOptionsExtension;

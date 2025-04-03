@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Globals", "Moritz.Gl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Xml", "Moritz.Xml\Moritz.Xml.csproj", "{B239C302-A15D-4397-9F3C-EE6CC85440F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Midi", "Moritz.Midi\Moritz.Midi.csproj", "{82E776E6-C819-42E6-9986-7EBDC3DFFA06}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Symbols", "Moritz.Symbols\Moritz.Symbols.csproj", "{DF59888C-F935-4E4F-BA31-664DAF79F7D6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Algorithm", "Moritz.Algorithm\Moritz.Algorithm.csproj", "{539A2302-1DB3-4EDA-879C-81A1624A24A0}"
@@ -73,17 +71,6 @@ Global
 		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Release|Mixed Platforms.Build.0 = Debug|Any CPU
 		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Release|x86.ActiveCfg = Release|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Debug|x86.Build.0 = Debug|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Release|Any CPU.Build.0 = Release|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Release|Mixed Platforms.Build.0 = Debug|Any CPU
-		{82E776E6-C819-42E6-9986-7EBDC3DFFA06}.Release|x86.ActiveCfg = Release|Any CPU
 		{DF59888C-F935-4E4F-BA31-664DAF79F7D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DF59888C-F935-4E4F-BA31-664DAF79F7D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF59888C-F935-4E4F-BA31-664DAF79F7D6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

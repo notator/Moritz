@@ -28,7 +28,7 @@ namespace Krystals5ObjectLibrary
             ExpansionOperatorsFolder = M.MoritzExpansionFieldsFolder;
             ModulationOperatorsFolder = M.MoritzModulationOperatorsFolder;
             // The Schemas location is a programmer's preference. The user need not bother with it.
-            MoritzXmlSchemasFolder = M.OnlineXMLSchemasFolder;
+            MoritzXmlSchemasFolder = M.XMLSchemasFolder;
             KrystalsSVGFolder = M.MoritzKrystalsSVGFolder;
         }
 

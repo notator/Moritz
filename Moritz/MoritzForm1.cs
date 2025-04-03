@@ -46,7 +46,7 @@ namespace Moritz
 
         private void PreferencesButton_Click(object sender, EventArgs e)
         {
-            ShowDialogForm(new PreferencesDialog());
+            ShowDialogForm(new FolderLocationsDialog());
         }
 
         private void AboutButton_Click(object sender, EventArgs e)
@@ -73,7 +73,6 @@ namespace Moritz
         private void MoritzForm1_FormClosing(object sender, FormClosingEventArgs e)
         {
             _assistantComposerForm?.Dispose();
-            M.Preferences.Dispose();
         }
 
         public void CloseAssistantComposer()

@@ -141,18 +141,6 @@ namespace Moritz.Composer
         #endregion called from ctor
 
         #region public interface
-        /// <summary>
-        /// Used when reverting other forms.
-        /// </summary>
-        public string SettingsPath { get { return _settingsPath; } }
-        public string LocalScoreAudioPath
-        {
-            get
-            {
-                string path = M.MoritzAudioFolder + @"\" + _scoreTitle;
-                return path;
-            }
-        }
         public void UpdateMainFormState()
         {
             if(((SavedState)NotationGroupBox.Tag == SavedState.unconfirmed)
@@ -1375,7 +1363,7 @@ namespace Moritz.Composer
 
                 w.WriteStartElement("moritzKrystalScore");
                 w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzKrystalScore.xsd");
+                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.XMLSchemasFolder + "/moritzKrystalScore.xsd");
 
                 _dimensionsAndMetadataForm.Write(w);
 

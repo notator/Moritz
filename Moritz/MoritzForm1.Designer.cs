@@ -62,7 +62,7 @@ namespace Moritz
 			this.PreferencesButton.Name = "PreferencesButton";
 			this.PreferencesButton.Size = new System.Drawing.Size(113, 31);
 			this.PreferencesButton.TabIndex = 0;
-			this.PreferencesButton.Text = "preferences";
+			this.PreferencesButton.Text = "folder locations";
 			this.PreferencesButton.UseVisualStyleBackColor = true;
 			this.PreferencesButton.Click += new System.EventHandler(this.PreferencesButton_Click);
 			// 
