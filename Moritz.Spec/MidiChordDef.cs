@@ -214,7 +214,7 @@ namespace Moritz.Spec
             w.WriteEndElement(); // end of noteOns
         }
 
-        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} MsPositionReFirstUD={MsPositionReFirstUD} BasePitch={_pitches[0]} ";
+        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration.ToString()} MsPositionReFirstUD={MsPositionReFirstUD} Pitches[0]={Pitches[0]}";
 
         /// <summary>
         /// Checks that pitches, velocities and EnvelopeTypeDef values are in the allowed ranges.
@@ -605,7 +605,7 @@ namespace Moritz.Spec
         {
             for(int j = 0; j < Velocities.Count; ++j)
             {
-                Velocities[j] = M.MidiValue(Velocities[j] * factor);
+                Velocities[j] = M.VelocityValue((int)(Velocities[j] * factor));
             }
         }
 

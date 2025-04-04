@@ -129,7 +129,8 @@ namespace Moritz.Composer
             for(int systemIndex = 0; systemIndex < Systems.Count; systemIndex++)
             {
                 SvgSystem system = Systems[systemIndex];
-                IReadOnlyList<VoiceDef> voiceDefs = bars[systemIndex].VoiceDefs;
+
+                int nVoices = 0;
 
                 #region create visible staves
                 int voiceDefIndex = 0;
@@ -137,12 +138,14 @@ namespace Moritz.Composer
                 {
                     string staffname = StaffName(systemIndex, staffIndex);
                     Staff staff = new Staff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
+                    IReadOnlyList<VoiceDef> voiceDefs = bars[systemIndex].VoiceDefs;
 
                     List<int> voiceIndices = _pageFormat.VoiceIndicesPerStaff[staffIndex];
                     for(int voiceIndex = 0; voiceIndex < voiceIndices.Count; ++voiceIndex)
                     {
                         Voice voice = new Voice(staff, voiceDefs[voiceDefIndex++]);
                         staff.Voices.Add(voice);
+                        nVoices++;
                     }
                     SetStemDirections(staff);
                     system.Staves.Add(staff);

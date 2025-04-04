@@ -21,8 +21,6 @@ namespace Moritz.Symbols
 
             Staff = staff;
             VoiceDef = voiceDef;
-
-            _midiChordDefsListList = GetMidiChordDefsListList(voiceDef.Trks);
         }
 
         private List<List<MidiChordDef>> GetMidiChordDefsListList(List<Trk> trks)
@@ -47,7 +45,7 @@ namespace Moritz.Symbols
             for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
             {
                 Debug.Assert(horizontalMcdListList[trkIndex].Count == nMcds);
-            } 
+            }
             
             List<List<MidiChordDef>> verticalMcdListList = new List<List<MidiChordDef>>();
             for(int mcdIndex = 0; mcdIndex < nMcds; ++mcdIndex)
@@ -68,16 +66,14 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public virtual void WriteSVG(SvgWriter w, int channelIndex)
         {
+            List<List<MidiChordDef>> midiChordDefsListList = GetMidiChordDefsListList(VoiceDef.Trks);
+            int mcdLLindex = 0;
+
             w.SvgStartGroup(CSSObjectClass.voice.ToString());
 
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
                 NoteObject noteObject = NoteObjects[i];
-                CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
-                ChordSymbol chordSymbol = noteObject as ChordSymbol;
-                RestSymbol restSymbol = noteObject as RestSymbol;
-                Clef clef = noteObject as Clef;
-                SmallClef smallClef = noteObject as SmallClef;
 
                 if(noteObject is Barline barline)
                 {
@@ -90,25 +86,25 @@ namespace Moritz.Symbols
                     }
                     barline.WriteDrawObjectsSVG(w);
                 }
-                else if(cautionaryChordSymbol != null)
+                else if(noteObject is CautionaryChordSymbol cautionaryChordSymbol)
                 {
                     cautionaryChordSymbol.WriteSVG(w);
                 }
-                else if(chordSymbol != null)
-                {
-                    MidiChordDef topMcd = chordSymbol.MidiChordDefs[0];
-					List<MidiChordDef> mcds = _midiChordDefsListList.Find(mcdList => mcdList[0].Equals(topMcd));
+                else if(noteObject is ChordSymbol chordSymbol)
+                { 
+                    List<MidiChordDef> mcds = midiChordDefsListList[mcdLLindex++];
+                    Debug.Assert(mcds != null);
                     for(int mcdIndex = 1; mcdIndex < mcds.Count; ++mcdIndex)
                     {
                         chordSymbol.AddMidiChordDef(mcds[mcdIndex]);
                     }
                     chordSymbol.WriteSVG(w, channelIndex);
                 }
-                else if(restSymbol != null)
+                else if(noteObject is RestSymbol restSymbol)
                 {
                     restSymbol.WriteSVG(w);
                 }
-                else if(clef != null) // clef
+                else if(noteObject is Clef clef) // clef
                 {
                     if(clef.Metrics != null)
                     {
@@ -117,7 +113,7 @@ namespace Moritz.Symbols
                         clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY);
                     }
                 }
-                else if(smallClef != null)
+                else if(noteObject is SmallClef smallClef)
                 {
                     if(smallClef.Metrics != null)
                     {
@@ -458,8 +454,6 @@ namespace Moritz.Symbols
         #endregion
 
         public VoiceDef VoiceDef = null;
-
-        private List<List<MidiChordDef>> _midiChordDefsListList;
 
         private DurationSymbol _firstDurationSymbol;
     }

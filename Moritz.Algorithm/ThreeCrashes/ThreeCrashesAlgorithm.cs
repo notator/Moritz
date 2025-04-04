@@ -169,10 +169,10 @@ namespace Moritz.Algorithm.ThreeCrashes
             List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
             Debug.Assert(trks.Count == NumberOfVoices);
             List<VoiceDef> voiceDefs = new List<VoiceDef>();
-            foreach(var trk in trks)
-            {
-                voiceDefs.Add(new VoiceDef(new List<Trk>() { trk }));
-            }
+
+            voiceDefs.Add(new VoiceDef(new List<Trk>() { crashATrk }));
+            voiceDefs.Add(new VoiceDef(new List<Trk>() { crashBTrk }));
+            voiceDefs.Add(new VoiceDef(new List<Trk>() { crashCTrk }));
 
             TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
 
