@@ -74,7 +74,6 @@
     <Compile Include="IUniqueSplittableChordDef.cs" />
     <Compile Include="MidiChordDef.cs" />
     <Compile Include="MidiChordControlDef.cs" />
-    <Compile Include="MomentDef.cs" />
     <Compile Include="Trk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestDef.cs" />
