@@ -97,24 +97,6 @@ namespace Moritz.Globals
             }
         }
 
-        public static string ScoreFolderName(string scoreName)
-        {
-            return scoreName + " score";
-        }
-
-        /// <summary>
-        /// The AlgorithmFolder contains:
-        ///     a. 'xxx score' folders containing the various scores associated with the algorithm.
-        ///     b. performance options files (.mpox)
-        ///     c. a 'midi' folder containing midi recordings created by the AssistantPerformer
-        /// </summary>
-        public static string AlgorithmFolder(string scorePathname)
-        {
-            string folder = Path.GetDirectoryName(scorePathname);
-            folder = folder.Remove(folder.LastIndexOf(@"\"));
-            return folder;
-        }
-
         public static string MoritzAppDataFolder = @"C:\Users\James\OneDrive\Moritz_2025";
 
         public static string MoritzKrystalsFolder = MoritzAppDataFolder + @"\krystals\krystals";
@@ -127,7 +109,7 @@ namespace Moritz.Globals
         // james-ingram-act-two\open-source\assistantPerformerTestSite\scores";
         public static string MoritzScoresFolder = MoritzAppDataFolder + @"\scores";
 
-        public static string XMLSchemasFolder = MoritzAppDataFolder + @"\XML_Schemas";
+        public static string XMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
 
         #endregion folders
 

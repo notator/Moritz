@@ -77,9 +77,9 @@ namespace Moritz
 			this.XMLSchemasFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.XMLSchemasFolderInfoLabel.Location = new System.Drawing.Point(244, 186);
 			this.XMLSchemasFolderInfoLabel.Name = "XMLSchemasFolderInfoLabel";
-			this.XMLSchemasFolderInfoLabel.Size = new System.Drawing.Size(238, 17);
+			this.XMLSchemasFolderInfoLabel.Size = new System.Drawing.Size(380, 17);
 			this.XMLSchemasFolderInfoLabel.TabIndex = 55;
-			this.XMLSchemasFolderInfoLabel.Text = "MoritzFolderLocation/XML_Schemas";
+			this.XMLSchemasFolderInfoLabel.Text = "https://james-ingram-act-two.de/open-source/XMLSchemas";
 			// 
 			// XMLSchemasFolderLabel
 			// 
