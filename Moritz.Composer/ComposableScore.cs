@@ -132,6 +132,7 @@ namespace Moritz.Composer
                 IReadOnlyList<VoiceDef> voiceDefs = bars[systemIndex].VoiceDefs;
 
                 #region create visible staves
+                int voiceDefIndex = 0;
                 for(int staffIndex = 0; staffIndex < nStaves; staffIndex++)
                 {
                     string staffname = StaffName(systemIndex, staffIndex);
@@ -140,7 +141,7 @@ namespace Moritz.Composer
                     List<int> voiceIndices = _pageFormat.VoiceIndicesPerStaff[staffIndex];
                     for(int voiceIndex = 0; voiceIndex < voiceIndices.Count; ++voiceIndex)
                     {
-                        Voice voice = new Voice(staff, voiceDefs[voiceIndex]);
+                        Voice voice = new Voice(staff, voiceDefs[voiceDefIndex++]);
                         staff.Voices.Add(voice);
                     }
                     SetStemDirections(staff);
