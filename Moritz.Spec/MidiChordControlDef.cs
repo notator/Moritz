@@ -451,6 +451,48 @@ namespace Moritz.Spec
             }
         }
 
+        internal bool IsDefault()
+        {
+            var isDefault = true;
+
+            isDefault = (Preset == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (PitchWheel == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (Bank == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (ModWheel == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (Volume == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (Pan == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (Expression == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (PitchWheelSensitivity == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (Mixture == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (TuningGroup == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (Tuning == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (OrnamentGroup == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (Ornament == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (SemitoneOffset == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (CentOffset == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (VelocityPitchSensitivity == null) ? true : false;
+            if(!isDefault) return false;
+            isDefault = (Reverberation == null) ? true : false;
+            if(!isDefault) return false;
+
+            return true;
+        }
+
         #region ResidentSynth controls
         // These messages are only sent if their value is not null.
         /// <summary>

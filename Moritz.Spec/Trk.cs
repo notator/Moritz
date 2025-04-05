@@ -1206,42 +1206,285 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Creates a moving pan from startPanValue at beginIndex to endPanValue at (beginIndex + count - 1).
-        /// (In other words, it sets count MidiChordDefs.)
-        /// Implemented using one pan value per MidiChordDef.
+        /// Creates a moving pan from startPanValue at beginIndex to endPanValue at endIndex (inclusive) in UniqueDefs.
+        /// Implemented using one pan value per existing MidiChordDef.
         /// This function does NOT change pan values outside the position range given in its arguments.
         /// </summary>
         /// <param name="beginIndex">The index at which to start setting pan values</param>
         /// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
         /// <param name="startPanValue">The MSB of the initial pan value (in range 0..127)</param>
         /// <param name="endPanValue">The MSB of the final pan value (in range 0..127)</param>
-        public void SetPanGliss(int beginIndex, int count, int startPanValue, int endPanValue)
+        public void SetPanGliss(int beginIndex, int inclusiveEndIndex, int startPanValue, int endPanValue)
         {
-            int endIndex = beginIndex + count;
-            if(CheckIndices(beginIndex, endIndex))
+            AssertLegalIndices(beginIndex, inclusiveEndIndex);
+            Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
+
+            var midiChordDefs = GetMidiChordDefs(beginIndex, inclusiveEndIndex);
+
+            int nMidiChordDefs = midiChordDefs.Count;
+            double increment = ((double)(endPanValue - startPanValue)) / (nMidiChordDefs - 1);
+            double panValue = startPanValue;
+
+            for(var i = 0; i < nMidiChordDefs; ++i)
             {
-                Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
-
-                int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
-                int steps = (endIndex - 1 - beginIndex - nNonMidiChordDefs);
-                if(steps > 0)
+                var mcd1 = midiChordDefs[i];
+                if(mcd1.MidiChordControlDef == null)
                 {
-                    double increment = ((double)(endPanValue - startPanValue)) / steps;
-                    double panValue = startPanValue;
-                    List<IUniqueDef> lmdds = _uniqueDefs;
+                    mcd1.MidiChordControlDef = new MidiChordControlDef();
+                }
+                int intPan = (int)Math.Round(panValue);
+                mcd1.MidiChordControlDef.Pan = intPan;
+                panValue += increment;
+            }
 
-                    for(int i = beginIndex; i < endIndex; ++i)
+            RemoveRedundantMidiControls(M.CTL.PAN_10, midiChordDefs);
+        }
+
+
+        private void RemoveRedundantMidiControls(M.CTL ctlType, List<MidiChordDef> midiChordDefs)
+        {
+            int? runningCtlVal = GetControlValue(ctlType, midiChordDefs[0].MidiChordControlDef);
+            for(var i = 1; i < midiChordDefs.Count; ++i)
+            {
+                var currentMidiControlDef = midiChordDefs[i].MidiChordControlDef;
+                if(runningCtlVal == null)
+                {
+                    runningCtlVal = GetControlValue(ctlType, currentMidiControlDef);
+                }
+                else
+                {
+                    int? currentCtlVal = GetControlValue(ctlType, currentMidiControlDef);
+                    if(currentCtlVal != null)
                     {
-                        if(_uniqueDefs[i] is MidiChordDef iumdd)
+                        if(currentCtlVal == runningCtlVal)
                         {
-                            int intPan = (int)Math.Round(panValue);
-                            iumdd.MidiChordControlDef.Pan = intPan;
-                            panValue += increment;
+                            SetControlValue(ctlType, currentMidiControlDef, null);
+                        }
+                        else
+                        {
+                            runningCtlVal = currentCtlVal;
                         }
                     }
                 }
             }
+
+            foreach(var mcd in midiChordDefs)
+            {
+                if(mcd.MidiChordControlDef != null && mcd.MidiChordControlDef.IsDefault())
+                {
+                    mcd.MidiChordControlDef = null;
+                }
+            }
         }
+
+        /// <summary>
+        /// Returns null if the control is null
+        /// </summary>
+        /// <param name="ctlType"></param>
+        /// <param name="midiChordDef"></param>
+        /// <returns></returns>
+        private int? GetControlValue(M.CTL ctlType, MidiChordControlDef mccd)
+        {
+            int? rval = null;
+            switch(ctlType)
+            {
+                case M.CTL.BANK_0:
+                {
+                    rval = mccd.Bank;
+                    break;
+                }
+                case M.CTL.MOD_WHEEL_1:
+                {
+                    rval = mccd.ModWheel;
+                    break;
+                }
+                case M.CTL.VOLUME_7:
+                {
+                    rval = mccd.Volume;
+                    break;
+                }
+                case M.CTL.PAN_10:
+                {
+                    rval = mccd.Pan;
+                    break;
+                }
+                case M.CTL.EXPRESSION_11:
+                {
+                    rval = mccd.Expression;
+                    break;
+                }
+                case M.CTL.PITCH_WHEEL_SENSITIVITY_16:
+                {
+                    rval = mccd.PitchWheelSensitivity;
+                    break;
+                }
+                case M.CTL.MIXTURE_17:
+                {
+                    rval = mccd.Mixture;
+                    break;
+                }
+                case M.CTL.TUNING_GROUP_18:
+                {
+                    rval = mccd.TuningGroup;
+                    break;
+                }
+                case M.CTL.TUNING_19:
+                {
+                    rval = mccd.Tuning;
+                    break;
+                }
+                case M.CTL.ORNAMENT_GROUP_75:
+                {
+                    rval = mccd.OrnamentGroup;
+                    break;
+                }
+                case M.CTL.ORNAMENT_76:
+                {
+                    rval = mccd.Ornament;
+                    break;
+                }
+                case M.CTL.SEMITONE_OFFSET_80:
+                {
+                    rval = mccd.SemitoneOffset;
+                    break;
+                }
+                case M.CTL.CENT_OFFSET_81:
+                {
+                    rval = mccd.CentOffset;
+                    break;
+                }
+                case M.CTL.VELOCITY_PITCH_SENSITIVITY_83:
+                {
+                    rval = mccd.VelocityPitchSensitivity;
+                    break;
+                }
+                case M.CTL.REVERBERATION_91:
+                {
+                    rval = mccd.Reverberation;
+                    break;
+                }
+                default:
+                {
+                    Debug.Assert(false, "Unknown control type.");
+                    break;
+                }
+            }
+            return rval;
+        }
+
+        /// <summary>
+        /// Returns null if the control is null
+        /// </summary>
+        /// <param name="ctlType"></param>
+        /// <param name="midiChordDef"></param>
+        /// <returns></returns>
+        private void SetControlValue(M.CTL ctlType, MidiChordControlDef mccd, int? value)
+        {
+            switch(ctlType)
+            {
+                case M.CTL.BANK_0:
+                {
+                    mccd.Bank = value;
+                    break;
+                }
+                case M.CTL.MOD_WHEEL_1:
+                {
+                    mccd.ModWheel = value;
+                    break;
+                }
+                case M.CTL.VOLUME_7:
+                {
+                    mccd.Volume = value;
+                    break;
+                }
+                case M.CTL.PAN_10:
+                {
+                    mccd.Pan = value;
+                    break;
+                }
+                case M.CTL.EXPRESSION_11:
+                {
+                    mccd.Expression = value;
+                    break;
+                }
+                case M.CTL.PITCH_WHEEL_SENSITIVITY_16:
+                {
+                    mccd.PitchWheelSensitivity = value;
+                    break;
+                }
+                case M.CTL.MIXTURE_17:
+                {
+                    mccd.Mixture = value;
+                    break;
+                }
+                case M.CTL.TUNING_GROUP_18:
+                {
+                    mccd.TuningGroup = value;
+                    break;
+                }
+                case M.CTL.TUNING_19:
+                {
+                    mccd.Tuning = value;
+                    break;
+                }
+                case M.CTL.ORNAMENT_GROUP_75:
+                {
+                    mccd.OrnamentGroup = value;
+                    break;
+                }
+                case M.CTL.ORNAMENT_76:
+                {
+                    mccd.Ornament = value;
+                    break;
+                }
+                case M.CTL.SEMITONE_OFFSET_80:
+                {
+                    mccd.SemitoneOffset = value;
+                    break;
+                }
+                case M.CTL.CENT_OFFSET_81:
+                {
+                    mccd.CentOffset = value;
+                    break;
+                }
+                case M.CTL.VELOCITY_PITCH_SENSITIVITY_83:
+                {
+                    mccd.VelocityPitchSensitivity = value;
+                    break;
+                }
+                case M.CTL.REVERBERATION_91:
+                {
+                    mccd.Reverberation = value;
+                    break;
+                }
+                default:
+                {
+                    Debug.Assert(false, "Unknown control type.");
+                    break;
+                }
+            }
+        }
+
+        private List<MidiChordDef> GetMidiChordDefs(int beginIndex, int inclusiveEndIndex)
+        {
+            var midiChordDefs = new List<MidiChordDef>();
+            for(var i = beginIndex; i <= inclusiveEndIndex; ++i)
+            {
+                if(UniqueDefs[i] is MidiChordDef mcd)
+                {
+                    midiChordDefs.Add(mcd);
+                }
+            }
+            return midiChordDefs;
+        }
+
+        protected void AssertLegalIndices(int beginIndex, int inclusiveEndIndex)
+        {
+            Debug.Assert(beginIndex >= 0 && beginIndex < _uniqueDefs.Count, "Error: beginIndex out of range.");
+            Debug.Assert(inclusiveEndIndex > 0 && inclusiveEndIndex < _uniqueDefs.Count, "Error: inclusiveEndIndex out of range.");
+            Debug.Assert(beginIndex <= inclusiveEndIndex, "Error: beginIndex must be less than or equal to inclusiveEndIndex.");
+        }
+
         /// <summary>
         /// Sets the pitchwheelDeviation for MidiChordDefs in the defined range.
         /// Rests in the range dont change.

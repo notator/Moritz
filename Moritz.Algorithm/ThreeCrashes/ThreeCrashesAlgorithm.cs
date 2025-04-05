@@ -389,7 +389,7 @@ namespace Moritz.Algorithm.ThreeCrashes
             int twoThirdsLeft = 64 - ((int)(Math.Abs(64 * Math.Sin(angle * 3))));
             int thirdLeft = 64 - ((int)(Math.Abs(64 * Math.Sin(angle))));
             int thirdRight = 64 + ((int)(Math.Abs(64 * Math.Sin(angle))));
-            int twoThirdsRight = 64 + ((int)(Math.Abs(64 * Math.Sin(angle * 3)))); ;
+            int twoThirdsRight = 64 + ((int)(Math.Abs(64 * Math.Sin(angle * 3))));
             int right = 127;
 
             int startPanValue = 0;
@@ -442,7 +442,7 @@ namespace Moritz.Algorithm.ThreeCrashes
                     break;
             }
 
-            crashTrk.SetPanGliss(0, crashTrk.Count, startPanValue, endPanValue);
+            crashTrk.SetPanGliss(0, crashTrk.Count - 1, startPanValue, endPanValue);
 
             return crashTrk;
         }
