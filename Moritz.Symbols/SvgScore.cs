@@ -992,7 +992,7 @@ namespace Moritz.Symbols
                     voice2.NoteObjects.RemoveAt(0);
                     try
                     {
-                        voice1.AppendNoteObjects(voice2.NoteObjects);
+                        voice1.Append(voice2);
                     }
                     catch(Exception ex)
                     {

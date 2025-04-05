@@ -218,12 +218,20 @@ namespace Moritz.Symbols
         /// (Sets each new noteObjects container to this.)
         /// </summary>
         /// <param name="noteObjects"></param>
-        public void AppendNoteObjects(List<NoteObject> noteObjects)
+        public void Append(Voice voice2)
         {
-            foreach(NoteObject noteObject in noteObjects)
+            foreach(NoteObject noteObject in voice2.NoteObjects)
             {
                 noteObject.Voice = this;
                 NoteObjects.Add(noteObject);
+            }
+
+            var trks1 = VoiceDef.Trks;
+            var trks2 = voice2.VoiceDef.Trks;
+            Debug.Assert(trks1.Count == trks2.Count);
+            for(var trkIndex = 0; trkIndex < trks1.Count; ++trkIndex)
+            {
+                trks1[trkIndex].UniqueDefs.AddRange(trks2[trkIndex].UniqueDefs);
             }
         }
 
