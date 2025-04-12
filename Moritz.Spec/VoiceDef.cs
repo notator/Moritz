@@ -54,9 +54,9 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns two VoiceDefs (each has the same index)
+        /// Returns two VoiceDefs (each having the same voice index)
         /// Item1.Trks[0] contains the IUniqueDefs that begin within the poppedMsDuration.
-        /// Item2.Trks[0] contains the remaining IUniqueDefs from the original voiceDef.Trks.
+        /// Item2.Trks[0] contains the remaining IUniqueDefs from the original voiceDef.Trks plus possible CautionaryChordDefs.
         /// The remaining Trks in Item1 and Item2 are parallel IUniqueDefs (that can have other durations).
         /// The popped IUniqueDefs are removed from the current voiceDef before returning it as Item2.
         /// MidiRestDefs and MidiChordDefs are split as necessary to fit the required Trk[0] duration.
@@ -73,6 +73,8 @@ namespace Moritz.Spec
 
             List<Trk> poppedTrks = new List<Trk> { poppedTrk0 };
             List<Trk> remainingTrks = new List<Trk> { remainingTrk0 };
+
+            // The rest of this function should be reprogrammed, first copying corresponding items from each lower track...
 
             int nUniqueDefs = poppedTrk0.UniqueDefs.Count;
             List<Trk> voiceTrks = Trks;

@@ -85,7 +85,7 @@ namespace Moritz.Spec
 
                 if(iudStartPos >= poppedMsDuration)
                 {
-                    // moves the first iud, regardless of type, to the start of remainingTrk
+                    // Adds the iud, regardless of type, to the remainingTrk
                     // This also moves CautionaryChordDefs (which can only be in this position).
                     remainingTrk.UniqueDefs.Add(iud);
                 }

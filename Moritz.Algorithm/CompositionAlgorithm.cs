@@ -64,6 +64,30 @@ namespace Moritz.Algorithm
         public virtual ScoreData SetScoreRegionsData(List<Bar> bars) { return null; }
 
         /// <summary>
+        /// This function is called by implementations of the above SetScoreRegionsData function.
+        /// Returns a dictionary containing (barlineIndex, (barlineIndex, barlineMsPosition)) KeyValuePairs.
+        /// Each barlineIndex is the index of the left barline of the bar with the same index, so the first KeyValuePair
+        /// is (0,(0,0)). The finalBarline is also added to the returned dictionary, so its Count is 1 + bars.Count.
+        /// The data for the final barline in the score is in the final entry.
+        /// </summary>
+        protected Dictionary<int, (int index, int msPosition)> GetMsPosPerBarlineIndexDict(List<Bar> bars)
+        {
+            var rval = new Dictionary<int, (int index, int msPosition)>();
+
+            int barlineMsPos = 0;
+            int barsCount = bars.Count;
+            for(int i = 0; i < barsCount; ++i)
+            {
+                var tuple = (index: i, msPosition: barlineMsPos);
+                rval.Add(i, tuple);
+                barlineMsPos += bars[i].MsDuration;
+            }
+            rval.Add(barsCount, (index: barsCount, msPosition: barlineMsPos));
+
+            return rval;
+        }
+
+        /// <summary>
         /// Defines the number of MIDI channels used by the algorithm.
         /// This number must be in range [1..16].
         /// Each voice in a score has a particular midi channel, so the number of midi channels is also the number of voices.

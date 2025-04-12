@@ -4,6 +4,7 @@ using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Symbols;
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -20,40 +21,206 @@ namespace Moritz.Algorithm.PianolaMusic
         public override int NumberOfVoices { get { return 6; } }
         public override int NumberOfBars { get { return 8; } }
 
+        /// <summary>
+        /// 12.04.2025: Three new Trks have been added to each voice (with Copilot's help).
+        /// The extra Trks are going to be performed during the repeated regions defined in the
+        /// new SetScoreRegionsData() implementation defined below.
+        /// I've now added a trkIndex parameter to the RegionDef constructor.
+        /// The AssistantPerformer is going to be enhanced to play a different interpretation
+        /// of the graphic symbols for each Region.
+        /// </summary>
+        /// <param name="pageFormat"></param>
+        /// <param name="krystals"></param>
+        /// <returns></returns>
         public override List<Bar> DoAlgorithm(PageFormat pageFormat, List<Krystal> krystals)
         {
             // The pageFormat and krystals arguments are not used.
             _ = pageFormat; // is used by the functions used for inserting clefs (see base class: CompositionAlgorithm.cs)
             _ = krystals;
 
+            // Generate the original Trks for each voice
             List<Trk> tracks1and6 = GetTracks1and6();
             List<Trk> tracks2and5 = GetTracks2and5();
             List<Trk> tracks3and4 = GetTracks3and4();
 
-            // Add each Trk to trks here, in top to bottom (=channelIndex) order in the score.
-            List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
-            Debug.Assert(trks.Count == NumberOfVoices);
+            // Add each original Trk to trks here, in top to bottom (=channelIndex) order in the score.
+            List<Trk> originalTrks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
+            Debug.Assert(originalTrks.Count == NumberOfVoices);
 
-            List<VoiceDef> voiceDefs = new List<VoiceDef>();
-            foreach(var trk in trks)
-            {
-                voiceDefs.Add(new VoiceDef(new List<Trk>() { trk }));
-            }
+            // Create VoiceDefs with four Trks each, preserving the original Trks in voicedDef.Trks[0]
+            List<VoiceDef> voiceDefs = GetFourTrkVoiceDefs(originalTrks);
 
+            AddAccelRitToTrksAtIndex(voiceDefs, 1);
+            AddRandomPitchBendToTrksAtIndex(voiceDefs, 2);
+            // TrkLevel3 is still TrkLevel0 (not a clone!)
+
+            Debug.Assert(voiceDefs.Count == NumberOfVoices);
+
+            // Create the temporal structure
             TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
 
-            temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
+            temporalStructure.AssertConsistency(); // Ensure Trks only contain MidiChordDefs and RestDefs
 
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(trks, 8);
-            
+            // Generate barline positions and create bars
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(temporalStructure.Trks0, NumberOfBars);
             List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
 
+            // Set the patch for the first chord in each voice
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
             return bars;
         }
 
-        // Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.
+        private void AddRandomPitchBendToTrksAtIndex(List<VoiceDef> voiceDefs, int trksIndex)
+        {
+            Random random = new Random();
+
+            foreach(var voiceDef in voiceDefs)
+            {
+                Trk trk = voiceDef.Trks[trksIndex];
+
+                foreach(var midiChordDef in trk.MidiChordDefs)
+                {
+                    if(midiChordDef.MidiChordControlDef == null)
+                    {
+                        midiChordDef.MidiChordControlDef = new MidiChordControlDef();
+                    }
+                    midiChordDef.MidiChordControlDef.PitchWheel = random.Next(128);
+                }
+
+                voiceDef.AssertConsistency();
+            }
+        }
+
+        /// <summary>
+        /// This function was produced by Copilot, giving it the following information followed by a few follow-up tweeks (!):
+        /// This transformation needs to preserve the absolute order (left-right) of the graphic symbols.
+        /// So:
+        /// 1. create a flat, ordered list of all the MidiChordDefs in the Trks at trksIndex in all voiceDef.Trks.
+        /// 2. create a Dictionary<oldMsPos, newMsPos> implementing accel/rit in the newMsPos values.
+        /// 3. use the Dictionary to set the new MsDuratons of all the MidiChordDefs in the Trks at trksIndex in all voiceDef.Trks.
+        /// Copilot suggested using Envelope.TimeWarp to create the accel/rit, but originally only created the accel.  
+        /// </summary>
+        /// <param name="voiceDefs"></param>
+        /// <param name="trksIndex"></param>
+        private void AddAccelRitToTrksAtIndex(List<VoiceDef> voiceDefs, int trksIndex)
+        {
+            // Step 1: Create a flat, ordered list of all the MidiChordDefs in the Trks at trksIndex
+            List<MidiChordDef> allMidiChordDefs = new List<MidiChordDef>();
+            foreach(var voiceDef in voiceDefs)
+            {
+                Trk trk = voiceDef.Trks[trksIndex];
+                allMidiChordDefs.AddRange(trk.MidiChordDefs);
+            }
+
+            // Sort the MidiChordDefs by their MsPositionReFirstUD to preserve absolute order
+            allMidiChordDefs.Sort((a, b) => a.MsPositionReFirstUD.CompareTo(b.MsPositionReFirstUD));
+
+            if(allMidiChordDefs.Count == 0)
+            {
+                return; // No MidiChordDefs to process
+            }
+
+            // Step 2: Calculate total duration and split into two halves
+            var lastMCD = allMidiChordDefs[allMidiChordDefs.Count - 1];
+            int totalDuration = lastMCD.MsPositionReFirstUD + lastMCD.MsDuration;
+            int midpointDuration = totalDuration / 2;
+
+            // Step 3: Create accel/rit mapping
+            Dictionary<int, int> oldToNewMsPositions = new Dictionary<int, int>();
+            List<int> originalMsPositions = new List<int>();
+            foreach(var midiChordDef in allMidiChordDefs)
+            {
+                originalMsPositions.Add(midiChordDef.MsPositionReFirstUD);
+            }
+
+            // Generate new positions for the first half (accelerando)
+            List<int> accelMsPositions = GenerateTimeWarp(originalMsPositions, 0, midpointDuration, true);
+
+            // Generate new positions for the second half (ritardando)
+            List<int> ritMsPositions = GenerateTimeWarp(originalMsPositions, midpointDuration, totalDuration, false);
+
+            // Combine accel and rit mappings
+            for(int i = 0; i < originalMsPositions.Count; i++)
+            {
+                if(originalMsPositions[i] <= midpointDuration)
+                {
+                    oldToNewMsPositions[originalMsPositions[i]] = accelMsPositions[i];
+                }
+                else
+                {
+                    oldToNewMsPositions[originalMsPositions[i]] = ritMsPositions[i];
+                }
+            }
+
+            // Step 4: Update the MsDurations of all the MidiChordDefs
+            foreach(var voiceDef in voiceDefs)
+            {
+                Trk trk = voiceDef.Trks[trksIndex];
+                foreach(var midiChordDef in trk.MidiChordDefs)
+                {
+                    int oldStart = midiChordDef.MsPositionReFirstUD;
+                    int oldEnd = oldStart + midiChordDef.MsDuration;
+
+                    // Calculate the new start and end positions
+                    int newStart = oldToNewMsPositions[oldStart];
+                    int newEnd = oldToNewMsPositions.ContainsKey(oldEnd) ? oldToNewMsPositions[oldEnd] : totalDuration;
+
+                    // Update the MsDuration
+                    midiChordDef.MsDuration = newEnd - newStart;
+                    midiChordDef.MsPositionReFirstUD = newStart; // Update the start position
+                }
+
+                voiceDef.AssertConsistency(); // Ensure the Trk remains consistent
+            }
+        }
+
+        // Copilot Helper function to generate time-warped positions
+        private List<int> GenerateTimeWarp(List<int> originalMsPositions, int startMs, int endMs, bool isAccel)
+        {
+            List<int> warpedPositions = new List<int>();
+            double totalRange = endMs - startMs;
+            double factor = isAccel ? 2.0 : 0.5; // Acceleration factor for accel, deceleration for rit
+
+            for(int i = 0; i < originalMsPositions.Count; i++)
+            {
+                if(originalMsPositions[i] < startMs || originalMsPositions[i] > endMs)
+                {
+                    warpedPositions.Add(originalMsPositions[i]);
+                    continue;
+                }
+
+                double normalizedPosition = (originalMsPositions[i] - startMs) / totalRange; // Normalize to [0, 1]
+                double warpedValue = isAccel
+                    ? Math.Pow(normalizedPosition, factor) // Exponential growth for accel
+                    : 1 - Math.Pow(1 - normalizedPosition, factor); // Exponential decay for rit
+                int newPosition = startMs + (int)(warpedValue * totalRange);
+                warpedPositions.Add(newPosition);
+            }
+
+            return warpedPositions;
+        }
+
+        private static List<VoiceDef> GetFourTrkVoiceDefs(List<Trk> originalTrks)
+        {
+            List<VoiceDef> voiceDefs = new List<VoiceDef>();
+            foreach(var originalTrk in originalTrks)
+            {
+                // Preserve the original Trk as Trks[0]
+                Trk trk0 = originalTrk;
+
+                // Create three additional Trks by cloning trk0
+                Trk trk1 = (Trk)trk0.Clone();
+                Trk trk2 = (Trk)trk0.Clone();
+                Trk trk3 = (Trk)trk0.Clone();
+
+                // Add all four Trks to the VoiceDef
+                voiceDefs.Add(new VoiceDef(new List<Trk>() { trk0, trk1, trk2, trk3 }));
+            }
+
+            return voiceDefs;
+        }
+
         private static List<List<int>> TrackDurations(List<int> firstHalfUpperTrack)
         {
             List<int> secondHalfUpperTrack = new List<int>(firstHalfUpperTrack);
@@ -206,5 +373,35 @@ namespace Moritz.Algorithm.PianolaMusic
 
             return GetTrks(2, t3Pitches, 3, t4Pitches, durations);
         }
+
+        /// <summary>
+        /// 12.04.2025: This function was originally written by Copilot using the (more complicated) implementation
+        /// in the old Tombeau1Algorithm file as an example.
+        /// I've now added a trkIndex parameter to the RegionDef constructor, linking Regions to Trks.
+        /// </summary>
+        /// <param name="bars"></param>
+        /// <returns></returns>
+        public override ScoreData SetScoreRegionsData(List<Bar> bars)
+        {
+            // Get barline positions and indices
+            Dictionary<int, (int index, int msPosition)> msPosPerBarlineIndexDict = GetMsPosPerBarlineIndexDict(bars);
+
+            // Define regions
+            var barline0 = msPosPerBarlineIndexDict[0];
+            var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
+
+            RegionDef regionA = new RegionDef("A", barline0, finalBarline, 0);
+            RegionDef regionB = new RegionDef("B", barline0, finalBarline, 1);
+            RegionDef regionC = new RegionDef("C", barline0, finalBarline, 2);
+            RegionDef regionD = new RegionDef("D", barline0, finalBarline, 3);
+
+            // Create a region sequence that plays the score four times (with different interpretation of the graphics each time).
+            List<RegionDef> regionDefs = new List<RegionDef>() { regionA, regionB, regionC, regionD };
+            RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCD");
+
+            // Return the ScoreData
+            return new ScoreData(regionSequence);
+        }
+
     }
 }

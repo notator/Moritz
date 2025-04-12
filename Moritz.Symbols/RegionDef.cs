@@ -13,14 +13,15 @@ namespace Moritz.Symbols
 		/// <summary>
 		/// A region in the score that will be played as a continuous sequence.
 		/// </summary>
-		public RegionDef(string name, (int index, int msPosition) startBarline, (int index, int msPosition) endBarline)
+		public RegionDef(string name, (int index, int msPosition) startBarline, (int index, int msPosition) endBarline, int trkIndex)
 		{
 			this.name = name;
 			startBarlineIndex = startBarline.index;
 			startBarlineMsPosInScore = startBarline.msPosition;
 			endBarlineIndex = endBarline.index;
 			endBarlineMsPosInScore = endBarline.msPosition;
-			Debug.Assert(startBarlineIndex >= 0 && endBarlineIndex > startBarlineIndex);
+            midiChordIndex = trkIndex; // The index of a performed "midiChord" inside the SVG "score:midiChords" element.
+            Debug.Assert(startBarlineIndex >= 0 && endBarlineIndex > startBarlineIndex);
 			Debug.Assert(startBarlineMsPosInScore >= 0 && endBarlineMsPosInScore > startBarlineMsPosInScore);
 		}
 
@@ -32,8 +33,9 @@ namespace Moritz.Symbols
 			w.WriteAttributeString("fromStartOfBar", (startBarlineIndex + 1).ToString());
 			w.WriteAttributeString("startMsPosInScore", startBarlineMsPosInScore.ToString());
 			w.WriteAttributeString("toEndOfBar", (endBarlineIndex + 1).ToString());
-			w.WriteAttributeString("endMsPosInScore", endBarlineMsPosInScore.ToString());
-			w.WriteEndElement();
+            w.WriteAttributeString("endMsPosInScore", endBarlineMsPosInScore.ToString());
+            w.WriteAttributeString("midiChordIndex", midiChordIndex.ToString());
+            w.WriteEndElement();
 		}
 
 		public readonly string name;
@@ -41,5 +43,6 @@ namespace Moritz.Symbols
 		public readonly int startBarlineMsPosInScore;
 		public readonly int endBarlineIndex;
 		public readonly int endBarlineMsPosInScore;
+        public readonly int midiChordIndex;
 	}
 }
