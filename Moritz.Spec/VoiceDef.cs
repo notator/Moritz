@@ -25,20 +25,20 @@ namespace Moritz.Spec
         public VoiceDef(List<Trk> trks)
         {
             #region conditions
-            // The Trks must have the same number and types of contained UniqueDefs
-            // but they can have different durations and MIDI definitions
-            List<IUniqueDef> iuds0 = trks[0].UniqueDefs;
-            int uidCount = iuds0.Count;
-            for(int i = 1; i < trks.Count; i++)
-            {
-                List<IUniqueDef> trkIUDs = trks[i].UniqueDefs;
-                Debug.Assert(trkIUDs.Count == uidCount);
-                for(int j = 0; j < trkIUDs.Count; j++)
-                {
-                    Debug.Assert((iuds0[j] is MidiChordDef && trkIUDs[j] is MidiChordDef)
-                        || (iuds0[j] is RestDef && trkIUDs[j] is RestDef));
-                }
-            }
+            //// The Trks must have the same number and types of contained UniqueDefs
+            //// but they can have different durations and MIDI definitions
+            //List<IUniqueDef> iuds0 = trks[0].UniqueDefs;
+            //int uidCount = iuds0.Count;
+            //for(int i = 1; i < trks.Count; i++)
+            //{
+            //    List<IUniqueDef> trkIUDs = trks[i].UniqueDefs;
+            //    Debug.Assert(trkIUDs.Count == uidCount);
+            //    for(int j = 0; j < trkIUDs.Count; j++)
+            //    {
+            //        Debug.Assert((iuds0[j] is MidiChordDef && trkIUDs[j] is MidiChordDef)
+            //            || (iuds0[j] is RestDef && trkIUDs[j] is RestDef));
+            //    }
+            //}
             #endregion
 
             Trks = trks;
@@ -55,46 +55,99 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Returns two VoiceDefs (each having the same voice index)
-        /// Item1.Trks[0] contains the IUniqueDefs that begin within the poppedMsDuration.
-        /// Item2.Trks[0] contains the remaining IUniqueDefs from the original voiceDef.Trks plus possible CautionaryChordDefs.
+        /// Item1.Trks[0] contains the IUniqueDefs (including IUniqueSplittableChordDefs) that begin within Trk0's poppedMsDuration.
+        /// Item2.Trks[0] contains the remaining IUniqueDefs (including CautionaryChordDefs) from the original voiceDef.Trks.
         /// The remaining Trks in Item1 and Item2 are parallel IUniqueDefs (that can have other durations).
         /// The popped IUniqueDefs are removed from the current voiceDef before returning it as Item2.
-        /// MidiRestDefs and MidiChordDefs are split as necessary to fit the required Trk[0] duration.
+        /// MidiRestDefs and MidiChordDefs in Trk0 are split as necessary to fit the required Trk[0] duration.
+        /// MidiRestDefs and MidiChordDefs in other Trks are split correspondingly (without regard to their duration).
         /// </summary>
         /// <param name="voiceDef"></param>
         /// <param name="poppedBarMsDuration"></param>
         /// <returns></returns>
-        public Tuple<VoiceDef, VoiceDef> PopVoiceDef(int poppedMsDuration)
+        public Tuple<VoiceDef, VoiceDef> PopVoiceDef(int poppedTrk0MsDuration)
         {
-            Tuple<Trk, Trk> trks = Trks[0].PopTrk(poppedMsDuration);
+            Tuple<Trk, Trk, double?> splitTrk0 = Trks[0].SplitTrk(poppedTrk0MsDuration);
 
-            Trk poppedTrk0 = trks.Item1;
-            Trk remainingTrk0 = trks.Item2;
+            Trk poppedTrk0 = splitTrk0.Item1;
+            Trk remainingTrk0 = splitTrk0.Item2;
+            double? finalSplitProportion = splitTrk0.Item3;
 
             List<Trk> poppedTrks = new List<Trk> { poppedTrk0 };
-            List<Trk> remainingTrks = new List<Trk> { remainingTrk0 };
+            List<Trk> remainingTrks = new List<Trk> { remainingTrk0 }; 
 
-            // The rest of this function should be reprogrammed, first copying corresponding items from each lower track...
-
-            int nUniqueDefs = poppedTrk0.UniqueDefs.Count;
             List<Trk> voiceTrks = Trks;
+            var nIUDs = poppedTrk0.UniqueDefs.Count;
 
             for(int trkIndex = 1; trkIndex < voiceTrks.Count; ++trkIndex)
             {
                 Trk poppedTrk = new Trk();
-                List<IUniqueDef> originalUids = voiceTrks[trkIndex].UniqueDefs;
-                for(int uidIndex = 0; uidIndex < nUniqueDefs; ++uidIndex)
+                Trk remainingTrk = voiceTrks[trkIndex];
+
+                var poppedIUDs = poppedTrk.UniqueDefs;
+                var remainingIUDs = remainingTrk.UniqueDefs;                
+
+                for(int i = 0; i < nIUDs; ++i)
                 {
-                    poppedTrk.UniqueDefs.Add(originalUids[0]);
-                    originalUids.RemoveAt(0);
+                    poppedIUDs.Add(remainingIUDs[i]);
                 }
-                var msDurationOffset = originalUids[0].MsPositionReFirstUD;
-                foreach(var iud in originalUids)
+                remainingIUDs.RemoveRange(0, nIUDs);
+
+                if(finalSplitProportion != null)
                 {
-                    iud.MsPositionReFirstUD -= msDurationOffset;
+                    var lastIUD = poppedIUDs[poppedIUDs.Count - 1];
+                    if(lastIUD is RestDef restDef)
+                    {
+                        var durationBeforeBarline = (int)(restDef.MsDuration * (double)finalSplitProportion);
+                        var durationAfterBarline = restDef.MsDuration - durationBeforeBarline;
+                        if(durationBeforeBarline > 0 && durationAfterBarline > 0)
+                        {
+                            RestDef firstRestHalf = new RestDef(restDef.MsPositionReFirstUD, durationBeforeBarline);
+                            poppedTrk.UniqueDefs.Add(firstRestHalf);
+
+                            RestDef secondRestHalf = new RestDef(0, durationAfterBarline);
+                            remainingTrk.UniqueDefs.Insert(0, secondRestHalf);
+                        }
+                        else if(durationBeforeBarline == 0)
+                        {
+                            remainingTrk.UniqueDefs.Insert(0, restDef);
+                        }
+                        else if(durationAfterBarline == 0)
+                        {
+                            poppedTrk.UniqueDefs.Add(restDef);
+                        }
+                    }
+                    else if(lastIUD is MidiChordDef lmcd)
+                    {
+                        var lastMsDuration = lmcd.MsDuration;
+                        lmcd.MsDurationToNextBarline = (int)(lastMsDuration * (double)finalSplitProportion);
+                        var msDurationAfterBarline = lastMsDuration - (int)lmcd.MsDurationToNextBarline;
+                        if(lmcd.MsDurationToNextBarline > 0 && msDurationAfterBarline > 0)
+                        {
+                            var cautionaryChordDef = new CautionaryChordDef(lmcd, 0, msDurationAfterBarline);
+                            remainingIUDs.Insert(0, cautionaryChordDef);
+                        }
+                        else if(lmcd.MsDurationToNextBarline == 0)
+                        {
+                            lmcd.MsDurationToNextBarline = null;
+                            poppedIUDs.Remove(lastIUD);
+                            remainingIUDs.Insert(0, lastIUD);
+                        }
+                        else if(msDurationAfterBarline == 0)
+                        {
+                            lmcd.MsDurationToNextBarline = null;
+                        }
+                    }
                 }
+
+                poppedTrk.ResetMsPositionsReFirstUID();
+                remainingTrk.ResetMsPositionsReFirstUID();
+
+                poppedTrk.AssertConsistency();
+                remainingTrk.AssertConsistency();
+
                 poppedTrks.Add(poppedTrk);
-                remainingTrks.Add(new Trk(originalUids));
+                remainingTrks.Add(remainingTrk);
             }
 
             VoiceDef poppedVoiceDef = new VoiceDef(poppedTrks);

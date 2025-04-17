@@ -177,10 +177,26 @@ namespace Moritz.Spec
                 remainingVoiceDefs.Add(voiceDefs.Item2);
             }
 
+            JustifyMsDurations(poppedVoiceDefs);
+            JustifyMsDurations(remainingVoiceDefs);
+
             var poppedBar = new Bar(poppedAbsMsPosition, poppedVoiceDefs);
             var remainingBar = new Bar(remainingAbsMsPosition, remainingVoiceDefs);
 
             return new Tuple<Bar, Bar>(poppedBar, remainingBar);
+        }
+
+        private void JustifyMsDurations(List<VoiceDef> voiceDefs)
+        {
+            var nTrks = voiceDefs[0].Trks.Count;
+            for(int trkIndex = 0; trkIndex < nTrks; trkIndex++)
+            {
+                int topTrkMsDuration = voiceDefs[0].Trks[trkIndex].MsDuration;
+                for(int voiceIndex = 1; voiceIndex < voiceDefs.Count; voiceIndex++)
+                {
+                    voiceDefs[voiceIndex].Trks[trkIndex].MsDuration = topTrkMsDuration;
+                }
+            }
         }
     }
 }

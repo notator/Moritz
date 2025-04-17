@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Moritz.Spec
 {
@@ -70,12 +71,13 @@ namespace Moritz.Spec
         }
 
 
-        public Tuple<Trk, Trk> PopTrk(int poppedMsDuration)
+        public Tuple<Trk, Trk, double?> SplitTrk(int poppedMsDuration)
         {
             AssertConsistency();
 
             Trk poppedTrk = new Trk(new List<IUniqueDef>());
             Trk remainingTrk = new Trk(new List<IUniqueDef>());
+            double? finalSplitProportion = null;
 
             foreach(IUniqueDef iud in UniqueDefs)
             {
@@ -95,12 +97,26 @@ namespace Moritz.Spec
                     int durationAfterBarline = iudEndPos - poppedMsDuration;
                     if(iud is RestDef)
                     {
-                        // This is a rest. Split it.
-                        RestDef firstRestHalf = new RestDef(iudStartPos, durationBeforeBarline);
-                        poppedTrk.UniqueDefs.Add(firstRestHalf);
+                        if(durationBeforeBarline > 0 && durationAfterBarline > 0)
+                        {
+                            // This is a rest. Split it.
+                            RestDef firstRestHalf = new RestDef(iudStartPos, durationBeforeBarline);
+                            poppedTrk.UniqueDefs.Add(firstRestHalf);
 
-                        RestDef secondRestHalf = new RestDef(poppedMsDuration, durationAfterBarline);
-                        remainingTrk.UniqueDefs.Add(secondRestHalf);
+                            RestDef secondRestHalf = new RestDef(poppedMsDuration, durationAfterBarline);
+                            remainingTrk.UniqueDefs.Add(secondRestHalf);
+
+                            finalSplitProportion = (double)durationBeforeBarline / (durationBeforeBarline + durationAfterBarline);
+                        }
+                        else if(durationBeforeBarline == 0)
+                        {
+                            remainingTrk.UniqueDefs.Add(iud);
+
+                        }
+                        else if(durationAfterBarline == 0)
+                        {
+                            poppedTrk.UniqueDefs.Add(iud);
+                        }
                     }
                     else if(iud is CautionaryChordDef)
                     {
@@ -110,13 +126,27 @@ namespace Moritz.Spec
                     }
                     else if(iud is MidiChordDef)
                     {
-                        IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
-                        uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
-                        poppedTrk.UniqueDefs.Add(uniqueChordDef);
+                        if(durationBeforeBarline > 0 && durationAfterBarline > 0)
+                        {
+                            IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
+                            uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
+                            poppedTrk.UniqueDefs.Add(uniqueChordDef);
 
-                        Debug.Assert(remainingTrk.UniqueDefs.Count == 0);
-                        CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
-                        remainingTrk.UniqueDefs.Add(ccd);
+                            Debug.Assert(remainingTrk.UniqueDefs.Count == 0);
+                            CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
+                            remainingTrk.UniqueDefs.Add(ccd);
+
+                            finalSplitProportion = (double)durationBeforeBarline / (durationBeforeBarline + durationAfterBarline);
+                        }
+                        else if(durationBeforeBarline == 0)
+                        {
+                            remainingTrk.UniqueDefs.Add(iud);
+
+                        }
+                        else if(durationAfterBarline == 0)
+                        {
+                            poppedTrk.UniqueDefs.Add(iud);
+                        }                       
                     }
                 }
                 else
@@ -132,7 +162,7 @@ namespace Moritz.Spec
                 iud.MsPositionReFirstUD -= msPositionOffset;
             }
 
-            return new Tuple<Trk, Trk>(poppedTrk, remainingTrk);
+            return new Tuple<Trk, Trk, double?>(poppedTrk, remainingTrk, finalSplitProportion);
         }
 
         #endregion constructors
@@ -184,36 +214,36 @@ namespace Moritz.Spec
 
         #region moved here from VoiceDef
 
-        /// <summary>
-        /// The position of the end of the last UniqueDef in the list re the first IUniqueDef in the list, or 0 if the list is empty.
-        /// Setting this value can only be done if the UniqueDefs list is not empty, and the value
-        /// is greater than the position of the final UniqueDef in the list. It then changes
-        /// the msDuration of the final IUniqueDef.
-        /// See also MsDuration.set.
-        /// </summary>
-        public int EndMsPositionReFirstIUD
-        {
-            get
-            {
-                int endMsPosReFirstUID = 0;
-                if(_uniqueDefs.Count > 0)
-                {
-                    IUniqueDef lastIUD = _uniqueDefs[_uniqueDefs.Count - 1];
-                    endMsPosReFirstUID += (lastIUD.MsPositionReFirstUD + lastIUD.MsDuration);
-                }
-                return endMsPosReFirstUID;
-            }
-            set
-            {
-                Debug.Assert(_uniqueDefs.Count > 0);
-                Debug.Assert(value > EndMsPositionReFirstIUD);
+        ///// <summary>
+        ///// The position of the end of the last UniqueDef in the list re the first IUniqueDef in the list, or 0 if the list is empty.
+        ///// Setting this value can only be done if the UniqueDefs list is not empty, and the value
+        ///// is greater than the position of the final UniqueDef in the list. It then changes
+        ///// the msDuration of the final IUniqueDef.
+        ///// See also MsDuration.set.
+        ///// </summary>
+        //public int MsDuration
+        //{
+        //    get
+        //    {
+        //        int endMsPosReFirstUID = 0;
+        //        if(_uniqueDefs.Count > 0)
+        //        {
+        //            IUniqueDef lastIUD = _uniqueDefs[_uniqueDefs.Count - 1];
+        //            endMsPosReFirstUID += (lastIUD.MsPositionReFirstUD + lastIUD.MsDuration);
+        //        }
+        //        return endMsPosReFirstUID;
+        //    }
+        //    set
+        //    {
+        //        Debug.Assert(_uniqueDefs.Count > 0);
+        //        Debug.Assert(value > MsDuration);
 
-                IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
-                lastLmdd.MsDuration = value - EndMsPositionReFirstIUD;
+        //        IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
+        //        lastLmdd.MsDuration = value - MsDuration;
 
-                AssertConsistency();
-            }
-        }
+        //        AssertConsistency();
+        //    }
+        //}
 
         public int Count { get { return _uniqueDefs.Count; } }
 
@@ -608,11 +638,11 @@ namespace Moritz.Spec
         public int FindIndexAtMsPositionReFirstIUD(int msPositionReFirstIUD)
         {
             int returnedIndex = -1;
-            if(msPositionReFirstIUD == EndMsPositionReFirstIUD)
+            if(msPositionReFirstIUD == MsDuration)
             {
                 returnedIndex = this.Count;
             }
-            else if(msPositionReFirstIUD >= _uniqueDefs[0].MsPositionReFirstUD && msPositionReFirstIUD < EndMsPositionReFirstIUD)
+            else if(msPositionReFirstIUD >= _uniqueDefs[0].MsPositionReFirstUD && msPositionReFirstIUD < MsDuration)
             {
                 returnedIndex = _uniqueDefs.FindIndex(u => ((u.MsPositionReFirstUD <= msPositionReFirstIUD) && ((u.MsPositionReFirstUD + u.MsDuration) > msPositionReFirstIUD)));
             }
@@ -2009,6 +2039,8 @@ namespace Moritz.Spec
         /// <summary>
         /// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
         /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
+        /// The Trk.MsDuration is calculated using the MsDuration fields of its UniqueDefs, except that if MsDurationToNextBarline
+        /// field on the final UniqueDef is != null, then that value is used instead.
         /// See also EndMsPosition.set.
         /// </summary>
         public int MsDuration
@@ -2018,13 +2050,13 @@ namespace Moritz.Spec
                 int total = 0;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iud is IUniqueSplittableChordDef iuscd && iuscd.MsDurationToNextBarline != null)
+                    if(iud is MidiChordDef mcd && mcd.MsDurationToNextBarline != null)
                     {
-                        total += (int)iuscd.MsDurationToNextBarline;
+                        total += (int)mcd.MsDurationToNextBarline;
                     }
                     else
                     {
-                        total += iud.MsDuration;
+                        total += iud.MsDuration;  // also CautionaryChordDef
                     }
 
                 }
@@ -2034,31 +2066,41 @@ namespace Moritz.Spec
             {
                 Debug.Assert(value > 0);
 
-                int msDuration = value;
+                int newMsDuration = value;
 
                 List<int> relativeDurations = new List<int>();
-                foreach(IUniqueDef iumdd in _uniqueDefs)
+                foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iumdd.MsDuration > 0)
-                        relativeDurations.Add(iumdd.MsDuration);
+                    if(iud is MidiChordDef mcd && mcd.MsDurationToNextBarline != null)
+                    {
+                        relativeDurations.Add((int)mcd.MsDurationToNextBarline);
+                    }
+                    else
+                    {
+                        relativeDurations.Add(iud.MsDuration);   // also CautionaryChordDef
+                    }
                 }
 
-                List<int> newDurations = M.IntDivisionSizes(msDuration, relativeDurations);
+                List<int> newDurations = M.IntDivisionSizes(newMsDuration, relativeDurations);
 
                 Debug.Assert(newDurations.Count == relativeDurations.Count);
                 int i = 0;
                 int newTotal = 0;
-                foreach(IUniqueDef iumdd in _uniqueDefs)
+                foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iumdd.MsDuration > 0)
+                    if(iud is MidiChordDef mcd && mcd.MsDurationToNextBarline != null)
                     {
-                        iumdd.MsDuration = newDurations[i];
-                        newTotal += iumdd.MsDuration;
-                        ++i;
+                        mcd.MsDurationToNextBarline = newDurations[i];
                     }
+                    else
+                    {
+                        relativeDurations.Add(newDurations[i]);  // also CautionaryChordDef
+                    }
+                    newTotal += newDurations[i];
+                    ++i;
                 }
 
-                Debug.Assert(msDuration == newTotal);
+                Debug.Assert(newMsDuration == newTotal);
 
                 SetMsPositionsReFirstUD();
 
@@ -2086,6 +2128,16 @@ namespace Moritz.Spec
                     AllControllersOff = true
                 };
                 break;
+            }
+        }
+
+        internal void ResetMsPositionsReFirstUID()
+        {
+            int msPos = 0;
+            foreach(var uid in _uniqueDefs)
+            {
+                uid.MsPositionReFirstUD = msPos;
+                msPos += uid.MsDuration;                
             }
         }
 

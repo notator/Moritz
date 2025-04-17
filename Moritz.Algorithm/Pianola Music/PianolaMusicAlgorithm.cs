@@ -173,6 +173,14 @@ namespace Moritz.Algorithm.PianolaMusic
 
                 voiceDef.AssertConsistency(); // Ensure the Trk remains consistent
             }
+
+            foreach(var voiceDef in voiceDefs)
+            {
+                for(int i = 1; i < voiceDef.Trks.Count; ++i)
+                {
+                    voiceDef.Trks[i].MsDuration = voiceDef.Trks[0].MsDuration;
+                }
+            }
         }
 
         // Copilot Helper function to generate time-warped positions
