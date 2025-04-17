@@ -2,8 +2,10 @@
 
 using Moritz.Globals;
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Xml.XPath;
 
 namespace Moritz.Spec
 {
@@ -16,72 +18,60 @@ namespace Moritz.Spec
         /// of the graphics that will eventually be associated with the VoiceDef's graphics. 
         /// </summary>
         /// <param name="absMsPosition">Must be greater than or equal to zero.</param>
-        /// <param name="voiceDefs">Each voiceDef has a Trks property containing at least one Trk (performance)
-        /// Each Trk must have a constructed UniqueDefs list which is either empty, or contains any combination of RestDef or MidiChordDef.
+        /// <param name="trks">There is one Trk per channel (A Trk's channel is the index in this list.).
+        /// Each Trk must have a constructed UniqueDefs list which is either empty, or contains any combination of MidiChordDef or RestDef.
         /// Each trk.MsPositionReContainer must be 0. All trk.UniqueDef.MsPositionReFirstUD values must be set correctly.
-        /// All Trks that have the same channel must have the same trk.DurationsCount. (They are different performances of the same ChordSymbols.)
-        public Bar(int absMsPosition, List<VoiceDef> voiceDefs)
+        /// each MidiChordDef and RestDef has a MidiDef property containing a list of the alternative interpretations of the symbol. 
+        public Bar(int absMsPosition, List<Trk> trks)
         {
             #region conditions
             Debug.Assert(absMsPosition >= 0);
-            Debug.Assert(voiceDefs != null && voiceDefs.Count > 0 && voiceDefs.Count <= 16);
-            Debug.Assert(voiceDefs[0].Trks != null && voiceDefs[0].Trks.Count > 0);
-            foreach(var voiceDef in voiceDefs)
+            Debug.Assert(trks != null && trks.Count > 0 && trks.Count <= 16);
+            foreach(var trk in trks)
             {
-                foreach(var trk in voiceDef.Trks)
-                {
-                    trk.AssertConsistency();
-                }
+                trk.AssertConsistency();
             }
             #endregion conditions
 
             _absMsPosition = absMsPosition;
-            _voiceDefs = voiceDefs;
+            _trks = trks;
 
             AssertConsistency();
         }
 
-        public Bar Clone()
-        {
-            var newMidiVoiceDefs = new List<VoiceDef>();
+        //public Bar Clone()
+        //{
+        //    var newTrks = new List<Trk>();
 
-            foreach(var oldMidiVoiceDef in this.VoiceDefs)
-            {
-                List<Trk> newTrks = new List<Trk>();
-                foreach(var oldTrk in oldMidiVoiceDef.Trks)
-                {
-                    newTrks.Add((Trk)oldTrk.Clone());
-                }
-                newMidiVoiceDefs.Add(new VoiceDef(newTrks));
-            }
+        //    foreach(var oldMidiVoiceDef in this.Trks)
+        //    {
+        //        List<Trk> newTrks = new List<Trk>();
+        //        foreach(var oldTrk in oldMidiVoiceDef.Trks)
+        //        {
+        //            newTrks.Add((Trk)oldTrk.Clone());
+        //        }
+        //        newTrks.Add(new VoiceDef(newTrks));
+        //    }
 
-            Bar clone = new Bar(_absMsPosition, newMidiVoiceDefs);
+        //    Bar clone = new Bar(_absMsPosition, newTrks);
 
-            return clone;
-        }
+        //    return clone;
+        //}
 
         #region old Bar
 
         public void Concat(Bar bar2)
         {
-            Debug.Assert(VoiceDefs.Count == bar2.VoiceDefs.Count);
+            Debug.Assert(Trks.Count == bar2.Trks.Count);
 
-            for(int i = 0; i < VoiceDefs.Count; ++i)
+            for(int i = 0; i < Trks.Count; ++i)
             {
-                VoiceDef voiceDef1 = VoiceDefs[i];
-                VoiceDef voiceDef2 = bar2.VoiceDefs[i];
-
-                Debug.Assert(voiceDef1.Trks.Count == voiceDef2.Trks.Count);
-
-                for(int j = 0; j < voiceDef1.Trks.Count; ++j)
-                {
-                    Trk trk1 = voiceDef1.Trks[j];
-                    Trk trk2 = voiceDef2.Trks[j];
+                    var trk1 = Trks[i];
+                    var trk2 = bar2.Trks[i];    
 
                     trk1.AddRange(trk2);
                     trk1.RemoveDuplicateClefDefs();
                     trk1.AgglomerateRests();
-                }
             }
 
             AssertConsistency();
@@ -89,18 +79,18 @@ namespace Moritz.Spec
 
         #region envelopes
         /// <summary>
-        /// Warps the durations in the Trks at trkIndex in all VoiceDefs.
-        /// This function does not change the MsDuration of the Trks.
+        /// Warps the durations of a particular interpretation of the Bar without
+        /// changing its overall MsDuration.
         /// See Envelope.TimeWarp() for a description of the arguments.
         /// </summary>
         /// <param name="envelope"></param>
         /// <param name="distortion"></param>
-        public void TimeWarp(int trkIndex, Envelope envelope, double distortion)
+        public void TimeWarp(int interpretationIndex, Envelope envelope, double distortion)
         {
             AssertConsistency();
-            foreach(var voiceDef in VoiceDefs)
+            for(int trkIndex = 0; trkIndex < Trks.Count; trkIndex++)
             {
-                var trk = voiceDef.Trks[trkIndex];
+                var trk = GetInterpretation(trkIndex, interpretationIndex);
                 int originalMsDuration = trk.MsDuration;
                 List<int> originalMsPositions = trk.GetMsPositions();
                 Dictionary<int, int> warpDict = new Dictionary<int, int>();
@@ -132,17 +122,16 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns a flat list containing
-        /// the unique msPositions of IUniqueDefs in Track 0 of all VoiceDefs,
-        /// plus the endMsPosition of the final object.
+        /// Returns a flat list containing the unique msPositions of the IUniqueDefs of the main
+        /// interpretation of in all Trks in the Bar, plus the endMsPosition of the final object.
         /// </summary>
-        private List<int> GetTrk0MsPositions()
+        private List<int> GetAllMsPositions()
         {
             List<int> originalMsPositions = new List<int>();
-            foreach(var voiceDef in VoiceDefs)
-            {
-                var trk = voiceDef.Trks[0];
-                int originalMsDuration = trk.MsDuration;                
+            int originalMsDuration = MsDuration;
+
+            foreach(var trk in Trks)
+            {                                 
                 foreach(IUniqueDef iud in trk.UniqueDefs)
                 {
                     int msPos = iud.MsPositionReFirstUD;
@@ -161,17 +150,14 @@ namespace Moritz.Spec
 
         public void SetMsPositionsReFirstUD()
         {
-            foreach(VoiceDef voiceDef in VoiceDefs)
+            foreach(Trk trk in Trks)
             {
-                foreach(var trk in voiceDef.Trks)
-                {
                     int msPosition = 0;
                     foreach(IUniqueDef iud in trk.UniqueDefs)
                     {
                         iud.MsPositionReFirstUD = msPosition;
                         msPosition += iud.MsDuration;
                     }
-                }
             }
         }
 
@@ -189,25 +175,11 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return $"AbsMsPosition={AbsMsPosition}, nVoiceDefs={VoiceDefs.Count}, nTrksPerVoice={VoiceDefs[0].Trks.Count}";
+            return $"AbsMsPosition={AbsMsPosition}, nTrks={Trks.Count}, nInterpretations={Trks[0].InterpretationsCount}";
         }
 
-        public IReadOnlyList<VoiceDef> VoiceDefs { get => _voiceDefs; }
-        private List<VoiceDef> _voiceDefs = new List<VoiceDef>();
-
-        /// A list containing only the top Trk in each VoiceDef
-        public List<Trk> Trks0
-        {
-            get 
-            {
-                List<Trk> trks0 = new List<Trk>();
-                foreach(var voiceDef in VoiceDefs)
-                {
-                    trks0.Add(voiceDef.Trks[0]);
-                }
-                return trks0;
-            }
-        }
+        public IReadOnlyList<Trk> Trks { get => _trks; }
+        private readonly List<Trk> _trks = new List<Trk>();
 
         #endregion old Bar
 
@@ -215,102 +187,101 @@ namespace Moritz.Spec
 
         /// <summary>
         /// AbsMsPosition is greater than or equal to 0.
-        /// There is at least one VoiceDef in VoiceDefs and at least one Trk in each VoiceDef.
+        /// There is at least one Trk in Trks.
         /// Trk.AssertConsistency() is called on all Trks.
-        /// All VoiceDef.Trks.Count values are the same.
-        /// All VoiceDef.MsPositionReContainer values are 0.
-        /// All Trks having the same index in any VoiceDef in this Bar have the same msDuration.
-        /// In each VoiceDef:
-        ///     1. All Trks have the same number of DurationDefs
-        ///     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
-        /// Performance consistency:
-        /// (A "performance" consists of all the trks at the same index within their VoiceDef.)
-        /// The overall sequence of events (DurationDefs) must be identical in all performances.
+        /// All Trk.InterpretationCount values are the same.
+        /// All Interpretations having the same index in any Trk in this Bar have the same msDuration.
+        /// Interpretation consistency across Trks:
+        /// The overall sequence of events (DurationDefs) must be identical in all interpretations.
         /// </summary>
         public virtual void AssertConsistency()
         {
             Debug.Assert(AbsMsPosition >= 0);
-            Debug.Assert(VoiceDefs.Count > 0);
-            var trksCount = VoiceDefs[0].Trks.Count;
-            Debug.Assert(trksCount > 0);
+            Debug.Assert(Trks.Count > 0);
 
-            int nTrks = VoiceDefs[0].Trks.Count;
-            Debug.Assert(nTrks > 0);
+            int nTrks = Trks.Count;
+            int nInterpretations = Trks[0].InterpretationsCount;
 
-            CheckVoiceDefConsistency(nTrks);
+            CheckTrksConsistency(nTrks, nInterpretations);
 
-            CheckPerformanceConsistency(nTrks);
+            CheckInterpretationConsistency(nTrks, nInterpretations);
         }
 
-        private void CheckVoiceDefConsistency(int nTrks)
+        private void CheckTrksConsistency(int nTrks, int nInterpretations)
         {
-            foreach(var voiceDef in VoiceDefs)
+            foreach(var trk in Trks)
             {
-                Debug.Assert(voiceDef.Trks.Count == nTrks);
-                Debug.Assert(voiceDef.MsPositionReContainer == 0);
-                foreach(var trk in voiceDef.Trks)
-                {
-                    trk.AssertConsistency();
-                }
+                trk.AssertConsistency();
+            }
 
-                // All Trks having the same index in any VoiceDef in this Bar have the same msDuration.
-                for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
+            
+            List<List<Trk>> interpretationsPerTrack = new List<List<Trk>>();
+            for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
+            {
+                var trk = Trks[trkIndex];
+                Debug.Assert(trk.InterpretationsCount == nInterpretations);
+                var interpretations = new List<Trk>();
+                for(int interpIndex = 0; interpIndex < nInterpretations; ++interpIndex)
                 {
-                    int barMsDuration = VoiceDefs[0].Trks[trkIndex].MsDuration;
-                    for(int voiceDefIndex = 1; voiceDefIndex < VoiceDefs.Count; ++voiceDefIndex)
-                    {
-                        var cDef = VoiceDefs[voiceDefIndex];
-                        Debug.Assert(cDef.Trks[trkIndex].MsDuration == barMsDuration);
-                    }
+                    interpretations.Add(GetInterpretation(trkIndex, interpIndex));
                 }
+                interpretationsPerTrack.Add(interpretations);
+            }
 
-                // In each VoiceDef:
-                //     1. All Trks have the same number of DurationDefs
-                //     2. In each Trk, DurationDefs at the same index in trk.UniqueDefs are of the same type.
-                List<DurationDef> trk0DurationDefs = voiceDef.Trks[0].DurationDefs;
+            // All Trks in this Bar have the same msDuration within the same interpretation.
+            for(int interpIndex = 0; interpIndex < nInterpretations; ++interpIndex)
+            {
+                int interp0MsDuration = interpretationsPerTrack[0][interpIndex].MsDuration;
                 for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
                 {
-                    List<DurationDef> trkDDs = voiceDef.Trks[trkIndex].DurationDefs;
-                    Debug.Assert(trkDDs.Count == trk0DurationDefs.Count);
-                    for(var ddIndex = 0; ddIndex < trk0DurationDefs.Count; ++ddIndex)
-                    {
-                        DurationDef dd0 = trk0DurationDefs[ddIndex]; // durationDef in Trk 0
-                        DurationDef trkDD = trkDDs[ddIndex];
-                        Debug.Assert((dd0 is MidiChordDef && trkDD is MidiChordDef) | (dd0 is RestDef && trkDD is RestDef));
-                    }
-                }
+                    Trk interpTrk = interpretationsPerTrack[trkIndex][interpIndex];
+                    Debug.Assert(interpTrk.MsDuration == interp0MsDuration);
+                }                
             }
         }
 
-        private void CheckPerformanceConsistency(int nTrks)
+        private Trk GetInterpretation(int trkIndex, int interpIndex)
         {
-            /// A "performance" consists of all the trks at the same index within their VoiceDef.
-            /// The overall sequence of events (DurationDefs) must be identical in all performances.
-            List<List<DurationDef>> performances = new List<List<DurationDef>>();
-            for(var trkIndex = 0; trkIndex < nTrks; ++trkIndex)
+            Trk returnTrk = new Trk();
+            var mainUniqueDefs = Trks[trkIndex].UniqueDefs;
+            for(int i = 0; i < mainUniqueDefs.Count; ++i)
             {
-                List<DurationDef> performance = new List<DurationDef>();
-                foreach(var voiceDef in VoiceDefs)
-                {
-                    performance.AddRange(voiceDef.Trks[trkIndex].DurationDefs);
+                var uniqueDef = mainUniqueDefs[i];
+                if(uniqueDef is MidiChordDef mcd)
+                {               
+                    returnTrk.Add(mcd.MidiDefs[interpIndex]);
                 }
-                performance.Sort((x, y) => x.MsPositionReFirstUD.CompareTo(y.MsPositionReFirstUD));
-                performances.Add(performance);
-            }
-            int nDurationDefs = performances[0].Count;
-            for(int pIndex = 1; pIndex < nTrks; ++pIndex)
-            {
-                Debug.Assert(performances[pIndex - 1].Count == nDurationDefs);
-                for(int i = 0; i < nDurationDefs; ++i)
+                else if(uniqueDef is RestDef restDef)
                 {
-                    DurationDef dd0 = performances[pIndex - 1][i];
-                    DurationDef dd1 = performances[pIndex][i];
-                    Debug.Assert((dd0 is MidiChordDef && dd1 is MidiChordDef) | (dd0 is RestDef && dd1 is RestDef));
+                    returnTrk.Add(restDef.MidiDefs[interpIndex]);
+                }
+            }
+            return returnTrk;
+        }
+
+        /// <summary>
+        /// The overall sequence of events (DurationDefs) must be identical in all interpretations.
+        /// </summary>
+        /// <param name="nTrks"></param>
+        /// <param name="nInterpretations"></param>
+        private void CheckInterpretationConsistency(int nTrks, int nInterpretations)
+        {
+            List<IUniqueDef> topIuds = GetInterpretation(0, 0).UniqueDefs;
+            for(int i = 0; i < topIuds.Count; i++)
+            {
+                var topIud = topIuds[i];
+                for(int trkIndex = 0; trkIndex < nTrks; trkIndex++)
+                {
+                    for(int interpIndex = 0; interpIndex < nInterpretations; interpIndex++)
+                    {
+                        List<IUniqueDef> localIuds = GetInterpretation(trkIndex, interpIndex).UniqueDefs;
+                        Debug.Assert((topIud is MidiChordDef && localIuds[i] is MidiChordDef) || (topIud is RestDef && localIuds[i] is RestDef));
+                    }                     
                 }
             }
         }
 
-        public int MsDuration { get => VoiceDefs[0].Trks[0].MsDuration; }
+        public int MsDuration { get => Trks[0].MsDuration; }
 
         #region Envelopes
         /// <summary>
@@ -334,25 +305,22 @@ namespace Moritz.Spec
             }
             #endregion get warpDict
 
-            foreach(var voiceDef in VoiceDefs)
+            foreach(Trk trk in Trks)
             {
-                foreach(Trk trk in voiceDef.Trks)
+                List<IUniqueDef> iuds = trk.UniqueDefs;
+                IUniqueDef iud;
+                int msPos = 0;
+                for(int i = 1; i < iuds.Count; ++i)
                 {
-                    List<IUniqueDef> iuds = trk.UniqueDefs;
-                    IUniqueDef iud = null;
-                    int msPos = 0;
-                    for(int i = 1; i < iuds.Count; ++i)
-                    {
-                        iud = iuds[i - 1];
-                        msPos = warpDict[iud.MsPositionReFirstUD];
-                        iud.MsPositionReFirstUD = msPos;
-                        iud.MsDuration = warpDict[iuds[i].MsPositionReFirstUD] - msPos;
-                        msPos += iud.MsDuration;
-                    }
-                    iud = iuds[iuds.Count - 1];
+                    iud = iuds[i - 1];
+                    msPos = warpDict[iud.MsPositionReFirstUD];
                     iud.MsPositionReFirstUD = msPos;
-                    iud.MsDuration = originalMsDuration - msPos;
+                    iud.MsDuration = warpDict[iuds[i].MsPositionReFirstUD] - msPos;
+                    msPos += iud.MsDuration;
                 }
+                iud = iuds[iuds.Count - 1];
+                iud.MsPositionReFirstUD = msPos;
+                iud.MsDuration = originalMsDuration - msPos;
             }
 
             Debug.Assert(originalMsDuration == MsDuration);
@@ -362,7 +330,7 @@ namespace Moritz.Spec
 
 
         /// <summary>
-        /// returns a list containing the msPositions of all the IUniqueDefs in all Trks
+        /// returns a list containing the msPositions of all the IUniqueDefs in the default interpretation of all Trks
         /// plus the endMsPosition of the final object.
         /// </summary>
         /// <returns></returns>
@@ -371,17 +339,14 @@ namespace Moritz.Spec
             int originalMsDuration = MsDuration;
 
             List<int> originalMsPositions = new List<int>();
-            foreach(var voiceDef in VoiceDefs)
+            foreach(Trk trk in Trks)
             {
-                foreach(Trk trk in voiceDef.Trks)
+                foreach(IUniqueDef iud in trk)
                 {
-                    foreach(IUniqueDef iud in trk)
+                    int msPos = iud.MsPositionReFirstUD;
+                    if(!originalMsPositions.Contains(msPos))
                     {
-                        int msPos = iud.MsPositionReFirstUD;
-                        if(!originalMsPositions.Contains(msPos))
-                        {
-                            originalMsPositions.Add(msPos);
-                        }
+                        originalMsPositions.Add(msPos);
                     }
                 }
             }

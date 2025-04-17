@@ -64,7 +64,7 @@ namespace Moritz.Symbols
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
                         Voice voice = staff.Voices[voiceIndex];
-                        Trk trk = voice.VoiceDef.Trks[0];
+                        Trk trk = voice.Trk;
 
                         trk.AssertConsistency();
 
@@ -190,7 +190,7 @@ namespace Moritz.Symbols
             {
                 List<int> currentVoiceMsPositions = new List<int>();
                 currentMsPositionPerVoicePerStaff.Add(currentVoiceMsPositions);
-                foreach(Voice voice in staff.Voices)
+                for(int i = 0; i < staff.Voices.Count; i++)
                 {
                     currentVoiceMsPositions.Add(0);
                 }
@@ -257,7 +257,6 @@ namespace Moritz.Symbols
 
         private float GetLeftMarginPos(SvgSystem system, Graphics graphics, PageFormat pageFormat)
         {
-            float leftMarginPos = pageFormat.LeftMarginPos;
             float maxNameWidth = 0;
             foreach(Staff staff in system.Staves)
             {
@@ -280,7 +279,7 @@ namespace Moritz.Symbols
                     }
                 }
             }
-            leftMarginPos = maxNameWidth + (pageFormat.Gap * 2.0F);
+            float leftMarginPos = maxNameWidth + (pageFormat.Gap * 2.0F);
             leftMarginPos = (leftMarginPos > pageFormat.LeftMarginPos) ? leftMarginPos : pageFormat.LeftMarginPos;
 
             return leftMarginPos;

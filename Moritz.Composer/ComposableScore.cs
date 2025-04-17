@@ -52,7 +52,7 @@ namespace Moritz.Composer
         }
 
         /// <summary>
-        /// Inserts a ClefDef at the beginning of the first Trk in each VoiceDef in each bar, taking any optional ChordDefs into account.
+        /// Inserts a ClefDef at the beginning of the first Trk in each bar, taking any optional ChordDefs into account.
         /// </summary>
         /// <param name="bars"></param>
         /// <param name="initialClefPerVoice">The clefs at the beginning of the score.</param>
@@ -60,28 +60,28 @@ namespace Moritz.Composer
         {
             // bars can currently contain cautionary clefs, but no initial clefs
             List<string> currentClefs = new List<string>(initialClefPerVoice);
-            int nVoiceDefs = bars[0].VoiceDefs.Count;
-            Debug.Assert(nVoiceDefs == currentClefs.Count);
+            int nTrks = bars[0].Trks.Count;
+            Debug.Assert(nTrks == currentClefs.Count);
 
             for(int barIndex = 0; barIndex < bars.Count; barIndex++)
             {
                 Bar bar = bars[barIndex];
-                for(int voiceIndex = 0; voiceIndex < nVoiceDefs; ++voiceIndex)
+                for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
                 {
-                    Trk trk = bar.VoiceDefs[voiceIndex].Trks[0];                    
+                    Trk trk = bar.Trks[trkIndex];                    
 
                     if(trk.UniqueDefs[0] is ClefDef startClef)
                     {
-                        currentClefs[voiceIndex] = startClef.ClefType;
+                        currentClefs[trkIndex] = startClef.ClefType;
                         if(barIndex > 0)
                         {
-                            Trk trkInPreviousBar = bars[barIndex - 1].VoiceDefs[voiceIndex].Trks[0];
+                            Trk trkInPreviousBar = bars[barIndex - 1].Trks[trkIndex];
                             trkInPreviousBar.UniqueDefs.Add(startClef);                           
                         }
                     }
                     else
                     {
-                        ClefDef initialClefDef = new ClefDef(currentClefs[voiceIndex], 0);
+                        ClefDef initialClefDef = new ClefDef(currentClefs[trkIndex], 0);
                         trk.Insert(0, initialClefDef);
                     }
 
@@ -90,9 +90,9 @@ namespace Moritz.Composer
                     {
                         if(iuds[iudIndex] is ClefDef midStaffClefDef)
                         {
-                            int result = String.Compare(currentClefs[voiceIndex], midStaffClefDef.ClefType);
-                            Debug.Assert(result != 0, $"Redundant clef change in voice index {voiceIndex}, position index {iudIndex}");                            
-                            currentClefs[voiceIndex] = midStaffClefDef.ClefType;
+                            int result = String.Compare(currentClefs[trkIndex], midStaffClefDef.ClefType);
+                            Debug.Assert(result != 0, $"Redundant clef change in voice index {trkIndex}, position index {iudIndex}");                            
+                            currentClefs[trkIndex] = midStaffClefDef.ClefType;
                         }
                     }
                 }
@@ -133,17 +133,17 @@ namespace Moritz.Composer
                 int nVoices = 0;
 
                 #region create visible staves
-                int voiceDefIndex = 0;
+                int trkIndex = 0;
                 for(int staffIndex = 0; staffIndex < nStaves; staffIndex++)
                 {
                     string staffname = StaffName(systemIndex, staffIndex);
                     Staff staff = new Staff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
-                    IReadOnlyList<VoiceDef> voiceDefs = bars[systemIndex].VoiceDefs;
+                    IReadOnlyList<Trk> trks = bars[systemIndex].Trks;
 
                     List<int> voiceIndices = _pageFormat.VoiceIndicesPerStaff[staffIndex];
                     for(int voiceIndex = 0; voiceIndex < voiceIndices.Count; ++voiceIndex)
                     {
-                        Voice voice = new Voice(staff, voiceDefs[voiceDefIndex++]);
+                        Voice voice = new Voice(staff, trks[trkIndex++]);
                         staff.Voices.Add(voice);
                         nVoices++;
                     }

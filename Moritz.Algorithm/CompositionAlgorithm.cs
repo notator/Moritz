@@ -205,7 +205,7 @@ namespace Moritz.Algorithm
         protected List<List<SortedDictionary<int, string>>> GetEmptyClefChangesPerBarPerStaff(List<Bar> bars , List<List<int>> voiceIndicesPerStaff)
         {
             var rval = new List<List<SortedDictionary<int, string>>>();
-            foreach(var bar in bars)
+            foreach(var _ in bars)
             {
                 List<SortedDictionary<int, string>> barList = new List<SortedDictionary<int, string>>();
                 foreach(var voiceIndices in voiceIndicesPerStaff)
@@ -229,7 +229,7 @@ namespace Moritz.Algorithm
                 for(var staffIndex = 0; staffIndex < voiceIndicesPerStaff.Count; ++staffIndex)
                 {
                     var midiIndex = voiceIndicesPerStaff[staffIndex][0];
-                    var trk = bar.VoiceDefs[midiIndex].Trks[0];
+                    var trk = bar.Trks[midiIndex];
                     SortedDictionary<int, string> clefDict = clefChangesPerBarPerStaff[barIndex][staffIndex];
                     if(clefDict.Count > 0)
                     {
@@ -309,8 +309,7 @@ namespace Moritz.Algorithm
 
             foreach(double approxMsPos in approximateBarlineMsPositions)
             {
-                int barlineMsPos = 0;
-                barlineMsPos = NearestAbsUIDEndMsPosition(trks0, approxMsPos);
+                int barlineMsPos = NearestAbsUIDEndMsPosition(trks0, approxMsPos);
 
                 barlineMsPositions.Add(barlineMsPos);
             }
@@ -380,10 +379,9 @@ namespace Moritz.Algorithm
         /// <param name="inputVoiceDefs">Can be null</param>
         /// <param name="nBars"></param>
         /// <returns></returns>
-        public List<int> GetBalancedBarlineMsPositions(List<Trk> trks0, int nBars)
-        {            
-            int msDuration = trks0[0].MsDuration; // all the trks0 have the same MsDuration
-
+        public List<int> GetBalancedBarlineMsPositions(List<Trk> trks, int nBars)
+        { 
+            var msDuration = trks[0].MsDuration;
             double approxBarMsDuration = (((double)msDuration) / nBars);
             Debug.Assert(approxBarMsDuration * nBars == msDuration);
 
@@ -392,7 +390,7 @@ namespace Moritz.Algorithm
             for(int barNumber = 1; barNumber <= nBars; ++barNumber)
             {
                 double approxBarMsPosition = approxBarMsDuration * barNumber;
-                int barMsPosition = NearestAbsUIDEndMsPosition(trks0, approxBarMsPosition);
+                int barMsPosition = NearestAbsUIDEndMsPosition(trks, approxBarMsPosition);
 
                 Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
 
@@ -406,15 +404,13 @@ namespace Moritz.Algorithm
         /// <summary>
         /// The patch only needs to be set in the first chord in each trk,
         /// since it will be set by shunting if the Assistant Performer starts later.
+        /// This function only sets the patch in the first interpretation of the first chord.
         /// </summary>
-        protected void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
+        protected void SetPatch0InTheFirstChordInEachTrk(Bar bar1)
         {
-            foreach(VoiceDef voiceDef in bar1.VoiceDefs)
+            foreach(Trk trk in bar1.Trks)
             {
-                foreach(Trk trk in voiceDef.Trks)
-                {
-                    trk.SetPresetInTheFirstChord(0);
-                }
+                trk.SetPresetInTheFirstChord(0);
             }
         }
         

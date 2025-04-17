@@ -15,49 +15,12 @@ namespace Moritz.Symbols
     /// </summary>
     public class Voice
     {
-        public Voice(Staff staff, VoiceDef voiceDef)
+        public Voice(Staff staff, Trk trk)
         {
-            voiceDef.AssertConsistency();
+            trk.AssertConsistency();
 
             Staff = staff;
-            VoiceDef = voiceDef;
-        }
-
-        private List<List<MidiChordDef>> GetMidiChordDefsListList(List<Trk> trks)
-        {
-            int nTrks = trks.Count;
-
-            List<List<MidiChordDef>> horizontalMcdListList = new List<List<MidiChordDef>>();
-            for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
-            {
-                List<MidiChordDef> hMcdList = new List<MidiChordDef>();
-                var iuds = trks[trkIndex].UniqueDefs;
-                foreach(IUniqueDef iud in iuds)
-                {
-                    if(iud is MidiChordDef mcd)
-                    {
-                        hMcdList.Add(mcd);
-                    }
-                }
-                horizontalMcdListList.Add(hMcdList);
-            }
-            int nMcds = horizontalMcdListList[0].Count;
-            for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
-            {
-                Debug.Assert(horizontalMcdListList[trkIndex].Count == nMcds);
-            }
-            
-            List<List<MidiChordDef>> verticalMcdListList = new List<List<MidiChordDef>>();
-            for(int mcdIndex = 0; mcdIndex < nMcds; ++mcdIndex)
-            {
-                List<MidiChordDef> vMcdList = new List<MidiChordDef>();
-                for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
-                {
-                    vMcdList.Add(horizontalMcdListList[trkIndex][mcdIndex]);
-                }
-                verticalMcdListList.Add(vMcdList);
-            }
-            return verticalMcdListList;
+            Trk = trk;
         }
 
         /// <summary>
@@ -66,9 +29,6 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public virtual void WriteSVG(SvgWriter w, int channelIndex)
         {
-            List<List<MidiChordDef>> midiChordDefsListList = GetMidiChordDefsListList(VoiceDef.Trks);
-            int mcdLLindex = 0;
-
             w.SvgStartGroup(CSSObjectClass.voice.ToString());
 
             for(int i = 0; i < NoteObjects.Count; ++i)
@@ -92,12 +52,6 @@ namespace Moritz.Symbols
                 }
                 else if(noteObject is ChordSymbol chordSymbol)
                 { 
-                    List<MidiChordDef> mcds = midiChordDefsListList[mcdLLindex++];
-                    Debug.Assert(mcds != null);
-                    for(int mcdIndex = 1; mcdIndex < mcds.Count; ++mcdIndex)
-                    {
-                        chordSymbol.AddMidiChordDef(mcds[mcdIndex]);
-                    }
                     chordSymbol.WriteSVG(w, channelIndex);
                 }
                 else if(noteObject is RestSymbol restSymbol)
@@ -211,7 +165,6 @@ namespace Moritz.Symbols
                 this.NoteObjects.Add(tempList[i]);
                 i++;
             }
-            tempList = null;
         }
         /// <summary>
         /// Appends a clone of the noteObjects to this voice's NoteObjects
@@ -226,13 +179,7 @@ namespace Moritz.Symbols
                 NoteObjects.Add(noteObject);
             }
 
-            var trks1 = VoiceDef.Trks;
-            var trks2 = voice2.VoiceDef.Trks;
-            Debug.Assert(trks1.Count == trks2.Count);
-            for(var trkIndex = 0; trkIndex < trks1.Count; ++trkIndex)
-            {
-                trks1[trkIndex].UniqueDefs.AddRange(trks2[trkIndex].UniqueDefs);
-            }
+            Trk.UniqueDefs.AddRange(voice2.Trk.UniqueDefs);
         }
 
         /// <summary>
@@ -461,7 +408,7 @@ namespace Moritz.Symbols
         }
         #endregion
 
-        public VoiceDef VoiceDef = null;
+        public Trk Trk = null;
 
         private DurationSymbol _firstDurationSymbol;
     }

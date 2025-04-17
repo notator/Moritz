@@ -21,7 +21,7 @@ namespace Moritz.Algorithm.ErratumMusical
         public override int NumberOfVoices { get { return 1; } }
         public override int NumberOfBars { get { return 8; } }
 
-        private static IReadOnlyList<IReadOnlyList<int>> erratumMusicalGraphPitches = new List<List<int>>()
+        private static readonly IReadOnlyList<IReadOnlyList<int>> erratumMusicalGraphPitches = new List<List<int>>()
         {
             new List<int>() // Selection 1
 			{ 49, 37, 58, 71, 53,  7, 25, 52, 22, 48,
@@ -111,19 +111,17 @@ namespace Moritz.Algorithm.ErratumMusical
             _ = pageFormat; // is used by the functions used for inserting clefs (see base class: CompositionAlgorithm.cs)
             _ = krystals;
 
-            List<int> endBarlinePositions;
-            List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
-            List<VoiceDef> voiceDefs = new List<VoiceDef>() { new VoiceDef(trks) };
+            List<Trk> mainTrks = new List<Trk>() { GetTrack(out List<int> endBarlinePositions) };
 
-            Debug.Assert(voiceDefs.Count == NumberOfVoices);
+            Debug.Assert(mainTrks.Count == NumberOfVoices);
 
-            TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(mainTrks);
 
             temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
             List<Bar> bars = temporalStructure.GetBars(endBarlinePositions);
 
-            SetPatch0InTheFirstChordInEachVoice(bars[0]);
+            SetPatch0InTheFirstChordInEachTrk(bars[0]);
 
             return bars;
         }

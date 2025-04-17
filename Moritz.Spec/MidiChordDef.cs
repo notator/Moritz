@@ -93,6 +93,11 @@ namespace Moritz.Spec
                 EnvelopeTypeDef = new Tuple<int, List<int>>(this.EnvelopeTypeDef.Item1, envValues);
             }
 
+            foreach(var midiDef in this.MidiDefs)
+            {
+                MidiDefs.Add((MidiChordDef)midiDef.Clone());  
+            }
+
             AssertConsistency();
 
             return rval;

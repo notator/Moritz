@@ -47,37 +47,85 @@ namespace Moritz.Algorithm.PianolaMusic
             List<Trk> originalTrks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
             Debug.Assert(originalTrks.Count == NumberOfVoices);
 
-            // Create VoiceDefs with four Trks each, preserving the original Trks in voicedDef.Trks[0]
-            List<VoiceDef> voiceDefs = GetFourTrkVoiceDefs(originalTrks);
+            List<List<Trk>> interpretations = GetFourInterpretationsPerTrk(originalTrks);
 
-            AddAccelRitToTrksAtIndex(voiceDefs, 1);
-            AddRandomPitchBendToTrksAtIndex(voiceDefs, 2);
+            AddAccelRitToTrksAtIndex(interpretations, 1);
+            AddRandomPitchBendToTrksAtIndex(interpretations, 2);
             // TrkLevel3 is still TrkLevel0 (not a clone!)
 
-            Debug.Assert(voiceDefs.Count == NumberOfVoices);
+            Debug.Assert(interpretations.Count == NumberOfVoices);
+
+            // The interpretations are moved into MidiChordDef and RestDef.MidiDef properties
+            List<Trk> mainTrks = GetMainTrks(interpretations); 
 
             // Create the temporal structure
-            TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(mainTrks);
 
             temporalStructure.AssertConsistency(); // Ensure Trks only contain MidiChordDefs and RestDefs
 
             // Generate barline positions and create bars
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(temporalStructure.Trks0, NumberOfBars);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainTrks, NumberOfBars);
             List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
 
             // Set the patch for the first chord in each voice
-            SetPatch0InTheFirstChordInEachVoice(bars[0]);
+            SetPatch0InTheFirstChordInEachTrk(bars[0]);
 
             return bars;
         }
 
-        private void AddRandomPitchBendToTrksAtIndex(List<VoiceDef> voiceDefs, int trksIndex)
+        /// <summary>
+        /// Returns one Trk per voice, containing MidiChordDefs and RestDefs whose MidiDef 
+        /// properties have been set to their alternative Trk values.
+        /// </summary>
+        /// <param name="voiceDefs"></param>
+        protected List<Trk> GetMainTrks(List<List<Trk>> interpretations)
+        {
+            List<Trk> returnTrks = new List<Trk>();
+
+            foreach(var trkList in interpretations)
+            {
+                var iuds = trkList[0].UniqueDefs;
+                for(int i = 0; i < iuds.Count; ++i)
+                {
+                    var iud = iuds[i];
+                    if(iud is MidiChordDef mcd)
+                    {
+                        mcd.MidiDefs.Add(mcd); // the first MidiDef is always the one that defines the Chord's appearance.
+                        for(int j = 1; j < trkList.Count; ++j)
+                        {
+                            MidiChordDef subMcd = trkList[j].UniqueDefs[i] as MidiChordDef;
+                            Debug.Assert(subMcd != null);
+                            mcd.MidiDefs.Add(subMcd);
+                        }
+                    }
+                    else if(iud is RestDef restDef)
+                    {
+                        restDef.MidiDefs.Add(restDef);  // the first MidiDef is always the one that defines the Rest's appearance.
+                        for(int j = 1; j < trkList.Count; ++j)
+                        {
+                            RestDef subRestDef = trkList[j].UniqueDefs[i] as RestDef;
+                            Debug.Assert(subRestDef != null);
+                            restDef.MidiDefs.Add(subRestDef);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Assert(false, "All VoiceDef.Trks must contain parallel duration types here!");
+                    }
+                }
+                returnTrks.Add(trkList[0]);
+            }
+
+            return returnTrks;
+        }
+
+        private void AddRandomPitchBendToTrksAtIndex(List<List<Trk>> interpretations, int trksIndex)
         {
             Random random = new Random();
 
-            foreach(var voiceDef in voiceDefs)
+            foreach(var trkList in interpretations)
             {
-                Trk trk = voiceDef.Trks[trksIndex];
+                Trk trk = trkList[trksIndex];
 
                 foreach(var midiChordDef in trk.MidiChordDefs)
                 {
@@ -88,7 +136,7 @@ namespace Moritz.Algorithm.PianolaMusic
                     midiChordDef.MidiChordControlDef.PitchWheel = random.Next(128);
                 }
 
-                voiceDef.AssertConsistency();
+                trk.AssertConsistency();
             }
         }
 
@@ -103,13 +151,13 @@ namespace Moritz.Algorithm.PianolaMusic
         /// </summary>
         /// <param name="voiceDefs"></param>
         /// <param name="trksIndex"></param>
-        private void AddAccelRitToTrksAtIndex(List<VoiceDef> voiceDefs, int trksIndex)
+        private void AddAccelRitToTrksAtIndex(List<List<Trk>> interpretations, int trksIndex)
         {
             // Step 1: Create a flat, ordered list of all the MidiChordDefs in the Trks at trksIndex
             List<MidiChordDef> allMidiChordDefs = new List<MidiChordDef>();
-            foreach(var voiceDef in voiceDefs)
+            foreach(var trkList in interpretations)
             {
-                Trk trk = voiceDef.Trks[trksIndex];
+                Trk trk = trkList[trksIndex];
                 allMidiChordDefs.AddRange(trk.MidiChordDefs);
             }
 
@@ -154,9 +202,9 @@ namespace Moritz.Algorithm.PianolaMusic
             }
 
             // Step 4: Update the MsDurations of all the MidiChordDefs
-            foreach(var voiceDef in voiceDefs)
+            foreach(var trkList in interpretations)
             {
-                Trk trk = voiceDef.Trks[trksIndex];
+                Trk trk = trkList[trksIndex];
                 foreach(var midiChordDef in trk.MidiChordDefs)
                 {
                     int oldStart = midiChordDef.MsPositionReFirstUD;
@@ -171,14 +219,14 @@ namespace Moritz.Algorithm.PianolaMusic
                     midiChordDef.MsPositionReFirstUD = newStart; // Update the start position
                 }
 
-                voiceDef.AssertConsistency(); // Ensure the Trk remains consistent
+                trk.AssertConsistency(); // Ensure the Trk remains consistent
             }
 
-            foreach(var voiceDef in voiceDefs)
+            foreach(var trkList in interpretations)
             {
-                for(int i = 1; i < voiceDef.Trks.Count; ++i)
+                for(int i = 1; i < trkList.Count; ++i)
                 {
-                    voiceDef.Trks[i].MsDuration = voiceDef.Trks[0].MsDuration;
+                    trkList[i].MsDuration = trkList[0].MsDuration;
                 }
             }
         }
@@ -209,9 +257,10 @@ namespace Moritz.Algorithm.PianolaMusic
             return warpedPositions;
         }
 
-        private static List<VoiceDef> GetFourTrkVoiceDefs(List<Trk> originalTrks)
+        private static List<List<Trk>> GetFourInterpretationsPerTrk(List<Trk> originalTrks)
         {
-            List<VoiceDef> voiceDefs = new List<VoiceDef>();
+            List<List<Trk>> trksPerTrk = new List<List<Trk>>();
+
             foreach(var originalTrk in originalTrks)
             {
                 // Preserve the original Trk as Trks[0]
@@ -222,11 +271,11 @@ namespace Moritz.Algorithm.PianolaMusic
                 Trk trk2 = (Trk)trk0.Clone();
                 Trk trk3 = (Trk)trk0.Clone();
 
-                // Add all four Trks to the VoiceDef
-                voiceDefs.Add(new VoiceDef(new List<Trk>() { trk0, trk1, trk2, trk3 }));
+                // Add all four Trks to the interpretations
+                trksPerTrk.Add(new List<Trk>(){ trk0, trk1, trk2, trk3 });
             }
 
-            return voiceDefs;
+            return trksPerTrk;
         }
 
         private static List<List<int>> TrackDurations(List<int> firstHalfUpperTrack)
@@ -287,7 +336,7 @@ namespace Moritz.Algorithm.PianolaMusic
             return defs;
         }
 
-        private List<Trk> GetTrks(int upperChannel, List<int> upperTrackPitches, int lowerChannel, List<int> lowerTrackPitches, List<List<int>> durations)
+        private List<Trk> GetTrks(List<int> upperTrackPitches, List<int> lowerTrackPitches, List<List<int>> durations)
         {
             List<IUniqueDef> t1MidiChordDefs = GetMidiChordDefs(upperTrackPitches, durations[0]);
             Trk trk1 = new Trk(t1MidiChordDefs);
@@ -327,7 +376,7 @@ namespace Moritz.Algorithm.PianolaMusic
             List<List<int>> durations = TrackDurations(first48Track1Durations);
             #endregion durations
 
-            return GetTrks(0, t1Pitches, 5, t6Pitches, durations);
+            return GetTrks(t1Pitches, t6Pitches, durations);
         }
 
         private List<Trk> GetTracks2and5()
@@ -353,7 +402,7 @@ namespace Moritz.Algorithm.PianolaMusic
             List<List<int>> durations = TrackDurations(first48Track2Durations);
             #endregion durations
 
-            return GetTrks(1, t2Pitches, 4, t5Pitches, durations);
+            return GetTrks(t2Pitches, t5Pitches, durations);
         }
 
         private List<Trk> GetTracks3and4()
@@ -379,7 +428,7 @@ namespace Moritz.Algorithm.PianolaMusic
             List<List<int>> durations = TrackDurations(first48Track3Durations);
             #endregion durations
 
-            return GetTrks(2, t3Pitches, 3, t4Pitches, durations);
+            return GetTrks(t3Pitches, t4Pitches, durations);
         }
 
         /// <summary>

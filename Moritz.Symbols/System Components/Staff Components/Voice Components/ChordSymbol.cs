@@ -21,26 +21,26 @@ namespace Moritz.Symbols
             // Beam is currently null. Create when necessary.
         }
 
-        public ChordSymbol(Voice voice, MidiChordDef umcd, int absMsPosition, PageFormat pageFormat)
-            : this(voice, umcd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight, umcd.BeamContinues)
+        public ChordSymbol(Voice voice, MidiChordDef midiChordDef, int absMsPosition, PageFormat pageFormat)
+            : this(voice, midiChordDef.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight, midiChordDef.BeamContinues)
         {
-            MidiChordDefs.Add(umcd);
+            MidiChordDef = midiChordDef;
 
-            _msDurationToNextBarline = umcd.MsDurationToNextBarline;
+            _msDurationToNextBarline = midiChordDef.MsDurationToNextBarline;
 
-            SetNoteheadPitchesAndVelocities(umcd.Pitches, umcd.Velocities);
+            SetNoteheadPitchesAndVelocities(midiChordDef.Pitches, midiChordDef.Velocities);
 
-            if(!String.IsNullOrEmpty(umcd.OrnamentText))
+            if(!String.IsNullOrEmpty(midiChordDef.OrnamentText))
             {
                 // if umcd.OrnamentText is null or empty, there will be no ornamentString DrawObject
-                string ornamentString = String.Concat('~', umcd.OrnamentText);
+                string ornamentString = String.Concat('~', midiChordDef.OrnamentText);
                 OrnamentText ornamentText = new OrnamentText(this, ornamentString, pageFormat.OrnamentFontHeight);
                 DrawObjects.Add(ornamentText);
             }
 
-            if(umcd.Lyric != null)
+            if(midiChordDef.Lyric != null)
             {
-                LyricText lyric = new LyricText(this, umcd.Lyric, FontHeight);
+                LyricText lyric = new LyricText(this, midiChordDef.Lyric, FontHeight);
                 DrawObjects.Add(lyric);
             }
         }
@@ -104,17 +104,6 @@ namespace Moritz.Symbols
                     this.HeadsTopDown[i].DisplayAccidental = DisplayAccidental.force;
                 }
             }
-        }
-
-        /// <summary>
-        /// Adds the argument to the chord's private list of MidiChordDefs. 
-        /// </summary>
-        /// <param name="midiChordDef"></param>
-        /// <returns>The number of midiChordDefs after adding the argument.</returns>
-        public int AddMidiChordDef(MidiChordDef midiChordDef)
-        {
-            MidiChordDefs.Add(midiChordDef);
-            return MidiChordDefs.Count;
         }
 
         internal void SetNoteheadColorClasses()
@@ -186,12 +175,14 @@ namespace Moritz.Symbols
 
             w.WriteStartElement("score", "midiChords", null);
 
+            var midiDefs = MidiChordDef.MidiDefs;
             // write a list of alternative <midiChord> elements
-            for(var trkIndex = 0; trkIndex < MidiChordDefs.Count; trkIndex++)
+            for(var mdIndex = 0; mdIndex < midiDefs.Count; mdIndex++)
             {                 
-                var midiChordDef = MidiChordDefs[trkIndex];
+                MidiChordDef midiDef = midiDefs[mdIndex] as MidiChordDef;
+                Debug.Assert(midiDef != null);
                 // writes a "midiChord" element
-                midiChordDef.WriteSVG(w, channel);  // writes a midiChord element
+                midiDef.WriteSVG(w, channel);  // writes a midiChord element
             }
 
             w.WriteEndElement(); // end score:midiChords
@@ -206,7 +197,7 @@ namespace Moritz.Symbols
             return sb.ToString();
         }
 
-        public List<MidiChordDef> MidiChordDefs = new List<MidiChordDef>();
+        public MidiChordDef MidiChordDef = null;
 
         public VerticalDir DefaultStemDirection(Clef clef)
         {

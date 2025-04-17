@@ -38,25 +38,23 @@ namespace Moritz.Algorithm.Study1
             Trk trk0 = GetTrk0(trackChordNumbers, trackRootPitches);
             // parallel Trks must have the same number and types of contained UniqueDefs
             // but they can have different durations and MIDI definitions
-            Trk trk1 = GetTrk1(trk0);
+            Trk trk1 = GetTrk1(trk0); 
             Trk trk2 = GetTrk2(trk1);
             Trk trk3 = GetTrk3(trk2);
 
-            List<Trk> channelTrks = new List<Trk>() { trk0, trk1, trk2, trk3 }; // all in the same channel
-            var voiceDef = new VoiceDef(channelTrks);
-            List<VoiceDef> voiceDefs = new List<VoiceDef>() { voiceDef };
+            List<Trk> mainTrks = new List<Trk>() { trk0, trk1, trk2, trk3 }; // all in the same channel
 
-            Debug.Assert(voiceDefs.Count == NumberOfVoices);
+            Debug.Assert(mainTrks.Count == NumberOfVoices);
 
-            TemporalStructure temporalStructure = new TemporalStructure(voiceDefs);
+            TemporalStructure temporalStructure = new TemporalStructure(mainTrks);
 
             temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
 
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(temporalStructure.Trks0, NumberOfBars);
+            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainTrks, NumberOfBars);
 
             List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
 
-            SetPatch0InTheFirstChordInEachVoice(bars[0]);
+            SetPatch0InTheFirstChordInEachTrk(bars[0]);
 
             InsertClefChanges(bars, pageFormat.VoiceIndicesPerStaff);
 
@@ -86,10 +84,10 @@ namespace Moritz.Algorithm.Study1
         {
             var trk1 = (Trk)trk0.Clone();
 
-            foreach(var midiChordDef in trk1.MidiChordDefs)
-            {
+            //foreach(var midiChordDef in trk1.MidiChordDefs)
+            //{
 
-            }
+            //}
 
             trk1.AssertConsistency();
 
@@ -99,10 +97,10 @@ namespace Moritz.Algorithm.Study1
         {
             var trk2 = (Trk)trk1.Clone();
 
-            foreach(var midiChordDef in trk2.MidiChordDefs)
-            {
+            //foreach(var midiChordDef in trk2.MidiChordDefs)
+            //{
 
-            }
+            //}
 
             trk2.AssertConsistency();
 
@@ -112,10 +110,10 @@ namespace Moritz.Algorithm.Study1
         {
             var trk3 = (Trk)trk2.Clone();
 
-            foreach(var midiChordDef in trk2.MidiChordDefs)
-            {
+            //foreach(var midiChordDef in trk2.MidiChordDefs)
+            //{
 
-            }
+            //}
 
             trk3.AssertConsistency();
 

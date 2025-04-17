@@ -3,6 +3,7 @@ using Moritz.Xml;
 
 using System;
 using System.Diagnostics;
+using System.Runtime.Remoting.Channels;
 
 namespace Moritz.Spec
 {
@@ -19,16 +20,31 @@ namespace Moritz.Spec
 
         public override object Clone()
         {
-            return new RestDef(this.MsPositionReFirstUD, this.MsDuration);
+            RestDef returnVal =  new RestDef(this.MsPositionReFirstUD, this.MsDuration);
+
+            foreach(var midiDef in this.MidiDefs)
+            {
+                returnVal.MidiDefs.Add((RestDef)midiDef.Clone());
+            }
+
+            return returnVal;
         }
 
         public void WriteSVG(SvgWriter w)
 		{
-			w.WriteStartElement("midiRest");
+            w.WriteStartElement("score", "midiRests", null);
 
-			w.WriteAttributeString("msDuration", MsDuration.ToString());
+            // write a list of alternative <midiRest> elements
+            for(var mdIndex = 0; mdIndex < MidiDefs.Count; mdIndex++)
+            {
+                RestDef restDef = MidiDefs[mdIndex] as RestDef;
+                Debug.Assert(restDef != null);
+                w.WriteStartElement("midiRest");
+                w.WriteAttributeString("msDuration", restDef.MsDuration.ToString());
+                w.WriteEndElement(); // end midiRest
+            }
 
-			w.WriteEndElement(); // score:midiRest
+            w.WriteEndElement(); // end score:midiRests
 		}
 
 		public override string ToString()

@@ -13,11 +13,12 @@ namespace Moritz.Spec
     /// The TemporalStructure is a single Bar without graphic information.
     /// It consists of a List of Trks (one per midi channel), each of which
     /// can contain only DurationDefs (i.e. MidiChordDefs and RestDefs)
+    /// The MidiDef properties of the MidiChordDefs and RestDefs have been set to thei alternative interpretations.
     /// </summary>
     public class TemporalStructure : Bar
     {
-        public TemporalStructure(List<VoiceDef> voiceDefs)
-            : base(0, voiceDefs)
+        public TemporalStructure(List<Trk> trks)
+            : base(0, trks)
         {
         }
 
@@ -25,15 +26,12 @@ namespace Moritz.Spec
 
         public override void AssertConsistency()
         {
-            foreach(var voiceDef in VoiceDefs)
+            foreach(var trk in Trks)
             {
-                foreach(var trk in voiceDef.Trks)
+                foreach(var uniqueDef in trk.UniqueDefs)
                 {
-                    foreach(var uniqueDef in trk.UniqueDefs)
-                    {
-                        Debug.Assert(uniqueDef is MidiChordDef || uniqueDef is RestDef);
-                        Debug.Assert(!(uniqueDef is CautionaryChordDef || uniqueDef is ClefDef));
-                    }
+                    Debug.Assert(uniqueDef is MidiChordDef || uniqueDef is RestDef);
+                    Debug.Assert(!(uniqueDef is CautionaryChordDef || uniqueDef is ClefDef));
                 }
             }
 
@@ -63,7 +61,7 @@ namespace Moritz.Spec
             }
 
             List<Bar> bars = new List<Bar>();
-            int totalDurationBeforePop = Trks0[0].MsDuration;  // all Trks0 have the same duration
+            int totalDurationBeforePop = Trks[0].MsDuration;  // all default interpretations have the same duration
             Bar remainingBar = (Bar)this;
             foreach(int barMsDuration in barMsDurations)
             {
@@ -72,10 +70,10 @@ namespace Moritz.Spec
                 Bar poppedBar = rTuple.Item1;
                 remainingBar = rTuple.Item2; // null after the last pop.
 
-                int poppedMsDuration = poppedBar.Trks0[0].MsDuration;
+                int poppedMsDuration = poppedBar.Trks[0].MsDuration;
                 if(remainingBar != null)
                 {
-                    int remainingMsDuration = remainingBar.Trks0[0].MsDuration;
+                    int remainingMsDuration = remainingBar.Trks[0].MsDuration;
                     Debug.Assert(poppedMsDuration == barMsDuration);
 
                     Debug.Assert(poppedMsDuration + remainingMsDuration == totalDurationBeforePop);
@@ -120,14 +118,13 @@ namespace Moritz.Spec
             }
 
             int currentMsPos = -1;
-            List<Trk> trks0 = Trks0;
 
             foreach(int msPosition in barlineMsPositionsReTrk0)
             {
                 Debug.Assert(msPosition > currentMsPos, "Value out of order.");
                 currentMsPos = msPosition;
                 bool found = false;
-                foreach(var trk in trks0)
+                foreach(var trk in Trks)
                 {
                     foreach(IUniqueDef iud in trk.UniqueDefs)
                     {
@@ -158,7 +155,7 @@ namespace Moritz.Spec
         {
             Debug.Assert(poppedBarMsDuration > 0);
 
-            if(poppedBarMsDuration == bar.VoiceDefs[0].Trks[0].MsDuration)
+            if(poppedBarMsDuration == bar.Trks[0].MsDuration)
             {
                 return new Tuple<Bar, Bar>(bar, null);
             }
@@ -166,36 +163,32 @@ namespace Moritz.Spec
             int poppedAbsMsPosition = bar.AbsMsPosition;
             int remainingAbsMsPosition = poppedAbsMsPosition + poppedBarMsDuration;
 
-            List<VoiceDef> poppedVoiceDefs = new List<VoiceDef>();
-            List<VoiceDef> remainingVoiceDefs = new List<VoiceDef>();
+            List<Trk> poppedTrks = new List<Trk>();
+            List<Trk> remainingTrks = new List<Trk>();
 
-            foreach(VoiceDef voiceDef in bar.VoiceDefs)
+            foreach(Trk trk in bar.Trks)
             {
-                Tuple<VoiceDef, VoiceDef> voiceDefs = voiceDef.PopVoiceDef(poppedBarMsDuration);
+                Tuple<Trk, Trk, double?> popTrk = trk.PopTrk(poppedBarMsDuration);
 
-                poppedVoiceDefs.Add(voiceDefs.Item1);
-                remainingVoiceDefs.Add(voiceDefs.Item2);
+                poppedTrks.Add(popTrk.Item1);
+                remainingTrks.Add(popTrk.Item2);
             }
 
-            JustifyMsDurations(poppedVoiceDefs);
-            JustifyMsDurations(remainingVoiceDefs);
+            JustifyMsDurations(poppedTrks);
+            JustifyMsDurations(remainingTrks);
 
-            var poppedBar = new Bar(poppedAbsMsPosition, poppedVoiceDefs);
-            var remainingBar = new Bar(remainingAbsMsPosition, remainingVoiceDefs);
+            var poppedBar = new Bar(poppedAbsMsPosition, poppedTrks);
+            var remainingBar = new Bar(remainingAbsMsPosition, remainingTrks);
 
             return new Tuple<Bar, Bar>(poppedBar, remainingBar);
         }
 
-        private void JustifyMsDurations(List<VoiceDef> voiceDefs)
+        private void JustifyMsDurations(List<Trk> trks)
         {
-            var nTrks = voiceDefs[0].Trks.Count;
-            for(int trkIndex = 0; trkIndex < nTrks; trkIndex++)
+            int topTrkMsDuration = trks[0].MsDuration;
+            for(int trkIndex = 1; trkIndex < trks.Count; trkIndex++)
             {
-                int topTrkMsDuration = voiceDefs[0].Trks[trkIndex].MsDuration;
-                for(int voiceIndex = 1; voiceIndex < voiceDefs.Count; voiceIndex++)
-                {
-                    voiceDefs[voiceIndex].Trks[trkIndex].MsDuration = topTrkMsDuration;
-                }
+                trks[trkIndex].MsDuration = topTrkMsDuration;
             }
         }
     }
