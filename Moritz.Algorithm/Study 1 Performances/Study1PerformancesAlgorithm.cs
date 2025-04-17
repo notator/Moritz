@@ -163,10 +163,10 @@ namespace Moritz.Algorithm.Study1
                 int chordNumber = trackChordNumbers[i];
                 int pitchNumber = trackRootPitches[i];
 
-                IUniqueDef midiChordDef = GetMidiChordDef(chordIntervals[chordNumber - 1], chordVelocities[chordNumber - 1], chordDurations[chordNumber - 1], pitchNumber, chordMsPosition);
+                MidiChordDef midiChordDef = GetMidiChordDef(chordIntervals[chordNumber - 1], chordVelocities[chordNumber - 1], chordDurations[chordNumber - 1], pitchNumber, chordMsPosition);
                 chordMsPosition += midiChordDef.MsDuration;
 
-                trk0.UniqueDefs.Add(midiChordDef);
+                trk0.UniqueDefs.Add((IUniqueDef)midiChordDef);
             }
 
             trk0.AssertConsistency();
@@ -174,12 +174,12 @@ namespace Moritz.Algorithm.Study1
             return trk0;
         }
 
-        private IUniqueDef GetMidiChordDef(List<int> chordIntervals, int chordVelocity, int chordDuration, int relativePitch, int msPosition)
+        private MidiChordDef GetMidiChordDef(List<int> chordIntervals, int chordVelocity, int chordDuration, int relativePitch, int msPosition)
         {
             List<int> pitches = GetPitches(relativePitch, chordIntervals);
             List<int> velocities = GetVelocities(chordVelocity, chordIntervals.Count() + 1);
 
-            IUniqueDef midiChordDef = new MidiChordDef(pitches, velocities, chordDuration, true)
+            MidiChordDef midiChordDef = new MidiChordDef(pitches, velocities, chordDuration, true)
             {
                 MsPositionReFirstUD = msPosition
             };

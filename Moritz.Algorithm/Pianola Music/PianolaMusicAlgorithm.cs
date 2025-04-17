@@ -281,7 +281,7 @@ namespace Moritz.Algorithm.PianolaMusic
                 {
                     MsPositionReFirstUD = msPosition
                 };
-                defs.Add(midiChordDef);
+                defs.Add((IUniqueDef)midiChordDef);
                 msPosition += msDuration;
             }
             return defs;

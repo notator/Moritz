@@ -29,7 +29,7 @@ namespace Moritz.Spec
     ///     4. An optional set of (single) midi control messages that will be sent before the NoteOns.
     ///     5. An optional control envelope that will be sent over the duration of the midiChord.
     ///</summary>
-    public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
+    public class MidiChordDef : DurationDef
     {
         #region constructors
         /// <summary>
@@ -496,7 +496,7 @@ namespace Moritz.Spec
         }
         #endregion utilities
 
-        #region IUniqueChordDef
+ 
         /// <summary>
         /// Transposes the Pitches by the number of semitones given in the argument interval.
         /// Negative interval values transpose down.
@@ -609,7 +609,6 @@ namespace Moritz.Spec
             }
         }
 
-        #endregion IUniqueChordDef
 
         #region properties
         private List<int> _pitches = new List<int>();

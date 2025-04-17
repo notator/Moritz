@@ -145,7 +145,7 @@ namespace Moritz.Algorithm.ErratumMusical
                 {
                     MsPositionReFirstUD = msPosition
                 };
-                defs.Add(midiChordDef);
+                defs.Add((IUniqueDef)midiChordDef);
                 msPosition += msDuration;
             }
             return defs;

@@ -95,9 +95,9 @@ namespace Moritz.Symbols
                                 }
                             }
 
-                            if(iud is IUniqueSplittableChordDef iscd && iscd.MsDurationToNextBarline != null)
+                            if(iud is MidiChordDef mcd && mcd.MsDurationToNextBarline != null)
                             {
-                                msPositionReVoiceDef += (int)iscd.MsDurationToNextBarline;
+                                msPositionReVoiceDef += (int)mcd.MsDurationToNextBarline;
                             }
                             else
                             {

@@ -205,7 +205,7 @@ namespace Moritz.Algorithm.ThreeCrashes
                 {
                     MsPositionReFirstUD = msPosition
                 };
-                defs.Add(midiChordDef);
+                defs.Add((IUniqueDef)midiChordDef);
                 msPosition += msDuration;
             }
             return defs;

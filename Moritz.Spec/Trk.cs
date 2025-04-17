@@ -124,17 +124,16 @@ namespace Moritz.Spec
                         // This error can happen if an attempt is made to set barlines too close together,
                         // i.e. (I think) if an attempt is made to create a bar that contains nothing... 
                     }
-                    else if(iud is MidiChordDef)
+                    else if(iud is MidiChordDef mcd)
                     {
                         if(durationBeforeBarline > 0 && durationAfterBarline > 0)
                         {
-                            IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
-                            uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
-                            poppedTrk.UniqueDefs.Add(uniqueChordDef);
+                            mcd.MsDurationToNextBarline = durationBeforeBarline;
+                            poppedTrk.UniqueDefs.Add((IUniqueDef) mcd);
 
                             Debug.Assert(remainingTrk.UniqueDefs.Count == 0);
-                            CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
-                            remainingTrk.UniqueDefs.Add(ccd);
+                            CautionaryChordDef ccd = new CautionaryChordDef(mcd, durationAfterBarline);
+                            remainingTrk.UniqueDefs.Add((IUniqueDef)ccd);
 
                             finalSplitProportion = (double)durationBeforeBarline / (durationBeforeBarline + durationAfterBarline);
                         }
@@ -290,9 +289,9 @@ namespace Moritz.Spec
         {
             for(int index = 0; index < _uniqueDefs.Count; ++index)
             {
-                if(_uniqueDefs[index] is IUniqueSplittableChordDef lmcd)
+                if(_uniqueDefs[index] is MidiChordDef mcd)
                 {
-                    lmcd.Lyric = index.ToString();
+                    mcd.Lyric = index.ToString();
                 }
             }
         }
@@ -365,9 +364,9 @@ namespace Moritz.Spec
 
         #region Transpose
         /// <summary>
-        /// Transpose all the IUniqueChordDefs from beginIndex to (excluding) endIndex
+        /// Transpose all the MidiChordDefs from beginIndex to (excluding) endIndex
         /// up by the number of semitones given in the interval argument.
-        /// IUniqueChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
+        /// MidiChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
         /// Negative interval values transpose down.
         /// It is not an error if Midi pitch values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
@@ -379,7 +378,7 @@ namespace Moritz.Spec
             {
                 for(int i = beginIndex; i < endIndex; ++i)
                 {
-                    if(_uniqueDefs[i] is IUniqueChordDef iucd)
+                    if(_uniqueDefs[i] is MidiChordDef iucd)
                     {
                         iucd.Transpose(interval);
                     }
@@ -405,7 +404,7 @@ namespace Moritz.Spec
         {
             foreach(IUniqueDef iud in _uniqueDefs)
             {
-                if(iud is IUniqueChordDef iucd)
+                if(iud is MidiChordDef iucd)
                 {
                     List<int> midiPitches = iucd.Pitches;
                     for(int i = 0; i < midiPitches.Count; ++i)
@@ -416,7 +415,7 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Each IUniqueChordDef is transposed by the interval current at its position.
+        /// Each MidiChordDef is transposed by the interval current at its position.
         /// The argument contains a dictionary[msPosition, transposition].
         /// </summary>
         /// <param name="msPosTranspositionDict"></param>
@@ -434,7 +433,7 @@ namespace Moritz.Spec
                 {
                     if(_uniqueDefs[j].MsPositionReFirstUD >= currentMsPosReFirstIUD)
                     {
-                        if(_uniqueDefs[j] is IUniqueChordDef iucd)
+                        if(_uniqueDefs[j] is MidiChordDef iucd)
                         {
                             iucd.Transpose(transposition);
                         }
@@ -463,7 +462,7 @@ namespace Moritz.Spec
                     double step = interval;
                     for(int i = beginIndex; i < endIndex; ++i)
                     {
-                        IUniqueChordDef iucd = _uniqueDefs[i] as IUniqueChordDef;
+                        MidiChordDef iucd = _uniqueDefs[i] as MidiChordDef;
                         if(iucd != null)
                         {
                             iucd.Transpose((int)Math.Round(interval));

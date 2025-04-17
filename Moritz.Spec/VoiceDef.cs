@@ -55,7 +55,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Returns two VoiceDefs (each having the same voice index)
-        /// Item1.Trks[0] contains the IUniqueDefs (including IUniqueSplittableChordDefs) that begin within Trk0's poppedMsDuration.
+        /// Item1.Trks[0] contains the IUniqueDefs (including MidiChordDefs) that begin within Trk0's poppedMsDuration.
         /// Item2.Trks[0] contains the remaining IUniqueDefs (including CautionaryChordDefs) from the original voiceDef.Trks.
         /// The remaining Trks in Item1 and Item2 are parallel IUniqueDefs (that can have other durations).
         /// The popped IUniqueDefs are removed from the current voiceDef before returning it as Item2.
@@ -124,8 +124,8 @@ namespace Moritz.Spec
                         var msDurationAfterBarline = lastMsDuration - (int)lmcd.MsDurationToNextBarline;
                         if(lmcd.MsDurationToNextBarline > 0 && msDurationAfterBarline > 0)
                         {
-                            var cautionaryChordDef = new CautionaryChordDef(lmcd, 0, msDurationAfterBarline);
-                            remainingIUDs.Insert(0, cautionaryChordDef);
+                            var cautionaryChordDef = new CautionaryChordDef(lmcd, msDurationAfterBarline);
+                            remainingIUDs.Insert(0, (IUniqueDef)cautionaryChordDef);
                         }
                         else if(lmcd.MsDurationToNextBarline == 0)
                         {

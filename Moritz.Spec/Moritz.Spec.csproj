@@ -70,9 +70,7 @@
     <Compile Include="TrkRef.cs" />
     <Compile Include="DurationDef.cs" />
     <Compile Include="TrkOptions.cs" />
-    <Compile Include="IUniqueChordDef.cs" />
     <Compile Include="IUniqueDef.cs" />
-    <Compile Include="IUniqueSplittableChordDef.cs" />
     <Compile Include="MidiChordDef.cs" />
     <Compile Include="MidiChordControlDef.cs" />
     <Compile Include="Trk.cs" />
