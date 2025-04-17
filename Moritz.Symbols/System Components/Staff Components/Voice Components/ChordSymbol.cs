@@ -117,17 +117,6 @@ namespace Moritz.Symbols
             return MidiChordDefs.Count;
         }
 
-        /// <summary>
-        /// Throws an exception if the argument (index) is out of range. 
-        /// </summary>
-        /// <param name="indexInPrivateMidiChordDefsList"></param>
-        /// <returns>A deep clone of the MidiChordDef at the given index</returns>
-        public MidiChordDef GetMidiChordDefClone(int indexInPrivateMidiChordDefsList)
-        {
-            Debug.Assert(indexInPrivateMidiChordDefsList >= 0 && indexInPrivateMidiChordDefsList < MidiChordDefs.Count);
-            return (MidiChordDef)MidiChordDefs[indexInPrivateMidiChordDefsList].Clone();
-        }
-
         internal void SetNoteheadColorClasses()
         {
             foreach(Head head in HeadsTopDown)
