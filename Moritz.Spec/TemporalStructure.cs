@@ -17,14 +17,16 @@ namespace Moritz.Spec
     /// </summary>
     public class TemporalStructure : Bar
     {
-        public TemporalStructure(List<Trk> trks)
+        public TemporalStructure(List<Trk> trks, List<List<Trk>> interpretations = null)
             : base(0, trks)
         {
+            if(interpretations != null)
+            {
+                AssertConsistency(interpretations);
+            }
         }
 
-
-
-        public override void AssertConsistency()
+        public void AssertConsistency(List<List<Trk>> interpretations)
         {
             foreach(var trk in Trks)
             {
@@ -35,7 +37,50 @@ namespace Moritz.Spec
                 }
             }
 
-            base.AssertConsistency();
+            CheckTrksConsistency(interpretations);
+
+            CheckInterpretationConsistency(interpretations);
+        }
+
+        private void CheckTrksConsistency(List<List<Trk>> interpretations)
+        {
+            foreach(var trk in Trks)
+            {
+                trk.AssertConsistency();
+            }        
+
+            // All Trks in this TemporalStructure have the same msDuration within the same interpretation.
+            for(int interpIndex = 0; interpIndex < interpretations[0].Count; ++interpIndex)
+            {
+                int interp0MsDuration = interpretations[0][interpIndex].MsDuration;
+                for(int trkIndex = 1; trkIndex < Trks.Count; ++trkIndex)
+                {
+                    Trk interpTrk = interpretations[trkIndex][interpIndex];
+                    Debug.Assert(interpTrk.MsDuration == interp0MsDuration);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The overall sequence of events (DurationDefs) must be identical in all interpretations.
+        /// </summary>
+        /// <param name="nTrks"></param>
+        /// <param name="nInterpretations"></param>
+        private void CheckInterpretationConsistency(List<List<Trk>> interpretations)
+        {
+            List<IUniqueDef> topIuds = interpretations[0][0].UniqueDefs;
+            for(int i = 0; i < topIuds.Count; i++)
+            {
+                var topIud = topIuds[i];
+                for(int trkIndex = 0; trkIndex < Trks.Count; trkIndex++)
+                {
+                    for(int interpIndex = 0; interpIndex < interpretations[0].Count; interpIndex++)
+                    {
+                        List<IUniqueDef> localIuds = interpretations[trkIndex][interpIndex].UniqueDefs;
+                        Debug.Assert((topIud is MidiChordDef && localIuds[i] is MidiChordDef) || (topIud is RestDef && localIuds[i] is RestDef));
+                    }
+                }
+            }
         }
 
         /// Converts this temporalStructure to a list of bars, consuming the temporalStructure's voiceDefs.

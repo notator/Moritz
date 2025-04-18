@@ -33,8 +33,8 @@ namespace Moritz.Spec
             }
             #endregion conditions
 
-            _absMsPosition = absMsPosition;
-            _trks = trks;
+            AbsMsPosition = absMsPosition;
+            Trks = trks;
 
             AssertConsistency();
         }
@@ -161,25 +161,13 @@ namespace Moritz.Spec
             }
         }
 
-        public int AbsMsPosition
-        {
-            get { return _absMsPosition; }
-            set
-            {
-                Debug.Assert(value >= 0);
-                _absMsPosition = value;
-            }
-        }
-
-        private int _absMsPosition = 0;
-
         public override string ToString()
         {
             return $"AbsMsPosition={AbsMsPosition}, nTrks={Trks.Count}, nInterpretations={Trks[0].InterpretationsCount}";
         }
 
-        public IReadOnlyList<Trk> Trks { get => _trks; }
-        private readonly List<Trk> _trks = new List<Trk>();
+        public int AbsMsPosition { get; private set; }
+        public IReadOnlyList<Trk> Trks { get; private set; } = new List<Trk>();
 
         #endregion old Bar
 
@@ -198,49 +186,9 @@ namespace Moritz.Spec
         {
             Debug.Assert(AbsMsPosition >= 0);
             Debug.Assert(Trks.Count > 0);
-
-            int nTrks = Trks.Count;
-            int nInterpretations = Trks[0].InterpretationsCount;
-
-            CheckTrksConsistency(nTrks, nInterpretations);
-
-            CheckInterpretationConsistency(nTrks, nInterpretations);
         }
 
-        private void CheckTrksConsistency(int nTrks, int nInterpretations)
-        {
-            foreach(var trk in Trks)
-            {
-                trk.AssertConsistency();
-            }
-
-            
-            List<List<Trk>> interpretationsPerTrack = new List<List<Trk>>();
-            for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
-            {
-                var trk = Trks[trkIndex];
-                Debug.Assert(trk.InterpretationsCount == nInterpretations);
-                var interpretations = new List<Trk>();
-                for(int interpIndex = 0; interpIndex < nInterpretations; ++interpIndex)
-                {
-                    interpretations.Add(GetInterpretation(trkIndex, interpIndex));
-                }
-                interpretationsPerTrack.Add(interpretations);
-            }
-
-            // All Trks in this Bar have the same msDuration within the same interpretation.
-            for(int interpIndex = 0; interpIndex < nInterpretations; ++interpIndex)
-            {
-                int interp0MsDuration = interpretationsPerTrack[0][interpIndex].MsDuration;
-                for(int trkIndex = 1; trkIndex < nTrks; ++trkIndex)
-                {
-                    Trk interpTrk = interpretationsPerTrack[trkIndex][interpIndex];
-                    Debug.Assert(interpTrk.MsDuration == interp0MsDuration);
-                }                
-            }
-        }
-
-        private Trk GetInterpretation(int trkIndex, int interpIndex)
+        protected Trk GetInterpretation(int trkIndex, int interpIndex)
         {
             Trk returnTrk = new Trk();
             var mainUniqueDefs = Trks[trkIndex].UniqueDefs;
@@ -257,28 +205,6 @@ namespace Moritz.Spec
                 }
             }
             return returnTrk;
-        }
-
-        /// <summary>
-        /// The overall sequence of events (DurationDefs) must be identical in all interpretations.
-        /// </summary>
-        /// <param name="nTrks"></param>
-        /// <param name="nInterpretations"></param>
-        private void CheckInterpretationConsistency(int nTrks, int nInterpretations)
-        {
-            List<IUniqueDef> topIuds = GetInterpretation(0, 0).UniqueDefs;
-            for(int i = 0; i < topIuds.Count; i++)
-            {
-                var topIud = topIuds[i];
-                for(int trkIndex = 0; trkIndex < nTrks; trkIndex++)
-                {
-                    for(int interpIndex = 0; interpIndex < nInterpretations; interpIndex++)
-                    {
-                        List<IUniqueDef> localIuds = GetInterpretation(trkIndex, interpIndex).UniqueDefs;
-                        Debug.Assert((topIud is MidiChordDef && localIuds[i] is MidiChordDef) || (topIud is RestDef && localIuds[i] is RestDef));
-                    }                     
-                }
-            }
         }
 
         public int MsDuration { get => Trks[0].MsDuration; }

@@ -88,6 +88,52 @@ namespace Moritz.Algorithm
         }
 
         /// <summary>
+        /// Returns one Trk per voice, containing MidiChordDefs and RestDefs whose MidiDef 
+        /// properties have been set to their alternative Trk values.
+        /// </summary>
+        /// <param name="voiceDefs"></param>
+        protected List<Trk> GetMainTrks(List<List<Trk>> interpretations)
+        {
+            List<Trk> returnTrks = new List<Trk>();
+
+            foreach(var trkList in interpretations)
+            {
+                var iuds = trkList[0].UniqueDefs;
+                for(int i = 0; i < iuds.Count; ++i)
+                {
+                    var iud = iuds[i];
+                    if(iud is MidiChordDef mcd)
+                    {
+                        mcd.MidiDefs.Add(mcd); // the first MidiDef is always the one that defines the Chord's appearance.
+                        for(int j = 1; j < trkList.Count; ++j)
+                        {
+                            MidiChordDef subMcd = trkList[j].UniqueDefs[i] as MidiChordDef;
+                            Debug.Assert(subMcd != null);
+                            mcd.MidiDefs.Add(subMcd);
+                        }
+                    }
+                    else if(iud is RestDef restDef)
+                    {
+                        restDef.MidiDefs.Add(restDef);  // the first MidiDef is always the one that defines the Rest's appearance.
+                        for(int j = 1; j < trkList.Count; ++j)
+                        {
+                            RestDef subRestDef = trkList[j].UniqueDefs[i] as RestDef;
+                            Debug.Assert(subRestDef != null);
+                            restDef.MidiDefs.Add(subRestDef);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Assert(false, "All VoiceDef.Trks must contain parallel duration types here!");
+                    }
+                }
+                returnTrks.Add(trkList[0]);
+            }
+
+            return returnTrks;
+        }
+
+        /// <summary>
         /// Defines the number of MIDI channels used by the algorithm.
         /// This number must be in range [1..16].
         /// Each voice in a score has a particular midi channel, so the number of midi channels is also the number of voices.

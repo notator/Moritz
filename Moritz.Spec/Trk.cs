@@ -32,7 +32,7 @@ namespace Moritz.Spec
         {
             _uniqueDefs = iuds;
 
-            AssertConsistency();;
+            AssertConsistency();
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Moritz.Spec
                             poppedTrk.UniqueDefs.Add(firstRestHalf);
 
                             RestDef secondRestHalf = new RestDef(poppedMsDuration, durationAfterBarline);
-                            remainingTrk.UniqueDefs.Add(secondRestHalf);
+                            remainingTrk.UniqueDefs.Insert(0, secondRestHalf);
 
                             finalSplitProportion = (double)durationBeforeBarline / (durationBeforeBarline + durationAfterBarline);
                         }
@@ -133,9 +133,11 @@ namespace Moritz.Spec
 
                             Debug.Assert(remainingTrk.UniqueDefs.Count == 0);
                             CautionaryChordDef ccd = new CautionaryChordDef(mcd, durationAfterBarline);
-                            remainingTrk.UniqueDefs.Add((IUniqueDef)ccd);
+                            remainingTrk.UniqueDefs.Insert(0, (IUniqueDef)ccd);
 
                             finalSplitProportion = (double)durationBeforeBarline / (durationBeforeBarline + durationAfterBarline);
+
+                            SplitInterpretations(mcd, ccd, (double)finalSplitProportion);
                         }
                         else if(durationBeforeBarline == 0)
                         {
@@ -155,13 +157,24 @@ namespace Moritz.Spec
                 }
             }
 
-            var msPositionOffset = remainingTrk.UniqueDefs[0].MsPositionReFirstUD;
-            foreach(var iud in  remainingTrk.UniqueDefs)
-            {
-                iud.MsPositionReFirstUD -= msPositionOffset;
-            }
+            remainingTrk.SetMsPositionsReFirstUD();
 
             return new Tuple<Trk, Trk, double?>(poppedTrk, remainingTrk, finalSplitProportion);
+        }
+
+        private void SplitInterpretations(MidiChordDef mcd, CautionaryChordDef ccd, double finalSplitProportion)
+        {
+            foreach(var durationDef in mcd.MidiDefs)
+            {
+                MidiChordDef midiChordDef = (MidiChordDef)durationDef;
+
+                int msBeforeBarline = (int)(midiChordDef.MsDuration * finalSplitProportion);
+                int msAfterBarline = midiChordDef.MsDuration - msBeforeBarline;
+
+                midiChordDef.MsDurationToNextBarline = msBeforeBarline;
+
+                ccd.MidiDefs.Add(new CautionaryChordDef(mcd, msAfterBarline));
+            }
         }
 
         #endregion constructors
