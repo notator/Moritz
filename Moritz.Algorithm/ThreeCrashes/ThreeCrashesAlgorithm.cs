@@ -19,7 +19,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         }
 
         public override int NumberOfVoices { get { return 3; } }
-        public override int NumberOfBars { get { return 27; } }
+        public override int NumberOfBars { get { return 11; } }
 
         private static readonly int nKeyboardPitches = 85;
         private readonly int transposition = (int)((127 - nKeyboardPitches) / 2); // 21 -- puts the range in middle of the MIDI range
@@ -173,8 +173,8 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             List<int> endBarlinePositions = GetEndBarlineMsPositions(firstATrkUIDs, firstBTrkUIDs, firstCTrkUIDs, msDuration);
 
-            //The global NumberOfBars is ignored!
-            // (is now endBarlinePositions.Count)) 
+            //The global NumberOfBars has been set to endBarlinePositions.Count.
+            //This sets one bar per system by default in the AssistantComposerForm.
 
             List<Bar> bars = singleBar.GetBars(endBarlinePositions);
 

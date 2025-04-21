@@ -49,7 +49,7 @@ namespace Moritz.Composer
 
             if(NumberOfVoicesPerStaffTextBox.Text == "")
             {
-                SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfVoices);
+                SetDefaultNumberOfVoicesPerStaff(_algorithm.NumberOfVoices);
             }
         }
         #region called from ctor
@@ -126,13 +126,12 @@ namespace Moritz.Composer
             SystemStartBarsHelpLabel.Text = "(" + numberOfBars.ToString() + " bars. Default is 1 bar per system)";
         }
         #endregion helpers
-        private void SetDefaultVoiceIndicesPerStaff(int nVoices)
+        private void SetDefaultNumberOfVoicesPerStaff(int nVoices)
         {
             StringBuilder voiceIndexList = new StringBuilder();
             for(int i = 0; i < nVoices; ++i)
             {
-                voiceIndexList.Append(i.ToString());
-                voiceIndexList.Append(", ");
+                voiceIndexList.Append("1, ");
             }
             voiceIndexList.Remove(voiceIndexList.Length - 2, 2);
             NumberOfVoicesPerStaffTextBox.Text = voiceIndexList.ToString();
