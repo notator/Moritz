@@ -2,6 +2,7 @@
 using Moritz.Xml;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Remoting.Channels;
 
@@ -52,6 +53,6 @@ namespace Moritz.Spec
 			return ("RestDef: MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString());
 		}
 
-
+        public List<RestDef> MidiDefs { get; set; } = new List<RestDef>();
     }
 }

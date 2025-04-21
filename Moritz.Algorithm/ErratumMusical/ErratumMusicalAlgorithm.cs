@@ -119,7 +119,7 @@ namespace Moritz.Algorithm.ErratumMusical
 
             List<Bar> bars = singleBar.GetBars(endBarlinePositions);
 
-            SetPatch0InTheFirstChordInEachTrk(bars[0]);
+            SetInitialChordControls(bars[0]);
 
             return bars;
         }

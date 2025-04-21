@@ -429,11 +429,15 @@ namespace Moritz.Algorithm
         /// since it will be set by shunting if the Assistant Performer starts later.
         /// This function only sets the patch in the first interpretation of the first chord.
         /// </summary>
-        protected void SetPatch0InTheFirstChordInEachTrk(Bar bar1)
+        protected virtual void SetInitialChordControls(Bar bar1)
         {
             foreach(Trk trk in bar1.Trks)
             {
-                trk.SetPresetInTheFirstChord(0);
+                /// Assigns a new MidiChordControlDef containing
+                ///     AllControllersOff = true,
+                ///     Preset = 0 (piano)
+                /// to the first MidiChordDef in all interpretations.
+                trk.SetInitialChordControl();
             }
         }
         

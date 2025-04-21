@@ -65,9 +65,23 @@ namespace Moritz.Algorithm.PianolaMusic
             List<Bar> bars = singleBar.GetBars(barlineMsPositions);
 
             // Set the patch for the first chord in each voice
-            SetPatch0InTheFirstChordInEachTrk(bars[0]);
+            SetInitialChordControls(bars[0]);
 
             return bars;
+        }
+
+        /// <summary>
+        /// The patch only needs to be set in the first chord in each trk,
+        /// since it will be set by shunting if the Assistant Performer starts later.
+        /// This function only sets the patch in the first interpretation of the first chord.
+        /// </summary>
+        protected override void SetInitialChordControls(Bar bar1)
+        {
+            base.SetInitialChordControls(bar1);  
+            foreach(Trk trk in bar1.Trks)
+            {
+                trk.SetInterpretationPreset(1, 16); // sets preset 16 (organ) in interpretationIndex 1.
+            }
         }
 
         private void AddRandomPitchBendToTrksAtIndex(List<List<Trk>> interpretations, int trksIndex)

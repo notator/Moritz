@@ -55,7 +55,7 @@ namespace Moritz.Algorithm.Study1
             List<int> barlineMsPositions = singleBar.GetBalancedBarlineMsPositions(singleBar.Trks, NumberOfBars);
             List<Bar> bars = singleBar.GetBars(barlineMsPositions);
 
-            SetPatch0InTheFirstChordInEachTrk(bars[0]);
+            SetInitialChordControls(bars[0]);
 
             InsertClefChanges(bars, pageFormat.VoiceIndicesPerStaff);
 

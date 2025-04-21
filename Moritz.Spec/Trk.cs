@@ -2245,18 +2245,33 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The preset only needs to be set in the first chord in each Trk,
-        /// since it will be set by shunting if the Assistant Performer starts later.
+        /// Assigns a new MidiChordControlDef containing
+        ///     AllControllersOff = true,
+        ///     Preset = 0 (piano)
+        /// to the first MidiChordDef in all interpretations.
         /// </summary>
-        public void SetPresetInTheFirstChord(int presetIndex)
+        public void SetInitialChordControl()
         {
             foreach(var midiChordDef in MidiChordDefs)
             {
-                midiChordDef.MidiChordControlDef = new MidiChordControlDef
+                foreach(MidiChordDef mcd in midiChordDef.MidiDefs)
                 {
-                    Preset = presetIndex,
-                    AllControllersOff = true
-                };
+                    mcd.MidiChordControlDef = new MidiChordControlDef()
+                    {
+                        AllControllersOff = true,
+                        Preset = 0
+                    };
+                }
+                break;
+            }
+        }
+
+        public void SetInterpretationPreset(int interpretationIndex, int presetIndex)
+        {
+            foreach(var midiChordDef in MidiChordDefs)
+            {
+                MidiChordDef mcd = midiChordDef.MidiDefs[interpretationIndex];
+                mcd.MidiChordControlDef.Preset = presetIndex;
                 break;
             }
         }

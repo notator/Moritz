@@ -646,6 +646,7 @@ namespace Moritz.Spec
         public bool HasChordOff { get; set; } = true;
         public int? MsDurationToNextBarline { get; set; } = null;
 
+        public List<MidiChordDef> MidiDefs { get; set; } = new List<MidiChordDef>();
 
         public bool BeamContinues { get; set; } = true;
         public string Lyric { get; set; } = null;

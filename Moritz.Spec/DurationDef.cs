@@ -30,7 +30,5 @@ namespace Moritz.Spec
 
         public int MsDuration { get; set; } = 0;
         public int MsPositionReFirstUD { get; set; } = 0;
-
-        public List<DurationDef> MidiDefs { get; set; } = new List<DurationDef>();
     }
 }

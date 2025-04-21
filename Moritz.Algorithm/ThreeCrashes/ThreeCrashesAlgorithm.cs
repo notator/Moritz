@@ -168,22 +168,17 @@ namespace Moritz.Algorithm.ThreeCrashes
 
             List<Trk> mainTrks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
             Debug.Assert(mainTrks.Count == NumberOfVoices);
-            //List<VoiceDef> voiceDefs = new List<VoiceDef>
-            //{
-            //    new VoiceDef(new List<Trk>() { crashATrk }),
-            //    new VoiceDef(new List<Trk>() { crashBTrk }),
-            //    new VoiceDef(new List<Trk>() { crashCTrk })
-            //};
 
             Bar singleBar = new Bar(0, mainTrks);
 
             List<int> endBarlinePositions = GetEndBarlineMsPositions(firstATrkUIDs, firstBTrkUIDs, firstCTrkUIDs, msDuration);
 
-            Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
+            //The global NumberOfBars is ignored!
+            // (is now endBarlinePositions.Count)) 
 
             List<Bar> bars = singleBar.GetBars(endBarlinePositions);
 
-            SetPatch0InTheFirstChordInEachTrk(bars[0]);
+            SetInitialChordControls(bars[0]);
 
             return bars;
         }
