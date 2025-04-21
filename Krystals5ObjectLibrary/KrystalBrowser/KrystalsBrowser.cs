@@ -155,7 +155,7 @@ namespace Krystals5ObjectLibrary
             Close();
         }
 
-        public void SetForKrystal(string filename)
+        private void SetForKrystal(string filename)
         {
             _krystal = null;
 
@@ -168,59 +168,50 @@ namespace Krystals5ObjectLibrary
 
             if(_ancestorsTreeView != null)
             {
-                KrystalAncestorsTreeView tv = this.splitContainer2.Panel1.Controls[0] as KrystalAncestorsTreeView;
-                this.splitContainer2.Panel1.Controls.Clear();
-                tv.Dispose();
+                if(this.splitContainer2.Panel1.Controls[0] is KrystalAncestorsTreeView tv)
+                {
+                    this.splitContainer2.Panel1.Controls.Clear();
+                    tv.Dispose();
+                }
             }
-            // if filename is null, _krystal is null here
+
             _ancestorsTreeView = new KrystalAncestorsTreeView(_krystal, _krystalFamily);
             _ancestorsTreeView.AfterSelect += new TreeViewEventHandler(this.AncestorsTreeView_AfterSelect);
             this.splitContainer2.Panel1.Controls.Add(_ancestorsTreeView);
 
-            ConstantKrystal ck = _krystal as ConstantKrystal;
-            LineKrystal lk = _krystal as LineKrystal;
-            ExpansionKrystal xk = _krystal as ExpansionKrystal;
-            ModulationKrystal mk = _krystal as ModulationKrystal;
-            PermutationKrystal pk = _krystal as PermutationKrystal;
-            PathKrystal pathK = _krystal as PathKrystal;
-
-            if(ck != null)
+            if(_krystal is ConstantKrystal ck)
             {
                 this.BasicData.Text = string.Format("Constant Krystal: {0}   Level: {1}   Value: {2}",
                     ck.Name, ck.Level.ToString(), ck.MaxValue.ToString());
                 SetForConstantKrystal();
             }
-            else if(lk != null)
+            else if(_krystal is LineKrystal lk)
             {
                 this.BasicData.Text = string.Format("Line Krystal: {0}    Level: {1}    Range of Values: {2}..{3}",
                     _krystal.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
                 SetForLineKrystal();
             }
-            else if(xk != null)
+            else if(_krystal is ExpansionKrystal xk)
             {
                 this.BasicData.Text = string.Format("Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
                     _krystal.Name, xk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
                 SetForExpansionKrystal(xk);
             }
-            else if(mk != null)
+            else if(_krystal is ModulationKrystal mk)
             {
                 this.BasicData.Text = string.Format("Modulation Krystal: {0}   Modulator: {1}   Level: {2}   Range of Values: {3}..{4}",
                     _krystal.Name, mk.Modulator.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
                 SetForModulationKrystal(mk);
             }
-            else if(pk != null)
+            else if(_krystal is PermutationKrystal pk)
             {
-                string sortFirstString;
-                if(pk.SortFirst)
-                    sortFirstString = "true";
-                else
-                    sortFirstString = "false";
+                string sortFirstString = pk.SortFirst ? "true" : "false";
 
                 this.BasicData.Text = string.Format("Permutation Krystal: {0}   Level: {1}   pLevel: {2}   sortFirst: {3}   Range of Values: {4}..{5}",
                     _krystal.Name, _krystal.Level.ToString(), pk.PermutationLevel.ToString(), sortFirstString, _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
                 SetForPermutationKrystal(pk);
             }
-            else if(pathK != null)
+            else if(_krystal is PathKrystal)
             {
                 throw new NotImplementedException();
             }
@@ -232,18 +223,11 @@ namespace Krystals5ObjectLibrary
 
             if(_krystal != null)
             {
-                if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalChildrenTreeView) == false)
+                if(_selectedTreeView == null || !_selectedTreeView.Equals(this._krystalChildrenTreeView))
                     SelectNodeInFamilyTree(_krystal.Name);
-                //SetFirstAncestorAppearance();
+
                 Krystal2DTextBox.Lines = Get2DText(_krystal);
-                if(_krystalChildrenTreeView.SelectedNode.Nodes.Count > 0) // krystals can only be deleted if they are not used to construct other krystals or scores
-                {
-                    SetDeleteKrystalButtonVisible = false;
-                }
-                else
-                {
-                    SetDeleteKrystalButtonVisible = true;
-                }
+                SetDeleteKrystalButtonVisible = _krystalChildrenTreeView.SelectedNode.Nodes.Count == 0;
             }
             this.ResumeLayout();
         }
