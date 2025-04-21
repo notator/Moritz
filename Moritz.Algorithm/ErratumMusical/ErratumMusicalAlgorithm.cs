@@ -115,11 +115,9 @@ namespace Moritz.Algorithm.ErratumMusical
 
             Debug.Assert(mainTrks.Count == NumberOfVoices);
 
-            TemporalStructure temporalStructure = new TemporalStructure(mainTrks);
+            Bar singleBar = new Bar(0, mainTrks);
 
-            temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
-
-            List<Bar> bars = temporalStructure.GetBars(endBarlinePositions);
+            List<Bar> bars = singleBar.GetBars(endBarlinePositions);
 
             SetPatch0InTheFirstChordInEachTrk(bars[0]);
 

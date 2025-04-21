@@ -54,15 +54,15 @@ namespace Moritz.Algorithm.PianolaMusic
             AddRandomPitchBendToTrksAtIndex(interpretations, 2);
             // TrkLevel3 is still TrkLevel0 (not a clone!)
 
-            // The interpretations are moved into MidiChordDef and RestDef.MidiDef properties
+            // The interpretations are checked for consistency and then
+            // moved into MidiChordDef and RestDef.MidiDef properties
             List<Trk> mainTrks = GetMainTrks(interpretations); 
 
-            // Create the temporal structure
-            TemporalStructure temporalStructure = new TemporalStructure(mainTrks, interpretations);
+            Bar singleBar = new Bar(0, mainTrks);
 
             // Generate barline positions and create bars
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainTrks, NumberOfBars);
-            List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
+            List<int> barlineMsPositions = singleBar.GetBalancedBarlineMsPositions(singleBar.Trks, NumberOfBars);
+            List<Bar> bars = singleBar.GetBars(barlineMsPositions);
 
             // Set the patch for the first chord in each voice
             SetPatch0InTheFirstChordInEachTrk(bars[0]);

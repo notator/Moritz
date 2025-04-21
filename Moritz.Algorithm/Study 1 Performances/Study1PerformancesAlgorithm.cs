@@ -46,13 +46,11 @@ namespace Moritz.Algorithm.Study1
 
             Debug.Assert(mainTrks.Count == NumberOfVoices);
 
-            TemporalStructure temporalStructure = new TemporalStructure(mainTrks);
+            Bar singleBar = new Bar(0, mainTrks);
 
-            temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
-
-            List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainTrks, NumberOfBars);
-
-            List<Bar> bars = temporalStructure.GetBars(barlineMsPositions);
+            // Generate barline positions and create bars
+            List<int> barlineMsPositions = singleBar.GetBalancedBarlineMsPositions(singleBar.Trks, NumberOfBars);
+            List<Bar> bars = singleBar.GetBars(barlineMsPositions);
 
             SetPatch0InTheFirstChordInEachTrk(bars[0]);
 

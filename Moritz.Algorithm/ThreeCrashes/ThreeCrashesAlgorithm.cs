@@ -175,15 +175,13 @@ namespace Moritz.Algorithm.ThreeCrashes
             //    new VoiceDef(new List<Trk>() { crashCTrk })
             //};
 
-            TemporalStructure temporalStructure = new TemporalStructure(mainTrks);
-
-            temporalStructure.AssertConsistency();  // Trks can only contain MidiChordDefs and RestDefs here
+            Bar singleBar = new Bar(0, mainTrks);
 
             List<int> endBarlinePositions = GetEndBarlineMsPositions(firstATrkUIDs, firstBTrkUIDs, firstCTrkUIDs, msDuration);
 
             Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
-            List<Bar> bars = temporalStructure.GetBars(endBarlinePositions);
+            List<Bar> bars = singleBar.GetBars(endBarlinePositions);
 
             SetPatch0InTheFirstChordInEachTrk(bars[0]);
 

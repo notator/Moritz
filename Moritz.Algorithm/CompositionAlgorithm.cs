@@ -94,6 +94,9 @@ namespace Moritz.Algorithm
         /// <param name="voiceDefs"></param>
         protected List<Trk> GetMainTrks(List<List<Trk>> interpretations)
         {
+            AssertConsistency(interpretations);
+            //interpretations contain only MidiChordDef and RestDef objects.
+
             List<Trk> returnTrks = new List<Trk>();
 
             foreach(var trkList in interpretations)
@@ -122,15 +125,68 @@ namespace Moritz.Algorithm
                             restDef.MidiDefs.Add(subRestDef);
                         }
                     }
-                    else
-                    {
-                        Debug.Assert(false, "All VoiceDef.Trks must contain parallel duration types here!");
-                    }
                 }
                 returnTrks.Add(trkList[0]);
             }
 
             return returnTrks;
+        }
+
+        public void AssertConsistency(List<List<Trk>> interpretations)
+        {
+            foreach(var trkList in interpretations)
+            {
+                foreach(var trk in trkList)
+                {
+                    trk.AssertConsistency();
+
+                    foreach(var uniqueDef in trk.UniqueDefs)
+                    {
+                        Debug.Assert(uniqueDef is MidiChordDef || uniqueDef is RestDef);
+                        Debug.Assert(!(uniqueDef is CautionaryChordDef || uniqueDef is ClefDef));
+                    }
+                }
+            }
+
+            CheckTrksConsistency(interpretations);
+
+            CheckInterpretationConsistency(interpretations);
+        }
+
+        private void CheckTrksConsistency(List<List<Trk>> interpretations)
+        {
+            // All Trks within the a particular interpretation must have the same msDuration.
+            for(int interpIndex = 0; interpIndex < interpretations[0].Count; ++interpIndex)
+            {
+                int interp0MsDuration = interpretations[0][interpIndex].MsDuration;
+                for(int trkIndex = 1; trkIndex < interpretations.Count; ++trkIndex)
+                {
+                    Trk interpTrk = interpretations[trkIndex][interpIndex];
+                    Debug.Assert(interpTrk.MsDuration == interp0MsDuration);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The overall sequence of events (DurationDefs) must be identical in all interpretations.
+        /// </summary>
+        /// <param name="nTrks"></param>
+        /// <param name="nInterpretations"></param>
+        private void CheckInterpretationConsistency(List<List<Trk>> interpretations)
+        {
+            List<IUniqueDef> topIuds = interpretations[0][0].UniqueDefs;
+            for(int i = 0; i < topIuds.Count; i++)
+            {
+                var topIud = topIuds[i];
+                for(int trkIndex = 0; trkIndex < interpretations.Count; trkIndex++)
+                {
+                    for(int interpIndex = 0; interpIndex < interpretations[0].Count; interpIndex++)
+                    {
+                        List<IUniqueDef> localIuds = interpretations[trkIndex][interpIndex].UniqueDefs;
+                        Debug.Assert((topIud is MidiChordDef && localIuds[i] is MidiChordDef) || (topIud is RestDef && localIuds[i] is RestDef));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -343,26 +399,6 @@ namespace Moritz.Algorithm
         }
 
         /// <summary>
-        /// Barlines will be fit to MidiChordDefs in the trks.
-        /// </summary>
-        /// <param name="mainSeq"></param>
-        /// <param name="inputVoiceDefs">can be null</param>
-        /// <param name="approximateBarlineMsPositions"></param>
-        /// <returns></returns>
-        protected List<int> GetBarlinePositions(IReadOnlyList<Trk> trks0, List<double> approximateBarlineMsPositions)
-        {
-            List<int> barlineMsPositions = new List<int>();
-
-            foreach(double approxMsPos in approximateBarlineMsPositions)
-            {
-                int barlineMsPos = NearestAbsUIDEndMsPosition(trks0, approxMsPos);
-
-                barlineMsPositions.Add(barlineMsPos);
-            }
-            return barlineMsPositions;
-        }
-
-        /// <summary>
         /// Returns a list of (index, msPosition) KeyValuePairs.
         /// These are the (index, msPosition) of the barlines at which regions begin, and the (index, msPosition) of the final barline.
         /// The first KeyValuePair is (0,0), the last is the (index, msPosition) for the final barline in the score.
@@ -386,66 +422,7 @@ namespace Moritz.Algorithm
 
             return rval;
         }
-        private int NearestAbsUIDEndMsPosition(IReadOnlyList<Trk> trks, double approxAbsMsPosition)
-        {
-            int nearestAbsUIDEndMsPosition = 0;
-            double diff = double.MaxValue;
-            foreach(var trk in trks)
-            {
-                for(int uidIndex = 0; uidIndex < trk.UniqueDefs.Count; ++uidIndex)
-                {
-                    IUniqueDef iud = trk[uidIndex];
-                    int absEndPos = iud.MsPositionReFirstUD + iud.MsDuration;
-                    double localDiff = Math.Abs(approxAbsMsPosition - absEndPos);
-                    if(localDiff < diff)
-                    {
-                        diff = localDiff;
-                        nearestAbsUIDEndMsPosition = absEndPos;
-                    }
-                    if(diff == 0)
-                    {
-                        break;
-                    }
-                }
-                if(diff == 0)
-                {
-                    break;
-                }
-            }
-            return nearestAbsUIDEndMsPosition;
-        }
 
-        /// <summary>
-        /// Returns nBars barlineMsPositions.
-        /// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef in the top Trk of a VoiceDef.
-        /// The returned list contains no duplicates (A M.Assertion fails otherwise).
-        /// </summary>
-        /// <returns></returns>
-        /// <param name="trks"></param>
-        /// <param name="inputVoiceDefs">Can be null</param>
-        /// <param name="nBars"></param>
-        /// <returns></returns>
-        public List<int> GetBalancedBarlineMsPositions(List<Trk> trks, int nBars)
-        { 
-            var msDuration = trks[0].MsDuration;
-            double approxBarMsDuration = (((double)msDuration) / nBars);
-            Debug.Assert(approxBarMsDuration * nBars == msDuration);
-
-            List<int> barlineMsPositions = new List<int>();
-
-            for(int barNumber = 1; barNumber <= nBars; ++barNumber)
-            {
-                double approxBarMsPosition = approxBarMsDuration * barNumber;
-                int barMsPosition = NearestAbsUIDEndMsPosition(trks, approxBarMsPosition);
-
-                Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
-
-                barlineMsPositions.Add(barMsPosition);
-            }
-            Debug.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == msDuration);
-
-            return barlineMsPositions;
-        }
 
         /// <summary>
         /// The patch only needs to be set in the first chord in each trk,
