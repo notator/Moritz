@@ -392,11 +392,6 @@ namespace Moritz.Spec
         /// <summary>
         /// AbsMsPosition is greater than or equal to 0.
         /// There is at least one Trk in Trks.
-        /// Trk.AssertConsistency() is called on all Trks.
-        /// All Trk.InterpretationCount values are the same.
-        /// All Interpretations having the same index in any Trk in this Bar have the same msDuration.
-        /// Interpretation consistency across Trks:
-        /// The overall sequence of events (DurationDefs) must be identical in all interpretations.
         /// </summary>
         public virtual void AssertConsistency()
         {

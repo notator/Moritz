@@ -7,6 +7,7 @@ using Moritz.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -42,9 +43,11 @@ namespace Moritz.Algorithm.Study1
             Trk trk2 = GetTrk2(trk1);
             Trk trk3 = GetTrk3(trk2);
 
-            List<Trk> mainTrks = new List<Trk>() { trk0, trk1, trk2, trk3 }; // all in the same channel
+            List<List<Trk>> interpretations = new List<List<Trk>>() { new List<Trk>() { trk0, trk1, trk2, trk3 } }; // all in the same channel
 
-            Debug.Assert(mainTrks.Count == NumberOfVoices);
+            Debug.Assert(interpretations.Count == NumberOfVoices);
+
+            List<Trk> mainTrks = GetMainTrks(interpretations);
 
             Bar singleBar = new Bar(0, mainTrks);
 
