@@ -13,9 +13,9 @@ using System.Linq;
 
 namespace Moritz.Algorithm.Study1
 {
-    public class Study1PerformancesAlgorithm : CompositionAlgorithm
+    public class Study1_2025Algorithm : CompositionAlgorithm
     {
-        public Study1PerformancesAlgorithm()
+        public Study1_2025Algorithm()
             : base()
         {
             CheckParameters();
@@ -37,8 +37,8 @@ namespace Moritz.Algorithm.Study1
             Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
             Trk trk0 = GetTrk0(trackChordNumbers, trackRootPitches);
-            // parallel Trks must have the same number and types of contained UniqueDefs
-            // but they can have different durations and MIDI definitions
+            // parallel Trks must have the same sequence of contained MidiChordDefs and RestDefs
+            // but they can have different durations and MIDI control definitions
             Trk trk1 = GetTrk1(trk0); 
             Trk trk2 = GetTrk2(trk1);
             Trk trk3 = GetTrk3(trk2);
@@ -57,7 +57,8 @@ namespace Moritz.Algorithm.Study1
 
             SetInitialChordControls(bars[0]);
 
-            InsertClefChanges(bars, pageFormat.VoiceIndicesPerStaff);
+            // Test function (see below):
+            // InsertClefChanges(bars, pageFormat.VoiceIndicesPerStaff);
 
             return bars;  // The Trks in these bars contain ClefDefs.
         }
@@ -124,7 +125,7 @@ namespace Moritz.Algorithm.Study1
 
         private List<int> GetTrackChordNumbers()
         {
-            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1 Performances\A4chordNumbers"); 
+            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1 (version 2025)\A4chordNumbers"); 
 
             var rval = new List<int>();
             foreach(var val in bytes)
@@ -137,7 +138,7 @@ namespace Moritz.Algorithm.Study1
 
         private List<int> GetTrackRootPitches()
         {
-            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1 Performances\A4pitches");
+            var bytes = File.ReadAllBytes(M.MoritzScoresFolder + @"\Study 1 (version 2025)\A4pitches");
 
             var rval = new List<int>();
             foreach(var val in bytes)

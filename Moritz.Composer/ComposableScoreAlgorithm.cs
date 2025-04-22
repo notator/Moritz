@@ -30,11 +30,11 @@ namespace Moritz.Composer
             CompositionAlgorithm algorithm = null;
             switch(title)
             {
-                case "Pianola Music":
-                    algorithm = new PianolaMusicAlgorithm();
+                case "Pianola Music (version 2025)":
+                    algorithm = new PianolaMusic_2025Algorithm();
                     break;
-                case "Study 1 Performances":
-                    algorithm = new Study1PerformancesAlgorithm();
+                case "Study 1 (version 2025)":
+                    algorithm = new Study1_2025Algorithm();
                     break;
                 case "Erratum Musical":
                     algorithm = new ErratumMusicalAlgorithm();

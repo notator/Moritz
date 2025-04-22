@@ -427,7 +427,6 @@ namespace Moritz.Algorithm
         /// <summary>
         /// The patch only needs to be set in the first chord in each trk,
         /// since it will be set by shunting if the Assistant Performer starts later.
-        /// This function only sets the patch in the first interpretation of the first chord.
         /// </summary>
         protected virtual void SetInitialChordControls(Bar bar1)
         {

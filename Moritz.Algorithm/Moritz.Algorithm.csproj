@@ -44,10 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
-    <Compile Include="Study 1 Performances\Study1PerformancesAlgorithm.cs" />
+    <Compile Include="Study1_2025\Study1_2025Algorithm.cs" />
     <Compile Include="ThreeCrashes\ThreeCrashesAlgorithm.cs" />
     <Compile Include="ErratumMusical\ErratumMusicalAlgorithm.cs" />
-    <Compile Include="Pianola Music\PianolaMusicAlgorithm.cs" />
+    <Compile Include="PianolaMusic_2025\PianolaMusic_2025Algorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

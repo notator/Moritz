@@ -10,9 +10,9 @@ using System.Diagnostics;
 
 namespace Moritz.Algorithm.PianolaMusic
 {
-    public class PianolaMusicAlgorithm : CompositionAlgorithm
+    public class PianolaMusic_2025Algorithm : CompositionAlgorithm
     {
-        public PianolaMusicAlgorithm()
+        public PianolaMusic_2025Algorithm()
             : base()
         {
             CheckParameters();
