@@ -229,23 +229,36 @@ namespace Krystals5ObjectLibrary
         /// Returns a dictionary in which:
         /// Key: one of the positions in msPositions,
         /// Value: the envelope value at that msPosition.
+        /// If the envelope value of successive msPositions is going to be identical,
+        /// both the second entry and its corresponding entry in msPositions are removed.
         /// </summary>
-        /// <param name="msPositions"></param>
+        /// <param name="defaultMsPositions"></param>
         /// <returns></returns>
-        public Dictionary<int, int> GetValuePerMsPosition(List<int> msPositions)
+        public Dictionary<int, int> GetValuePerMsPosition(List<int> defaultMsPositions, out List<int> msPositions)
         {
+            msPositions = new List<int>(defaultMsPositions);
+
             Envelope envelope = Clone() as Envelope;
             envelope.SetCount(msPositions.Count);
-            List<int> pitchWheelValues = envelope.Original;
+            List<int> values = envelope.Original;            
 
-            Dictionary<int, int> pitchWheelValuesPerMsPosition = new Dictionary<int, int>();
+            Dictionary<int, int> valuePerMsPosition = new Dictionary<int, int>();
 
             for(int i = 0; i < msPositions.Count; ++i)
             {
-                pitchWheelValuesPerMsPosition.Add(msPositions[i], pitchWheelValues[i]);
+                valuePerMsPosition.Add(msPositions[i], values[i]);
             }
 
-            return pitchWheelValuesPerMsPosition;
+            for(int i = msPositions.Count - 2; i >= 0; i--)
+            {
+                if(valuePerMsPosition[msPositions[i]] == valuePerMsPosition[msPositions[i+1]])
+                {
+                    valuePerMsPosition.Remove(msPositions[i + 1]);
+                    msPositions.RemoveAt(i + 1);
+                }
+            }
+
+            return valuePerMsPosition;
         }
 
         public List<int> Original

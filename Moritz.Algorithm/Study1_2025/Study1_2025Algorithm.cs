@@ -39,13 +39,13 @@ namespace Moritz.Algorithm.Study1
             Trk trk0 = GetTrk0(trackChordNumbers, trackRootPitches);
             // parallel Trks must have the same sequence of contained MidiChordDefs and RestDefs
             // but they can have different durations and MIDI control definitions
-            Trk trk1 = GetTrk1(trk0); 
-            Trk trk2 = GetTrk2(trk1);
-            Trk trk3 = GetTrk3(trk2);
+            Trk trk1 = (Trk)trk0.Clone();
 
-            List<List<Trk>> interpretations = new List<List<Trk>>() { new List<Trk>() { trk0, trk1, trk2, trk3 } }; // all in the same channel
+            List<List<Trk>> interpretations = new List<List<Trk>>() { new List<Trk>() { trk0, trk1 } }; // in the same channel
 
             Debug.Assert(interpretations.Count == NumberOfVoices);
+
+            AddRandomPitchBendEnvelopeToTrkAtIndex(interpretations, 1);
 
             List<Trk> mainTrks = GetMainTrks(interpretations);
 
@@ -63,7 +63,31 @@ namespace Moritz.Algorithm.Study1
             return bars;  // The Trks in these bars contain ClefDefs.
         }
 
-         // Inserts ClefDefs at arbitrary positions in the top VoiceDef.Trks[0].UniqueDefs in each Staff.
+        private void AddRandomPitchBendEnvelopeToTrkAtIndex(List<List<Trk>> interpretations, int trksIndex)
+        {
+            Random random = new Random();
+
+            foreach(var trkList in interpretations)
+            {
+                Trk trk = trkList[trksIndex];
+
+                foreach(var midiChordDef in trk.MidiChordDefs)
+                {
+                    int pitchWheel = (int)M.CMD.PITCH_WHEEL_224;
+                    int nValues = random.Next(4) + 1; // 1..4
+                    List<int> values = new List<int>();
+                    for(int i = 0; i < nValues; i++)
+                    {
+                        values.Add(random.Next(128));  // 0..127
+                    }
+                    midiChordDef.EnvelopeTypeDef = new Tuple<int, List<int>>(pitchWheel, values);
+                }
+
+                trk.AssertConsistency();
+            }
+        }
+
+        // Inserts ClefDefs at arbitrary positions in the top VoiceDef.Trks[0].UniqueDefs in each Staff.
         // The main clefs at the beginnings of bars are added automatically later, taking these clef changes
         // into account.
         protected override void InsertClefChanges(List<Bar> bars, List<List<int>> voiceIndicesPerStaff)
@@ -81,47 +105,6 @@ namespace Moritz.Algorithm.Study1
 
             InsertClefChangesInBars(bars, voiceIndicesPerStaff, clefChangesPerBarPerStaff);
         }
-
-        private Trk GetTrk1(Trk trk0)
-        {
-            var trk1 = (Trk)trk0.Clone();
-
-            //foreach(var midiChordDef in trk1.MidiChordDefs)
-            //{
-
-            //}
-
-            trk1.AssertConsistency();
-
-            return trk1;
-        }
-        private Trk GetTrk2(Trk trk1)
-        {
-            var trk2 = (Trk)trk1.Clone();
-
-            //foreach(var midiChordDef in trk2.MidiChordDefs)
-            //{
-
-            //}
-
-            trk2.AssertConsistency();
-
-            return trk2;
-        }
-        private Trk GetTrk3(Trk trk2)
-        {
-            var trk3 = (Trk)trk2.Clone();
-
-            //foreach(var midiChordDef in trk2.MidiChordDefs)
-            //{
-
-            //}
-
-            trk3.AssertConsistency();
-
-            return trk3;
-        }
-
 
         private List<int> GetTrackChordNumbers()
         {

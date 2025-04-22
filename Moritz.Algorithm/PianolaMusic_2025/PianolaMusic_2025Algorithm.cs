@@ -98,7 +98,7 @@ namespace Moritz.Algorithm.PianolaMusic
                     {
                         midiChordDef.MidiChordControlDef = new MidiChordControlDef();
                     }
-                    midiChordDef.MidiChordControlDef.PitchWheel = random.Next(128);
+                    midiChordDef.MidiChordControlDef.PitchWheel = random.Next(128);  // 0..127
                 }
 
                 trk.AssertConsistency();

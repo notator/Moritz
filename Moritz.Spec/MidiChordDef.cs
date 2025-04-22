@@ -6,6 +6,7 @@ using Moritz.Xml;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Xml;
@@ -159,32 +160,55 @@ namespace Moritz.Spec
         /// <returns>A list of Tuples: Each Tuple.Item1 is a MidiMsg, Item2 is its msDuration</returns>
         private List<Tuple<MidiMsg, int>> GetEnvelopeMessages(int channel, Tuple<int, List<int>> envelopeTypeDef, int msDuration)
         {
-            int status = (int)M.CMD.CONTROL_CHANGE_176 + channel;
-            int control = envelopeTypeDef.Item1;
+            #region get msPosValues
             int defaultMsgMsDuration = 50;
 
             var envDef = envelopeTypeDef.Item2;
             int count = (int)Math.Round((double)msDuration / defaultMsgMsDuration);
-            List<int> msPositions = M.IntDivisionSizes(msDuration, count);
+            List<int> defaultMsDurations = M.IntDivisionSizes(msDuration, count);
+            List<int> defaultMsPositions = new List<int>();
+            int msPos = 0;
+            foreach(var duration in defaultMsDurations)
+            {
+                defaultMsPositions.Add(msPos);
+                msPos += duration;
+            }
 
             Envelope env = new Envelope(envDef, 127, 127, count);
-            Dictionary<int, int> msPosValues = env.GetValuePerMsPosition(msPositions);
-
-            List<int> msDurations = new List<int>();
-            for(int i = 0; i < msPositions.Count - 1; ++i)
+            Dictionary<int, int> msPosValues = env.GetValuePerMsPosition(defaultMsPositions, out List<int> msPositions);
+            List<int> msDurations = new List<int>(); 
+            for(int i = 1; i < msPositions.Count; i++)
             {
-                var msDur = msPositions[i + 1] - msPositions[i];
+                var msDur = msPositions[i] - msPositions[i-1];
                 msDurations.Add(msDur);
             }
-            msDurations.Add(msDuration - msPositions[msPositions.Count - 1]);
+            #endregion
 
             List<Tuple<MidiMsg, int>> msgDurs = new List<Tuple<MidiMsg, int>>();
-            for(int i = 0; i < msPosValues.Count; ++i)
+
+            int status;
+            if(envelopeTypeDef.Item1 == (int)M.CMD.PITCH_WHEEL_224)
             {
-                MidiMsg msg = new MidiMsg(status, control, msPosValues[i]);
-                int msDur = msDurations[i];
-                Tuple<MidiMsg, int> msgDur = new Tuple<MidiMsg, int>(msg, msDur);
-                msgDurs.Add(msgDur);
+                status = envelopeTypeDef.Item1 + channel;
+                for(int i = 0; i < msPosValues.Count; ++i)
+                {
+                    var data = msPosValues[msPositions[i]];
+                    MidiMsg msg = new MidiMsg(status, data, data);
+                    int msDur = defaultMsDurations[i];
+                    Tuple<MidiMsg, int> msgDur = new Tuple<MidiMsg, int>(msg, msDur);
+                    msgDurs.Add(msgDur);
+                }
+            }
+            else
+            {
+                status = (int)M.CMD.CONTROL_CHANGE_176 + channel;                
+                for(int i = 0; i < msPosValues.Count; ++i)
+                {
+                    MidiMsg msg = new MidiMsg(status, envelopeTypeDef.Item1, msPosValues[msPositions[i]]);
+                    int msDur = defaultMsDurations[i];
+                    Tuple<MidiMsg, int> msgDur = new Tuple<MidiMsg, int>(msg, msDur);
+                    msgDurs.Add(msgDur);
+                }
             }
 
             return msgDurs;
@@ -658,7 +682,7 @@ namespace Moritz.Spec
         /// <summary>
         /// See ControlEnvelope: a class that converts an EnvelopeTypeDef into a series of control values with a specific Count.
         /// </summary>
-        public Tuple<int, List<int>> EnvelopeTypeDef { get; private set; } = null;
+        public Tuple<int, List<int>> EnvelopeTypeDef { get; set; } = null;
 
         #endregion properties
     }
