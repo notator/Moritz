@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bar.cs" />
-    <Compile Include="ControlEnvelope.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="GamutVector.cs" />
     <Compile Include="ModeProximity.cs" />
