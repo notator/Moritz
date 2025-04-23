@@ -1,17 +1,15 @@
 
 using Moritz.Xml;
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.Remoting.Channels;
 
 namespace Moritz.Spec
 {
 	///<summary>
 	/// A RestDef is a unique rest definition which is saved in an SVG file.
 	///<summary>
-	public class RestDef : DurationDef, IUniqueDef
+	public class RestDef : DurationDef
 	{
 		public RestDef(int msPositionReFirstIUD, int msDuration)
 			: base(msDuration)

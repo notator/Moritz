@@ -1,8 +1,3 @@
-using Moritz.Globals;
-
-using System.Collections.Generic;
-using System.Diagnostics;
-
 namespace Moritz.Spec
 {
 	/// <summary>
@@ -15,12 +10,14 @@ namespace Moritz.Spec
 		public CautionaryChordDef(MidiChordDef midiChordDef, int msDurationAfterBarline)
         :base(midiChordDef.Pitches, midiChordDef.Velocities, msDurationAfterBarline, midiChordDef.HasChordOff)
 		{
-			MsPositionReFirstUD = 0;  // always immediately follows the barline
 		}
 
 		public override string ToString()
 		{
-			return ("CautionaryChordDef: MsDuration=" + MsDuration.ToString());
+			return ($"CautionaryChordDef: MsDuration={MsDuration.ToString()}, MsPositionReFirstUD={MsPositionReFirstUD}");
 		}
-	}
+
+        public new int MsDuration { get; } // = msDurationAfterBarline
+        public new int MsPositionReFirstUD { get; } = 0;
+    }
 }

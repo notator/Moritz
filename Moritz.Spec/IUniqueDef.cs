@@ -1,7 +1,7 @@
 namespace Moritz.Spec
 {
     ///<summary>
-    /// IUniqueDef is implemented by all objects that can be added to a VoiceDefs.UniqueDefs list.
+    /// IUniqueDef is implemented by all objects that can be added to a Trk.UniqueDefs list.
     /// Currently (11.9.2014) these are:
     ///     MidiChordDef
     ///     RestDef

@@ -157,7 +157,6 @@ namespace Krystals5ObjectLibrary
             int roundingError = originalTotalDuration - newIntTotalDuration;
             while(roundingError != 0)
             {
-                // correct rounding errors
                 int indexOfLongestDuration = 0;
                 for(int index = 0; index < newIntMsDurations.Count; ++index)
                 {

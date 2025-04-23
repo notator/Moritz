@@ -6,12 +6,7 @@ using Moritz.Xml;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
-using System.Xml;
-
-using static Moritz.Globals.M;
 
 namespace Moritz.Spec
 {
@@ -59,7 +54,7 @@ namespace Moritz.Spec
             _pitches = pitches;
             Velocities = velocities;
 
-            MsPositionReFirstUD = 0; // default value
+			MsPositionReFirstUD = 0; // default value
             HasChordOff = hasChordOff;
             OrnamentText = null; // could be useful later, but is only a non-functional annotation (2025)
 

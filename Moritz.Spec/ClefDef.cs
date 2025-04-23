@@ -33,7 +33,6 @@ namespace Moritz.Spec
             }
             #endregion
 
-            _id = "clefChange" + UniqueClefChangeIDNumber.ToString();
             _clefType = clefType;
             MsPositionReFirstUD = msPositionReFirstIUD;
         }
@@ -72,16 +71,10 @@ namespace Moritz.Spec
         }
         #endregion IUniqueDef
 
-        public string ID { get { return _id; } }
-        private readonly string _id;
-
         /// <summary>
         /// One of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
         /// </summary>
         public string ClefType { get { return _clefType; } }
         private readonly string _clefType;
-
-        private int UniqueClefChangeIDNumber { get { return ++_uniqueClefChangeIDNumber; } }
-        private static int _uniqueClefChangeIDNumber = 0;
     }
 }
