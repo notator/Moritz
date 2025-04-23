@@ -45,7 +45,7 @@ namespace Moritz.Algorithm.Study1
 
             Debug.Assert(interpretations.Count == NumberOfVoices);
 
-            AddRandomPitchBendEnvelopeToTrkAtIndex(interpretations, 1);
+            SetInterpretationAtIndex(interpretations, 1);
 
             List<Trk> mainTrks = GetMainTrks(interpretations);
 
@@ -63,28 +63,53 @@ namespace Moritz.Algorithm.Study1
             return bars;  // The Trks in these bars contain ClefDefs.
         }
 
-        private void AddRandomPitchBendEnvelopeToTrkAtIndex(List<List<Trk>> interpretations, int trksIndex)
+        private void SetInterpretationAtIndex(List<List<Trk>> interpretations, int trksIndex)
         {
             Random random = new Random();
 
-            foreach(var trkList in interpretations)
+            var trkList = interpretations[0]; // voice[0]
+            var trk = trkList[trksIndex];
+            var iuds = trk.UniqueDefs;
+            int chordsPerSection = (int)Math.Ceiling(iuds.Count / 5.0);
+            int sensitivity = 2;
+            for(int i = 0; i < iuds.Count; i++)
             {
-                Trk trk = trkList[trksIndex];
-
-                foreach(var midiChordDef in trk.MidiChordDefs)
+                if(iuds[i] is MidiChordDef mcd)
                 {
-                    int pitchWheel = (int)M.CMD.PITCH_WHEEL_224;
-                    int nValues = random.Next(4) + 1; // 1..4
-                    List<int> values = new List<int>();
-                    for(int i = 0; i < nValues; i++)
+                    mcd.MsDuration = (int)Math.Floor(mcd.MsDuration * 1.2);
+                    if(i % chordsPerSection == 0)
                     {
-                        values.Add(random.Next(128));  // 0..127
+                        SetPitchWheelSensitivity(mcd, sensitivity++);
                     }
-                    midiChordDef.EnvelopeTypeDef = new Tuple<int, List<int>>(pitchWheel, values);
-                }
 
-                trk.AssertConsistency();
+                    SetRandomPitchWheelEnvelope(random, mcd);
+                }
             }
+
+            trk.SetMsPositionsReFirstUD();
+
+            trk.AssertConsistency();
+        }
+
+        private static void SetPitchWheelSensitivity(MidiChordDef mcd, int sensitivity)
+        {
+            if(mcd.MidiChordControlDef == null)
+            {
+                mcd.MidiChordControlDef = new MidiChordControlDef();
+            }
+            mcd.MidiChordControlDef.PitchWheelSensitivity = sensitivity;  // 2..6
+        }
+
+        private static void SetRandomPitchWheelEnvelope(Random random, MidiChordDef midiChordDef)
+        {
+            int pitchWheel = (int)M.CMD.PITCH_WHEEL_224;
+            int nValues = random.Next(4) + 1; // 1..4
+            List<int> values = new List<int>();
+            for(int i = 0; i < nValues; i++)
+            {
+                values.Add(random.Next(128));  // 0..127
+            }
+            midiChordDef.EnvelopeTypeDef = new Tuple<int, List<int>>(pitchWheel, values);
         }
 
         // Inserts ClefDefs at arbitrary positions in the top VoiceDef.Trks[0].UniqueDefs in each Staff.
