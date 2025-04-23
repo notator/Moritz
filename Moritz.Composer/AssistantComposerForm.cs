@@ -1390,7 +1390,7 @@ namespace Moritz.Composer
             w.WriteAttributeString("gap", GapPixelsComboBox.Text);
             w.WriteAttributeString("minGapsBetweenStaves", this.MinimumGapsBetweenStavesTextBox.Text);
             w.WriteAttributeString("minGapsBetweenSystems", MinimumGapsBetweenSystemsTextBox.Text);
-            w.WriteAttributeString("voiceIndicesPerStaff", NumberOfVoicesPerStaffTextBox.Text);
+            w.WriteAttributeString("numberOfVoicesPerStaff", NumberOfVoicesPerStaffTextBox.Text);
             w.WriteAttributeString("clefsPerStaff", ClefsPerStaffTextBox.Text);
             w.WriteAttributeString("stafflinesPerStaff", StafflinesPerStaffTextBox.Text);
             w.WriteAttributeString("staffGroups", StaffGroupsTextBox.Text);
