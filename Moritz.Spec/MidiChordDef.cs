@@ -131,12 +131,12 @@ namespace Moritz.Spec
 
             if(envelopeMessages != null && envelopeMessages.Count > 0)
             {
-                w.SvgStartGroup("envelope"); // "envelope"
+                w.WriteStartElement("envelope"); // "envelope"
                 foreach(var envMsg in envelopeMessages)
                 {
                     envMsg.Item1.WriteSVG(w, envMsg.Item2);
                 }
-                w.SvgEndGroup(); // "envelope"
+                w.WriteEndElement(); // "envelope"
             }
 
             if(HasChordOff)
