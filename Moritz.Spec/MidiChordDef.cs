@@ -160,6 +160,9 @@ namespace Moritz.Spec
 
             var envDef = envelopeTypeDef.Item2;
             int count = (int)Math.Round((double)msDuration / defaultMsgMsDuration);
+
+            count = count < 3 ? 3 : count;
+
             List<int> defaultMsDurations = M.IntDivisionSizes(msDuration, count);
             List<int> defaultMsPositions = new List<int>();
             int msPos = 0;
@@ -177,6 +180,7 @@ namespace Moritz.Spec
                 var msDur = msPositions[i] - msPositions[i-1];
                 msDurations.Add(msDur);
             }
+            msDurations.Add(msDuration - msPositions[msPositions.Count - 1]);
             #endregion
 
             List<Tuple<MidiMsg, int>> msgDurs = new List<Tuple<MidiMsg, int>>();
@@ -189,7 +193,7 @@ namespace Moritz.Spec
                 {
                     var data = msPosValues[msPositions[i]];
                     MidiMsg msg = new MidiMsg(status, data, data);
-                    int msDur = defaultMsDurations[i];
+                    int msDur = msDurations[i];
                     Tuple<MidiMsg, int> msgDur = new Tuple<MidiMsg, int>(msg, msDur);
                     msgDurs.Add(msgDur);
                 }
@@ -200,7 +204,7 @@ namespace Moritz.Spec
                 for(int i = 0; i < msPosValues.Count; ++i)
                 {
                     MidiMsg msg = new MidiMsg(status, envelopeTypeDef.Item1, msPosValues[msPositions[i]]);
-                    int msDur = defaultMsDurations[i];
+                    int msDur = msDurations[i];
                     Tuple<MidiMsg, int> msgDur = new Tuple<MidiMsg, int>(msg, msDur);
                     msgDurs.Add(msgDur);
                 }

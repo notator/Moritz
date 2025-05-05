@@ -103,7 +103,7 @@ namespace Moritz.Algorithm.Study1
         private static void SetRandomPitchWheelEnvelope(Random random, MidiChordDef midiChordDef)
         {
             int pitchWheel = (int)M.CMD.PITCH_WHEEL_224;
-            int nValues = random.Next(4) + 1; // 1..4
+            int nValues = random.Next(3) + 2; // 2..4
             List<int> values = new List<int>();
             for(int i = 0; i < nValues; i++)
             {
