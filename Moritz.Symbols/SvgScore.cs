@@ -784,7 +784,7 @@ namespace Moritz.Symbols
         #endregion save multi-page score
 
         #region save single svg score
-        public void SaveSingleSVGScore()
+        public string SaveScrollScore()
         {
             string pageFilename = Path.GetFileNameWithoutExtension(FilePath) + " (scroll).svg";
             string pagePath = Path.GetDirectoryName(FilePath) + @"\" + pageFilename;
@@ -794,6 +794,8 @@ namespace Moritz.Symbols
             SvgPage singlePage = new SvgPage(this, _pageFormat, 0, infoTextInfo, this.Systems, true);
 
             SaveSVGPage(pagePath, singlePage, this.Metadata, true);
+
+            return pagePath;
         }
 
 

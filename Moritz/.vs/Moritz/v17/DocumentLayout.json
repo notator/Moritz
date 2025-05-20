@@ -1,0 +1,323 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Visual Studio\\Projects\\Moritz - NET8-0 working\\Moritz\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Composer\\AssistantComposerForm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{47036733-6056-4B1E-B48D-E8EB93D78F7E}|Moritz.csproj|d:\\visual studio\\projects\\moritz - net8-0 working\\moritz\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{47036733-6056-4B1E-B48D-E8EB93D78F7E}|Moritz.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz - earlier copies\\Moritz - backup\\Moritz.Globals\\MoritzStatics.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Symbols\\SvgScore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Composer\\Moritz.Composer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Algorithm\\CompositionAlgorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Algorithm\\Moritz.Algorithm.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Krystals5ControlLibrary\\Krystals5ControlLibrary.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Symbols\\Moritz.Symbols.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Spec\\Moritz.Spec.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Krystals5ObjectLibrary\\Krystals5ObjectLibrary.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Globals\\Moritz.Globals.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Visual Studio\\Projects\\Moritz\\Moritz.Xml\\Moritz.Xml.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 3263,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SvgScore.cs",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Symbols\\SvgScore.cs",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Symbols\\SvgScore.cs",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Symbols\\SvgScore.cs",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Symbols\\SvgScore.cs",
+              "ViewState": "AgIAABIBAAAAAAAAAAAowBQDAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T20:19:00.697Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz - NET8-0 working\\Moritz\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz - NET8-0 working\\Moritz\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAArwBEAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T19:16:17Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AssistantComposerForm.cs",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Composer\\AssistantComposerForm.cs",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Composer\\AssistantComposerForm.cs",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Composer\\AssistantComposerForm.cs",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Composer\\AssistantComposerForm.cs",
+              "ViewState": "AgIAAC4AAAAAAAAAAAAxwJIFAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T18:57:59.777Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Moritz.Composer.csproj",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Composer\\Moritz.Composer.csproj",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Composer\\Moritz.Composer.csproj",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Composer\\Moritz.Composer.csproj",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Composer\\Moritz.Composer.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-19T18:52:52.454Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "CompositionAlgorithm.cs",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Algorithm\\CompositionAlgorithm.cs",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Algorithm\\CompositionAlgorithm.cs",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Algorithm\\CompositionAlgorithm.cs",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Algorithm\\CompositionAlgorithm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T18:50:11.405Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Moritz.Algorithm.csproj",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Algorithm\\Moritz.Algorithm.csproj",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Algorithm\\Moritz.Algorithm.csproj",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Algorithm\\Moritz.Algorithm.csproj",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Algorithm\\Moritz.Algorithm.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-19T18:46:48.97Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Krystals5ControlLibrary.csproj",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Krystals5ControlLibrary\\Krystals5ControlLibrary.csproj",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Krystals5ControlLibrary\\Krystals5ControlLibrary.csproj",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Krystals5ControlLibrary\\Krystals5ControlLibrary.csproj",
+              "RelativeToolTip": "..\\..\\Moritz\\Krystals5ControlLibrary\\Krystals5ControlLibrary.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-19T17:01:11.798Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MoritzStatics.cs",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz - earlier copies\\Moritz - backup\\Moritz.Globals\\MoritzStatics.cs",
+              "RelativeDocumentMoniker": "..\\..\\Moritz - earlier copies\\Moritz - backup\\Moritz.Globals\\MoritzStatics.cs",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz - earlier copies\\Moritz - backup\\Moritz.Globals\\MoritzStatics.cs",
+              "RelativeToolTip": "..\\..\\Moritz - earlier copies\\Moritz - backup\\Moritz.Globals\\MoritzStatics.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T16:14:38.357Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Moritz.Symbols.csproj",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Symbols\\Moritz.Symbols.csproj",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Symbols\\Moritz.Symbols.csproj",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Symbols\\Moritz.Symbols.csproj",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Symbols\\Moritz.Symbols.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-19T15:43:52.435Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Moritz.Spec.csproj",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Spec\\Moritz.Spec.csproj",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Spec\\Moritz.Spec.csproj",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Spec\\Moritz.Spec.csproj",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Spec\\Moritz.Spec.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-19T11:55:16.508Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Krystals5ObjectLibrary.csproj",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Krystals5ObjectLibrary\\Krystals5ObjectLibrary.csproj",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Krystals5ObjectLibrary\\Krystals5ObjectLibrary.csproj",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Krystals5ObjectLibrary\\Krystals5ObjectLibrary.csproj",
+              "RelativeToolTip": "..\\..\\Moritz\\Krystals5ObjectLibrary\\Krystals5ObjectLibrary.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-19T11:32:20.808Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Moritz.Globals.csproj",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Globals\\Moritz.Globals.csproj",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Globals\\Moritz.Globals.csproj",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Globals\\Moritz.Globals.csproj",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Globals\\Moritz.Globals.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-19T11:30:55.136Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Moritz.Xml.csproj",
+              "DocumentMoniker": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Xml\\Moritz.Xml.csproj",
+              "RelativeDocumentMoniker": "..\\..\\Moritz\\Moritz.Xml\\Moritz.Xml.csproj",
+              "ToolTip": "D:\\Visual Studio\\Projects\\Moritz\\Moritz.Xml\\Moritz.Xml.csproj",
+              "RelativeToolTip": "..\\..\\Moritz\\Moritz.Xml\\Moritz.Xml.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-19T11:30:12.886Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 383,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 383,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e506b91c-c606-466a-90a9-123d1d1e12b3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:5:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:7:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:11:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:134:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:3:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:6:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:9:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 383,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

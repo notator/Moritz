@@ -1452,9 +1452,15 @@ namespace Moritz.Composer
             if(score != null && score.Systems.Count > 0)
             {
                 score.SaveMultiPageScore();
-                score.SaveSingleSVGScore();
-                // Opens the multi-page score in the program which is set by the system to open .svg files.
-                global::System.Diagnostics.Process.Start(score.FilePath);
+                var scrollFilePath = score.SaveScrollScore();
+                // Opens the multi-page score in Chrome (which is set to open .html files in the system).
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe",
+                    Arguments = $"\"{scrollFilePath}\"",  // quotes stop space characters from truncating the string.
+                    UseShellExecute = true
+                };
+                Process.Start(processStartInfo);
             }
         }
 
