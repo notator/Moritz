@@ -1000,11 +1000,45 @@ namespace Moritz.Globals
             #endregion
         }
 
-        #region MIDI helper constants
-        public static readonly int SELECT_PITCHBEND_RANGE_0 = 0; // deprecated (Use CTL2.PITCHWHEEL_SENSITIVITY_16 instead)
-        public static readonly byte DEFAULT_PITCHWHEELDEVIATION_2 = 2;
-        public static readonly int DEFAULT_NOTEOFF_VELOCITY_64 = 64;
-        #endregion
+        public static byte DefaultMidiControlValue(CTL ctl)
+        { 
+            byte rval = 0;
+            switch(ctl)
+            {
+                case CTL.BANK_0:
+                    rval = 0;
+                    break;
+                case CTL.MOD_WHEEL_1:
+                    rval = 0;
+                    break;
+                case CTL.VOLUME_7:
+                    rval = 100;
+                    break;
+                case CTL.PAN_10:
+                    rval = 64; // center
+                    break;
+                case CTL.EXPRESSION_11:
+                    rval = 127; // max
+                    break;
+                case CTL.ALL_SOUND_OFF_120:
+                case CTL.ALL_CONTROLLERS_OFF_121:
+                    rval = 0; // off
+                    break;
+                case CTL.PITCH_WHEEL_SENSITIVITY_16:
+                case CTL.MIXTURE_17:
+                case CTL.TUNING_GROUP_18:
+                case CTL.TUNING_19:
+                case CTL.ORNAMENT_GROUP_75:
+                case CTL.ORNAMENT_76:
+                case CTL.SEMITONE_OFFSET_80:
+                case CTL.CENT_OFFSET_81:
+                case CTL.VELOCITY_PITCH_SENSITIVITY_83:
+                case CTL.REVERBERATION_91:
+                    rval = 0; // off
+                    break;
+            }
+            return rval;
+        }
 
         /// <summary>
         /// Called in the above constructor

@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Symbols", "Moritz.Sy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Xml", "Moritz.Xml\Moritz.Xml.csproj", "{1618D039-7148-6244-92B9-4170E4551E68}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertSVGMIDI", "ConvertSVGMIDI\ConvertSVGMIDI.csproj", "{7E3DAEF0-E682-3B13-3B4E-D41E5003B6A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{1618D039-7148-6244-92B9-4170E4551E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1618D039-7148-6244-92B9-4170E4551E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1618D039-7148-6244-92B9-4170E4551E68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E3DAEF0-E682-3B13-3B4E-D41E5003B6A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E3DAEF0-E682-3B13-3B4E-D41E5003B6A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E3DAEF0-E682-3B13-3B4E-D41E5003B6A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E3DAEF0-E682-3B13-3B4E-D41E5003B6A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
