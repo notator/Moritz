@@ -1328,6 +1328,7 @@ namespace Moritz.Composer
             Krystal krystal = null;
             try
             {
+                //C:\Users\Admin\OneDrive\Moritz_2025\krystals\krystals
                 string krystalPath = M.MoritzKrystalsFolder + @"\" + krystalFileName;
                 krystal = K.LoadKrystal(krystalPath);
             }
@@ -1456,7 +1457,8 @@ namespace Moritz.Composer
                 // Opens the multi-page score in Chrome (which is set to open .html files in the system).
                 var processStartInfo = new ProcessStartInfo
                 {
-                    FileName = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe",
+                
+                    FileName = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
                     Arguments = $"\"{scrollFilePath}\"",  // quotes stop space characters from truncating the string.
                     UseShellExecute = true
                 };

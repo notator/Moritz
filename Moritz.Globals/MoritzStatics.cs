@@ -97,7 +97,7 @@ namespace Moritz.Globals
             }
         }
 
-        public static string MoritzAppDataFolder = @"C:\Users\James\OneDrive\Moritz_2025";
+        public static string MoritzAppDataFolder = @"C:\Users\Admin\OneDrive\Moritz_2025";
 
         public static string MoritzKrystalsFolder = MoritzAppDataFolder + @"\krystals\krystals";
         public static string MoritzExpansionFieldsFolder = MoritzAppDataFolder + @"\krystals\expansion operators";
