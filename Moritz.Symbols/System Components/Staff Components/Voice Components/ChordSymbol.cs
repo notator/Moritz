@@ -169,10 +169,6 @@ namespace Moritz.Symbols
             w.SvgStartGroup(CSSObjectClass.chord.ToString()); // "chord"
             w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 
-            w.SvgStartGroup(CSSObjectClass.graphics.ToString());
-            ChordMetrics.WriteSVG(w);
-            w.SvgEndGroup(); // "graphics"
-
             w.WriteStartElement("score", "midiChords", null);
 
             var midiDefs = MidiChordDef.MidiDefs;
@@ -184,8 +180,12 @@ namespace Moritz.Symbols
                 // writes a "midiChord" element
                 midiDef.WriteSVG(w, channel);  // writes a midiChord element
             }
-
             w.WriteEndElement(); // end score:midiChords
+
+            w.SvgStartGroup(CSSObjectClass.graphics.ToString());
+            ChordMetrics.WriteSVG(w);
+            w.SvgEndGroup(); // "graphics"
+
             w.SvgEndGroup(); // "chord"
         }
 
