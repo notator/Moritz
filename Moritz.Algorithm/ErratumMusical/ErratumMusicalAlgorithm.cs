@@ -155,7 +155,7 @@ namespace Moritz.Algorithm.ErratumMusical
 
             if(finalRestDuration > 0)
             {
-                RestDef midiRestDef = new RestDef(0, finalRestDuration);
+                MidiRestDef midiRestDef = new MidiRestDef(0, finalRestDuration);
                 trk.Add(midiRestDef);
             }
 

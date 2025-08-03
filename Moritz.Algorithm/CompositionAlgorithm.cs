@@ -115,12 +115,12 @@ namespace Moritz.Algorithm
                             mcd.MidiDefs.Add(subMcd);
                         }
                     }
-                    else if(iud is RestDef restDef)
+                    else if(iud is MidiRestDef restDef)
                     {
                         restDef.MidiDefs.Add(restDef);  // the first MidiDef is always the one that defines the Rest's appearance.
                         for(int j = 1; j < trkList.Count; ++j)
                         {
-                            RestDef subRestDef = trkList[j].UniqueDefs[i] as RestDef;
+                            MidiRestDef subRestDef = trkList[j].UniqueDefs[i] as MidiRestDef;
                             Debug.Assert(subRestDef != null);
                             restDef.MidiDefs.Add(subRestDef);
                         }
@@ -142,7 +142,7 @@ namespace Moritz.Algorithm
 
                     foreach(var uniqueDef in trk.UniqueDefs)
                     {
-                        Debug.Assert(uniqueDef is MidiChordDef || uniqueDef is RestDef);
+                        Debug.Assert(uniqueDef is MidiChordDef || uniqueDef is MidiRestDef);
                         Debug.Assert(!(uniqueDef is CautionaryChordDef || uniqueDef is ClefDef));
                     }
                 }
@@ -183,7 +183,7 @@ namespace Moritz.Algorithm
                     for(int interpIndex = 0; interpIndex < interpretations[0].Count; interpIndex++)
                     {
                         List<IUniqueDef> localIuds = interpretations[trkIndex][interpIndex].UniqueDefs;
-                        Debug.Assert((topIud is MidiChordDef && localIuds[i] is MidiChordDef) || (topIud is RestDef && localIuds[i] is RestDef));
+                        Debug.Assert((topIud is MidiChordDef && localIuds[i] is MidiChordDef) || (topIud is MidiRestDef && localIuds[i] is MidiRestDef));
                     }
                 }
             }

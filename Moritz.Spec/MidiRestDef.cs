@@ -9,9 +9,9 @@ namespace Moritz.Spec
 	///<summary>
 	/// A RestDef is a unique rest definition which is saved in an SVG file.
 	///<summary>
-	public class RestDef : DurationDef
+	public class MidiRestDef : DurationDef
 	{
-		public RestDef(int msPositionReFirstIUD, int msDuration)
+		public MidiRestDef(int msPositionReFirstIUD, int msDuration)
 			: base(msDuration)
 		{
 			MsPositionReFirstUD = msPositionReFirstIUD;
@@ -19,11 +19,11 @@ namespace Moritz.Spec
 
         public override object Clone()
         {
-            RestDef returnVal =  new RestDef(this.MsPositionReFirstUD, this.MsDuration);
+            MidiRestDef returnVal =  new MidiRestDef(this.MsPositionReFirstUD, this.MsDuration);
 
             foreach(var midiDef in this.MidiDefs)
             {
-                returnVal.MidiDefs.Add((RestDef)midiDef.Clone());
+                returnVal.MidiDefs.Add((MidiRestDef)midiDef.Clone());
             }
 
             return returnVal;
@@ -36,7 +36,7 @@ namespace Moritz.Spec
             // write a list of alternative <midiRest> elements
             for(var mdIndex = 0; mdIndex < MidiDefs.Count; mdIndex++)
             {
-                RestDef restDef = MidiDefs[mdIndex] as RestDef;
+                MidiRestDef restDef = MidiDefs[mdIndex] as MidiRestDef;
                 Debug.Assert(restDef != null);
                 w.WriteStartElement("midiRest");
                 w.WriteAttributeString("msDuration", restDef.MsDuration.ToString());
@@ -51,6 +51,6 @@ namespace Moritz.Spec
 			return ("RestDef: MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString());
 		}
 
-        public List<RestDef> MidiDefs { get; set; } = new List<RestDef>();
+        public List<MidiRestDef> MidiDefs { get; set; } = new List<MidiRestDef>();
     }
 }

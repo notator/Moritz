@@ -95,15 +95,15 @@ namespace Moritz.Spec
                 {
                     int durationBeforeBarline = poppedMsDuration - iudStartPos;
                     int durationAfterBarline = iudEndPos - poppedMsDuration;
-                    if(iud is RestDef)
+                    if(iud is MidiRestDef)
                     {
                         if(durationBeforeBarline > 0 && durationAfterBarline > 0)
                         {
                             // This is a rest. Split it.
-                            RestDef firstRestHalf = new RestDef(iudStartPos, durationBeforeBarline);
+                            MidiRestDef firstRestHalf = new MidiRestDef(iudStartPos, durationBeforeBarline);
                             poppedTrk.UniqueDefs.Add(firstRestHalf);
 
-                            RestDef secondRestHalf = new RestDef(poppedMsDuration, durationAfterBarline);
+                            MidiRestDef secondRestHalf = new MidiRestDef(poppedMsDuration, durationAfterBarline);
                             remainingTrk.UniqueDefs.Insert(0, secondRestHalf);
 
                             finalSplitProportion = (double)durationBeforeBarline / (durationBeforeBarline + durationAfterBarline);
@@ -204,7 +204,7 @@ namespace Moritz.Spec
             bool restFound = false;
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                if(iud is RestDef)
+                if(iud is MidiRestDef)
                 {
                     Debug.Assert(restFound == false, "Consecutive rests found!");
                     restFound = true;
@@ -217,7 +217,7 @@ namespace Moritz.Spec
 
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefDef);
+                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is CautionaryChordDef || iud is ClefDef);
             }
         }
 
@@ -717,7 +717,7 @@ namespace Moritz.Spec
             {
                 if(this[i] is IUniqueDef iud)
                 {
-                    RestDef restDef = new RestDef(iud.MsPositionReFirstUD, iud.MsDuration);
+                    MidiRestDef restDef = new MidiRestDef(iud.MsPositionReFirstUD, iud.MsDuration);
                     RemoveAt(i);
                     Insert(i, restDef);
                 }
@@ -771,7 +771,7 @@ namespace Moritz.Spec
         /// </summary>
         public void RemoveRests()
         {
-            AdjustMsDurations<RestDef>(0, _uniqueDefs.Count, 0);
+            AdjustMsDurations<MidiRestDef>(0, _uniqueDefs.Count, 0);
         }
         /// <summary>
         /// Multiplies the MsDuration of each chord and rest from beginIndex to endIndex (exclusive) by factor.
@@ -798,7 +798,7 @@ namespace Moritz.Spec
         /// </summary>
         public void AdjustRestMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<RestDef>(beginIndex, endIndex, factor, minThreshold);
+            AdjustMsDurations<MidiRestDef>(beginIndex, endIndex, factor, minThreshold);
         }
         /// <summary>
         /// Multiplies the MsDuration of each rest in the UniqueDefs list by factor.
@@ -807,7 +807,7 @@ namespace Moritz.Spec
         /// </summary>
         public void AdjustRestMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<RestDef>(0, _uniqueDefs.Count, factor, minThreshold);
+            AdjustMsDurations<MidiRestDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
 
         /// <summary>
@@ -922,7 +922,7 @@ namespace Moritz.Spec
                 {
                     IUniqueDef lmdd2 = _uniqueDefs[i];
                     IUniqueDef lmdd1 = _uniqueDefs[i - 1];
-                    if(lmdd2 is RestDef && lmdd1 is RestDef)
+                    if(lmdd2 is MidiRestDef && lmdd1 is MidiRestDef)
                     {
                         lmdd1.MsDuration += lmdd2.MsDuration;
                         _uniqueDefs.RemoveAt(i);
@@ -982,13 +982,13 @@ namespace Moritz.Spec
             {
                 int msDuration = (msPositionReThisTrk - MsDuration);
                 IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
-                if(lastIud is RestDef)
+                if(lastIud is MidiRestDef)
                 {
                     lastIud.MsDuration += msDuration;
                 }
                 else
                 {
-                    RestDef midiRestDef = new RestDef(0, msDuration);
+                    MidiRestDef midiRestDef = new MidiRestDef(0, msDuration);
                     this.Add(midiRestDef);
                 }
             }
@@ -998,7 +998,7 @@ namespace Moritz.Spec
                 IUniqueDef lastIud = (_uniqueDefs.Count > 0) ? _uniqueDefs[_uniqueDefs.Count - 1] : null;
                 IUniqueDef clonedIUD = (IUniqueDef)iu2.Clone();
 
-                if(_uniqueDefs.Count > 0 && (lastIud is RestDef finalRestDef && clonedIUD is RestDef restDef2))
+                if(_uniqueDefs.Count > 0 && (lastIud is MidiRestDef finalRestDef && clonedIUD is MidiRestDef restDef2))
                 {
                     finalRestDef.MsDuration += restDef2.MsDuration;
                 }
@@ -1297,7 +1297,7 @@ namespace Moritz.Spec
                     midiChordDef.AdjustVelocities(factor);
                     if(midiChordDef.Pitches.Count == 0)
                     {
-                        Replace(i, new RestDef(midiChordDef.MsPositionReFirstUD, midiChordDef.MsDuration));
+                        Replace(i, new MidiRestDef(midiChordDef.MsPositionReFirstUD, midiChordDef.MsDuration));
                     }
                 }
             }
@@ -1338,7 +1338,7 @@ namespace Moritz.Spec
                         }
                         if(midiChordDef.Pitches.Count == 0)
                         {
-                            Replace(i, new RestDef(midiChordDef.MsPositionReFirstUD, midiChordDef.MsDuration));
+                            Replace(i, new MidiRestDef(midiChordDef.MsPositionReFirstUD, midiChordDef.MsDuration));
                         }
                     }
                 }
@@ -2117,7 +2117,7 @@ namespace Moritz.Spec
                     {
                         rval = mcd.MidiDefs.Count;
                     }
-                    else if(iud is RestDef restDef)
+                    else if(iud is MidiRestDef restDef)
                     {
                         rval = restDef.MidiDefs.Count;
                     }
@@ -2155,7 +2155,7 @@ namespace Moritz.Spec
                 List<DurationDef> rval = new List<DurationDef>();
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    if(iud is MidiChordDef || iud is RestDef)
+                    if(iud is MidiChordDef || iud is MidiRestDef)
                     {
                         rval.Add((DurationDef)iud);
                     }

@@ -410,7 +410,7 @@ namespace Moritz.Spec
                 {               
                     returnTrk.Add(mcd.MidiDefs[interpIndex]);
                 }
-                else if(uniqueDef is RestDef restDef)
+                else if(uniqueDef is MidiRestDef restDef)
                 {
                     returnTrk.Add(restDef.MidiDefs[interpIndex]);
                 }

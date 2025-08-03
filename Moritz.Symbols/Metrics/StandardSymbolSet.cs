@@ -523,7 +523,7 @@ namespace Moritz.Symbols
         {
             NoteObject noteObject = null;
             CautionaryChordDef cautionaryChordDef = iud as CautionaryChordDef;
-            RestDef midiRestDef = iud as RestDef;
+            MidiRestDef midiRestDef = iud as MidiRestDef;
 
             if(cautionaryChordDef != null && iudIndex == 1)
             {
