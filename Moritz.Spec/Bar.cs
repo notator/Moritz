@@ -379,7 +379,7 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return $"AbsMsPosition={AbsMsPosition}, nTrks={Trks.Count}, nInterpretations={Trks[0].InterpretationsCount}";
+            return $"AbsMsPosition={AbsMsPosition}, nTrks={Trks.Count}";
         }
 
         public int AbsMsPosition { get; private set; }

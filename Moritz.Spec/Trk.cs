@@ -2106,26 +2106,6 @@ namespace Moritz.Spec
             return ($"Trk: MsDuration={MsDuration}, Count={Count}");
         }
 
-        public int InterpretationsCount
-        {
-            get
-            {
-                int rval = 0;
-                foreach(var iud in _uniqueDefs)
-                {
-                    if(iud is MidiChordDef mcd)
-                    {
-                        rval = mcd.MidiDefs.Count;
-                    }
-                    else if(iud is MidiRestDef restDef)
-                    {
-                        rval = restDef.MidiDefs.Count;
-                    }
-                }
-                return rval;
-            }
-        }
-
         /// <summary>
         /// This value is used by Seq.AlignTrkAxes(). It is set by the Permute functions, but can also be set manually.
         /// It is the index of the UniqueDef (in the UniqueDefs list) that will be aligned when calling Seq.AlignTrkAxes().
