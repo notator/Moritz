@@ -111,7 +111,6 @@ namespace Moritz.Spec
                         else if(durationBeforeBarline == 0)
                         {
                             remainingTrk.UniqueDefs.Add(iud);
-
                         }
                         else if(durationAfterBarline == 0)
                         {

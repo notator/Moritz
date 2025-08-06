@@ -47,16 +47,17 @@ namespace Moritz.Algorithm.PianolaMusic
             List<Trk> originalTrks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
             Debug.Assert(originalTrks.Count == NumberOfVoices);
 
-            List<List<Trk>> interpretations = GetFourInterpretationsPerTrk(originalTrks);
-            Debug.Assert(interpretations.Count == NumberOfVoices);
+            List<List<Trk>> interpretationsPerTrk = GetFourInterpretationsPerTrk(originalTrks);
+            Debug.Assert(interpretationsPerTrk.Count == NumberOfVoices);
 
-            AddAccelRitToTrksAtIndex(interpretations, 1);
-            AddRandomPitchBendToTrksAtIndex(interpretations, 2);
+            AddAccelRitToTrksAtIndex(interpretationsPerTrk, 1);
+            AddRandomPitchBendToTrksAtIndex(interpretationsPerTrk, 2);
             // TrkLevel3 is still TrkLevel0 (not a clone!)
 
             // The interpretations are checked for consistency and then
             // moved into MidiChordDef and RestDef.MidiDef properties
-            List<Trk> mainTrks = GetMainTrks(interpretations); 
+            List<Trk> mainTrks = GetMainTrks(interpretationsPerTrk);
+            // The interpretations are inside the MidiChordDef and RestDef objects.
 
             Bar singleBar = new Bar(0, mainTrks);
 

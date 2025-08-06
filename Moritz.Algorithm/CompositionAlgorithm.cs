@@ -92,25 +92,25 @@ namespace Moritz.Algorithm
         /// properties have been set to their alternative Trk values.
         /// </summary>
         /// <param name="voiceDefs"></param>
-        protected List<Trk> GetMainTrks(List<List<Trk>> interpretations)
+        protected List<Trk> GetMainTrks(List<List<Trk>> interpretationsPerTrk)
         {
-            AssertConsistency(interpretations);
+            AssertConsistency(interpretationsPerTrk);
             //interpretations contain only MidiChordDef and RestDef objects.
 
             List<Trk> returnTrks = new List<Trk>();
 
-            foreach(var trkList in interpretations)
+            foreach(var interpretations in interpretationsPerTrk)
             {
-                var iuds = trkList[0].UniqueDefs;
+                var iuds = interpretations[0].UniqueDefs;
                 for(int i = 0; i < iuds.Count; ++i)
                 {
                     var iud = iuds[i];
                     if(iud is MidiChordDef mcd)
                     {
                         mcd.MidiDefs.Add(mcd); // the first MidiDef is always the one that defines the Chord's appearance.
-                        for(int j = 1; j < trkList.Count; ++j)
+                        for(int j = 1; j < interpretations.Count; ++j)
                         {
-                            MidiChordDef subMcd = trkList[j].UniqueDefs[i] as MidiChordDef;
+                            MidiChordDef subMcd = interpretations[j].UniqueDefs[i] as MidiChordDef;
                             Debug.Assert(subMcd != null);
                             mcd.MidiDefs.Add(subMcd);
                         }
@@ -118,25 +118,25 @@ namespace Moritz.Algorithm
                     else if(iud is MidiRestDef restDef)
                     {
                         restDef.MidiDefs.Add(restDef);  // the first MidiDef is always the one that defines the Rest's appearance.
-                        for(int j = 1; j < trkList.Count; ++j)
+                        for(int j = 1; j < interpretations.Count; ++j)
                         {
-                            MidiRestDef subRestDef = trkList[j].UniqueDefs[i] as MidiRestDef;
+                            MidiRestDef subRestDef = interpretations[j].UniqueDefs[i] as MidiRestDef;
                             Debug.Assert(subRestDef != null);
                             restDef.MidiDefs.Add(subRestDef);
                         }
                     }
                 }
-                returnTrks.Add(trkList[0]);
+                returnTrks.Add(interpretations[0]);
             }
 
             return returnTrks;
         }
 
-        public void AssertConsistency(List<List<Trk>> interpretations)
+        public void AssertConsistency(List<List<Trk>> interpretationsPerTrk)
         {
-            foreach(var trkList in interpretations)
+            foreach(var interpretations in interpretationsPerTrk)
             {
-                foreach(var trk in trkList)
+                foreach(var trk in interpretations)
                 {
                     trk.AssertConsistency();
 
@@ -148,9 +148,9 @@ namespace Moritz.Algorithm
                 }
             }
 
-            CheckTrksConsistency(interpretations);
+            CheckTrksConsistency(interpretationsPerTrk);
 
-            CheckInterpretationConsistency(interpretations);
+            CheckInterpretationConsistency(interpretationsPerTrk);
         }
 
         private void CheckTrksConsistency(List<List<Trk>> interpretations)

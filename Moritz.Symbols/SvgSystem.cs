@@ -30,9 +30,12 @@ namespace Moritz.Symbols
 
             WriteLeftToRightElement(w);
 
+            var firstVoiceIndex = 0;
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
-                Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1);
+                var staff = Staves[staffIndex];    
+                staff.WriteSVG(w, systemNumber, firstVoiceIndex);
+                firstVoiceIndex += staff.Voices.Count;
             }
 
             w.SvgStartGroup(CSSObjectClass.staffConnectors.ToString());

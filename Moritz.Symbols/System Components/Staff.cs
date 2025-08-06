@@ -19,7 +19,7 @@ namespace Moritz.Symbols
             StafflineStemStrokeWidth = stafflineStemStrokeWidth;
         }
 
-        public virtual void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
+        public virtual void WriteSVG(SvgWriter w, int systemNumber, int firstVoiceIndex)
         {
             w.SvgStartGroup(CSSObjectClass.staff.ToString()); // "staff"
 
@@ -44,7 +44,7 @@ namespace Moritz.Symbols
 
             for(var voiceIndex = 0; voiceIndex < Voices.Count; voiceIndex++)
             { 
-                Voices[voiceIndex].WriteSVG(w, voiceIndex);
+                Voices[voiceIndex].WriteSVG(w, firstVoiceIndex++);
             }
 
             w.SvgEndGroup(); // staff
