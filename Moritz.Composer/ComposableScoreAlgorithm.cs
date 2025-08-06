@@ -30,7 +30,12 @@ namespace Moritz.Composer
             CompositionAlgorithm algorithm = null;
             switch(title)
             {
+                // These two scores simply have different .mkss files
+                // that define the number of voices per staff.
+                // As usual, the output score will be saved in the
+                // folder containing the .mkss file. 
                 case "Pianola Music (version 2025)":
+                case "Pianola Music (version 2025) - 3 staves":
                     algorithm = new PianolaMusic_2025Algorithm();
                     break;
                 case "Study 1 (version 2025)":
