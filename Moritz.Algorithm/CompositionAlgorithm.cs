@@ -433,7 +433,6 @@ namespace Moritz.Algorithm
             foreach(Trk trk in bar1.Trks)
             {
                 /// Assigns a new MidiChordControlDef containing
-                ///     AllControllersOff = true,
                 ///     Preset = 0 (piano)
                 /// to the first MidiChordDef in all interpretations.
                 trk.SetInitialChordControl();

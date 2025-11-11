@@ -2225,7 +2225,6 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Assigns a new MidiChordControlDef containing
-        ///     AllControllersOff = true,
         ///     Preset = 0 (piano)
         /// to the first MidiChordDef in all interpretations.
         /// </summary>
@@ -2237,7 +2236,6 @@ namespace Moritz.Spec
                 {
                     mcd.MidiChordControlDef = new MidiChordControlDef()
                     {
-                        AllControllersOff = true,
                         Preset = 0
                     };
                 }

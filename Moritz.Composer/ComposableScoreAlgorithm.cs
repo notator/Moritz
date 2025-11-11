@@ -1,8 +1,6 @@
 using Moritz.Algorithm;
-using Moritz.Algorithm.ErratumMusical;
 using Moritz.Algorithm.PianolaMusic;
 using Moritz.Algorithm.Study1;
-using Moritz.Algorithm.ThreeCrashes;
 using Moritz.Symbols;
 
 using System.Windows.Forms;
@@ -40,12 +38,6 @@ namespace Moritz.Composer
                     break;
                 case "Study 1 (version 2025)":
                     algorithm = new Study1_2025Algorithm();
-                    break;
-                case "Erratum Musical":
-                    algorithm = new ErratumMusicalAlgorithm();
-                    break;
-                case "Three Crashes":
-                    algorithm = new ThreeCrashesAlgorithm();
                     break;
                 default:
                     MessageBox.Show("Error in ComposableScoreAlgorithm.cs:\n\n" +
