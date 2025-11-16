@@ -99,7 +99,7 @@ namespace Moritz.Symbols
 				RegionDef brd = FindBaseRegionDef(regionDefs, regionSequence[i]);
 				var startBarData = (index: brd.startBarlineIndex, msPosition: brd.startBarlineMsPosInScore);
 				var endBarlineData = (index: brd.endBarlineIndex, msPosition: brd.endBarlineMsPosInScore);
-                int trkIndex = brd.midiChordIndex;
+                int trkIndex = brd.midiObjectIndex;
 				RegionDef uniqueRegionDef = new RegionDef(uniqueName, startBarData, endBarlineData, trkIndex);
 				regionDefSeq.Add(uniqueRegionDef);
 			}

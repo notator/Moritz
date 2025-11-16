@@ -20,7 +20,7 @@ namespace Moritz.Symbols
 			startBarlineMsPosInScore = startBarline.msPosition;
 			endBarlineIndex = endBarline.index;
 			endBarlineMsPosInScore = endBarline.msPosition;
-            midiChordIndex = trkIndex; // The index of a performed "midiChord" inside the SVG "score:midiChords" element.
+            midiObjectIndex = trkIndex; // The index of a performed "midiChord" inside the SVG "score:midiChords" element.
             Debug.Assert(startBarlineIndex >= 0 && endBarlineIndex > startBarlineIndex);
 			Debug.Assert(startBarlineMsPosInScore >= 0 && endBarlineMsPosInScore > startBarlineMsPosInScore);
 		}
@@ -34,7 +34,7 @@ namespace Moritz.Symbols
 			w.WriteAttributeString("startMsPosInScore", startBarlineMsPosInScore.ToString());
 			w.WriteAttributeString("toEndOfBar", (endBarlineIndex + 1).ToString());
             w.WriteAttributeString("endMsPosInScore", endBarlineMsPosInScore.ToString());
-            w.WriteAttributeString("midiChordIndex", midiChordIndex.ToString());
+            w.WriteAttributeString("midiObjectIndex", midiObjectIndex.ToString());
             w.WriteEndElement();
 		}
 
@@ -43,6 +43,6 @@ namespace Moritz.Symbols
 		public readonly int startBarlineMsPosInScore;
 		public readonly int endBarlineIndex;
 		public readonly int endBarlineMsPosInScore;
-        public readonly int midiChordIndex;
+        public readonly int midiObjectIndex;
 	}
 }
