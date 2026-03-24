@@ -735,7 +735,7 @@ namespace Moritz.Symbols
 
             float normalLeftLineOriginX = Barline_LineMetrics.OriginX - (ThickStrokeWidth / 2) - DoubleBarPadding - (NormalStrokeWidth / 2F);
             w.SvgStartGroup(CSSObjectClass.endOfScoreBarline.ToString());
-            w.SvgLine(CSSObjectClass.normalBarline, normalLeftLineOriginX, topY, normalLeftLineOriginX, bottomY);
+            w.SvgLine(CSSObjectClass.thinBarline, normalLeftLineOriginX, topY, normalLeftLineOriginX, bottomY);
 
             float thickRightLineOriginX = Barline_LineMetrics.OriginX;
             w.SvgLine(CSSObjectClass.thickBarline, thickRightLineOriginX, topY, thickRightLineOriginX, bottomY);
@@ -752,7 +752,7 @@ namespace Moritz.Symbols
         {
             float leftEdge = -((ThickStrokeWidth / 2F) + DoubleBarPadding + NormalStrokeWidth);
             float rightEdge = (ThickStrokeWidth / 2F);
-            Barline_LineMetrics = new Barline_LineMetrics(leftEdge, rightEdge, CSSObjectClass.normalBarline, CSSObjectClass.thickBarline);
+            Barline_LineMetrics = new Barline_LineMetrics(leftEdge, rightEdge, CSSObjectClass.thinBarline, CSSObjectClass.thickBarline);
 
             foreach(DrawObject drawObject in DrawObjects)
             {
